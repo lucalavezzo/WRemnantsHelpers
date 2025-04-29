@@ -23,6 +23,12 @@ if [ -z "$input_file" ]; then
     exit 1
 fi
 
+# check if WREM_BASE is set
+if [ -z "$WREM_BASE" ]; then
+    echo "WREM_BASE is not set. Please source the setup.sh in WRemnants."
+    exit 1
+fi
+
 # if no output dir is given, use the input file's directory
 if [ -z "$output_dir" ]; then
     output_dir=$(dirname "$input_file")
