@@ -1,3 +1,6 @@
+import sys
+sys.path.append("../../WRemnants/")
+
 import combinetf2.io_tools
 import argparse
 
