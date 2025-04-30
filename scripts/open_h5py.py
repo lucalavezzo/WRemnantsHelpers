@@ -4,6 +4,7 @@ sys.path.append("../../WRemnants/")
 from wums import ioutils
 import argparse
 import h5py
+import pprint
 
 def load_results_h5py(h5file):
     if "results" in h5file.keys():
@@ -25,4 +26,4 @@ args = parser.parse_args()
 h5file = h5py.File(args.infile, "r")
 results = load_results_h5py(h5file)
 print(results.keys())
-#print(results['ZmumuPostVFP'])
+pprint.pprint(results['meta_info'])
