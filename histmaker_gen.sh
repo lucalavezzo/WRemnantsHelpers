@@ -1,4 +1,4 @@
-# Run the histmaker for alphaS analysis
+# Run the histmaker for the gen level distributions of the alphaS analysis
 
 while getopts "p:" opt; do
     case $opt in
@@ -34,6 +34,6 @@ fi
 mkdir -p $output_dir
 echo "Output directory: $output_dir"
 
-command="python ${WREM_BASE}/scripts/histmakers/mz_dilepton.py --dataPath /scratch/submit/cms/wmass/NanoAOD/ -o $output_dir --maxFiles -1 --axes ptll yll --csVarsHist --forceDefaultName"
+command="python ${WREM_BASE}scripts/histmakers/w_z_gen_dists.py --dataPath /scratch/submit/cms/wmass/NanoAOD/ -o ${output_dir} -j -1 --maxFiles -1 --filterProcs  ZmumuPostVFP --useUnfoldingBinning"
 echo "Executing command: $command"
 eval $command

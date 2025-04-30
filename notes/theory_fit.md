@@ -23,3 +23,15 @@ combinetf2_fit.py /home/submit/lavezzo/cms/alphaS/250430_mz_unfolding_full//ZMas
 ```
 
 `--chisqFit` necessary here since the bin by bin data is not uncorrelated, due to the unfolding procedure.
+
+# Comparison to gen-level distributions
+
+Now we want to compare to the fit done with the gen-level distributions.
+
+First, I generate the gen-level histograms,
+
+```
+python scripts/histmakers/w_z_gen_dists.py --dataPath /scratch/submit/cms/wmass/NanoAOD/ -o ~/cms/alphaS/ -j -1 --maxFiles -1 --filterProcs  ZmumuPostVFP --useUnfoldingBinning
+```
+
+Then I run the fit on these,
