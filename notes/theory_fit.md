@@ -28,10 +28,21 @@ combinetf2_fit.py /home/submit/lavezzo/cms/alphaS/250430_mz_unfolding_full//ZMas
 
 Now we want to compare to the fit done with the gen-level distributions.
 
-First, I generate the gen-level histograms,
+First, generate the gen-level histograms,
 
 ```
-python scripts/histmakers/w_z_gen_dists.py --dataPath /scratch/submit/cms/wmass/NanoAOD/ -o ~/cms/alphaS/ -j -1 --maxFiles -1 --filterProcs  ZmumuPostVFP --useUnfoldingBinning
+python $WREM_BASE/scripts/histmakers/w_z_gen_dists.py --dataPath /scratch/submit/cms/wmass/NanoAOD/ -o $MY_OUT_DIR/250430_gen/ -j -1 --maxFiles -1 --filterProcs ZmumuPostVFP --useUnfoldingBinning --theoryCorrections --helicity
 ```
 
-Then I run the fit on these,
+Then setup the fit on these,
+
+```
+python $WREM_BASE/scripts/combine/setupCombine.py -i $MY_OUT_DIR/250430_gen/w_z_gen_dists_scetlib_dyturboCorr_maxFiles_m1.hdf5 -o $MY_OUT_DIR/250430_gen/  --fitAlphaS --baseName nominal_gen --fitvar ptVgen-absYVgen --filterProcGroups Zmumu
+```
+
+Finally run the fit,
+
+```
+combinetf2_fit.py $MY_OUT_DIR/250430_gen/ZGen_ptVgen_absYVgen/ZGen.hdf5 -t -1 --computeVariations --computeHistErrors --doImpacts -o $MY_OUT_DIR/250430_gen/ --globalImpacts --saveHists --saveHistsPerProcess --verbose 4
+```
+

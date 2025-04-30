@@ -44,6 +44,6 @@ fi
 
 echo "Output directory: $output_dir" 
 
-command="combinetf2_plot_hists.py --config $WREM_BASE'/utilities/styles/styles.py' $input_file --title CMS --subtitle Preliminary --rrange '0.90' '1.04' --legCols 1 -o $outpit_dir -m Project ch0 ptVGen --varName pdfAlphaS --varLabel '$\alpha_\mathrm{S}{\pm}1\sigma$' --yscale '1.25' --prefit"
+command="combinetf2_plot_hists.py --config $WREM_BASE'/utilities/styles/styles.py' $input_file --title CMS --subtitle Preliminary --rrange '0.90' '1.04' --legCols 1 -o $output_dir -m Project ch0 ptVGen --varName pdfAlphaS --varLabel '$\alpha_\mathrm{S}{\pm}1\sigma$' --yscale '1.25' --prefit"
 echo "Executing command: $command"
 eval $command

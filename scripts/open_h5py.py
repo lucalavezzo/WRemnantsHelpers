@@ -24,4 +24,5 @@ args = parser.parse_args()
 
 h5file = h5py.File(args.infile, "r")
 results = load_results_h5py(h5file)
-print(results)
+print(results.keys())
+#print(results['ZmumuPostVFP'])
