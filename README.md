@@ -13,3 +13,10 @@ To initialize the environment,
 ```
 source setup.sh
 ```
+
+Which relies on the directory structure,
+
+```
+WRemnants/
+WRemntantsHelpers/
+```
