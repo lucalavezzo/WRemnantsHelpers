@@ -1,6 +1,6 @@
 # WRemnantsHelpers
 
-Scripts and common recipies for WRemnants framework.
+Scripts, common recipies, and notes for the WRemnants framework.
 
 We assume you're running in the WRemenants singularity:
 
@@ -8,9 +8,15 @@ We assume you're running in the WRemenants singularity:
 singularity run --bind /scratch/,/ceph/ /cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/bendavid/cmswmassdocker/wmassdevrolling\:latest
 ```
 
-We assume you've already initialized the WRemnants environment:
+To initialize the environment, 
 
 ```
-cd WRemnants/
 source setup.sh
+```
+
+Which relies on the directory structure,
+
+```
+WRemnants/
+WRemntantsHelpers/
 ```
