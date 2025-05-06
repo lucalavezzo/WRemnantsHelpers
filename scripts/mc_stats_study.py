@@ -80,7 +80,7 @@ colors = {
 }
 
 
-for mc_stat, files in fitresults1D.items():
+for mc_stat, files in fitresults4D.items():
 
     uncerts[mc_stat] = {}
 
@@ -121,5 +121,5 @@ for mc_stat in uncerts.keys():
 ax.set_title("4D Fit")
 ax.legend()
 fig.tight_layout()
-fig.savefig(OUT_DIR + "mc_stat_study.png", dpi=300, bbox_inches="tight")   
-fig.savefig(OUT_DIR + "mc_stat_study.pdf", bbox_inches="tight")   
+fig.savefig(OUT_DIR + "mc_stat_study_4D.png", dpi=300, bbox_inches="tight")   
+fig.savefig(OUT_DIR + "mc_stat_study_4D.pdf", bbox_inches="tight")   
