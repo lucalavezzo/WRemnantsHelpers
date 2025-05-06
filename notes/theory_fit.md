@@ -1,4 +1,4 @@
-# Theory fit
+# Theory/Unfolded fit
 
 Run the theory fit first to create the signal model, here we select only the unpolarized term in the signal model (via `'Select ch0_masked helicitySig:0'`). We keep the helicityAxis for compatibility with the data histogram, but it only has one bin.
 
