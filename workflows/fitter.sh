@@ -44,7 +44,7 @@ fi
 echo "Output directory: $output_dir" # setupCombine will create subdir in here
 
 echo "Setting up combine..."
-setup_output=$(PYTHONUNBUFFERED=1 python ${WREM_BASE}/scripts/combine/setupCombine.py -i $input_file --fitvar 'ptll' --realData -o $output_dir --fitAlphaS $extra_setup 2>&1 | tee /dev/tty)
+setup_output=$(python ${WREM_BASE}/scripts/combine/setupCombine.py -i $input_file --fitvar 'ptll-yll' --realData -o $output_dir --fitAlphaS $extra_setup 2>&1 | tee /dev/tty)
 
 # extract the output file name, and the output directory, where we will put the fit results
 combine_file=$(echo "$setup_output" | grep -oP '(?<=Write output file ).*')

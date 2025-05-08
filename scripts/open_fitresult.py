@@ -21,7 +21,7 @@ parser.add_argument(
 args = parser.parse_args()
 
 fitresult, meta = combinetf2.io_tools.get_fitresult(
-    args.infile, args.result, meta=True
+    args.infile, result=args.result, meta=True
 )
 
 print(f"Fit result: {fitresult}")

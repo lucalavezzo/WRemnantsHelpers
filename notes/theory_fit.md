@@ -1,5 +1,11 @@
 # Theory/Unfolded fit
 
+To generate the unfolded histograms,
+
+```
+python scripts/combine/setupCombine.py -i <histmaker_output> -o <output_dir> --analysisMode unfolding --poiAsNoi --fitvar 'ptll-yll-cosThetaStarll_quantile-phiStarll_quantile' --genAxes 'ptVGen-absYVGen-helicitySig' --scaleNormXsecHistYields '0.05' --allowNegativeExpectation --realData --systematicType normal
+```
+
 Run the theory fit first to create the signal model, here we select only the unpolarized term in the signal model (via `'Select ch0_masked helicitySig:0'`). We keep the helicityAxis for compatibility with the data histogram, but it only has one bin.
 
 ```
