@@ -8,15 +8,18 @@ hep.style.use(hep.style.ROOT)
 
 BASE_DIR = "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/"
 OUT_DIR = "/home/submit/lavezzo/public_html/alphaS/mc_stats_study/"
-fittype = "2D" # "1D" or "4D"
+fittype = "4D" # "1D" or "4D" or "2D"
 
 fitresults4D = {
-    "unfolding_full_mcstats": {
-        "1": "/250508_unfolding_3D/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile/ZMassDilepton_ptVGen_absYVGen_helicitySig_theoryfit/fitresults.hdf5",
+    "unfolding_all_fit_half": {
+        "1": "/250513_unfoldingAllEvents_3D_noBinByBinStat_fitHalfEvents/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile/ZMassDilepton_ptVGen_absYVGen_helicitySig_theoryfit/fitresults.hdf5",
     },
-    "unfolding_half_mcstats": {
-        "1": "/250508_unfolding_3D_oneMCfileEvery2/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile/ZMassDilepton_ptVGen_absYVGen_helicitySig_theoryfit/fitresults.hdf5",
-    },
+    # "unfolding_full_mcstats": {
+    #     "1": "/250508_unfolding_3D/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile/ZMassDilepton_ptVGen_absYVGen_helicitySig_theoryfit/fitresults.hdf5",
+    # },
+    # "unfolding_half_mcstats": {
+    #     "1": "/250508_unfolding_3D_oneMCfileEvery2/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile/ZMassDilepton_ptVGen_absYVGen_helicitySig_theoryfit/fitresults.hdf5",
+    # },
     "unfolding_full": {
         "1": "/250508_unfolding_3D_noBinByBinStat/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile/ZMassDilepton_ptVGen_absYVGen_helicitySig_theoryfit/fitresults.hdf5",
     },
@@ -33,16 +36,16 @@ fitresults4D = {
         "2": "/250505_oneMCfileEvery2/250505_4D_rebin2/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile/fitresults.hdf5",
         "4": "/250505_oneMCfileEvery2/250505_4D_rebin4/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile/fitresults.hdf5"
     },
-    "full_mcstats": {
-        "1": "/250505_4DFit_rebin1_MCstats/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile/fitresults.hdf5",
-        "2": "/250505_4DFit_rebin2_MCstats/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile/fitresults.hdf5",
-        "4": "/250505_4DFit_rebin4_MCstats/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile/fitresults.hdf5"
-    },
-    "half_mcstats": {
-        "1": "/250505_oneMCfileEvery2/250505_4D_rebin1_MCstats/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile/fitresults.hdf5",
-        "2": "/250505_oneMCfileEvery2/250505_4D_rebin2_MCstats/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile/fitresults.hdf5",
-        "4": "/250505_oneMCfileEvery2/250505_4D_rebin4_MCstats/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile/fitresults.hdf5"
-    },
+    # "full_mcstats": {
+    #     "1": "/250505_4DFit_rebin1_MCstats/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile/fitresults.hdf5",
+    #     "2": "/250505_4DFit_rebin2_MCstats/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile/fitresults.hdf5",
+    #     "4": "/250505_4DFit_rebin4_MCstats/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile/fitresults.hdf5"
+    # },
+    # "half_mcstats": {
+    #     "1": "/250505_oneMCfileEvery2/250505_4D_rebin1_MCstats/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile/fitresults.hdf5",
+    #     "2": "/250505_oneMCfileEvery2/250505_4D_rebin2_MCstats/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile/fitresults.hdf5",
+    #     "4": "/250505_oneMCfileEvery2/250505_4D_rebin4_MCstats/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile/fitresults.hdf5"
+    # },
 }
 fitresults1D = {
     "full": {
@@ -112,10 +115,11 @@ mc_stat_labels = {
     "half": "Half MC events (--noBinByBinStat)",
     "full_mcstats": "All MC events",
     "half_mcstats": "Half MC events",
-    "unfolding_half": "Unfolding - Half MC events (--noBinByBinStat)",
-    "unfolding_full": "Unfolding - All MC events (--noBinByBinStat)",
-    "unfolding_half_mcstats": "Unfolding - Half MC events",
-    "unfolding_full_mcstats": "Unfolding - All MC events",
+    "unfolding_half": "(Unfolding, fit) = (half, all) MC events (--noBinByBinStat)",
+    "unfolding_full": "(Unfolding, fit) = (all, all) MC events (--noBinByBinStat)",
+    "unfolding_half_mcstats": "(Unfolding, fit) = (half, all) MC events",
+    "unfolding_full_mcstats": "(Unfolding, fit) = (all, all) MC events",
+    "unfolding_all_fit_half": "(Unfolding, fit) = (all, half) MC events (--noBinByBinStat)",
 }
 markers = {
     "full": "o",
@@ -126,6 +130,7 @@ markers = {
     "unfolding_full": "+",
     "unfolding_half_mcstats": "x",
     "unfolding_full_mcstats": "x",
+    "unfolding_all_fit_half": "1"
 }
 colors = {
     "full": "blue",
@@ -136,6 +141,7 @@ colors = {
     "unfolding_half": "red",
     "unfolding_full_mcstats": "blue",
     "unfolding_half_mcstats": "red",
+    "unfolding_all_fit_half": "green"
 }
 
 if fittype == "1D":
@@ -171,7 +177,7 @@ for mc_stat, files in fitresults.items():
 fig, (ax, axr) = plt.subplots(2,1,figsize=(15, 10),gridspec_kw={'height_ratios': [2, 1]}, sharex=True)
 ax.set_ylabel(r"Uncertainty on $\alpha_\mathrm{S}$ in $10^{-3}$")
 
-xlabels = [xlabels[b] for b in uncerts["full_mcstats"].keys()]
+xlabels = [xlabels[b] for b in uncerts["full"].keys()]
 axr.set_xticks(np.arange(len(xlabels)))
 axr.set_xticklabels(xlabels)
 

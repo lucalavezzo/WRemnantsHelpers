@@ -29,13 +29,22 @@ print(f"Meta data: {meta}")
 print(f"Fit result keys: {fitresult.keys()}")
 print(f"Meta data keys: {meta.keys()}")
 
-print(f"Fit physics_models: {fitresult['physics_models']}")
-print(f"Fit physics_models keys: {fitresult['physics_models'].keys()}")
+print(fitresult['parms'].get()['pdfAlphaS'])
 
-h = fitresult["physics_models"]["Basemodel"]['channels']['ch0']["hist_prefit_inclusive_variations"].get()
-print(h)
-print()
-ax = h.axes[2]
-for i in range(len(ax)):
-    if 'alpha' in ax[i].lower():
-        print(ax[i])
+# print(f"Fit physics_models: {fitresult['physics_models']}")
+# print(f"Fit physics_models keys: {fitresult['physics_models'].keys()}")
+
+# for physics_model in fitresult["physics_models"].keys():
+#     print(f"Physics model: {physics_model}")
+    
+#     channels = fitresult["physics_models"][physics_model]["channels"].keys()
+#     for channel in channels:
+#         print(f"\t\tChannel: {channel}")
+#         hists = fitresult["physics_models"][physics_model]["channels"][channel].keys()
+
+#         for hist in hists:
+#             print(f"\t\t\tHist: {hist}")
+#             #h = fitresult["physics_models"][physics_model]["channels"][channel][hist].get()
+#             #print("\t\t", h)
+
+# print(fitresult['parms'].get()[0])
