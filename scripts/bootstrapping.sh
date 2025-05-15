@@ -27,7 +27,7 @@ for i in $(seq $start_index $end_index); do
 
     echo "Running the fit for toy ${i}"
 
-    fit_command="combinetf2_fit.py $MY_OUT_DIR/250512_toys/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile_toys_${i}_${i_plus_one}/ZMassDilepton.hdf5 -o $MY_OUT_DIR/250512_toys/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile_toys_${i}_${i_plus_one}/ -t 1 --toysSystRandomize frequentist --toysDataRandomize poisson --toysDataMode observed --noChi2 --verbose 0"
+    fit_command="combinetf2_fit.py $MY_OUT_DIR/250512_toys/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile_toys_${i}_${i_plus_one}/ZMassDilepton.hdf5 -o $MY_OUT_DIR/250512_toys/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile_toys_${i}_${i_plus_one}/ --pseudoData asimov -t 1 --toysSystRandomize frequentist --toysDataRandomize poisson --toysDataMode observed --noChi2 --verbose 0"
     fit_output="${MY_OUT_DIR}/250512_toys/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile_toys_${i}_${i_plus_one}/fitresults.hdf5"
 
     if [ -f $fit_output ]; then
