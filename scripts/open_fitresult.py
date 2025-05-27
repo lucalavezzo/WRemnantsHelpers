@@ -1,6 +1,7 @@
 import sys
 sys.path.append("../../WRemnants/")
-
+import matplotlib.pyplot as plt
+import mplhep as hep
 import combinetf2.io_tools
 import argparse
 
@@ -29,6 +30,7 @@ print(f"Meta data: {meta}")
 print(f"Fit result keys: {fitresult.keys()}")
 print(f"Meta data keys: {meta.keys()}")
 
+#print(fitresult['parms'].get())
 print(fitresult['parms'].get()['pdfAlphaS'])
 
 # print(f"Fit physics_models: {fitresult['physics_models']}")

@@ -21,3 +21,7 @@ In the combine fitting step, we generate the toys on the data, and use the frequ
 ```
 combinetf2_fit.py $MY_OUT_DIR/250510_toys/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile_toys_0_1/ZMassDilepton.hdf5 -o $MY_OUT_DIR/250510_toys/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile_toys_0_1/ -t 1 --toysSystRandomize frequentist --toysDataRandomize poisson --toysDataMode observed
 ```
+
+# Pseudodata for the theory fit
+
+For the theory fit, we 

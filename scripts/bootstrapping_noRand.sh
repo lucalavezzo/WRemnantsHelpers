@@ -51,7 +51,7 @@ run_toys_fit() {
         echo "Setting up Combine for toy ${i}"
         echo
 
-        setup_command="python $WREM_BASE/scripts/combine/setupCombine.py -i ${indir} -o ${outdir} --fitvar 'ptll-yll-cosThetaStarll_quantile-phiStarll_quantile' --fitAlphaS --baseName nominal --pseudoData asimov --select 'toys ${i}.0j ${i_plus_one}.0j' --postfix ${postfix}_${i}_${i_plus_one} --systematicType normal "
+        setup_command="python $WREM_BASE/scripts/combine/setupCombine.py -i ${indir} -o ${outdir} --fitvar 'ptll-yll-cosThetaStarll_quantile-phiStarll_quantile' --fitAlphaS --baseName nominal --pseudoData asimov --select 'toys ${i}.0j ${i_plus_one}.0j' --postfix ${postfix}_${i}_${i_plus_one} "
         setup_output="${outdir}/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile_${postfix}_${i}_${i_plus_one}//ZMassDilepton.hdf5"
 
         if [ -f "$setup_output" ] && [ "$force" = false ]; then
@@ -72,6 +72,7 @@ run_toys_fit() {
         echo "Running the fit for toy ${i}"
         echo
 
+        # fit_command="combinetf2_fit.py ${setup_output} -o $(dirname ${setup_output}) --pseudoData asimov -t 1 --toysDataRandomize poisson --toysDataMode observed --noChi2"
         fit_command="combinetf2_fit.py ${setup_output} -o $(dirname ${setup_output}) --pseudoData asimov -t 1 --toysDataRandomize none --toysSystRandomize none --toysDataMode observed --noChi2 --postfix ${fit_postfix}"
         fit_output="$(dirname ${setup_output})/fitresults${_fit_postfix}.hdf5"
 
@@ -95,6 +96,6 @@ run_toys_fit() {
 
 }
 
-run_toys_fit 0 29 "/scratch/submit/cms/alphaS/histmaker_output_toys/mz_dilepton_toys_12345.hdf5" "toys_12345" "${MY_OUT_DIR}/250521_toys_systematicTypeNormal/"
-run_toys_fit 0 29 "/scratch/submit/cms/alphaS/histmaker_output_toys/mz_dilepton_toys_23456.hdf5" "toys_23456" "${MY_OUT_DIR}/250521_toys_systematicTypeNormal/"
-run_toys_fit 0 29 "/scratch/submit/cms/alphaS/histmaker_output_toys/mz_dilepton_toys_34567.hdf5" "toys_34567" "${MY_OUT_DIR}/250521_toys_systematicTypeNormal/"
+run_toys_fit 0 29 "/scratch/submit/cms/alphaS/histmaker_output_toys/mz_dilepton_toys_12345.hdf5" "toys_12345" "${MY_OUT_DIR}/250515_toys/" "toys_noDataRandomize_noSystRandomize_12345"
+run_toys_fit 0 29 "/scratch/submit/cms/alphaS/histmaker_output_toys/mz_dilepton_toys_23456.hdf5" "toys_23456" "${MY_OUT_DIR}/250515_toys/" "toys_noDataRandomize_noSystRandomize_23456"
+run_toys_fit 0 29 "/scratch/submit/cms/alphaS/histmaker_output_toys/mz_dilepton_toys_34567.hdf5" "toys_34567" "${MY_OUT_DIR}/250515_toys/" "toys_noDataRandomize_noSystRandomize_34567"
