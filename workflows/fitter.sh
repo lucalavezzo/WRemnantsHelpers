@@ -1,4 +1,4 @@
-# Setup combine and run the fit for the alphaS analysis
+# Setup combine and run the fit for the alphaS analysis (4D, detector-level)
 
 while getopts "i:o:e:f:" opt; do
     case $opt in
@@ -44,7 +44,7 @@ fi
 echo "Output directory: $output_dir" # setupCombine will create subdir in here
 
 echo "Setting up combine..."
-setup_output=$(python ${WREM_BASE}/scripts/combine/setupCombine.py -i $input_file --fitvar 'ptll-yll' --realData -o $output_dir --fitAlphaS $extra_setup 2>&1 | tee /dev/tty)
+setup_output=$(python ${WREM_BASE}/scripts/combine/setupCombine.py -i $input_file --fitvar 'ptll-yll-cosThetaStarll_quantile-phiStarll_quantile' --realData -o $output_dir --fitAlphaS $extra_setup 2>&1 | tee /dev/tty)
 
 # extract the output file name, and the output directory, where we will put the fit results
 combine_file=$(echo "$setup_output" | grep -oP '(?<=Write output file ).*')
