@@ -18,3 +18,4 @@ h5file = h5py.File(args.infile, "r")
 print(h5file.keys())
 
 print(h5file['hpseudodata'])
+print(h5file['hnorm'])
