@@ -11,6 +11,7 @@ fi
 
 # Get the script name and base name for the log file
 SCRIPT="$1"
+shift
 BASENAME=$(basename "$SCRIPT")
 LOGFILE="${MY_WORK_DIR}/logs/${BASENAME%.*}.log"
 
@@ -19,9 +20,13 @@ TIME=$(date +%Y%m%d_%H%M%S)
 LOGFILE="${LOGFILE%.log}_${TIME}.log"
 
 # Run the script with nohup, detach it, redirect output
-nohup bash "$SCRIPT" > "$LOGFILE" 2>&1 &
+nohup bash "$SCRIPT" "$@" > "$LOGFILE" 2>&1 &
 
 # PID of the last background command
 PID=$!
 
-echo "Started '$SCRIPT' in background with PID $PID. Output is logged to $LOGFILE"
+echo "Executing command:"
+echo "${SCRIPT} $@"
+echo "in background with PID: $PID."
+echo "Output is logged to:"
+echo "$LOGFILE"
