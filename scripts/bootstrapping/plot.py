@@ -19,6 +19,8 @@ import re
 sys.path.append("../../WRemnants/")
 import combinetf2.io_tools
 
+hep.style.use("CMS")
+
 def load_results_from_dir(
         indirs,
         fitresult_name='fitresults.hdf5',
@@ -27,6 +29,7 @@ def load_results_from_dir(
     ):
     
     fit_values = {}
+    fit_variances = {}
 
     # create a list of directories to process in case there are wildcards
     dirs_to_process = []
@@ -98,22 +101,30 @@ def load_results_from_dir(
                     for param in params:
                         if param not in fit_values:
                             fit_values[param] = np.array([])
+                            fit_variances[param] = np.array([])
                         fit_values[param] = np.append(
                             fit_values[param], pulls[param].value
                         )
+                        fit_variances[param] = np.append(
+                            fit_variances[param], pulls[param].variance
+                        )
+                        if param == 'pdfAlphaS':
+                            print(f"\t\t{pulls[param].value}")
                 
         except Exception as e:
             print(f"Error reading fit results from {subdir}: {e}")
             continue
 
-    return fit_values
+    return fit_values, fit_variances
 
 def plot_alphaS_postfit(fit_values, outdir, postfix=None):
+
+    fit_values = np.array(fit_values)
 
     # calculate the alphaS post-fit value from the pull
     alphaS = 0.118
     sigma_alphaS = 0.002
-    fit_values = alphaS + np.array(fit_values) * sigma_alphaS
+    fit_values = alphaS + fit_values * sigma_alphaS
 
     # plot the results
     fig, ax = plt.subplots(1, 1, figsize=(10, 6))
@@ -123,10 +134,28 @@ def plot_alphaS_postfit(fit_values, outdir, postfix=None):
     h_toys.fill(fit_values)
     sample_mean = np.mean(fit_values)
     sample_std_dev = np.std(fit_values, ddof=1)
+    std_error_mean = sample_std_dev / np.sqrt(len(fit_values))
+    std_error_std_dev = (2 * sample_std_dev**4 / (len(fit_values) - 1))**0.25
     print(f"Mean of fit values: {sample_mean}")
     print(f"Std of fit values: {sample_std_dev}")
-    hep.histplot(h_toys, ax=ax, label=r"Mean: {:.4f} $\pm$ {:.4f}".format(sample_mean, sample_std_dev))
-    ax.legend(loc='upper right')
+    print(f"Standard error on mean: {std_error_mean}")
+    print(f"Standard error on std dev: {std_error_std_dev}")
+    hep.histplot(
+        h_toys,
+        ax=ax,
+        label= "$\\bar{x}$ = " + \
+            "{:.4f}".format(sample_mean) + \
+            "\n" + \
+            "Standard error on $\\bar{x}$ = " + \
+            "{:.4f}".format(std_error_mean) + \
+            "\n" + \
+            "$\\sigma_x$ = " + \
+            "{:.2e}".format(sample_std_dev) + \
+            "\n" + \
+            "Standard error on $\\sigma_x$ = " + \
+            "{:.2e}".format(std_error_std_dev)
+    )
+    ax.legend(loc='upper right', fontsize='small')
     
     # save the figure
     if not os.path.exists(outdir):
@@ -142,6 +171,7 @@ def plot_alphaS_postfit(fit_values, outdir, postfix=None):
 def plot_pulls(fit_values, outdir, postfix=None, nparams=20):
 
     # define leading nparams parameters to plot
+    fit_values = {k:v for k, v in fit_values.items() if 'pdf' in k}
     largest_pull_params = sorted(
         fit_values.keys(), key=lambda x: np.abs(np.mean(fit_values[x])), reverse=True
     )[:nparams]
@@ -149,20 +179,22 @@ def plot_pulls(fit_values, outdir, postfix=None, nparams=20):
     largest_std_pulls = [np.std(fit_values[param]) for param in largest_pull_params]
 
     # plot them
-    fig, ax = plt.subplots(1, 1, figsize=(10, 10))
+    fig, ax = plt.subplots(1, 1, figsize=(12, 10))
     ax.set_xlabel("Mean Pull over toys")
     ax.axvline(0, color='k', linestyle='--')
+    ax.set_xlim(-1.2, 1.2)
     for i, param in enumerate(largest_pull_params):
         ax.errorbar(
             largest_mean_pulls[i], -i, xerr=largest_std_pulls[i], fmt='o', color='black',
             capsize=5, elinewidth=2, markeredgewidth=2
         )
     ax.set_yticks(range(-len(largest_pull_params) + 1, 1))
-    ax.set_yticklabels(largest_pull_params[::-1])
+    ax.set_yticklabels(largest_pull_params[::-1], fontsize='xx-small')
     figname = os.path.join(outdir, "mean_pulls")
     if postfix:
         figname += f"_{postfix}"
     fig.tight_layout()
+    print("Saving", figname)
     fig.savefig(figname + ".pdf", bbox_inches='tight')
     fig.savefig(figname + ".png", bbox_inches='tight', dpi=300)
 
@@ -217,18 +249,18 @@ def main():
 
     if not args.noAlphaSHist:
 
-        fit_values = load_results_from_dir(
+        fit_values, fit_variances = load_results_from_dir(
             indirs=args.indir,
             fitresult_name=args.fitresultName,
             fitresult_result=args.fitresultResult,
             params=["pdfAlphaS"]
-        )['pdfAlphaS'].tolist()
+        )
 
-        plot_alphaS_postfit(fit_values, args.outdir, args.postfix)
+        plot_alphaS_postfit(fit_values['pdfAlphaS'], args.outdir, args.postfix)
         
     if args.pulls:
 
-        fit_values = load_results_from_dir(
+        fit_values, fit_variances = load_results_from_dir(
             indirs=args.indir,
             fitresult_name=args.fitresultName,
             fitresult_result=args.fitresultResult,

@@ -32,7 +32,7 @@ run_toys_fit() {
     # arguments
     local start_index=$1 # indicies of the toys to be run
     local end_index=$2
-    local indir=$3
+    local infile=$3
     local outdir=$4
     local postfix=$5
     local fit_postfix=$6
@@ -41,6 +41,7 @@ run_toys_fit() {
         local _postfix=""
     else
         local _postfix="_${postfix}"
+        postfix="${postfix}_$" # expect the toy number to be appended later
     fi
 
     if [ -z "$fit_postfix" ]; then
@@ -58,8 +59,8 @@ run_toys_fit() {
         echo "Setting up Combine for toy ${i}"
         echo
 
-        setup_command="python $WREM_BASE/scripts/combine/setupCombine.py -i ${indir} -o ${outdir} --fitvar 'ptll-yll-cosThetaStarll_quantile-phiStarll_quantile' --fitAlphaS --baseName nominal --pseudoData asimov --select 'toys ${i}.0j ${i_plus_one}.0j' --postfix ${postfix}_${i}_${i_plus_one} --systematicType normal "
-        setup_output="${outdir}/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile${_postfix}_${i}_${i_plus_one}//ZMassDilepton.hdf5"
+        setup_command="python $WREM_BASE/scripts/combine/setupCombine.py -i ${infile}_toys_${i}.hdf5 -o ${outdir} --fitvar 'ptll-yll-cosThetaStarll_quantile-phiStarll_quantile' --fitAlphaS --baseName nominal --pseudoData asimov --postfix ${postfix}toys_${i} --systematicType normal "
+        setup_output="${outdir}/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile${_postfix}_toys_${i}//ZMassDilepton.hdf5"
 
         if [ -f "$setup_output" ] && [ "$force" = false ]; then
             echo "Setup output already exists: ${setup_output}"
@@ -79,7 +80,7 @@ run_toys_fit() {
         echo "Running the fit for toy ${i}"
         echo
 
-        fit_command="combinetf2_fit.py ${setup_output} -o $(dirname ${setup_output}) --pseudoData asimov -t 1 --seed ${i} --toysDataRandomize poisson --toysSystRandomize frequentist --toysDataMode observed --noChi2 --chisqFit --binByBinStatType normal ${fit_postfix}"
+        fit_command="combinetf2_fit.py ${setup_output} -o $(dirname ${setup_output}) --pseudoData asimov -t 1 --seed ${i} --toysDataRandomize poisson --toysSystRandomize frequentist --noChi2 --chisqFit --binByBinStatType normal ${fit_postfix}"
         fit_output="$(dirname ${setup_output})/fitresults${_fit_postfix}.hdf5"
 
         if [ -f $fit_output ] && [ "$force" = false ]; then
@@ -103,7 +104,7 @@ run_toys_fit() {
 }
 
 
-run_toys_fit 1 29 "/scratch/submit/cms/alphaS/histmaker_output_toys/mz_dilepton_toys_12345.hdf5" "${MY_OUT_DIR}/250521_toys_systematicTypeNormal/" "toys_12345" "chisqFit_noForceNexpPositive"
+run_toys_fit 0 29 "${SCRATCH_DIR}/histmaker_output_toys_theoryClip3_oneMCfileEvery2/mz_dilepton_toys_56789_theoryClip3_oneMCfileEvery2" "${MY_OUT_DIR}/250603_toys_theoryClip3_chisqFit_oneMCfileEvery2/"
 
 # run_toys_fit 0 29 "/scratch/submit/cms/alphaS/histmaker_output_toys/mz_dilepton_toys_12345.hdf5" "${MY_OUT_DIR}/250521_toys_systematicTypeNormal/" "dataRandomize_systRandomize"
 # run_toys_fit 0 29 "/scratch/submit/cms/alphaS/histmaker_output_toys/mz_dilepton_toys_23456.hdf5" "toys_23456" "${MY_OUT_DIR}/250521_toys_systematicTypeNormal/" "dataRandomize_systRandomize"
