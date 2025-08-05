@@ -114,7 +114,7 @@ def main():
     args = parser.parse_args()
 
     if args.compareVars:
-        args.plotAxes.append('pdfVar')
+        args.plotAxes.append('vars')
 
     files_hists = {}
     for infile in args.infiles:
@@ -167,7 +167,7 @@ def main():
             # convert vars in case they are a grep pattern
             # check if each var exists in the vars axis
             vars_to_compare = []
-            available_vars = [n for n in h.axes['pdfVar']]
+            available_vars = [n for n in h.axes['vars']]
             for var in args.compareVars:
 
                 # check if it's a regex pattern
@@ -184,7 +184,7 @@ def main():
                         raise ValueError(f"Variable '{var}' not found in 'vars' axis. Available vars: {available_vars}")
                     
             for var in vars_to_compare:
-                hists[var] = h[{'pdfVar': var}]
+                hists[var] = h[{'vars': var}]
 
         else:
             hists[args.histName] = h
