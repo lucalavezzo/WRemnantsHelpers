@@ -1,11 +1,11 @@
-# Iterate over the toys stored in the histmaker output file
+# Iterate over the samples stored in the histmaker output file
 # setting up and executing the fit for each
 
 # program quits in case of error
 # set -e
 force=false
-dry=false
 force_fit=false
+dry=false
 
 # Parse command line options
 while [[ $# -gt 0 ]]; do
@@ -32,16 +32,15 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-run_toys_fit() {
+run_fit() {
 
     # arguments
-    local start_index=$1 # indicies of the toys to be run
+    local start_index=$1 # indices of the samples to be run
     local end_index=$2
     local infile=$3
     local outdir=$4
     local postfix=$5
     local fit_postfix=$6
-    local base_seed=$7
 
     if [ -z "$postfix" ] || [ "$postfix" = "" ]; then
         local _postfix=""
@@ -62,15 +61,15 @@ run_toys_fit() {
 
         i_plus_one=$((i + 1))
         echo '=================================================='
-        echo "Setting up Combine for toy ${i}"
+        echo "Setting up Combine for sample ${i}"
         echo
 
-        setup_command="python $WREM_BASE/scripts/combine/setupCombine.py -i ${infile}_toys_${i}.hdf5 -o ${outdir} --fitvar 'ptll-yll-cosThetaStarll_quantile-phiStarll_quantile' --fitAlphaS --baseName nominal --pseudoData asimov --postfix ${postfix}toys_${i} --systematicType normal --excludeNuisances 'pdf.*' "
-        setup_output="${outdir}/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile${_postfix}_toys_${i}//ZMassDilepton.hdf5"
+        setup_command="python $WREM_BASE/scripts/combine/setupCombine.py -i ${infile}_sample_split_${i}.hdf5 -o ${outdir} --fitvar 'ptll-yll' --fitAlphaS --baseName nominal --pseudoData asimov --postfix ${postfix}sample_${i} --systematicType normal"
+        setup_output="${outdir}/ZMassDilepton_ptll_yll${_postfix}_sample_${i}//ZMassDilepton.hdf5"
 
         if [ -f "$setup_output" ] && [ "$force" = false ]; then
             echo "Setup output already exists: ${setup_output}"
-            echo "Skipping setup for toy ${i}"
+            echo "Skipping setup for sample ${i}"
         else
             echo $setup_command
             echo
@@ -83,15 +82,15 @@ run_toys_fit() {
         echo
         echo
 
-        echo "Running the fit for toy ${i}"
+        echo "Running the fit for sample ${i}"
         echo
 
-        fit_command="combinetf2_fit.py ${setup_output} -o $(dirname ${setup_output}) --pseudoData asimov -t 1 --seed $(($i+$base_seed)) --toysDataRandomize poisson --toysSystRandomize frequentist --toysDataMode observed --noChi2 --chisqFit --binByBinStatType normal ${fit_postfix}"
+        fit_command="combinetf2_fit.py ${setup_output} -o $(dirname ${setup_output}) --pseudoData asimov -t 1 --seed ${i} --toysDataRandomize none --toysSystRandomize none  --toysDataMode observed --noChi2 --chisqFit --binByBinStatType normal ${fit_postfix}"
         fit_output="$(dirname ${setup_output})/fitresults${_fit_postfix}.hdf5"
 
         if [ -f $fit_output ] && [ "$force_fit" = false ]; then
             echo "Fit output already exists, ${fit_output}"
-            echo "Skipping fit for toy ${i}"
+            echo "Skipping fit for sample ${i}"
         else
             echo $fit_command
             echo
@@ -110,10 +109,10 @@ run_toys_fit() {
 }
 
 
-run_toys_fit 1 29 "${SCRATCH_DIR}/histmaker_output_toys/mz_dilepton_toys_12345" "${MY_OUT_DIR}/250616_exlcudePDF/" "seed12345" "" 12345
-run_toys_fit 1 29 "${SCRATCH_DIR}/histmaker_output_toys/mz_dilepton_toys_23456" "${MY_OUT_DIR}/250616_exlcudePDF/" "seed23456" "" 23456
-run_toys_fit 1 29 "${SCRATCH_DIR}/histmaker_output_toys/mz_dilepton_toys_34567" "${MY_OUT_DIR}/250616_exlcudePDF/" "seed34567" "" 34567
+run_fit 1 25 "${MY_OUT_DIR}/250615_split25_seed1776_oneMCfileEvery4/mz_dilepton_split25_seed1776_oneMCfileEvery4" "${MY_OUT_DIR}/250615_split25_seed1776_oneMCfileEvery4/" "" ""
+# run_fit 1 30 "${SCRATCH_DIR}/histmaker_output_toys/mz_dilepton_toys_23456" "${MY_OUT_DIR}/250605_default/" "seed_23456"
+# run_fit 1 30 "${SCRATCH_DIR}/histmaker_output_toys/mz_dilepton_toys_34567" "${MY_OUT_DIR}/250605_default/" "seed_34567"
 
-# run_toys_fit 0 29 "/scratch/submit/cms/alphaS/histmaker_output_toys/mz_dilepton_toys_12345.hdf5" "${MY_OUT_DIR}/250521_toys_systematicTypeNormal/" "dataRandomize_systRandomize"
-# run_toys_fit 0 29 "/scratch/submit/cms/alphaS/histmaker_output_toys/mz_dilepton_toys_23456.hdf5" "toys_23456" "${MY_OUT_DIR}/250521_toys_systematicTypeNormal/" "dataRandomize_systRandomize"
-# run_toys_fit 0 29 "/scratch/submit/cms/alphaS/histmaker_output_toys/mz_dilepton_toys_34567.hdf5" "toys_34567" "${MY_OUT_DIR}/250521_toys_systematicTypeNormal/" "dataRandomize_systRandomize"
+# run_fit 0 29 "/scratch/submit/cms/alphaS/histmaker_output_toys/mz_dilepton_toys_12345.hdf5" "${MY_OUT_DIR}/250521_toys_systematicTypeNormal/" "dataRandomize_systRandomize"
+# run_fit 0 29 "/scratch/submit/cms/alphaS/histmaker_output_toys/mz_dilepton_toys_23456.hdf5" "toys_23456" "${MY_OUT_DIR}/250521_toys_systematicTypeNormal/" "dataRandomize_systRandomize"
+# run_fit 0 29 "/scratch/submit/cms/alphaS/histmaker_output_toys/mz_dilepton_toys_34567.hdf5" "toys_34567" "${MY_OUT_DIR}/250521_toys_systematicTypeNormal/" "dataRandomize_systRandomize"

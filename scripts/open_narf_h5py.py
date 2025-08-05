@@ -30,8 +30,17 @@ args = parser.parse_args()
 with h5py.File(args.infile, "r") as h5file:
     results = load_results_h5py(h5file)
     print("Keys in h5 file:", h5file.keys())
+   
+    print(results['WplusmunuPostVFP']['output']['nominal_gen_scetlib_dyturboCT18Z_pdfasCorr'].get())
+    print(results.keys())
+    print(results['WplusmunuPostVFP']['output']['nominal_gen_pdfCT18Z'].get())
+    
 
-    print([x for x in results['ZmumuPostVFP']['output'].keys() if 'pdf' in x])
+    # print(results['ZmumuPostVFP']['output'].keys())
+    # var_old = results['ZmumuPostVFP']['output']['nominal_pdfCT18Z'].get()[{'pdfVar': 'pdf1CT18ZDown'}]
 
-    h = results['ZmumuPostVFP']['output']['pdfMSHT20mbrange_0']
-    print(h.get())
+    # var = results['ZmumuPostVFP']['output']['nominal_pdfUncertByHelicity'].get()[{'pdfVar': 'pdf1CT18ZUp'}]
+    # nom = results['ZmumuPostVFP']['output']['nominal'].get()
+
+    #print(var)
+    #print(var.values() / var_old.values())

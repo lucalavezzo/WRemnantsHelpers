@@ -2,16 +2,16 @@ import sys
 sys.path.append("../../WRemnants/")
 import matplotlib.pyplot as plt
 import mplhep as hep
-import combinetf2.io_tools
+import rabbit.io_tools
 import argparse
 
 parser = argparse.ArgumentParser(
-    description="Read fit result from hdf5 file from combinetf2 or root file from combinetf1"
+    description="Read fit result from hdf5 file from rabbit or root file from combinetf1"
 )
 parser.add_argument(
     "infile",
     type=str,
-    help="hdf5 file from combinetf2 or root file from combinetf1",
+    help="hdf5 file from rabbit or root file from combinetf1",
 )
 parser.add_argument(
     "--result",
@@ -21,7 +21,7 @@ parser.add_argument(
 )
 args = parser.parse_args()
 
-fitresult, meta = combinetf2.io_tools.get_fitresult(
+fitresult, meta = rabbit.io_tools.get_fitresult(
     args.infile, result=args.result, meta=True
 )
 

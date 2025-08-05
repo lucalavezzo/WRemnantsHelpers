@@ -25,7 +25,8 @@ def load_results_from_dir(
         indirs,
         fitresult_name='fitresults.hdf5',
         fitresult_result=None,
-        params=['pdfAlphaS']
+        params=['pdfAlphaS'],
+        skip_toy0=False
     ):
     
     fit_values = {}
@@ -45,6 +46,10 @@ def load_results_from_dir(
 
     # Loop over all subdirectories in the input directory and read the fit results
     for subdir in dirs_to_process:
+
+        if "toys_0" in subdir and skip_toy0:
+            print(f"Skipping toy 0 in {subdir} as requested.")
+            continue
 
         print("Reading fit results from", subdir)
         
@@ -123,7 +128,7 @@ def plot_alphaS_postfit(fit_values, outdir, postfix=None):
 
     # calculate the alphaS post-fit value from the pull
     alphaS = 0.118
-    sigma_alphaS = 0.002
+    sigma_alphaS = 0.0015
     fit_values = alphaS + fit_values * sigma_alphaS
 
     # plot the results
@@ -245,6 +250,11 @@ def main():
         action='store_true',
         help="Do not plot the alphaS histogram"
     )
+    parser.add_argument(
+        "--skipToy0",
+        action='store_true',
+        help="Skip toy 0 in the fit results. This is useful if you want to skip the first toy, which is usually the non-randomized toy."
+    )
     args = parser.parse_args()
 
     if not args.noAlphaSHist:
@@ -253,7 +263,8 @@ def main():
             indirs=args.indir,
             fitresult_name=args.fitresultName,
             fitresult_result=args.fitresultResult,
-            params=["pdfAlphaS"]
+            params=["pdfAlphaS"],
+            skip_toy0=args.skipToy0
         )
 
         plot_alphaS_postfit(fit_values['pdfAlphaS'], args.outdir, args.postfix)

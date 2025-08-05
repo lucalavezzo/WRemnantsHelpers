@@ -1,10 +1,17 @@
+#!/bin/bash
+
 # Setup combine and run the fit for the alphaS analysis (4D, detector-level)
 
-while getopts "i:o:e:f:" opt; do
+if [ -z "$1" ]; then
+    echo "Usage: fitter.sh <infile> -o <output_dir> -e <extra arguments for setupRabbit.py> -f <extra arguments for rabbit.py"
+    exit 1
+fi
+
+input_file=$1
+shift
+
+while getopts "o:e:f:noSetup" opt; do
     case $opt in
-        i)
-            input_file=$OPTARG
-            ;;
         o)
             output_dir=$OPTARG
             ;;
@@ -13,6 +20,9 @@ while getopts "i:o:e:f:" opt; do
             ;;
         f)
             extra_fit=$OPTARG
+            ;;
+        noSetup)
+            no_setup=$OPTARG
             ;;
         \?)
             echo "Invalid option: -$OPTARG" >&2
@@ -34,8 +44,6 @@ fi
 # if no output dir is given, use the input file's directory
 if [ -z "$output_dir" ]; then
     output_dir=$(dirname "$input_file")
-else:
-    output_dir=$(dirname "$input_file")
 fi
 # if the output dir doesn't exist, create it
 if [ ! -d "$output_dir" ]; then
@@ -43,18 +51,22 @@ if [ ! -d "$output_dir" ]; then
 fi
 echo "Output directory: $output_dir" # setupCombine will create subdir in here
 
-echo "Setting up combine..."
-setup_output=$(python ${WREM_BASE}/scripts/combine/setupCombine.py -i $input_file --fitvar 'ptll-yll-cosThetaStarll_quantile-phiStarll_quantile' --realData -o $output_dir --fitAlphaS $extra_setup 2>&1 | tee /dev/tty)
+if [ ! "$no_setup" ]; then
+    echo "Setting up rabbit..."
+    setup_output=$(python ${WREM_BASE}/scripts/rabbit/setupRabbit.py -i $input_file --fitvar 'ptll-yll-cosThetaStarll_quantile-phiStarll_quantile' -o $output_dir --fitAlphaS $extra_setup 2>&1 | tee /dev/tty)
+else
+    echo "Skipping setup rabbit..."
+fi
 
 # extract the output file name, and the output directory, where we will put the fit results
-combine_file=$(echo "$setup_output" | grep -oP '(?<=Write output file ).*')
-combine_file=$(echo "$combine_file" | sed 's/\x1B\[[0-9;]*[a-zA-Z]//g') # sanitize the output
-echo "Combine file: $combine_file"
-output=$(dirname "$combine_file")
+carrot=$(echo "$setup_output" | grep -oP '(?<=Write output file ).*')
+carrot=$(echo "$carrot" | sed 's/\x1B\[[0-9;]*[a-zA-Z]//g') # sanitize the output
+echo "Rabbit file: $carrot"
+output=$(dirname "$carrot")
 echo "Output: $output"
 
 echo
 echo "Running the fit..."
-command="combinetf2_fit.py $combine_file -t '-1' --computeVariations -m Project ch0 ptll --computeHistErrors --doImpacts -o $output --globalImpacts --saveHists --saveHistsPerProcess $extra_fit"
-echo "Executing command: $command"
+command="rabbit_fit.py $carrot -t '-1' --computeVariations -m Project ch0 ptll --computeHistErrors --doImpacts -o $output --globalImpacts --saveHists --saveHistsPerProcess $extra_fit"
+echo "$command"
 eval $command

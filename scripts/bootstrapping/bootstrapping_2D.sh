@@ -2,6 +2,7 @@
 # setting up and executing the fit for each
 
 # program quits in case of error
+# set -e
 force=false
 dry=false
 
@@ -31,15 +32,16 @@ run_toys_fit() {
     # arguments
     local start_index=$1 # indicies of the toys to be run
     local end_index=$2
-    local indir=$3
+    local infile=$3
     local outdir=$4
     local postfix=$5
     local fit_postfix=$6
 
-    if [ -z "$postfix" ]; then
+    if [ -z "$postfix" ] || [ "$postfix" = "" ]; then
         local _postfix=""
     else
         local _postfix="_${postfix}"
+        postfix="${postfix}_" # expect the toy number to be appended later
     fi
 
     if [ -z "$fit_postfix" ]; then
@@ -57,8 +59,8 @@ run_toys_fit() {
         echo "Setting up Combine for toy ${i}"
         echo
 
-        setup_command="python $WREM_BASE/scripts/combine/setupCombine.py -i ${indir} -o ${outdir} --fitvar 'ptll-yll' --fitAlphaS --baseName nominal --pseudoData asimov --select 'toys ${i}.0j ${i_plus_one}.0j' --postfix ${postfix}_${i}_${i_plus_one} --systematicType normal "
-        setup_output="${outdir}/ZMassDilepton_ptll_yll${_postfix}_${i}_${i_plus_one}//ZMassDilepton.hdf5"
+        setup_command="python $WREM_BASE/scripts/combine/setupCombine.py -i ${infile}_toys_${i}.hdf5 -o ${outdir} --fitvar 'ptll-yll' --fitAlphaS --baseName nominal --pseudoData asimov --postfix ${postfix}toys_${i} --systematicType normal --pseudoDataFile /ceph/submit/data/group/cms/store/user/lavezzo/alphaS//250607_split_100/mz_dilepton_split_100.hdf5"
+        setup_output="${outdir}/ZMassDilepton_ptll_yll${_postfix}_toys_${i}//ZMassDilepton.hdf5"
 
         if [ -f "$setup_output" ] && [ "$force" = false ]; then
             echo "Setup output already exists: ${setup_output}"
@@ -78,7 +80,7 @@ run_toys_fit() {
         echo "Running the fit for toy ${i}"
         echo
 
-        fit_command="combinetf2_fit.py ${setup_output} -o $(dirname ${setup_output}) --pseudoData asimov -t 1 --seed ${i} --toysDataRandomize poisson --toysSystRandomize frequentist --toysDataMode observed --noChi2 ${fit_postfix}"
+        fit_command="combinetf2_fit.py ${setup_output} -o $(dirname ${setup_output}) --pseudoData asimov -t 1 --seed ${i} --toysDataRandomize none --toysSystRandomize none  --toysDataMode observed --noChi2 --chisqFit ${fit_postfix}"
         fit_output="$(dirname ${setup_output})/fitresults${_fit_postfix}.hdf5"
 
         if [ -f $fit_output ] && [ "$force" = false ]; then
@@ -102,4 +104,10 @@ run_toys_fit() {
 }
 
 
-run_toys_fit 1 29 "/scratch/submit/cms/alphaS/histmaker_output_toys/mz_dilepton_toys_12345.hdf5" "${MY_OUT_DIR}/250530_bootstrapping_2D/" "toys_12345"
+run_toys_fit 1 100 "$MY_OUT_DIR/250608_oneMCfileEvery100_toys_seed77777/mz_dilepton_oneMCfileEvery100_toys_seed77777" "${MY_OUT_DIR}/250615_oneMCfileEvery100_toys_seed77777_pseudoDataFull/" "" ""
+# run_toys_fit 1 30 "${SCRATCH_DIR}/histmaker_output_toys/mz_dilepton_toys_23456" "${MY_OUT_DIR}/250605_default/" "seed_23456"
+# run_toys_fit 1 30 "${SCRATCH_DIR}/histmaker_output_toys/mz_dilepton_toys_34567" "${MY_OUT_DIR}/250605_default/" "seed_34567"
+
+# run_toys_fit 0 29 "/scratch/submit/cms/alphaS/histmaker_output_toys/mz_dilepton_toys_12345.hdf5" "${MY_OUT_DIR}/250521_toys_systematicTypeNormal/" "dataRandomize_systRandomize"
+# run_toys_fit 0 29 "/scratch/submit/cms/alphaS/histmaker_output_toys/mz_dilepton_toys_23456.hdf5" "toys_23456" "${MY_OUT_DIR}/250521_toys_systematicTypeNormal/" "dataRandomize_systRandomize"
+# run_toys_fit 0 29 "/scratch/submit/cms/alphaS/histmaker_output_toys/mz_dilepton_toys_34567.hdf5" "toys_34567" "${MY_OUT_DIR}/250521_toys_systematicTypeNormal/" "dataRandomize_systRandomize"

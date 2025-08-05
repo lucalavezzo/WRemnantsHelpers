@@ -5,7 +5,7 @@ import hist
 import numpy as np
 import matplotlib.pyplot as plt
 import mplhep as hep
-import combinetf2.io_tools
+import rabbit.io_tools
 import argparse
 import h5py
 from itertools import product
@@ -25,7 +25,7 @@ def load_results_h5py(h5file):
 def main():
 
     parser = argparse.ArgumentParser(
-        description="Read fit result from hdf5 file from combinetf2 or root file from combinetf1"
+        description="Read fit result from hdf5 file from rabbit or root file from combinetf1"
     )
     parser.add_argument(
         "infiles",
@@ -114,7 +114,7 @@ def main():
     args = parser.parse_args()
 
     if args.compareVars:
-        args.plotAxes.append('vars')
+        args.plotAxes.append('pdfVar')
 
     files_hists = {}
     for infile in args.infiles:
@@ -134,7 +134,7 @@ def main():
                 
 
             # Load fit result and metadata
-            fitresult, meta = combinetf2.io_tools.get_fitresult(
+            fitresult, meta = rabbit.io_tools.get_fitresult(
                 infile, result=args.result, meta=True
             )
 
@@ -167,7 +167,7 @@ def main():
             # convert vars in case they are a grep pattern
             # check if each var exists in the vars axis
             vars_to_compare = []
-            available_vars = [n for n in h.axes['vars']]
+            available_vars = [n for n in h.axes['pdfVar']]
             for var in args.compareVars:
 
                 # check if it's a regex pattern
@@ -184,7 +184,7 @@ def main():
                         raise ValueError(f"Variable '{var}' not found in 'vars' axis. Available vars: {available_vars}")
                     
             for var in vars_to_compare:
-                hists[var] = h[{'vars': var}]
+                hists[var] = h[{'pdfVar': var}]
 
         else:
             hists[args.histName] = h

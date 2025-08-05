@@ -1,8 +1,8 @@
 # Perform the unfolding with all the helicity xsecs in ptll-yll-cosThetaStarll-phiStarll
-# The fit for alphaS is performed only on the sigma UL in ptVgen-absYVgen using the same MC events
+# The fit for alphaS is performed only on the sigma UL in ptVgen-absYVgen using the theory predictions
 
 if [ -z "$1" ]; then
-    echo "Usage: unfolding_2D.sh <input_file> -o <output_dir> -e <extra setupRabbit arguments> -f <extra rabbit_fit arguments>"
+    echo "Usage: unfolding_pred.sh <input_file> -o <output_dir> -e <extra feedRabbitTheory arguments> -f <extra rabbit_fit arguments>"
     exit 1
 fi
 
@@ -27,6 +27,7 @@ while getopts "u:o:e:f:" opt; do
     esac
 done
 
+
 # unfolding command
 unfolding_setup_command="python $WREM_BASE/scripts/rabbit/setupRabbit.py -i $input_file -o $output_dir --analysisMode unfolding --poiAsNoi --fitvar 'ptll-yll-cosThetaStarll_quantile-phiStarll_quantile' --genAxes 'ptVGen-absYVGen-helicitySig' --scaleNormXsecHistYields '0.05' --allowNegativeExpectation --realData --systematicType normal"
 echo "Executing command: $unfolding_setup_command"
@@ -42,7 +43,7 @@ echo "Output: $output"
 echo
 
 
-unfolding_command="rabbit_fit.py ${unfolding_combine_file} -o ${output} --binByBinStatType normal -t -1 --doImpacts --globalImpacts --saveHists --computeHistErrors --computeHistImpacts --computeHistCov -m Select 'ch0_masked' 'helicitySig:slice(0,1)' --postfix asimov ${extra_fit}"
+unfolding_command="rabbit_fit.py ${unfolding_combine_file} -o ${output} --binByBinStatType normal -t -1 --doImpacts --globalImpacts --saveHists --computeHistErrors --computeHistImpacts --computeHistCov -m Select 'ch0_masked' 'helicitySig:slice(0,1)' --postfix asimov_unfolded ${extra_fit}"
 echo "Executing command: $unfolding_command"
 unfolding_command_output=$(eval "$unfolding_command 2>&1" | tee /dev/tty)
 echo
@@ -55,20 +56,21 @@ output=$(dirname "$unfolding_fitresult")
 echo "Output: $output"
 echo
 
-setup_command="python $WREM_BASE/scripts/rabbit/setupRabbit.py -i $input_file -o ${output} --fitresult ${unfolding_fitresult} 'Select helicitySig:slice(0,1)' 'ch0_masked' --fitvar ptVGen-absYVGen-helicitySig --axlim -1000 1000 -1000 1000 0 1 --fitAlphaS --postfix theoryfit --baseName prefsr"
+# setup_command="python $WREM_BASE/scripts/combine/feedRabbit_theory.py $unfolding_fitresult --predGenerator scetlib_dyturbo -o $output --angularCoeffs --predAiFile /ceph/submit/data/group/cms/store/user/lavezzo/alphaS//250627_angularCoefficients/w_z_helicity_xsecs_scetlib_dyturboCorr_maxFiles_m1_alphaSunfoldingBinning_helicity.hdf5 --fitresultModel 'CompositeModel' --systematicType normal"
+setup_command="python $WREM_BASE/scripts/combine/feedRabbit_theory.py $unfolding_fitresult --predGenerator scetlib_dyturbo -o $output --fitresultModel 'Select helicitySig:slice(0,1)' --systematicType normal"
 echo "Executing command: $setup_command"
 setup_command_output=$(eval "$setup_command 2>&1" | tee /dev/tty)
 echo
 
 # extract the output file name, and the output directory, where we will put the fit results
-combine_file=$(echo "$setup_command_output" | grep -oP '(?<=Write output file ).*')
+combine_file=$(echo "$setup_command_output" | grep -oP '(?<=Written to ).*')
 combine_file=$(echo "$combine_file" | sed 's/\x1B\[[0-9;]*[a-zA-Z]//g') # sanitize the output
 echo "Combine file: $combine_file"
 output=$(dirname "$combine_file")
 echo "Output: $output"
 echo
 
-combine_command="rabbit_fit.py ${combine_file} -o ${output} --doImpacts --globalImpacts --saveHists --computeHistErrors --computeVariations --chisqFit --externalCovariance -t -1 -m Basemodel -m Project ch0 ptVGen -m Project ch0 absYVGen ${extra_fit}"
+combine_command="rabbit_fit.py ${combine_file} -o ${output} --doImpacts --globalImpacts --saveHists --computeHistErrors --computeVariations --chisqFit --externalCovariance -t 0 -m Basemodel ${extra_fit}"
 echo "Executing command: $combine_command"
 combine_command_output=$(eval "$combine_command 2>&1" | tee /dev/tty)
 echo

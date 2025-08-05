@@ -1,6 +1,11 @@
 # Theory/Unfolded fit
 
-To generate the unfolded histograms,
+Perform the unfolding with all the helicity cross sections in ptll-yll-cosThetaStarll-phiStarll.
+The fit for alphaS is performed only on the sigma UL in ptVgen-absYVgen using the same MC events.
+The script to do this automatically is `workflows/unfolding_2D.sh`.
+Following are the steps explained in more detail.
+
+To generate the unfolded histograms, by performing the fit MC to data in 4D (ptll-yll-cosThetaStarll-phiStarll),
 
 ```
 python scripts/combine/setupCombine.py -i <histmaker_output> -o <output_dir> --analysisMode unfolding --poiAsNoi --fitvar 'ptll-yll-cosThetaStarll_quantile-phiStarll_quantile' --genAxes 'ptVGen-absYVGen-helicitySig' --scaleNormXsecHistYields '0.05' --allowNegativeExpectation --realData --systematicType normal

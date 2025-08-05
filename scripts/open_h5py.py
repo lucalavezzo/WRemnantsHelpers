@@ -17,5 +17,9 @@ args = parser.parse_args()
 h5file = h5py.File(args.infile, "r")
 print(h5file.keys())
 
-print(h5file['hpseudodata'])
-print(h5file['hnorm'])
+print(h5file['meta']['pickle_data'].keys())
+print(h5file['hpseudodata'][()])
+print(h5file['hsumw'][()])
+
+print(h5file['hpseudodata'][()] - h5file['hsumw'][()] < 1e-5)
+

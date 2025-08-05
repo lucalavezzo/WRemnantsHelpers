@@ -1,10 +1,15 @@
 # Setup combine and run the fit for the alphaS analysis
 
-while getopts "i:o:e:" opt; do
+if [ -z "$1" ]; then
+    echo "Usage: plotAlphaSVariations.sh input_file -o output_dir -e extra_args"
+    exit 1
+fi
+
+input_file="$1"
+shift
+
+while getopts "o:e:" opt; do
     case $opt in
-        i)
-            input_file=$OPTARG
-            ;;
         o)
             output_dir=$OPTARG
             ;;
@@ -18,15 +23,10 @@ while getopts "i:o:e:" opt; do
     esac
 done
 
-if [ -z "$input_file" ]; then
-    echo "Input file is required. Use -i to specify the input file."
-    exit 1
+if [ -z "$output_dir" ]; then
+    output_dir="./"
 fi
 
-if [ -z "$output_dir" ]; then
-    echo "Output directory is required. Use -o to specify the output directory."
-    exit 1
-fi
 # Check if $MY_PLOT_DIR is already in the $output_dir
 if [[ ! "$output_dir" == *"$MY_PLOT_DIR"* ]]; then
     output_dir="$MY_PLOT_DIR/$output_dir"
@@ -44,6 +44,6 @@ fi
 
 echo "Output directory: $output_dir" 
 
-command="combinetf2_plot_hists.py --config $WREM_BASE'/utilities/styles/styles.py' $input_file --title CMS --subtitle Preliminary --rrange '0.98' '1.02' --legCols 1 -o $output_dir -m Project ch0 ptll --varName pdfAlphaS --varLabel '$\alpha_\mathrm{S}{\pm}1\sigma$' --yscale '1.25' ${extra_args}"
+command="rabbit_plot_hists.py --config $WREM_BASE'/utilities/styles/styles.py' $input_file --title CMS --subtitle Preliminary --rrange '0.98' '1.02' --legCols 1 -o $output_dir -m Project ch0 ptll --varName pdfAlphaS --varLabel '$\alpha_\mathrm{S}{\pm}1\sigma$' --yscale '1.25' ${extra_args}"
 echo "Executing command: $command"
 eval $command

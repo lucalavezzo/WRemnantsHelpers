@@ -11,6 +11,9 @@ from wums import boostHistHelpers as hh
 import numpy as np
 import mplhep as hep
 import matplotlib.pyplot as plt
+from wums import logging, output_tools, plot_tools  # isort: skip
+from utilities import common, parsing
+
 
 hep.style.use("CMS")
 
@@ -23,10 +26,13 @@ def load_results_h5py(h5file):
 
 def is_regex(pattern):
 
-    try:
-        re.compile(pattern)
-        return True
-    except re.error:
+    if any([x in pattern for x in ["*", "/"]]):
+        try:
+            re.compile(pattern)
+            return True
+        except re.error:
+            return False
+    else:
         return False
     
 def match_regex(pattern, list):
@@ -44,6 +50,13 @@ def main():
         "infile",
         type=str,
         help="hdf5 file.",
+    )
+    parser.add_argument(
+        "--axes",
+        nargs="+",
+        type=str,
+        default=[],
+        help="Axes to plot."
     )
     parser.add_argument(
         "--filterProcs",
@@ -72,9 +85,52 @@ def main():
         help="Label for the y-axis of the histograms. If not provided, label from histogram is used."
     )
     parser.add_argument(
+        "--labels",
+        nargs="+",
+        type=str,
+        default=[],
+        help="Name of histograms to display in legend. Must be of same length as --hists."
+    )
+    parser.add_argument(
         "--logy",
         action="store_true",
         help="Use logarithmic scale for the y-axis of the histograms. Default is linear scale."
+    )
+    parser.add_argument(
+        "--rrange",
+        default=(0.5, 1.5),
+        type=float,
+        nargs=2,
+        help="Range for the ratio plot (default: 0.5, 1.5).",
+    )
+    parser.add_argument(
+        "--noRatioErrorBars",
+        action='store_true'
+    )
+    parser.add_argument(
+        "--select",
+        nargs="+",
+        dest="selection",
+        type=str,
+        default=None,
+        help="Apply a selection to the histograms, if the axis exists."
+        "This option can be applied to any of the axis, not necessarily one of the fitaxes, unlike --axlim."
+        "Use complex numbers for axis value, integers for bin number."
+        "e.g. --select 'ptll 0 10"
+        "e.g. --select 'ptll 0j 10j",
+    )
+    parser.add_argument(
+        "--selectRefHist",
+        nargs="+",
+        dest="selectRefHist",
+        type=str,
+        default=None,
+        help="Apply a selection to the reference histograms, if the axis exists."
+        "Reference histogram will be applied --select, if this option is not specified."
+        "This option can be applied to any of the axis, not necessarily one of the fitaxes, unlike --axlim."
+        "Use complex numbers for axis value, integers for bin number."
+        "e.g. --select 'ptll 0 10"
+        "e.g. --select 'ptll 0j 10j",
     )
     parser.add_argument(
         "-p",
@@ -131,34 +187,116 @@ def main():
                             hists_to_plot.append(hist_name)
                         else:
                             print(f"Histogram '{hist_name}' not found in process '{proc}'. Available histograms: {available_hists}")
+                    
             else:
                 hists_to_plot = available_hists
 
 
-            for hist in hists_to_plot:
+            if len(args.labels):
+                if len(args.labels) != len(hists_to_plot):
+                    raise Exception(f"Length of labels passed ({len(args.labels)}), number of hists to plot ({len(hists_to_plot)}) does not match")
+            else:
+                args.labels = hists_to_plot
+
+            h_ref = output[hists_to_plot[0]].get()
+            if args.selectRefHist == []:
+                args.selectRefHist = args.selection
+            if args.selectRefHist:
+                for sel in args.selectRefHist:
+                    sel = sel.split()
+                    if len(sel) == 3:
+                        sel_ax, sel_lb, sel_ub = sel
+                        sel_lb = parsing.str_to_complex_or_int(sel_lb)
+                        sel_ub = parsing.str_to_complex_or_int(sel_ub)
+                        h_ref = h_ref[{sel_ax: slice(sel_lb, sel_ub, sum)}]
+                    elif len(sel) == 2:
+                        sel_ax, sel_val = sel
+                        h_ref = h_ref[{sel_ax: sel_val}]
+            if args.axes:
+                h_ref = h_ref.project(*args.axes)
+            h_ref = hh.unrolledHist(h_ref, binwnorm=1)
+            
+            fig, ax1, ratio_axes = plot_tools.figureWithRatio(
+                h_ref,
+                "("  + ",".join(args.axes) + ") bin",
+                "Events",
+                ylim=np.max(h_ref.values()) * 1.3,
+                rlabel=f"1/ref.",
+                rrange=args.rrange,
+                base_size=10
+            )
+            ax2 = ratio_axes[-1]
+
+            hep.histplot(h_ref, ax=ax1, label=args.labels[0] + " (ref.)", histtype="step", color="black")
+
+            for ihist, hist in enumerate(hists_to_plot):
+                if ihist == 0: continue # already plotted
 
                 h = output[hist].get()
-                fig, ax = plt.subplots(figsize=(10, 6))
-                hep.histplot(
+                if args.selection:
+                    for sel in args.selection:
+                        sel = sel.split()
+                        if len(sel) == 3:
+                            sel_ax, sel_lb, sel_ub = sel
+                            sel_lb = parsing.str_to_complex_or_int(sel_lb)
+                            sel_ub = parsing.str_to_complex_or_int(sel_ub)
+                            h = h[{sel_ax: slice(sel_lb, sel_ub, sum)}]
+                        elif len(sel) == 2:
+                            sel_ax, sel_val = sel
+                            h = h[{sel_ax: sel_val}]
+                if args.axes:
+                    h = h.project(*args.axes)
+                h = hh.unrolledHist(h, binwnorm=1)
+                hep.histplot(h, ax=ax1, label=args.labels[ihist], histtype="step")
+
+                hr = hh.divideHists(
                     h,
-                    ax=ax,
-                    histtype="step",
-                    linewidth=2,
-                    yerr=False
+                    h_ref,
+                    cutoff=1e-8,
+                    rel_unc=True,
+                    flow=False,
+                    by_ax_name=False,
                 )
-                if args.logy: ax.set_yscale("log")
-                if args.xlabel:
-                    ax.set_xlabel(args.xlabel)
-                if args.ylabel:
-                    ax.set_ylabel(args.ylabel)
-                ax.set_title(f"{proc} - {hist}")
-                fig.tight_layout()
-                _postfix = "" if not args.postfix else f"_{args.postfix}"
-                oname=f"{args.outdir}{proc}_{hist}{_postfix}.pdf"
-                fig.savefig(oname,  bbox_inches="tight")
-                fig.savefig(oname.replace(".pdf", ".png"), bbox_inches="tight", dpi=300)
-                plt.close(fig)
-                print(f"Saved {oname}(.png)")
+                hep.histplot(hr, ax=ax2, histtype="step", label=args.labels[ihist], yerr=not args.noRatioErrorBars)
+
+            selections_text = ""
+            if args.selection or args.selectRefHist:
+                selections_text = "Selections:\n"
+                for sel in args.selection:
+                    sel = sel.split()
+                    if len(sel) == 3:
+                        sel_ax, sel_lb, sel_ub = sel
+                        selections_text += f"{sel_ax}: [{sel_lb}, {sel_ub})\n"
+                    elif len(sel) == 2:
+                        sel_ax, sel_val = sel
+                        selections_text += f"{sel_ax}: {sel_val}\n"
+                if args.selectRefHist is None:
+                    args.selectRefHist = args.selection
+                selections_text += "\nref. hist:\n"
+                for sel in args.selectRefHist:
+                    sel = sel.split()
+                    if len(sel) == 3:
+                        sel_ax, sel_lb, sel_ub = sel
+                        selections_text += f"{sel_ax}: [{sel_lb}, {sel_ub})\n"
+                    elif len(sel) == 2:
+                        sel_ax, sel_val = sel
+                        selections_text += f"{sel_ax}: {sel_val}\n"
+                ax1.text(1.01, 0, selections_text, transform=ax1.transAxes, fontsize='small')
+            if args.logy: ax1.set_yscale("log")
+            if args.xlabel:
+                ax2.set_xlabel(args.xlabel)
+            if args.ylabel:
+                ax1.set_ylabel(args.ylabel)
+            plot_tools.fix_axes(ax1, ax2, fig)
+            plot_tools.add_cms_decor(ax1, "Preliminary", lumi=16.8, loc=2)
+            ax1.legend()
+            ax1.invert_yaxis() # I have no idea why I have to do this
+            _postfix = "" if not args.postfix else f"_{args.postfix}"
+            oname=f"{args.outdir}{proc}_{hist}{_postfix}.pdf"
+            fig.savefig(oname,  bbox_inches="tight")
+            fig.savefig(oname.replace(".pdf", ".png"), bbox_inches="tight", dpi=300)
+            plt.close(fig)
+            print(f"Saved {oname}(.png)")
                                 
 if __name__ == "__main__":
     main()
