@@ -1,15 +1,8 @@
-import sys
+import os, sys
 sys.path.append("../../WRemnants/")
-import os
-from wums import ioutils
 import argparse
 import h5py
-import pprint
 from wums import ioutils
-from wums import boostHistHelpers as hh
-import numpy as np
-import mplhep as hep
-import matplotlib.pyplot as plt
 
 def load_results_h5py(h5file):
     if "results" in h5file.keys():
@@ -25,22 +18,35 @@ parser.add_argument(
     type=str,
     help="hdf5 file.",
 )
+parser.add_argument(
+    "--noShowHists",
+    action='store_true',
+    help="Don't print all histograms, for all samples."
+)
+parser.add_argument(
+    "--filterProcs",
+    nargs="+",
+    default=[],
+    help="Filter processes to show info about. Supports multiple process names."
+)
+parser.add_argument(
+    "--filterHists",
+    type=str,
+    default=None,
+    help="Filter histograms to print. Supports one string that will be checked against all histogram names in the file."
+)
 args = parser.parse_args()
 
 with h5py.File(args.infile, "r") as h5file:
     results = load_results_h5py(h5file)
-    print("Keys in h5 file:", h5file.keys())
+    print(f"Samples in file: {results.keys()}\n")
    
-    print(results['WplusmunuPostVFP']['output']['nominal_gen_scetlib_dyturboCT18Z_pdfasCorr'].get())
-    print(results.keys())
-    print(results['WplusmunuPostVFP']['output']['nominal_gen_pdfCT18Z'].get())
-    
-
-    # print(results['ZmumuPostVFP']['output'].keys())
-    # var_old = results['ZmumuPostVFP']['output']['nominal_pdfCT18Z'].get()[{'pdfVar': 'pdf1CT18ZDown'}]
-
-    # var = results['ZmumuPostVFP']['output']['nominal_pdfUncertByHelicity'].get()[{'pdfVar': 'pdf1CT18ZUp'}]
-    # nom = results['ZmumuPostVFP']['output']['nominal'].get()
-
-    #print(var)
-    #print(var.values() / var_old.values())
+    if not args.notShowHists:
+        for sample in results.keys():
+            if args.filterProcs and sample not in args.filterProcs:
+                continue
+            print(f"Sample: {sample}\n")
+            hists = results[sample].keys()
+            if args.filterHists:
+                hists = [h for h in hists if args.filterHists in h]
+            print(f"Histograms: {hists}\n")
