@@ -1,31 +1,64 @@
 #!/bin/bash
+# Setup rabbit and run the fit for the alphaS analysis at the detector level
 
-# Setup combine and run the fit for the alphaS analysis (4D, detector-level)
+usage() {
+    echo "Usage: fitter.sh <infile> -o <output_dir>"
+    echo "-e <extra arguments for setupRabbit.py> -f <extra arguments for rabbit.py>"
+    echo "--noSetup <skip setupRabbit.py call, carrot is infile>"
+    echo "--2D <run 2D fit, ptll-yll>"
+    echo "-h, --help <show this help message>"
+    exit 1
+}
 
 if [ -z "$1" ]; then
-    echo "Usage: fitter.sh <infile> -o <output_dir> -e <extra arguments for setupRabbit.py> -f <extra arguments for rabbit.py"
-    exit 1
+    usage
 fi
 
 input_file=$1
 shift
 
-while getopts "o:e:f:noSetup" opt; do
-    case $opt in
-        o)
-            output_dir=$OPTARG
+do_setup=true
+do_2D=false
+do_impacts=false
+
+PARSED=$(getopt -o o:e:f:h --long output:,extra-setup:,extra-fit:,noSetup,2D,help -- "$@")
+if [[ $? -ne 0 ]]; then
+    echo "Failed to parse arguments." >&2
+    exit 1
+fi
+eval set -- "$PARSED"
+
+while true; do
+    case "$1" in
+        -o|--output)
+            output_dir="$2"
+            shift 2
             ;;
-        e)
-            extra_setup=$OPTARG
+        -e|--extra-setup)
+            extra_setup="$2"
+            shift 2
             ;;
-        f)
-            extra_fit=$OPTARG
+        -f|--extra-fit)
+            extra_fit="$2"
+            shift 2
             ;;
-        noSetup)
-            no_setup=$OPTARG
+        --noSetup)
+            do_setup=false
+            shift
             ;;
-        \?)
-            echo "Invalid option: -$OPTARG" >&2
+        --2D)
+            do_2D=true
+            shift
+            ;;
+        -h|--help)
+            usage
+            ;;
+        --)
+            shift
+            break
+            ;;
+        *)
+            echo "Unexpected option: $1" >&2
             exit 1
             ;;
     esac
@@ -51,22 +84,35 @@ if [ ! -d "$output_dir" ]; then
 fi
 echo "Output directory: $output_dir" # setupCombine will create subdir in here
 
-if [ ! "$no_setup" ]; then
+if $do_setup; then
     echo "Setting up rabbit..."
-    setup_output=$(python ${WREM_BASE}/scripts/rabbit/setupRabbit.py -i $input_file --fitvar 'ptll-yll-cosThetaStarll_quantile-phiStarll_quantile' -o $output_dir --fitAlphaS $extra_setup 2>&1 | tee /dev/tty)
+    
+    if $do_2D; then
+        fitvar='ptll-yll'
+    else
+        fitvar='ptll-yll-cosThetaStarll_quantile-phiStarll_quantile'
+    fi
+
+    setup_commmand="python ${WREM_BASE}/scripts/rabbit/setupRabbit.py -i $input_file --fitvar $fitvar -o $output_dir --fitAlphaS $extra_setup"
+
+    echo "$setup_commmand"
+    setup_output=$($setup_commmand 2>&1 | tee /dev/tty)
+    
+    # extract the output file name, and the output directory, where we will put the fit results
+    carrot=$(echo "$setup_output" | grep -oP '(?<=Write output file ).*')
+    carrot=$(echo "$carrot" | sed 's/\x1B\[[0-9;]*[a-zA-Z]//g') # sanitize the output
+
 else
     echo "Skipping setup rabbit..."
+    carrot=$input_file
 fi
 
-# extract the output file name, and the output directory, where we will put the fit results
-carrot=$(echo "$setup_output" | grep -oP '(?<=Write output file ).*')
-carrot=$(echo "$carrot" | sed 's/\x1B\[[0-9;]*[a-zA-Z]//g') # sanitize the output
 echo "Rabbit file: $carrot"
 output=$(dirname "$carrot")
 echo "Output: $output"
 
 echo
 echo "Running the fit..."
-command="rabbit_fit.py $carrot -t '-1' --computeVariations -m Project ch0 ptll --computeHistErrors --doImpacts -o $output --globalImpacts --saveHists --saveHistsPerProcess $extra_fit"
-echo "$command"
-eval $command
+fit_command="rabbit_fit.py $carrot -t -1 --computeVariations -m Project ch0 ptll --computeHistErrors --doImpacts -o $output --globalImpacts --saveHists --saveHistsPerProcess $extra_fit"
+echo "$fit_command"
+fit_output=$($fit_command 2>&1 | tee /dev/tty)

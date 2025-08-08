@@ -32,7 +32,7 @@ fi
 if [ -n "$output_dir" ]; then
     echo "Output directory: $output_dir"
 else
-    current_date=$(date +"%H-%M_%d-%m-%Y")
+    current_date=$(date +"%y%m%d")
     output_dir=~/public_html/alphaS/$current_date/
     echo "Output directory: $output_dir"
 fi

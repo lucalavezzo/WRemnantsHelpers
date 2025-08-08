@@ -9,6 +9,7 @@ import rabbit.io_tools
 import argparse
 import h5py
 from itertools import product
+from utilities import common, parsing
 from wums import ioutils
 from wums import boostHistHelpers as hh  # isort: skip
 from wums import logging, output_tools, plot_tools  # isort: skip
@@ -45,10 +46,12 @@ def main():
         help="Process name to grab from the narf file (default: ZmumuPostVFP).",
     )
     parser.add_argument(
-        "--histName",
-        default="hist_prefit_inclusive_variations",
+        "--hist",
+        nargs="+",
+        default=["hist_prefit_inclusive_variations"],
         type=str,
-        help="Name of the histogram to read from the fit result (default: hist_prefit_inclusive_variations).",
+        help="Name of the histogram to read from the fit result (default: hist_prefit_inclusive_variations)."
+        "If multiple names are passed, the assumption is that they match the number of files.",
     )
     parser.add_argument(
         "--labels",
@@ -116,8 +119,14 @@ def main():
     if args.compareVars:
         args.plotAxes.append('vars')
 
+    if len(args.hist) > 1:
+        if len(args.hist) != len(args.infiles):
+            raise Exception("Either pass one hist, or one per file.")
+    else:
+        args.hist = args.hist * len(args.infiles)
+
     files_hists = {}
-    for infile in args.infiles:
+    for infile, hist_name in zip(args.infiles, args.hist):
         print(f"Processing file: {infile}")
         
         hists = {}
@@ -127,12 +136,11 @@ def main():
             with h5py.File(infile, "r") as h5file:
                 results = load_results_h5py(h5file)
                 try:
-                    h = results[args.proc]['output'][args.histName].get()
+                    h = results[args.proc]['output'][hist_name].get()
                 except KeyError:
-                    raise KeyError(f"Histogram '{args.histName}' not found in file '{infile}'. Available histograms: {list(results[args.proc]['output'].keys())}")
+                    raise KeyError(f"Histogram '{hist_name}' not found in file '{infile}'. Available histograms: {list(results[args.proc]['output'].keys())}")
         else:
                 
-
             # Load fit result and metadata
             fitresult, meta = rabbit.io_tools.get_fitresult(
                 infile, result=args.result, meta=True
@@ -140,23 +148,33 @@ def main():
 
             # grab the histogram
             try:
-                h = fitresult['physics_models']['Basemodel']['channels']['ch0'][args.histName].get()
+                h = fitresult['physics_models']['Basemodel']['channels']['ch0'][hist_name].get()
             except KeyError:
-                raise KeyError(f"Histogram '{args.histName}' not found in fit result. Available histograms: {list(fitresult['physics_models']['Basemodel']['channels']['ch0'].keys())}")
+                raise KeyError(f"Histogram '{hist_name}' not found in fit result. Available histograms: {list(fitresult['physics_models']['Basemodel']['channels']['ch0'].keys())}")
 
         # apply selections if specified
         for sel in args.selection:
             split =  sel.split()
             if len(split) == 3:
                 sel_ax, sel_lb, sel_ub = split
-                sel_lb = complex(sel_lb)
-                sel_ub = complex(sel_ub)
+                sel_lb = parsing.str_to_complex_or_int(sel_lb)
+                sel_ub = parsing.str_to_complex_or_int(sel_ub)
                 if sel_ax not in h.axes.name:
-                    raise ValueError(f"Selection axis '{sel_ax}' not found in histogram axes. Available axes: {h.axes.name}")
-                h = h[{sel_ax: slice(sel_lb, sel_ub, hist.sum)}]
+                    print(f"Selection axis '{sel_ax}' not found in histogram axes. Available axes: {h.axes.name}")
+                else:
+                    h = h[{sel_ax: slice(sel_lb, sel_ub, sum)}]
             else:
-                # not supported yet
-                pass
+                sel_ax, sel_val = split
+                try:
+                    sel_val = parsing.str_to_complex_or_int(sel_val)
+                except argparse.ArgumentTypeError as e:
+                    print(e)
+                    print("Trying to use as string...")
+                    pass
+                if sel_ax not in h.axes.name:
+                    print(f"Selection axis '{sel_ax}' not found in histogram axes. Available axes: {h.axes.name}")
+                else:
+                    h = h[{sel_ax: sel_val}]
 
         # take only relevant axes for plotting        
         h = h.project(*args.plotAxes, *args.selectionAxes)
@@ -187,7 +205,7 @@ def main():
                 hists[var] = h[{'vars': var}]
 
         else:
-            hists[args.histName] = h
+            hists[hist_name] = h
         
         files_hists[infile] = hists
 
@@ -200,70 +218,74 @@ def main():
     if not os.path.exists(args.outdir):
         os.makedirs(args.outdir)
 
-    common_vars = set.intersection(*[set(hists.keys()) for hists in files_hists.values()])
-    for var in common_vars:
+    # print(files_hists)
+    # common_vars = set.intersection(*[set(hists.keys()) for hists in files_hists.values()])
+    # print(common_vars)
+    # for var in common_vars:
 
-        print("Plotting variable:", var)
+    var = "_".join([list(d.keys())[0] for d in files_hists.values()])
+    print("Plotting variable:", var)
 
-        h_ref = files_hists[args.infiles[0]][var]
+    h_ref = list(files_hists[args.infiles[0]].values())[0]
 
-        selection_axes = [ax for ax in h_ref.axes if ax.name in args.selectionAxes]
-        selection_axes_lenghts = [len(ax) for ax in selection_axes]
-        ranges = [range(b) for b in selection_axes_lenghts]
-        combinations = list(product(*ranges))
+    selection_axes = [ax for ax in h_ref.axes if ax.name in args.selectionAxes]
+    selection_axes_lenghts = [len(ax) for ax in selection_axes]
+    ranges = [range(b) for b in selection_axes_lenghts]
+    combinations = list(product(*ranges))
 
-        for combination in combinations:
+    for combination in combinations:
 
-            _h_ref = h_ref[{ax.name: combination[i] for i, ax in enumerate(selection_axes)}]
-            _h_ref = hh.unrolledHist(_h_ref, binwnorm=1)
+        _h_ref = h_ref[{ax.name: combination[i] for i, ax in enumerate(selection_axes)}]
+        _h_ref = hh.unrolledHist(_h_ref, binwnorm=1)
 
-            fig, ax1, ratio_axes = plot_tools.figureWithRatio(
+        fig, ax1, ratio_axes = plot_tools.figureWithRatio(
+            _h_ref,
+            "("  + ",".join(args.plotAxes) + ") bin",
+            "Events",
+            ylim=np.max(_h_ref.values()) * 1.2,
+            rlabel=f"1/{args.labels[0]}",
+            rrange=args.rrange
+        )
+        ax2 = ratio_axes[-1]
+
+        hep.histplot(_h_ref, ax=ax1, label=args.labels[0] + " - " + list(files_hists[args.infiles[0]].keys())[0], histtype="step", color="black")
+
+        for i, (infile, hists) in enumerate(files_hists.items()):
+            if i == 0: continue # already plotted
+
+            h = list(hists.values())[0]
+            h = h[{ax.name: combination[i] for i, ax in enumerate(selection_axes)}]
+            h = hh.unrolledHist(h, binwnorm=1)
+
+            hep.histplot(h, ax=ax1, label=args.labels[i] + " - " + list(hists.keys())[0], histtype="step")
+
+            hr = hh.divideHists(
+                h,
                 _h_ref,
-                "("  + ",".join(args.plotAxes) + ") bin",
-                "Events",
-                ylim=np.max(_h_ref.values()) * 1.2,
-                rlabel=f"1/{args.labels[0]}",
-                rrange=args.rrange
+                cutoff=1e-8,
+                rel_unc=True,
+                flow=False,
+                by_ax_name=False,
             )
-            ax2 = ratio_axes[-1]
+            hep.histplot(hr, ax=ax2, histtype="step", label=args.labels[i] + " - " + list(hists.keys())[0])
 
-            hep.histplot(_h_ref, ax=ax1, label=args.labels[0], histtype="step", color="black")
-
-            for i, (infile, hists) in enumerate(files_hists.items()):
-                if i == 0: continue # already plotted
-
-                h = hists[var]
-                h = h[{ax.name: combination[i] for i, ax in enumerate(selection_axes)}]
-                h = hh.unrolledHist(h, binwnorm=1)
-
-                hep.histplot(h, ax=ax1, label=args.labels[i], histtype="step")
-
-                hr = hh.divideHists(
-                    h,
-                    _h_ref,
-                    cutoff=1e-8,
-                    rel_unc=True,
-                    flow=False,
-                    by_ax_name=False,
-                )
-                hep.histplot(hr, ax=ax2, histtype="step", label=args.labels[i])
-
-            plot_tools.fix_axes(ax1, ax2, fig)
-            ax1.legend()
-            ax1.invert_yaxis() # I have no idea why I have to do this
-            _postfix = "_"+args.postfix if args.postfix else ""
-            selection_label = "_".join([f"{ax.name}_{combination[i]}" for i, ax in enumerate(selection_axes)]) if selection_axes else ""
-            if selection_label:
-                selection_label = f"_{selection_label}"
-            else:
-                selection_label = ""
-            ax1.set_title(f"{var}{selection_label}")
-            oname = args.outdir + f"/{var}{selection_label}{_postfix}.png"
-            print(f"Saving plot to {oname}(.pdf)")
-            fig.tight_layout()
-            fig.savefig(oname, dpi=300, bbox_inches='tight')
-            fig.savefig(oname.replace(".png", ".pdf"), bbox_inches='tight')
-            plt.close(fig)
+        plot_tools.fix_axes(ax1, ax2, fig)
+        ax1.legend()
+        ax1.invert_yaxis() # I have no idea why I have to do this
+        _postfix = "_"+args.postfix if args.postfix else ""
+        selection_label = "_".join([f"{ax.name}_{combination[i]}" for i, ax in enumerate(selection_axes)]) if selection_axes else ""
+        if selection_label:
+            selection_label = f"_{selection_label}"
+        else:
+            selection_label = ""
+        if selection_label:
+            ax1.set_title(f"{selection_label}")
+        oname = args.outdir + f"/{var}{selection_label}{_postfix}.png"
+        print(f"Saving plot to {oname}(.pdf)")
+        fig.tight_layout()
+        fig.savefig(oname, dpi=300, bbox_inches='tight')
+        fig.savefig(oname.replace(".png", ".pdf"), bbox_inches='tight')
+        plt.close(fig)
 
 
 if __name__ == "__main__":
