@@ -1,7 +1,7 @@
-# pulls and impacts for the alphaS analysis
+# pulls and impacts for the alphaS analysis fitting to W and Z
 
 if [ -z "$1" ]; then
-    echo "Usage: pullsAndImpacts.sh <infile> -o <output_dir> -e <extra_args>"
+    echo "Usage: pullsAndImpactsCombined.sh <infile> -o <output_dir> -e <extra_args>"
     exit 1
 fi
 
@@ -44,6 +44,17 @@ echo "Executing command: $command"
 eval $command
 
 command="rabbit_plot_pulls_and_impacts.py $input_file --poi pdfAlphaS --config '${WREM_BASE}/utilities/styles/styles.py' --scaleImpacts 1.5 --showNumbers --oneSidedImpacts --grouping max -o $output_dir --otherExtensions pdf png -n 50 --poi pdfAlphaS --impactTitle '<i>α</i><sub>S</sub> in 10<sup>-3</sup>' --title CMS --subtitle Preliminary --globalImpacts ${extra}"
+
+echo "Executing command: $command"
+eval $command
+
+
+command="rabbit_plot_pulls_and_impacts.py $input_file --poi massShiftW100MeV --config '${WREM_BASE}/utilities/styles/styles.py' --scaleImpacts 100 --showNumbers --oneSidedImpacts --grouping max -o $output_dir --otherExtensions pdf png -n 50 --poi massShiftW100MeV --impactTitle 'Δ<i>m</i><sub>W</sub>' --title CMS --subtitle Preliminary ${extra}"
+
+echo "Executing command: $command"
+eval $command
+
+command="rabbit_plot_pulls_and_impacts.py $input_file --poi massShiftW100MeV --config '${WREM_BASE}/utilities/styles/styles.py' --scaleImpacts 100 --showNumbers --oneSidedImpacts --grouping max -o $output_dir --otherExtensions pdf png -n 50 --poi massShiftW100MeV --impactTitle 'Δ<i>m</i><sub>W</sub>' --title CMS --subtitle Preliminary --globalImpacts ${extra}"
 
 echo "Executing command: $command"
 eval $command

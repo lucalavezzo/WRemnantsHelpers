@@ -1,10 +1,11 @@
 #!/bin/bash
-# Setup rabbit and run the fit for the mW analysis at the detector level
+# Setup rabbit and run the fit for the alphaS analysis at the detector level
 
 usage() {
-    echo "Usage: fitter.sh <infile> -o <output_dir>"
+    echo "Usage: fitter.sh <infile_Z> <infile_W> -o <output_dir>"
     echo "-e <extra arguments for setupRabbit.py> -f <extra arguments for rabbit.py>"
     echo "--noSetup <skip setupRabbit.py call, carrot is infile>"
+    echo "--2D <run 2D fit for Z, ptll-yll>"
     echo "-h, --help <show this help message>"
     exit 1
 }
@@ -13,7 +14,9 @@ if [ -z "$1" ]; then
     usage
 fi
 
-input_file=$1
+input_file_Z=$1
+shift
+input_file_W=$1
 shift
 
 do_setup=true
@@ -45,6 +48,10 @@ while true; do
             do_setup=false
             shift
             ;;
+        --2D)
+            do_2D=true
+            shift
+            ;;
         -h|--help)
             usage
             ;;
@@ -59,19 +66,23 @@ while true; do
     esac
 done
 
-if [ -z "$input_file" ]; then
-    echo "Input file is required. Use -i to specify the input file."
+if [ -z "$input_file_Z" ] ||  [ -z "$input_file_W" ]; then
+    echo "Two input files are required."
     exit 1
+fi
+
+if [ -n "$output_dir" ]; then
+    echo "Output directory: $output_dir"
+else
+    current_date=$(date +"%y%m%d")
+    output_dir="${MY_OUT_DIR}/${current_date}_CombinedFit/"
+    echo "Output directory: $output_dir"
 fi
 
 # check if WREM_BASE is set
 if [ -z "$WREM_BASE" ]; then
     echo "WREM_BASE is not set. Please source the setup.sh in WRemnants."
     exit 1
-fi
-# if no output dir is given, use the input file's directory
-if [ -z "$output_dir" ]; then
-    output_dir=$(dirname "$input_file")
 fi
 # if the output dir doesn't exist, create it
 if [ ! -d "$output_dir" ]; then
@@ -82,9 +93,13 @@ echo "Output directory: $output_dir" # setupCombine will create subdir in here
 if $do_setup; then
     echo "Setting up rabbit..."
     
-    fitvar='pt-eta-charge'
+    if $do_2D; then
+        fitvar_Z='ptll-yll'
+    else
+        fitvar_Z='ptll-yll-cosThetaStarll_quantile-phiStarll_quantile'
+    fi
 
-    setup_commmand="python ${WREM_BASE}/scripts/rabbit/setupRabbit.py -i $input_file --fitvar $fitvar -o $output_dir $extra_setup"
+    setup_commmand="python ${WREM_BASE}/scripts/rabbit/setupRabbit.py -i $input_file_Z $input_file_W --fitvar $fitvar_Z eta-pt-charge -o $output_dir --binByBinStatScaleForMW 1.0 --fitAlphaS $extra_setup"
 
     echo "$setup_commmand"
     setup_output=$($setup_commmand 2>&1 | tee /dev/tty)
@@ -104,6 +119,6 @@ echo "Output: $output"
 
 echo
 echo "Running the fit..."
-fit_command="rabbit_fit.py $carrot -t -1 --computeVariations -m Project ch0 pt eta --computeHistErrors --doImpacts -o $output --globalImpacts --saveHists --saveHistsPerProcess $extra_fit"
+fit_command="rabbit_fit.py $carrot -t -1 --computeVariations -m Project ch0 ptll -m Select ch1 --computeHistErrors --doImpacts -o $output --globalImpacts --saveHists --saveHistsPerProcess $extra_fit"
 echo "$fit_command"
 fit_output=$($fit_command 2>&1 | tee /dev/tty)

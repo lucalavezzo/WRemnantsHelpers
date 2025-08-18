@@ -41,9 +41,9 @@ def main():
     )
     parser.add_argument(
         "--proc",
-        default="ZmumuPostVFP",
+        default=None,
         type=str,
-        help="Process name to grab from the narf file (default: ZmumuPostVFP).",
+        help="Process name to grab from the narf file (default: None).",
     )
     parser.add_argument(
         "--hist",
@@ -136,7 +136,10 @@ def main():
             with h5py.File(infile, "r") as h5file:
                 results = load_results_h5py(h5file)
                 try:
-                    h = results[args.proc]['output'][hist_name].get()
+                    if args.proc is None:
+                        h = results[hist_name]
+                    else:
+                        h = results[args.proc]['output'][hist_name].get()
                 except KeyError:
                     raise KeyError(f"Histogram '{hist_name}' not found in file '{infile}'. Available histograms: {list(results[args.proc]['output'].keys())}")
         else:
@@ -218,6 +221,7 @@ def main():
     if not os.path.exists(args.outdir):
         os.makedirs(args.outdir)
 
+    # TODO I think this made sense when doing args.compareVars. Should set up to support this again
     # print(files_hists)
     # common_vars = set.intersection(*[set(hists.keys()) for hists in files_hists.values()])
     # print(common_vars)

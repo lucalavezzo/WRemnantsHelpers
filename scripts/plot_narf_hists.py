@@ -13,7 +13,8 @@ import mplhep as hep
 import matplotlib.pyplot as plt
 from wums import logging, output_tools, plot_tools  # isort: skip
 from utilities import common, parsing
-
+import hist
+from hist import Hist
 
 hep.style.use("CMS")
 
@@ -104,6 +105,10 @@ def main():
         help="Range for the ratio plot (default: 0.5, 1.5).",
     )
     parser.add_argument(
+        "--noErrorBars",
+        action='store_true'
+    )
+    parser.add_argument(
         "--noRatioErrorBars",
         action='store_true'
     )
@@ -165,12 +170,17 @@ def main():
         
         for proc in procs:
             print(f"Process: {proc}")
-            output = results[proc].get("output", {})
-            if not output:
-                print(f"No output found for process {proc}.")
-                continue
-            
-            available_hists = list(output.keys())
+
+            if type(results[proc]) is dict:
+                output = results[proc].get("output", {})
+                if not output:
+                    print(f"No output found for process {proc}.")
+                    continue
+                available_hists = list(output.keys())
+            elif type(results[proc]) is Hist:
+                available_hists = [proc]
+                output = results
+
             hists_to_plot = []
             if args.hists:
 
@@ -198,7 +208,11 @@ def main():
             else:
                 args.labels = hists_to_plot
 
-            h_ref = output[hists_to_plot[0]].get()
+            h_ref = output[hists_to_plot[0]]
+            if not (type(h_ref) is Hist):
+                h_ref = h_ref.get()
+            print(h_ref)
+            h_ref = h_ref[{'ptVgen': hist.rebin(2)}]
             if args.selectRefHist == []:
                 args.selectRefHist = args.selection
             if args.selectRefHist:
@@ -211,11 +225,16 @@ def main():
                         h_ref = h_ref[{sel_ax: slice(sel_lb, sel_ub, sum)}]
                     elif len(sel) == 2:
                         sel_ax, sel_val = sel
+                        try:
+                            sel_val = parsing.str_to_complex_or_int(sel_val)
+                        except argparse.ArgumentTypeError as e:
+                            print(e)
+                            print("Trying to use as string...")
+                            pass
                         h_ref = h_ref[{sel_ax: sel_val}]
             if args.axes:
                 h_ref = h_ref.project(*args.axes)
             h_ref = hh.unrolledHist(h_ref, binwnorm=1)
-            
             fig, ax1, ratio_axes = plot_tools.figureWithRatio(
                 h_ref,
                 "("  + ",".join(args.axes) + ") bin",
@@ -227,12 +246,15 @@ def main():
             )
             ax2 = ratio_axes[-1]
 
-            hep.histplot(h_ref, ax=ax1, label=args.labels[0] + " (ref.)", histtype="step", color="black")
+            hep.histplot(h_ref, ax=ax1, label=args.labels[0] + " (ref.)", histtype="step", color="black", yerr=not args.noErrorBars)
 
-            for ihist, hist in enumerate(hists_to_plot):
+            for ihist, hist_to_plot in enumerate(hists_to_plot):
                 if ihist == 0: continue # already plotted
 
-                h = output[hist].get()
+                h = output[hist_to_plot]
+                if not (type(h) is Hist):
+                    h = h.get()
+                h = h[{'ptVgen': hist.rebin(2)}]
                 if args.selection:
                     for sel in args.selection:
                         sel = sel.split()
@@ -243,11 +265,18 @@ def main():
                             h = h[{sel_ax: slice(sel_lb, sel_ub, sum)}]
                         elif len(sel) == 2:
                             sel_ax, sel_val = sel
+                            try:
+                                sel_val = parsing.str_to_complex_or_int(sel_val)
+                            except argparse.ArgumentTypeError as e:
+                                print(e)
+                                print("Trying to use as string...")
+                                pass
+                            print(sel_ax, sel_val)
                             h = h[{sel_ax: sel_val}]
                 if args.axes:
                     h = h.project(*args.axes)
                 h = hh.unrolledHist(h, binwnorm=1)
-                hep.histplot(h, ax=ax1, label=args.labels[ihist], histtype="step")
+                hep.histplot(h, ax=ax1, label=args.labels[ihist], histtype="step", yerr=not args.noErrorBars)
 
                 hr = hh.divideHists(
                     h,
@@ -292,7 +321,7 @@ def main():
             ax1.legend()
             ax1.invert_yaxis() # I have no idea why I have to do this
             _postfix = "" if not args.postfix else f"_{args.postfix}"
-            oname=f"{args.outdir}{proc}_{hist}{_postfix}.pdf"
+            oname=f"{args.outdir}{proc}_{hist_to_plot}{_postfix}.pdf"
             fig.savefig(oname,  bbox_inches="tight")
             fig.savefig(oname.replace(".pdf", ".png"), bbox_inches="tight", dpi=300)
             plt.close(fig)
