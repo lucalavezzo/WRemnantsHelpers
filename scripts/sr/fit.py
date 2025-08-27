@@ -6,6 +6,7 @@ import pysr
 from pysr import TensorBoardLoggerSpec
 import os, sys
 import argparse
+from datetime import datetime
 import h5py
 import numpy as np
 import copy
@@ -15,6 +16,7 @@ import matplotlib.pyplot as plt
 sys.path.append("../../WRemnants/")
 
 from wums import ioutils
+from wums import output_tools
 from wums import plot_tools
 from wums import boostHistHelpers as hh
 
@@ -77,13 +79,6 @@ parser.add_argument(
     default=None,
     help="Postfix to add to the output file names.",
 )
-parser.add_argument(
-    "-o",
-    "--outdir",
-    type=str,
-    default="./",
-    help="Output directory for the plots. Default is current directory.",
-)
 args = parser.parse_args()
 
 
@@ -107,6 +102,13 @@ y = h.values()
 y_err = h.variances()**0.5
 x = np.array([h.axes[0].centers]).T
 
+run_id = datetime.now().strftime("%y%m%d_%H%M")
+if args.postfix:
+    run_id += f"{args.postfix}"
+
+# store the histogram with the model
+output_tools.write_lz4_pkl_output(f"pysr_runs/{run_id}/hist", "input", {"h":h}, "./", args)
+
 # see https://ai.damtp.cam.ac.uk/pysr/tuning/
 model = pysr.PySRRegressor(
 
@@ -114,7 +116,7 @@ model = pysr.PySRRegressor(
     niterations=args.niterations,
     maxsize=20,
     population_size=len(y), # TODO testing this
-    populations=args.nprocs/10, 
+    populations=args.nprocs/10, # TODO test this
     ncycles_per_iteration=5000, # TODO testing this
     #parsimony=0.001, # TODO test this
     weight_optimize=0.001, # TODO testing this
@@ -131,7 +133,9 @@ model = pysr.PySRRegressor(
         "inv",
         "abs"
     ],
-    extra_sympy_mappings={"inv": lambda x: 1 / x},
+    extra_sympy_mappings={
+        "inv": lambda x: 1 / x
+    },
     constraints={ # TODO play with this
         "^": (-1, 2),
         "sin": 5
@@ -147,6 +151,7 @@ model = pysr.PySRRegressor(
     turbo=True,
     procs=args.nprocs,
     output_directory="pysr_runs",
+    run_id=run_id,
     logger_spec=TensorBoardLoggerSpec(
         log_dir="pysr_runs/logs",
         log_interval=1, 
@@ -155,30 +160,3 @@ model = pysr.PySRRegressor(
 
 model.fit(x, y, weights=y_err)
 print(model)
-
-# only plot results if you specify outdir, else use other scripts
-if args.outdir:
-
-    # show top 5
-    show_n = 5
-    colors = plt.cm.rainbow(np.linspace(0, 1, show_n))
-    h_preds = []
-    for i in range(show_n):
-
-        pred = model.predict(x, i)
-
-        h_pred = copy.deepcopy(h)
-        h_pred.values()[...] = pred
-        h_preds.append(h_pred)
-
-    fig = plot_tools.makePlotWithRatioToRef(
-        [h, *h_preds],
-        ["Data", *[f"Prediction {i}" for i in range(show_n)]],
-        ["black", *colors],
-        xlabel="Bin",
-        yerr=True,
-        base_size=10
-    )
-    if not os.path.isdir(args.outdir):
-        os.makedirs(args.outdir)
-    plot_tools.save_pdf_and_png(args.outdir, f"runresults_{args.runid}_{args.postfix}" if args.postfix else f"results_{args.runid}", fig)
