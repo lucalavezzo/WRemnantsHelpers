@@ -74,6 +74,10 @@ def main():
         help="Specify histogram names to filter output. If empty, all histograms are loaded. Supports regex.",
     )
     parser.add_argument(
+        "--binwnorm",
+        default=None
+    )
+    parser.add_argument(
         "--xlabel",
         type=str,
         default=None,
@@ -211,9 +215,7 @@ def main():
             h_ref = output[hists_to_plot[0]]
             if not (type(h_ref) is Hist):
                 h_ref = h_ref.get()
-            print(h_ref)
-            h_ref = h_ref[{'ptVgen': hist.rebin(2)}]
-            if args.selectRefHist == []:
+            if args.selectRefHist is None:
                 args.selectRefHist = args.selection
             if args.selectRefHist:
                 for sel in args.selectRefHist:
@@ -234,10 +236,11 @@ def main():
                         h_ref = h_ref[{sel_ax: sel_val}]
             if args.axes:
                 h_ref = h_ref.project(*args.axes)
-            h_ref = hh.unrolledHist(h_ref, binwnorm=1)
+            if len(h_ref.axes) > 1:
+                h_ref = hh.unrolledHist(h_ref)
             fig, ax1, ratio_axes = plot_tools.figureWithRatio(
                 h_ref,
-                "("  + ",".join(args.axes) + ") bin",
+                "("  + ",".join(args.axes) + ") bin" if len(args.axes) else "bin",
                 "Events",
                 ylim=np.max(h_ref.values()) * 1.3,
                 rlabel=f"1/ref.",
@@ -246,7 +249,7 @@ def main():
             )
             ax2 = ratio_axes[-1]
 
-            hep.histplot(h_ref, ax=ax1, label=args.labels[0] + " (ref.)", histtype="step", color="black", yerr=not args.noErrorBars)
+            hep.histplot(h_ref, ax=ax1, label=args.labels[0] + " (ref.)", histtype="step", binwnorm=args.binwnorm, color="black", yerr=not args.noErrorBars)
 
             for ihist, hist_to_plot in enumerate(hists_to_plot):
                 if ihist == 0: continue # already plotted
@@ -254,7 +257,6 @@ def main():
                 h = output[hist_to_plot]
                 if not (type(h) is Hist):
                     h = h.get()
-                h = h[{'ptVgen': hist.rebin(2)}]
                 if args.selection:
                     for sel in args.selection:
                         sel = sel.split()
@@ -275,8 +277,9 @@ def main():
                             h = h[{sel_ax: sel_val}]
                 if args.axes:
                     h = h.project(*args.axes)
-                h = hh.unrolledHist(h, binwnorm=1)
-                hep.histplot(h, ax=ax1, label=args.labels[ihist], histtype="step", yerr=not args.noErrorBars)
+                if len(h.axes) > 1:
+                    h = hh.unrolledHist(h)
+                hep.histplot(h, ax=ax1, label=args.labels[ihist], histtype="step", binwnorm=args.binwnorm, yerr=not args.noErrorBars)
 
                 hr = hh.divideHists(
                     h,
@@ -316,12 +319,12 @@ def main():
                 ax2.set_xlabel(args.xlabel)
             if args.ylabel:
                 ax1.set_ylabel(args.ylabel)
-            plot_tools.fix_axes(ax1, ax2, fig)
+            plot_tools.fix_axes(ax1, ax2, fig, logy=args.logy)
             plot_tools.add_cms_decor(ax1, "Preliminary", lumi=16.8, loc=2)
             ax1.legend()
             ax1.invert_yaxis() # I have no idea why I have to do this
             _postfix = "" if not args.postfix else f"_{args.postfix}"
-            oname=f"{args.outdir}{proc}_{hist_to_plot}{_postfix}.pdf"
+            oname=os.path.join(args.outdir, f"{proc}_{hist_to_plot}{_postfix}.pdf")
             fig.savefig(oname,  bbox_inches="tight")
             fig.savefig(oname.replace(".pdf", ".png"), bbox_inches="tight", dpi=300)
             plt.close(fig)

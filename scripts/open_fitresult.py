@@ -19,16 +19,23 @@ parser.add_argument(
     type=str,
     help="fitresults key in file (e.g. 'asimov'). Leave empty for data fit result.",
 )
+parser.add_argument(
+    "--parms",
+    nargs="+",
+    default=['pdfAlphaS'],
+    type=str,
+    help="Parms in the fitresult to print the pull of."
+)
 args = parser.parse_args()
 
 fitresult, meta = rabbit.io_tools.get_fitresult(
     args.infile, result=args.result, meta=True
 )
 
-print(f"Fit result: {fitresult}")
-print(f"Meta data: {meta}")
 print(f"Fit result keys: {fitresult.keys()}")
 print(f"Meta data keys: {meta.keys()}")
-
+print()
 print('edmval', fitresult['edmval'])
-print('pdfAlphaS', fitresult['parms'].get()['pdfAlphaS'])
+parms = fitresult['parms'].get()
+for p in args.parms:
+    print(p, parms[p])

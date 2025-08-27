@@ -16,3 +16,10 @@ echo "Created environment variable MY_OUT_DIR=$MY_OUT_DIR"
 echo "Created environment variable NANO_DIR=$NANO_DIR"
 echo "Created environment variable SCRATCH_DIR=$SCRATCH_DIR"
 echo "Created alias print_command to 'python ${WREM_BASE}/scripts/utilities/print_command.py'"
+echo
+echo "--- PySR/Julia"
+export PYTHON_JULIAPKG_PROJECT="$HOME/.julia_env"
+export JULIA_DEPOT_PATH="$HOME/.julia_depot"
+echo "Created environment variable PYTHON_JULIAPKG_PROJECT=$PYTHON_JULIAPKG_PROJECT"
+echo "Created environment variable JULIA_DEPOT_PATH=$JULIA_DEPOT_PATH"
+echo

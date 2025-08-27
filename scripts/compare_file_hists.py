@@ -60,18 +60,18 @@ def main():
         help="Labels for the input files, must match the number of input files.",
     )
     parser.add_argument(
-        "--plotAxes",
+        "--axes",
         nargs="+",
         type=str,
-        default=["ptll", "yll"],
-        help="Axes to plot in the histograms (default: ptll, yll).",
+        default=[],
+        help="Axes to plot in the histograms. Leave empty for all available axes. (default: []).",
     )
     parser.add_argument(
         "--selectionAxes",
         nargs="+",
         type=str,
         default=[],
-        help="For each bin of these axes, a different histogram will be created with the axes selected via --plotAxes."
+        help="For each bin of these axes, a different histogram will be created with the axes selected via --axes."
     )
     parser.add_argument(
         "--select",
@@ -89,11 +89,23 @@ def main():
         help="Variables to compare in the histograms. Applicable only if the 'vars' axis is present in the histogram.",
     )
     parser.add_argument(
+        "--range",
+        default=None,
+        type=float,
+        nargs=2,
+        help="Range for the plot (default: None).",
+    )
+    parser.add_argument(
         "--rrange",
         default=(0.5, 1.5),
         type=float,
         nargs=2,
         help="Range for the ratio plot (default: 0.5, 1.5).",
+    )
+    parser.add_argument(
+        "--norm",
+        action='store_true',
+        help="Normalize the hists to unity."
     )
     parser.add_argument(
         "--result",
@@ -117,7 +129,7 @@ def main():
     args = parser.parse_args()
 
     if args.compareVars:
-        args.plotAxes.append('vars')
+        args.axes.append('vars')
 
     if len(args.hist) > 1:
         if len(args.hist) != len(args.infiles):
@@ -179,8 +191,16 @@ def main():
                 else:
                     h = h[{sel_ax: sel_val}]
 
-        # take only relevant axes for plotting        
-        h = h.project(*args.plotAxes, *args.selectionAxes)
+        # take only relevant axes for plotting     
+        if len(args.axes):
+            h = h.project(*args.axes, *args.selectionAxes)
+        if args.norm:
+            norm = h.sum()
+            if hasattr(norm, 'value'):
+                norm = norm.value
+            if not (norm > 0):
+                raise ValueError
+            h /= norm
 
         # this really only works for the fitresult
         if args.compareVars:
@@ -240,11 +260,11 @@ def main():
     for combination in combinations:
 
         _h_ref = h_ref[{ax.name: combination[i] for i, ax in enumerate(selection_axes)}]
-        _h_ref = hh.unrolledHist(_h_ref, binwnorm=1)
+        _h_ref = hh.unrolledHist(_h_ref)
 
         fig, ax1, ratio_axes = plot_tools.figureWithRatio(
             _h_ref,
-            "("  + ",".join(args.plotAxes) + ") bin",
+            "("  + ",".join(args.axes) + ") bin" if len(args.axes) else "bin",
             "Events",
             ylim=np.max(_h_ref.values()) * 1.2,
             rlabel=f"1/{args.labels[0]}",
@@ -252,16 +272,16 @@ def main():
         )
         ax2 = ratio_axes[-1]
 
-        hep.histplot(_h_ref, ax=ax1, label=args.labels[0] + " - " + list(files_hists[args.infiles[0]].keys())[0], histtype="step", color="black")
+        hep.histplot(_h_ref, ax=ax1, label=args.labels[0] + " - " + list(files_hists[args.infiles[0]].keys())[0], binwnorm=1, histtype="step", color="black", yerr=not args.norm)
 
         for i, (infile, hists) in enumerate(files_hists.items()):
             if i == 0: continue # already plotted
 
             h = list(hists.values())[0]
             h = h[{ax.name: combination[i] for i, ax in enumerate(selection_axes)}]
-            h = hh.unrolledHist(h, binwnorm=1)
+            h = hh.unrolledHist(h)
 
-            hep.histplot(h, ax=ax1, label=args.labels[i] + " - " + list(hists.keys())[0], histtype="step")
+            hep.histplot(h, ax=ax1, label=args.labels[i] + " - " + list(hists.keys())[0], binwnorm=1, histtype="step", yerr=not args.norm)
 
             hr = hh.divideHists(
                 h,
@@ -271,7 +291,7 @@ def main():
                 flow=False,
                 by_ax_name=False,
             )
-            hep.histplot(hr, ax=ax2, histtype="step", label=args.labels[i] + " - " + list(hists.keys())[0])
+            hep.histplot(hr, ax=ax2, histtype="step", label=args.labels[i] + " - " + list(hists.keys())[0], yerr=not args.norm)
 
         plot_tools.fix_axes(ax1, ax2, fig)
         ax1.legend()
@@ -284,6 +304,8 @@ def main():
             selection_label = ""
         if selection_label:
             ax1.set_title(f"{selection_label}")
+        if args.range:
+            ax1.set_ylim(args.range[0], args.range[1])
         oname = args.outdir + f"/{var}{selection_label}{_postfix}.png"
         print(f"Saving plot to {oname}(.pdf)")
         fig.tight_layout()
