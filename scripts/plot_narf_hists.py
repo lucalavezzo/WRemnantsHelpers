@@ -75,6 +75,7 @@ def main():
     )
     parser.add_argument(
         "--binwnorm",
+        type=int,
         default=None
     )
     parser.add_argument(
