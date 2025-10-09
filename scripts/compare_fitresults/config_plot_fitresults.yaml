@@ -1,0 +1,40 @@
+# Example YAML configuration for alpha_S uncertainty plotting script
+
+# Fit results configuration
+# Each entry is a fit result with its file path and optional plotting parameters
+fit_results:
+  
+  reco_Z:
+    file: "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS//250921_histmaker_dilepton/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile/fitresults.hdf5"
+    label: "Detector-level Z"
+    marker: "+"
+    color: "black"
+    
+  theory_Z:
+    file: "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS//250921_histmaker_dilepton_unfolding/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile/fitresults.hdf5"
+    label: "Theory fit Z"
+    marker: "x"
+    color: "black"
+    
+  reco_WZ:
+    file: "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS//250922_WZCombinedFit/Combination_ZMassDileptonWMass/fitresults.hdf5"
+    label: "Detector-level W+Z"
+    marker: "P"
+    color: "black"
+    
+  theory_WZ:
+    file: "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS//250922_WZCombinedTheoryFit/Combination_ZMassDileptonWMass/fitresults.hdf5"
+    label: "Theory fit W+Z"
+    marker: "X"
+    color: "black"
+
+# Example with auto-assigned markers and colors (commented out)
+# auto_assigned_example:
+#   file: "some/other/fit/result.hdf5"
+#   label: "This will get auto-assigned marker and color"
+#   # marker and color will be automatically assigned from defaults
+
+# ATLAS results configuration (handled via --showATLAS command line flag)
+# The script includes predefined ATLAS measurements:
+# - N4LLa: uncertainty = 0.9 * 10^-3
+# - N3LL+N3LO: uncertainty = 1.1 * 10^-3

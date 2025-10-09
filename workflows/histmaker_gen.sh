@@ -24,8 +24,8 @@ if [ -z "$MY_OUT_DIR" ]; then
 fi
 
 # create a subdirectory in the output directory with the current date
-current_date=$(date +"%H-%M_%d-%m-%Y")
-output_dir=$MY_OUT_DIR/$current_date
+current_date=$(date +"%y%m%d")
+output_dir=$MY_OUT_DIR/${current_date}_histmaker_gen/
 if [ -n "$postfix" ]; then
     output_dir=${output_dir}_${postfix}/
 else

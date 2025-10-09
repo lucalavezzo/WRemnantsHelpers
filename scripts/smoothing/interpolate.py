@@ -2,8 +2,6 @@
 Fit a histogram from a narf file with PySR.
 """
 
-import pysr
-from pysr import TensorBoardLoggerSpec
 import os, sys
 import argparse
 from datetime import datetime
@@ -92,30 +90,18 @@ parser.add_argument(
     help="Sample to fit."
 )
 parser.add_argument(
-    "-n",
-    "--nprocs",
-    type=int,
-    default=100,
-    help="Number of processes to use.",
-)
-parser.add_argument(
-    "-i",
-    "--niterations",
-    type=int,
-    default=20,
-    help="Number of iterations to run for.",
-)
-parser.add_argument(
-    "-t",
-    "--timeout",
-    type=int,
+    "--ylim",
+    nargs=2,
+    type=float,
     default=None,
-    help="Number of seconds to run for.",
+    help="y limits."
 )
 parser.add_argument(
-    "--tensorboard",
-    action='store_true',
-    help="Use tensorboard."
+    "-o",
+    "--outdir",
+    type=str,
+    required=True,
+    help="Output directory for the plots. Default is current directory.",
 )
 parser.add_argument(
     "-p",
@@ -167,135 +153,35 @@ if args.refHist:
     h_ref, _ = prepare_hist(h_ref, args.axes, args.refHistSelection if args.refHistSelection else args.selection)
     h = hh.divideHists(h, h_ref)
     h_unroll = hh.unrolledHist(h)
-    h_unroll = hh.normalize(h_unroll, scale=1)
-    y = h_unroll.values()
+    #h_unroll = hh.normalize(h_unroll, scale=1)
+    y = h.values()
     y_err = h_unroll.variances() ** 0.5
 else:
     y = h_unroll.values()
     y_err = h_unroll.variances()**0.5
+x = [ax.centers for ax in h.axes]
+
+from scipy.interpolate import RegularGridInterpolator
+
+print(x)
+print(y.shape)
+interp = RegularGridInterpolator((x[0], x[1]), y)
 x = np.array(list(itertools.product(*[ax.centers for ax in h.axes])))
+interps = interp(x)
+h_pred = copy.deepcopy(h_unroll)
+h_pred.values()[...] = interps
 
-# unique identifier to store run results, input histogram
-run_id = datetime.now().strftime("%y%m%d_%H%M")
-if args.postfix:
-    run_id += f"_{args.postfix}"
-
-# store the histogram with the model
-if not os.path.isdir(f"pysr_runs/{run_id}/"):
-    os.makedirs(f"pysr_runs/{run_id}/")
-output_tools.write_lz4_pkl_output(
-    f"pysr_runs/{run_id}/hist",
-    "input",
-    {"h":h, "h_unroll":h_unroll,"isratio": True if args.refHist else False},
-    "./",
-    args
-)
-
-if args.checkpoint:
-    # initialize model from an existing checkpoint
-    model = pysr.PySRRegressor()
-    model = model.from_file(
-        run_directory=args.checkpoint,
-        warm_start=True, # start where we left off
-
-        # update parameters that are dependent on arguments of this script
-        niterations=args.niterations,
-        timeout_in_seconds=args.timeout,
-        populations=args.nprocs/10,
-        procs=args.nprocs,
-
-    )
-    model.set_params(
-        extra_sympy_mappings={
-            'inv': lambda x: 1/x
-        },
-
-        binary_operators=[
-            "+",
-            "*",
-            "^"
-        ],
-        unary_operators=[
-            "exp",
-            "sin",
-            "tan",
-            "inv",
-            "abs",
-            "log",
-            "min",
-            "sinh",
-            "tanh",
-            "cosh"
-        ],
-        constraints={ # TODO play with this
-            "^": (-1, 3),
-            #"sin": 5
-        },
-        nested_constraints={  # TODO play with this
-            "sin": {"sin": 2},
-            "tan": {"tan": 1},
-            "exp": {"exp": 2},
-            "abs": {"abs": 3},
-            "^": {"sin": 2, "exp": 2, "log": 2, "tan": 2},
-            "log": {"log": 2}
-        },
-    )
-else:
-    # initialize a new model
-    # see https://ai.damtp.cam.ac.uk/pysr/tuning/
-    model = pysr.PySRRegressor(
-
-        # search size
-        niterations=args.niterations,
-        timeout_in_seconds=args.timeout,
-
-        # TODO test these parameters
-        maxsize=30,
-        population_size=len(y),
-        populations=args.nprocs/10,
-        ncycles_per_iteration=5000,
-        #parsimony=0.001,
-        weight_optimize=0.001,
-        
-        # operators and constraints
-        binary_operators=[
-            "+",
-            "*",
-            "^"
-        ],
-        unary_operators=[
-            "exp",
-            "sin",
-            "inv",
-            "abs",
-            "log",
-        ],
-        extra_sympy_mappings={
-            "inv": lambda x: 1 / x
-        },
-        constraints={ # TODO play with this
-            "^": (-1, 2),
-            "sin": 5
-        },
-        nested_constraints={  # TODO play with this
-            "sin": {"sin": 1, "exp": 1, "log": 1},
-            "exp": {"exp": 1, "sin": 1, "log": 1},
-            "abs": {"abs": 3},
-            "^": {"sin": 1, "exp": 1, "log": 1},
-            "log": {"log": 1, "exp": 1, "sin": 1}
-        },
-        # TODO customize loss
-
-        # computing
-        turbo=True,
-        procs=args.nprocs,
-        output_directory="pysr_runs",
-        run_id=run_id,
-        logger_spec=TensorBoardLoggerSpec(
-            log_dir="pysr_runs/logs",
-            log_interval=1, 
-        ) if args.tensorboard else None
-    )
-
-model.fit(x, y, weights=y_err)
-print(model)
+fig = plot_tools.makePlotWithRatioToRef(
+    [h_unroll, h_pred],
+    ["Data", "Pred"],
+    ["black", "red"],
+    xlabel="Bin",
+    ylim=args.ylim,
+    yerr=True,
+    base_size=10,
+)        
+fig.axes[0].legend(loc=(1.01,0))
+fig.axes[1].legend(loc=(1.01,0)).remove()
+if not os.path.isdir(args.outdir):
+    os.makedirs(args.outdir)
+plot_tools.save_pdf_and_png(args.outdir, f"results_RegularGridInterpolator_{args.postfix}" if args.postfix else f"results_RegularGridInterpolator", fig)

@@ -15,6 +15,7 @@ from wums import logging, output_tools, plot_tools  # isort: skip
 from utilities import common, parsing
 import hist
 from hist import Hist
+import datetime
 
 hep.style.use("CMS")
 
@@ -98,6 +99,13 @@ def main():
         help="Name of histograms to display in legend. Must be of same length as --hists."
     )
     parser.add_argument(
+        "--xlim",
+        type=float,
+        nargs=2,
+        default=None,
+        help="Limits for the x-axis of the histograms. Default is automatic.",
+    )
+    parser.add_argument(
         "--logy",
         action="store_true",
         help="Use logarithmic scale for the y-axis of the histograms. Default is linear scale."
@@ -143,6 +151,13 @@ def main():
         "e.g. --select 'ptll 0j 10j",
     )
     parser.add_argument(
+        "--rebin",
+        nargs="+",
+        type=lambda x: x.split(),
+        default=[],
+        help="Rebin the histograms. Provide pairs of axis name and rebin factor. E.g. --rebin 'ptll 2' 'mll 5' will rebin the 'ptll' axis by a factor of 2 and the 'mll' axis by a factor of 5.",
+    )
+    parser.add_argument(
         "-p",
         "--postfix",
         type=str,
@@ -153,7 +168,7 @@ def main():
         "-o",
         "--outdir",
         type=str,
-        default="./",
+        default=os.path.join(os.environ.get("MY_PLOT_DIR", "."), datetime.datetime.now().strftime("%y%m%d"), "plot_narf_hists/"),
         help="Output directory for the plots. Default is current directory.",
     )
     args = parser.parse_args()
@@ -225,7 +240,7 @@ def main():
                         sel_ax, sel_lb, sel_ub = sel
                         sel_lb = parsing.str_to_complex_or_int(sel_lb)
                         sel_ub = parsing.str_to_complex_or_int(sel_ub)
-                        h_ref = h_ref[{sel_ax: slice(sel_lb, sel_ub, sum)}]
+                        h_ref = h_ref[{sel_ax: slice(sel_lb, sel_ub)}]
                     elif len(sel) == 2:
                         sel_ax, sel_val = sel
                         try:
@@ -239,6 +254,12 @@ def main():
                 h_ref = h_ref.project(*args.axes)
             if len(h_ref.axes) > 1:
                 h_ref = hh.unrolledHist(h_ref)
+            if args.rebin:
+                for rebin in args.rebin:
+                    axis_name = rebin[0]
+                    if axis_name.isdigit():
+                        axis_name = int(axis_name)
+                    h_ref = h_ref[{axis_name: np.s_[::hist.rebin(int(rebin[1]))]}]
             fig, ax1, ratio_axes = plot_tools.figureWithRatio(
                 h_ref,
                 "("  + ",".join(args.axes) + ") bin" if len(args.axes) else "bin",
@@ -280,6 +301,12 @@ def main():
                     h = h.project(*args.axes)
                 if len(h.axes) > 1:
                     h = hh.unrolledHist(h)
+                if args.rebin:
+                    for rebin in args.rebin:
+                        axis_name = rebin[0]
+                        if axis_name.isdigit():
+                            axis_name = int(axis_name)
+                        h = h[{axis_name: np.s_[::hist.rebin(int(rebin[1]))]}]
                 hep.histplot(h, ax=ax1, label=args.labels[ihist], histtype="step", binwnorm=args.binwnorm, yerr=not args.noErrorBars)
 
                 hr = hh.divideHists(
@@ -320,16 +347,35 @@ def main():
                 ax2.set_xlabel(args.xlabel)
             if args.ylabel:
                 ax1.set_ylabel(args.ylabel)
-            plot_tools.fix_axes(ax1, ax2, fig, logy=args.logy)
+            if args.xlim:
+                ax1.set_xlim(args.xlim)
+                ax2.set_xlim(args.xlim)
+            # in case of only one axis being used, we want to set the x_ticks_ndp to a reasonable number, since they represent actual values, not bin numbers
+            if len(h_ref.axes) == 1:
+                centers = h_ref.axes[0].centers
+                diff = np.diff(centers)
+                min_diff = np.min(diff)
+                # grab the number of decimal places in min_diff
+                if min_diff < 1:
+                    x_ticks_ndp = abs(int(np.floor(np.log10(min_diff)))) - 1
+                else:
+                    x_ticks_ndp = 0
+            else:
+                x_ticks_ndp = None
+            plot_tools.fix_axes(ax1, ax2, fig, logy=args.logy, x_ticks_ndp=x_ticks_ndp)
             plot_tools.add_cms_decor(ax1, "Preliminary", lumi=16.8, loc=2)
             ax1.legend()
             ax1.invert_yaxis() # I have no idea why I have to do this
             _postfix = "" if not args.postfix else f"_{args.postfix}"
-            oname=os.path.join(args.outdir, f"{proc}_{hist_to_plot}{_postfix}.pdf")
+            oname=os.path.join(args.outdir, f"{proc}_{"_".join(hists_to_plot)}{_postfix}.pdf")
             fig.savefig(oname,  bbox_inches="tight")
             fig.savefig(oname.replace(".pdf", ".png"), bbox_inches="tight", dpi=300)
             plt.close(fig)
-            print(f"Saved {oname}(.png)")
+            output_tools.write_logfile(
+                args.outdir,
+                f"{proc}_{"_".join(hists_to_plot)}{_postfix}",
+            )
+            print(f"Saved {oname}(.png)(.log)")
                                 
 if __name__ == "__main__":
     main()

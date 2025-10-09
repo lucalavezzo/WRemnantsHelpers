@@ -1,10 +1,12 @@
 #!/bin/bash
-# Setup rabbit and run the fit for the mW analysis at the detector level
+# Setup rabbit and run the fit for the alphaS analysis at the detector level
+# Using a given pdf histogram as pseudo-data
 
 usage() {
-    echo "Usage: fitter.sh <infile> -o <output_dir>"
+    echo "Usage: fitter.sh <infile> <psuedo-data pdf hisotgram> -o <output_dir>"
     echo "-e <extra arguments for setupRabbit.py> -f <extra arguments for rabbit.py>"
     echo "--noSetup <skip setupRabbit.py call, carrot is infile>"
+    echo "--2D <run 2D fit, ptll-yll>"
     echo "-h, --help <show this help message>"
     exit 1
 }
@@ -14,6 +16,7 @@ if [ -z "$1" ]; then
 fi
 
 input_file=$1
+pdf=$2
 shift
 
 do_setup=true
@@ -45,6 +48,10 @@ while true; do
             do_setup=false
             shift
             ;;
+        --2D)
+            do_2D=true
+            shift
+            ;;
         -h|--help)
             usage
             ;;
@@ -61,6 +68,11 @@ done
 
 if [ -z "$input_file" ]; then
     echo "Input file is required. Use -i to specify the input file."
+    exit 1
+fi
+
+if [ -z "$pdf" ]; then
+    echo "PDF set for pseudo-data is required."
     exit 1
 fi
 
@@ -82,16 +94,16 @@ echo "Output directory: $output_dir" # setupCombine will create subdir in here
 if $do_setup; then
     echo "Setting up rabbit..."
     
-    fitvar='pt-eta-charge'
-
-    setup_command=(python "${WREM_BASE}/scripts/rabbit/setupRabbit.py" -i "$input_file" --fitvar "$fitvar" -o "$output_dir")
-    if [ -n "$extra_setup" ]; then
-        # Use eval to split extra_setup into array elements
-        eval "setup_command+=( $extra_setup )"
+    if $do_2D; then
+        fitvar='ptll-yll'
+    else
+        fitvar='ptll-yll-cosThetaStarll_quantile-phiStarll_quantile'
     fi
-    
-    echo "${setup_command[@]}"
-    setup_output=$("${setup_command[@]}" 2>&1 | tee /dev/tty)
+
+    setup_commmand="python ${WREM_BASE}/scripts/rabbit/setupRabbit.py -i $input_file --fitvar $fitvar -o $output_dir --fitAlphaS --pseudoData $pdf --postfix $pdf $extra_setup"
+
+    echo "$setup_commmand"
+    setup_output=$($setup_commmand 2>&1 | tee /dev/tty)
     
     # extract the output file name, and the output directory, where we will put the fit results
     carrot=$(echo "$setup_output" | grep -oP '(?<=Write output file ).*')
@@ -104,13 +116,10 @@ fi
 
 echo "Rabbit file: $carrot"
 output=$(dirname "$carrot")
-fit_command=(rabbit_fit.py "$carrot" -t -1 --computeVariations -m Project ch0 pt eta --computeHistErrors --doImpacts -o "$output" --globalImpacts --saveHists --saveHistsPerProcess)
-if [ -n "$extra_fit" ]; then
-    eval "fit_command+=( $extra_fit )"
-fi
-echo "${fit_command[@]}"
-fit_output=$("${fit_command[@]}" 2>&1 | tee /dev/tty)
+echo "Output: $output"
+
+echo
 echo "Running the fit..."
-fit_command="rabbit_fit.py $carrot -t -1 --computeVariations -m Project ch0 pt eta --computeHistErrors --doImpacts -o $output --globalImpacts --saveHists --saveHistsPerProcess $extra_fit"
+fit_command="rabbit_fit.py $carrot -t -1 --computeVariations -m Project ch0 ptll --computeHistErrors --doImpacts -o $output --globalImpacts --saveHists --saveHistsPerProcess $extra_fit"
 echo "$fit_command"
 fit_output=$($fit_command 2>&1 | tee /dev/tty)

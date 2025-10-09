@@ -13,6 +13,7 @@ from utilities import common, parsing
 from wums import ioutils
 from wums import boostHistHelpers as hh  # isort: skip
 from wums import logging, output_tools, plot_tools  # isort: skip
+import datetime
 
 hep.style.use("CMS")
 
@@ -116,7 +117,7 @@ def main():
     parser.add_argument(
         "-o",
         "--outdir",
-        default=".",
+        default=os.path.join(os.environ.get("MY_PLOT_DIR", "."), f"{datetime.datetime.now().strftime('%y%m%d')}_compare_file_hists/"),
         type=str,
         help="Output directory for the plots. Default is current directory.",
     )

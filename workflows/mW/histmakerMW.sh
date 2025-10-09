@@ -1,4 +1,4 @@
-# Run the histmaker for alphaS analysis
+# Run the histmaker for mW analysis
 
 while getopts "p:e:" opt; do
     case $opt in
@@ -28,7 +28,7 @@ fi
 
 # create a subdirectory in the output directory with the current date
 current_date=$(date +"%y%m%d")
-output_dir="${MY_OUT_DIR}/${current_date}_histmaker_dilepton_unfolding/"
+output_dir="${MY_OUT_DIR}/${current_date}_histmakerMW/"
 if [ -n "$postfix" ]; then
     output_dir=${output_dir}_${postfix}/
     postfix="--postfix ${postfix}"
@@ -39,6 +39,6 @@ fi
 mkdir -p $output_dir
 echo "Output directory: $output_dir"
 
-command="python ${WREM_BASE}/scripts/histmakers/mz_dilepton.py --dataPath /scratch/submit/cms/wmass/NanoAOD/ -o $output_dir --maxFiles -1 --axes ptll yll --csVarsHist --unfolding --poiAsNoi --unfoldingAxes ptVGen absYVGen helicitySig --unfoldingInclusive --forceDefaultName ${extra_args} ${postfix}"
+command="python ${WREM_BASE}/scripts/histmakers/mw_with_mu_eta_pt.py --dataPath /scratch/submit/cms/wmass/NanoAOD/ -o $output_dir --maxFiles -1 --poiAsNoi ${extra_args} ${postfix}"
 echo "Executing command: $command"
 eval $command

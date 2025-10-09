@@ -26,9 +26,12 @@ if [ -z "$input_file_Z" ] || [ -z "$input_file_W" ]; then
     exit 1
 fi
 
-if [ -z "$output_dir" ]; then
-    output_dir=$(dirname $input_file_Z)
-    echo "Set output directory to: $output_dir"
+if [ -n "$output_dir" ]; then
+    echo "Output directory: $output_dir"
+else
+    current_date=$(date +"%y%m%d")
+    output_dir="${MY_OUT_DIR}/${current_date}_WZCombinedTheoryFit/"
+    echo "Output directory: $output_dir"
 fi
 
 # unfolding command

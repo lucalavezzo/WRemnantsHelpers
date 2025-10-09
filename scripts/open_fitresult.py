@@ -22,7 +22,7 @@ parser.add_argument(
 parser.add_argument(
     "--parms",
     nargs="+",
-    default=['pdfAlphaS'],
+    default=[],
     type=str,
     help="Parms in the fitresult to print the pull of."
 )
@@ -34,6 +34,9 @@ fitresult, meta = rabbit.io_tools.get_fitresult(
 
 print(f"Fit result keys: {fitresult.keys()}")
 print(f"Meta data keys: {meta.keys()}")
+for k, v in meta.items():
+    if 'meta' in k: continue # suppress verbose meta info
+    print(f"{k}: {v}")
 print()
 print('edmval', fitresult['edmval'])
 parms = fitresult['parms'].get()

@@ -33,7 +33,7 @@ if [ -n "$output_dir" ]; then
     echo "Output directory: $output_dir"
 else
     current_date=$(date +"%y%m%d")
-    output_dir=~/public_html/alphaS/$current_date/
+    output_dir=~/public_html/alphaS/${current_date}_alphaS_mW_pulls_and_impacts/
     echo "Output directory: $output_dir"
 fi
 mkdir -p $output_dir
@@ -49,12 +49,12 @@ echo "Executing command: $command"
 eval $command
 
 
-command="rabbit_plot_pulls_and_impacts.py $input_file --poi massShiftW100MeV --config '${WREM_BASE}/utilities/styles/styles.py' --scaleImpacts 100 --showNumbers --oneSidedImpacts --grouping max -o $output_dir --otherExtensions pdf png -n 50 --poi massShiftW100MeV --impactTitle 'Δ<i>m</i><sub>W</sub>' --title CMS --subtitle Preliminary ${extra}"
+command="rabbit_plot_pulls_and_impacts.py $input_file --poi massShiftW100MeV --config '${WREM_BASE}/utilities/styles/styles.py' --scaleImpacts 100 --showNumbers --oneSidedImpacts --grouping max -o $output_dir --otherExtensions pdf png -n 50 --poi massShiftW100MeV --impactTitle '<i>m</i><sub>W</sub>' --title CMS --subtitle Preliminary ${extra}"
 
 echo "Executing command: $command"
 eval $command
 
-command="rabbit_plot_pulls_and_impacts.py $input_file --poi massShiftW100MeV --config '${WREM_BASE}/utilities/styles/styles.py' --scaleImpacts 100 --showNumbers --oneSidedImpacts --grouping max -o $output_dir --otherExtensions pdf png -n 50 --poi massShiftW100MeV --impactTitle 'Δ<i>m</i><sub>W</sub>' --title CMS --subtitle Preliminary --globalImpacts ${extra}"
+command="rabbit_plot_pulls_and_impacts.py $input_file --poi massShiftW100MeV --config '${WREM_BASE}/utilities/styles/styles.py' --scaleImpacts 100 --showNumbers --oneSidedImpacts --grouping max -o $output_dir --otherExtensions pdf png -n 50 --poi massShiftW100MeV --impactTitle '<i>m</i><sub>W</sub>' --title CMS --subtitle Preliminary --globalImpacts ${extra}"
 
 echo "Executing command: $command"
 eval $command
