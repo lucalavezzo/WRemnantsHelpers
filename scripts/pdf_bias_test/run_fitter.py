@@ -2,9 +2,9 @@ import os
 
 # script parameters
 central_pdfs_to_test = [
-    "ct18",
-    # "ct18z",
-    # "nnpdf31",
+    #"ct18",
+    "ct18z",
+    "nnpdf31",
     # "nnpdf40",
     # "pdf4lhc21",
     # "msht20",
@@ -19,7 +19,7 @@ pseudodata_pdfs_to_test = [
     "msht20",
     #"msht20an3lo"
 ]
-input_dir = f"{os.environ['MY_OUT_DIR']}/251009_histmaker_dilepton"
+input_dir = f"{os.environ['MY_OUT_DIR']}/251010_histmaker_dilepton"
 
 for pdf_central in central_pdfs_to_test:
 
