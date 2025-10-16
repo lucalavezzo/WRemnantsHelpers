@@ -104,6 +104,12 @@ def main():
         help="Range for the ratio plot (default: 0.5, 1.5).",
     )
     parser.add_argument(
+        "--binwnorm",
+        default=1,
+        type=float,
+        help="Bin width normalization factor (default: 1).",
+    )
+    parser.add_argument(
         "--norm",
         action='store_true',
         help="Normalize the hists to unity."
@@ -241,6 +247,7 @@ def main():
 
     if not os.path.exists(args.outdir):
         os.makedirs(args.outdir)
+    output_tools.write_indexfile(args.outdir)
 
     # TODO I think this made sense when doing args.compareVars. Should set up to support this again
     # print(files_hists)
@@ -261,7 +268,8 @@ def main():
     for combination in combinations:
 
         _h_ref = h_ref[{ax.name: combination[i] for i, ax in enumerate(selection_axes)}]
-        _h_ref = hh.unrolledHist(_h_ref)
+        if len(_h_ref.axes) > 1:
+            _h_ref = hh.unrolledHist(_h_ref, binwnorm=args.binwnorm)
 
         fig, ax1, ratio_axes = plot_tools.figureWithRatio(
             _h_ref,
@@ -273,16 +281,32 @@ def main():
         )
         ax2 = ratio_axes[-1]
 
-        hep.histplot(_h_ref, ax=ax1, label=args.labels[0] + " - " + list(files_hists[args.infiles[0]].keys())[0], binwnorm=1, histtype="step", color="black", yerr=not args.norm)
+        hep.histplot(
+            _h_ref,
+            ax=ax1,
+            label=args.labels[0] + " - " + list(files_hists[args.infiles[0]].keys())[0],
+            binwnorm=args.binwnorm if len(_h_ref.axes) == 1 else None,
+            histtype="step",
+            color="black",
+            yerr=not args.norm
+        )
 
         for i, (infile, hists) in enumerate(files_hists.items()):
             if i == 0: continue # already plotted
 
             h = list(hists.values())[0]
             h = h[{ax.name: combination[i] for i, ax in enumerate(selection_axes)}]
-            h = hh.unrolledHist(h)
+            if len(h.axes) > 1:
+                h = hh.unrolledHist(h, binwnorm=args.binwnorm)
 
-            hep.histplot(h, ax=ax1, label=args.labels[i] + " - " + list(hists.keys())[0], binwnorm=1, histtype="step", yerr=not args.norm)
+            hep.histplot(
+                h,
+                ax=ax1,
+                label=args.labels[i] + " - " + list(hists.keys())[0],
+                binwnorm=args.binwnorm if len(h.axes) == 1 else None,
+                histtype="step",
+                yerr=not args.norm
+            )
 
             hr = hh.divideHists(
                 h,
@@ -307,13 +331,18 @@ def main():
             ax1.set_title(f"{selection_label}")
         if args.range:
             ax1.set_ylim(args.range[0], args.range[1])
-        oname = args.outdir + f"/{var}{selection_label}{_postfix}.png"
-        print(f"Saving plot to {oname}(.pdf)")
+        fname = f"{var}{selection_label}{_postfix}"
+        oname = os.path.join(args.outdir, fname)
         fig.tight_layout()
-        fig.savefig(oname, dpi=300, bbox_inches='tight')
-        fig.savefig(oname.replace(".png", ".pdf"), bbox_inches='tight')
+        fig.savefig(oname + ".png", dpi=300, bbox_inches='tight')
+        fig.savefig(oname + ".pdf", bbox_inches='tight')
         plt.close(fig)
-
+        output_tools.write_index_and_log(
+            args.outdir,
+            fname,
+            args=args
+        )
+        print(f"Saved {oname}(.png)(.log)")
 
 if __name__ == "__main__":
     main()

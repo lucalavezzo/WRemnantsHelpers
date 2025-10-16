@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import mplhep as hep
 import rabbit.io_tools
 import argparse
+import wums.ioutils
 
 parser = argparse.ArgumentParser(
     description="Read fit result from hdf5 file from rabbit or root file from combinetf1"
@@ -26,6 +27,12 @@ parser.add_argument(
     type=str,
     help="Parms in the fitresult to print the pull of."
 )
+parser.add_argument(
+    "--path",
+    default="",
+    type=str,
+    help="Open a specific, slash-separated, path inside the HDF5 file."
+)
 args = parser.parse_args()
 
 fitresult, meta = rabbit.io_tools.get_fitresult(
@@ -42,3 +49,14 @@ print('edmval', fitresult['edmval'])
 parms = fitresult['parms'].get()
 for p in args.parms:
     print(p, parms[p])
+
+if args.path:
+    print()
+    full_path = args.path.split('/')
+    h = fitresult
+    print(f"Navigating to path: {args.path}")
+    for p in full_path:
+        h = h[p]
+        if type(h) is wums.ioutils.H5PickleProxy:
+            h = h.get()
+        print(p, h)

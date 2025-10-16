@@ -168,7 +168,10 @@ def main():
         "-o",
         "--outdir",
         type=str,
-        default=os.path.join(os.environ.get("MY_PLOT_DIR", "."), datetime.datetime.now().strftime("%y%m%d"), "plot_narf_hists/"),
+        default=os.path.join(
+            os.environ.get("MY_PLOT_DIR", "."),
+            datetime.datetime.now().strftime("%y%m%d") + "_plot_narf_hists/"
+        ),
         help="Output directory for the plots. Default is current directory.",
     )
     args = parser.parse_args()
@@ -221,12 +224,12 @@ def main():
             else:
                 hists_to_plot = available_hists
 
-
             if len(args.labels):
                 if len(args.labels) != len(hists_to_plot):
                     raise Exception(f"Length of labels passed ({len(args.labels)}), number of hists to plot ({len(hists_to_plot)}) does not match")
+                labels_to_plot = args.labels
             else:
-                args.labels = hists_to_plot
+                labels_to_plot = hists_to_plot
 
             h_ref = output[hists_to_plot[0]]
             if not (type(h_ref) is Hist):
@@ -249,11 +252,14 @@ def main():
                             print(e)
                             print("Trying to use as string...")
                             pass
-                        h_ref = h_ref[{sel_ax: sel_val}]
+                        if sel_ax not in h_ref.axes.name:
+                            print(f"Axis '{sel_ax}' not found in histogram axes {h_ref.axes.name}. Available axes: {h_ref.axes.name}")
+                        else:
+                            h_ref = h_ref[{sel_ax: sel_val}]
             if args.axes:
                 h_ref = h_ref.project(*args.axes)
             if len(h_ref.axes) > 1:
-                h_ref = hh.unrolledHist(h_ref)
+                h_ref = hh.unrolledHist(h_ref, binwnorm=args.binwnorm)
             if args.rebin:
                 for rebin in args.rebin:
                     axis_name = rebin[0]
@@ -271,7 +277,7 @@ def main():
             )
             ax2 = ratio_axes[-1]
 
-            hep.histplot(h_ref, ax=ax1, label=args.labels[0] + " (ref.)", histtype="step", binwnorm=args.binwnorm, color="black", yerr=not args.noErrorBars)
+            hep.histplot(h_ref, ax=ax1, label=labels_to_plot[0] + " (ref.)", histtype="step", binwnorm=args.binwnorm if len(h_ref.axes) > 1 else None, color="black", yerr=not args.noErrorBars)
 
             for ihist, hist_to_plot in enumerate(hists_to_plot):
                 if ihist == 0: continue # already plotted
@@ -300,14 +306,14 @@ def main():
                 if args.axes:
                     h = h.project(*args.axes)
                 if len(h.axes) > 1:
-                    h = hh.unrolledHist(h)
+                    h = hh.unrolledHist(h, binwnorm=args.binwnorm)
                 if args.rebin:
                     for rebin in args.rebin:
                         axis_name = rebin[0]
                         if axis_name.isdigit():
                             axis_name = int(axis_name)
                         h = h[{axis_name: np.s_[::hist.rebin(int(rebin[1]))]}]
-                hep.histplot(h, ax=ax1, label=args.labels[ihist], histtype="step", binwnorm=args.binwnorm, yerr=not args.noErrorBars)
+                hep.histplot(h, ax=ax1, label=labels_to_plot[ihist], histtype="step", binwnorm=args.binwnorm if len(h_ref.axes) > 1 else None, yerr=not args.noErrorBars)
 
                 hr = hh.divideHists(
                     h,
@@ -317,19 +323,20 @@ def main():
                     flow=False,
                     by_ax_name=False,
                 )
-                hep.histplot(hr, ax=ax2, histtype="step", label=args.labels[ihist], yerr=not args.noRatioErrorBars)
+                hep.histplot(hr, ax=ax2, histtype="step", label=labels_to_plot[ihist], yerr=not args.noRatioErrorBars)
 
             selections_text = ""
             if args.selection or args.selectRefHist:
                 selections_text = "Selections:\n"
-                for sel in args.selection:
-                    sel = sel.split()
-                    if len(sel) == 3:
-                        sel_ax, sel_lb, sel_ub = sel
-                        selections_text += f"{sel_ax}: [{sel_lb}, {sel_ub})\n"
-                    elif len(sel) == 2:
-                        sel_ax, sel_val = sel
-                        selections_text += f"{sel_ax}: {sel_val}\n"
+                if args.selection:
+                    for sel in args.selection:
+                        sel = sel.split()
+                        if len(sel) == 3:
+                            sel_ax, sel_lb, sel_ub = sel
+                            selections_text += f"{sel_ax}: [{sel_lb}, {sel_ub})\n"
+                        elif len(sel) == 2:
+                            sel_ax, sel_val = sel
+                            selections_text += f"{sel_ax}: {sel_val}\n"
                 if args.selectRefHist is None:
                     args.selectRefHist = args.selection
                 selections_text += "\nref. hist:\n"
@@ -366,16 +373,18 @@ def main():
             plot_tools.add_cms_decor(ax1, "Preliminary", lumi=16.8, loc=2)
             ax1.legend()
             ax1.invert_yaxis() # I have no idea why I have to do this
+
             _postfix = "" if not args.postfix else f"_{args.postfix}"
-            oname=os.path.join(args.outdir, f"{proc}_{"_".join(hists_to_plot)}{_postfix}.pdf")
-            fig.savefig(oname,  bbox_inches="tight")
-            fig.savefig(oname.replace(".pdf", ".png"), bbox_inches="tight", dpi=300)
+            oname=os.path.join(args.outdir, f"{proc}_{"_".join(hists_to_plot)}{_postfix}")
+            fig.savefig(oname + ".pdf",  bbox_inches="tight")
+            fig.savefig(oname + ".png", bbox_inches="tight", dpi=300)
             plt.close(fig)
-            output_tools.write_logfile(
+            output_tools.write_index_and_log(
                 args.outdir,
                 f"{proc}_{"_".join(hists_to_plot)}{_postfix}",
+                args=args
             )
-            print(f"Saved {oname}(.png)(.log)")
+            print(f"Saved {oname}(.log)(.png)(.log)")
                                 
 if __name__ == "__main__":
     main()

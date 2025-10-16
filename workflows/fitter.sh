@@ -113,6 +113,6 @@ echo "Output: $output"
 
 echo
 echo "Running the fit..."
-fit_command="rabbit_fit.py $carrot -t -1 --computeVariations -m Project ch0 ptll --computeHistErrors --doImpacts -o $output --globalImpacts --saveHists --saveHistsPerProcess $extra_fit"
+fit_command="rabbit_fit.py $carrot --computeVariations -m Project ch0 ptll --computeHistErrors --doImpacts -o $output --globalImpacts --saveHists --saveHistsPerProcess $extra_fit"
 echo "$fit_command"
 fit_output=$($fit_command 2>&1 | tee /dev/tty)
