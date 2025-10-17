@@ -21,7 +21,8 @@ DEFAULT_CENTRAL_PDFS = [
 DEFAULT_PSEUDODATA_PDFS = [
     "ct18",
     "ct18z",
-    "nnpdf31",
+    # "nnpdf31",
+    "nnpdf30",
     "nnpdf40",
     "pdf4lhc21",
     "msht20",

@@ -24,7 +24,7 @@ extra_pdfs = [
 
 all_pdfs = pdfs_to_test + pdfs_for_uncs + extra_pdfs
 for i, central_pdf in enumerate(pdfs_to_test):
-    if i > 0: break # testing
+    if i == 0: continue # testing
 
     other_pdfs = [pdf for pdf in all_pdfs if pdf != central_pdf]
 

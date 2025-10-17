@@ -1,6 +1,6 @@
 # WRemnantsHelpers
 
-Scripts, common recipes, and notes for the `WRemnants` framework.
+Scripts, common workflows, and studies for the `WRemnants` framework ecosystem: `WRemnants`, `rabbit`, `wums`, `narf`.
 
 We assume you're running in the `WRemenants` singularity:
 
@@ -21,16 +21,15 @@ WRemnants/
 WRemntantsHelpers/
 ```
 
-## `notes/`
-Contains notes on how to run certain studies in the `WRemnants` framework. 
-These are not the outcomes of the studies, which are documented in slides.
+## `scripts/`
+General-purpose scripts for use with `WRemnants` and `rabbit`, for example, plotting histmaker outputs, opening fitresults, etc.
 
 ## `workflows/`
-Common recipes for running the `WRemnants` framework.
+Common recipes for running the framework, such as running the full histmaker-fitter-plotting chain for given analyses, plotting the pulls and impacts for the $\alpha_S$ fits, etc.
 
-## `scripts/`
-Scripts used for studies in the `WRemnants` framework.
-Usually more specific than what is found in `workflows/`.
+## `studies/`
+Scripts used for specific studies for analyses.
+Usually more specific, less of general interest, than what is found in `workflows/`.
 
 ## `bin/`
 Executables added to the `PATH` by `setup.sh`.
