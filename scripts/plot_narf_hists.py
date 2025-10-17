@@ -1,4 +1,5 @@
 import sys
+
 sys.path.append("../../WRemnants/")
 import os
 import re
@@ -19,12 +20,14 @@ import datetime
 
 hep.style.use("CMS")
 
+
 def load_results_h5py(h5file):
 
     if "results" in h5file.keys():
         return ioutils.pickle_load_h5py(h5file["results"])
     else:
         return {k: ioutils.pickle_load_h5py(v) for k, v in h5file.items()}
+
 
 def is_regex(pattern):
 
@@ -36,30 +39,24 @@ def is_regex(pattern):
             return False
     else:
         return False
-    
+
+
 def match_regex(pattern, list):
     """
     Return elements from list that match the regex pattern.
     """
     return [item for item in list if re.match(pattern, item)]
 
+
 def main():
 
-    parser = argparse.ArgumentParser(
-        description="Read in a hdf5 file."
-    )
+    parser = argparse.ArgumentParser(description="Read in a hdf5 file.")
     parser.add_argument(
         "infile",
         type=str,
         help="hdf5 file.",
     )
-    parser.add_argument(
-        "--axes",
-        nargs="+",
-        type=str,
-        default=[],
-        help="Axes to plot."
-    )
+    parser.add_argument("--axes", nargs="+", type=str, default=[], help="Axes to plot.")
     parser.add_argument(
         "--filterProcs",
         nargs="+",
@@ -74,29 +71,25 @@ def main():
         default=[],
         help="Specify histogram names to filter output. If empty, all histograms are loaded. Supports regex.",
     )
-    parser.add_argument(
-        "--binwnorm",
-        type=int,
-        default=None
-    )
+    parser.add_argument("--binwnorm", type=int, default=None)
     parser.add_argument(
         "--xlabel",
         type=str,
         default=None,
-        help="Label for the x-axis of the histograms. If not provided, label from histogram is used."
+        help="Label for the x-axis of the histograms. If not provided, label from histogram is used.",
     )
     parser.add_argument(
         "--ylabel",
         type=str,
         default=None,
-        help="Label for the y-axis of the histograms. If not provided, label from histogram is used."
+        help="Label for the y-axis of the histograms. If not provided, label from histogram is used.",
     )
     parser.add_argument(
         "--labels",
         nargs="+",
         type=str,
         default=[],
-        help="Name of histograms to display in legend. Must be of same length as --hists."
+        help="Name of histograms to display in legend. Must be of same length as --hists.",
     )
     parser.add_argument(
         "--xlim",
@@ -108,7 +101,7 @@ def main():
     parser.add_argument(
         "--logy",
         action="store_true",
-        help="Use logarithmic scale for the y-axis of the histograms. Default is linear scale."
+        help="Use logarithmic scale for the y-axis of the histograms. Default is linear scale.",
     )
     parser.add_argument(
         "--rrange",
@@ -117,14 +110,8 @@ def main():
         nargs=2,
         help="Range for the ratio plot (default: 0.5, 1.5).",
     )
-    parser.add_argument(
-        "--noErrorBars",
-        action='store_true'
-    )
-    parser.add_argument(
-        "--noRatioErrorBars",
-        action='store_true'
-    )
+    parser.add_argument("--noErrorBars", action="store_true")
+    parser.add_argument("--noRatioErrorBars", action="store_true")
     parser.add_argument(
         "--select",
         nargs="+",
@@ -170,7 +157,7 @@ def main():
         type=str,
         default=os.path.join(
             os.environ.get("MY_PLOT_DIR", "."),
-            datetime.datetime.now().strftime("%y%m%d") + "_plot_narf_hists/"
+            datetime.datetime.now().strftime("%y%m%d") + "_plot_narf_hists/",
         ),
         help="Output directory for the plots. Default is current directory.",
     )
@@ -190,7 +177,7 @@ def main():
             print(f"Filtered results to processes: {procs}")
         else:
             print("No filtering applied, all processes loaded.")
-        
+
         for proc in procs:
             print(f"Process: {proc}")
 
@@ -208,25 +195,31 @@ def main():
             if args.hists:
 
                 for hist_name in args.hists:
-                    
+
                     if is_regex(hist_name):
                         matched_hists = match_regex(hist_name, available_hists)
                         if matched_hists:
                             hists_to_plot.extend(matched_hists)
                         else:
-                            print(f"No histograms matched the regex '{hist_name}' in process '{proc}'.")
+                            print(
+                                f"No histograms matched the regex '{hist_name}' in process '{proc}'."
+                            )
                     else:
                         if hist_name in available_hists:
                             hists_to_plot.append(hist_name)
                         else:
-                            print(f"Histogram '{hist_name}' not found in process '{proc}'. Available histograms: {available_hists}")
-                    
+                            print(
+                                f"Histogram '{hist_name}' not found in process '{proc}'. Available histograms: {available_hists}"
+                            )
+
             else:
                 hists_to_plot = available_hists
 
             if len(args.labels):
                 if len(args.labels) != len(hists_to_plot):
-                    raise Exception(f"Length of labels passed ({len(args.labels)}), number of hists to plot ({len(hists_to_plot)}) does not match")
+                    raise Exception(
+                        f"Length of labels passed ({len(args.labels)}), number of hists to plot ({len(hists_to_plot)}) does not match"
+                    )
                 labels_to_plot = args.labels
             else:
                 labels_to_plot = hists_to_plot
@@ -253,7 +246,9 @@ def main():
                             print("Trying to use as string...")
                             pass
                         if sel_ax not in h_ref.axes.name:
-                            print(f"Axis '{sel_ax}' not found in histogram axes {h_ref.axes.name}. Available axes: {h_ref.axes.name}")
+                            print(
+                                f"Axis '{sel_ax}' not found in histogram axes {h_ref.axes.name}. Available axes: {h_ref.axes.name}"
+                            )
                         else:
                             h_ref = h_ref[{sel_ax: sel_val}]
             if args.axes:
@@ -265,22 +260,31 @@ def main():
                     axis_name = rebin[0]
                     if axis_name.isdigit():
                         axis_name = int(axis_name)
-                    h_ref = h_ref[{axis_name: np.s_[::hist.rebin(int(rebin[1]))]}]
+                    h_ref = h_ref[{axis_name: np.s_[:: hist.rebin(int(rebin[1]))]}]
             fig, ax1, ratio_axes = plot_tools.figureWithRatio(
                 h_ref,
-                "("  + ",".join(args.axes) + ") bin" if len(args.axes) else "bin",
+                "(" + ",".join(args.axes) + ") bin" if len(args.axes) else "bin",
                 "Events",
                 ylim=np.max(h_ref.values()) * 1.3,
                 rlabel=f"1/ref.",
                 rrange=args.rrange,
-                base_size=10
+                base_size=10,
             )
             ax2 = ratio_axes[-1]
 
-            hep.histplot(h_ref, ax=ax1, label=labels_to_plot[0] + " (ref.)", histtype="step", binwnorm=args.binwnorm if len(h_ref.axes) > 1 else None, color="black", yerr=not args.noErrorBars)
+            hep.histplot(
+                h_ref,
+                ax=ax1,
+                label=labels_to_plot[0] + " (ref.)",
+                histtype="step",
+                binwnorm=args.binwnorm if len(h_ref.axes) > 1 else None,
+                color="black",
+                yerr=not args.noErrorBars,
+            )
 
             for ihist, hist_to_plot in enumerate(hists_to_plot):
-                if ihist == 0: continue # already plotted
+                if ihist == 0:
+                    continue  # already plotted
 
                 h = output[hist_to_plot]
                 if not (type(h) is Hist):
@@ -312,8 +316,15 @@ def main():
                         axis_name = rebin[0]
                         if axis_name.isdigit():
                             axis_name = int(axis_name)
-                        h = h[{axis_name: np.s_[::hist.rebin(int(rebin[1]))]}]
-                hep.histplot(h, ax=ax1, label=labels_to_plot[ihist], histtype="step", binwnorm=args.binwnorm if len(h_ref.axes) > 1 else None, yerr=not args.noErrorBars)
+                        h = h[{axis_name: np.s_[:: hist.rebin(int(rebin[1]))]}]
+                hep.histplot(
+                    h,
+                    ax=ax1,
+                    label=labels_to_plot[ihist],
+                    histtype="step",
+                    binwnorm=args.binwnorm if len(h_ref.axes) > 1 else None,
+                    yerr=not args.noErrorBars,
+                )
 
                 hr = hh.divideHists(
                     h,
@@ -323,7 +334,13 @@ def main():
                     flow=False,
                     by_ax_name=False,
                 )
-                hep.histplot(hr, ax=ax2, histtype="step", label=labels_to_plot[ihist], yerr=not args.noRatioErrorBars)
+                hep.histplot(
+                    hr,
+                    ax=ax2,
+                    histtype="step",
+                    label=labels_to_plot[ihist],
+                    yerr=not args.noRatioErrorBars,
+                )
 
             selections_text = ""
             if args.selection or args.selectRefHist:
@@ -348,8 +365,11 @@ def main():
                     elif len(sel) == 2:
                         sel_ax, sel_val = sel
                         selections_text += f"{sel_ax}: {sel_val}\n"
-                ax1.text(1.01, 0, selections_text, transform=ax1.transAxes, fontsize='small')
-            if args.logy: ax1.set_yscale("log")
+                ax1.text(
+                    1.01, 0, selections_text, transform=ax1.transAxes, fontsize="small"
+                )
+            if args.logy:
+                ax1.set_yscale("log")
             if args.xlabel:
                 ax2.set_xlabel(args.xlabel)
             if args.ylabel:
@@ -372,19 +392,20 @@ def main():
             plot_tools.fix_axes(ax1, ax2, fig, logy=args.logy, x_ticks_ndp=x_ticks_ndp)
             plot_tools.add_cms_decor(ax1, "Preliminary", lumi=16.8, loc=2)
             ax1.legend()
-            ax1.invert_yaxis() # I have no idea why I have to do this
+            ax1.invert_yaxis()  # I have no idea why I have to do this
 
             _postfix = "" if not args.postfix else f"_{args.postfix}"
-            oname=os.path.join(args.outdir, f"{proc}_{"_".join(hists_to_plot)}{_postfix}")
-            fig.savefig(oname + ".pdf",  bbox_inches="tight")
+            oname = os.path.join(
+                args.outdir, f"{proc}_{"_".join(hists_to_plot)}{_postfix}"
+            )
+            fig.savefig(oname + ".pdf", bbox_inches="tight")
             fig.savefig(oname + ".png", bbox_inches="tight", dpi=300)
             plt.close(fig)
             output_tools.write_index_and_log(
-                args.outdir,
-                f"{proc}_{"_".join(hists_to_plot)}{_postfix}",
-                args=args
+                args.outdir, f"{proc}_{"_".join(hists_to_plot)}{_postfix}", args=args
             )
             print(f"Saved {oname}(.log)(.png)(.log)")
-                                
+
+
 if __name__ == "__main__":
     main()

@@ -20,15 +20,15 @@ from wums import plot_tools
 from wums import boostHistHelpers as hh
 from utilities import parsing
 
+
 def load_results_h5py(h5file):
     if "results" in h5file.keys():
         return ioutils.pickle_load_h5py(h5file["results"])
     else:
         return {k: ioutils.pickle_load_h5py(v) for k, v in h5file.items()}
 
-parser = argparse.ArgumentParser(
-    description="Read in a hdf5 file."
-)
+
+parser = argparse.ArgumentParser(description="Read in a hdf5 file.")
 parser.add_argument(
     "infile",
     type=str,
@@ -62,40 +62,17 @@ parser.add_argument(
     type=str,
     default=None,
     help="Apply a selection to the reference histogram, if the axis exists."
-    "If left empty, the --select will apply to the reference hist."
+    "If left empty, the --select will apply to the reference hist.",
+)
+parser.add_argument("--hist", type=str, default="nominal", help="Histogram to fit.")
+parser.add_argument(
+    "--refHist", type=str, default=None, help="Fit the ratio of --hist to --refHist."
 )
 parser.add_argument(
-    "--hist",
-    type=str,
-    default="nominal",
-    help="Histogram to fit."
+    "--axes", nargs="+", type=str, default=["ptll"], help="Axes to fit."
 )
-parser.add_argument(
-    "--refHist",
-    type=str,
-    default=None,
-    help="Fit the ratio of --hist to --refHist."
-)
-parser.add_argument(
-    "--axes",
-    nargs="+",
-    type=str,
-    default=["ptll"],
-    help="Axes to fit."
-)
-parser.add_argument(
-    "--sample",
-    type=str,
-    default="ZmumuPostVFP",
-    help="Sample to fit."
-)
-parser.add_argument(
-    "--ylim",
-    nargs=2,
-    type=float,
-    default=None,
-    help="y limits."
-)
+parser.add_argument("--sample", type=str, default="ZmumuPostVFP", help="Sample to fit.")
+parser.add_argument("--ylim", nargs=2, type=float, default=None, help="y limits.")
 parser.add_argument(
     "-o",
     "--outdir",
@@ -116,13 +93,14 @@ args = parser.parse_args()
 with h5py.File(args.infile, "r") as h5file:
     results = load_results_h5py(h5file)
     print(f"Samples in file: {results.keys()}\n")
-    h = results[args.sample]['output'][args.hist].get()
+    h = results[args.sample]["output"][args.hist].get()
     if args.refHist:
-        h_ref = results[args.sample]['output'][args.refHist].get()
+        h_ref = results[args.sample]["output"][args.refHist].get()
 
 # needed for the weights
 if h.storage_type != hist.storage.Weight and h.storage_type != hist.storage.Double:
     raise Exception()
+
 
 # prepare the histogram
 def prepare_hist(_h, axes, selection):
@@ -148,17 +126,22 @@ def prepare_hist(_h, axes, selection):
     _h_unroll = hh.normalize(_h_unroll, scale=1)
     return _h, _h_unroll
 
+
 h, h_unroll = prepare_hist(h, args.axes, args.selection)
 if args.refHist:
-    h_ref, _ = prepare_hist(h_ref, args.axes, args.refHistSelection if args.refHistSelection else args.selection)
+    h_ref, _ = prepare_hist(
+        h_ref,
+        args.axes,
+        args.refHistSelection if args.refHistSelection else args.selection,
+    )
     h = hh.divideHists(h, h_ref)
     h_unroll = hh.unrolledHist(h)
-    #h_unroll = hh.normalize(h_unroll, scale=1)
+    # h_unroll = hh.normalize(h_unroll, scale=1)
     y = h.values()
     y_err = h_unroll.variances() ** 0.5
 else:
     y = h_unroll.values()
-    y_err = h_unroll.variances()**0.5
+    y_err = h_unroll.variances() ** 0.5
 x = [ax.centers for ax in h.axes]
 
 from scipy.interpolate import RegularGridInterpolator
@@ -179,9 +162,17 @@ fig = plot_tools.makePlotWithRatioToRef(
     ylim=args.ylim,
     yerr=True,
     base_size=10,
-)        
-fig.axes[0].legend(loc=(1.01,0))
-fig.axes[1].legend(loc=(1.01,0)).remove()
+)
+fig.axes[0].legend(loc=(1.01, 0))
+fig.axes[1].legend(loc=(1.01, 0)).remove()
 if not os.path.isdir(args.outdir):
     os.makedirs(args.outdir)
-plot_tools.save_pdf_and_png(args.outdir, f"results_RegularGridInterpolator_{args.postfix}" if args.postfix else f"results_RegularGridInterpolator", fig)
+plot_tools.save_pdf_and_png(
+    args.outdir,
+    (
+        f"results_RegularGridInterpolator_{args.postfix}"
+        if args.postfix
+        else f"results_RegularGridInterpolator"
+    ),
+    fig,
+)

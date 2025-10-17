@@ -22,15 +22,15 @@ from wums import plot_tools
 from wums import boostHistHelpers as hh
 from utilities import parsing
 
+
 def load_results_h5py(h5file):
     if "results" in h5file.keys():
         return ioutils.pickle_load_h5py(h5file["results"])
     else:
         return {k: ioutils.pickle_load_h5py(v) for k, v in h5file.items()}
 
-parser = argparse.ArgumentParser(
-    description="Read in a hdf5 file."
-)
+
+parser = argparse.ArgumentParser(description="Read in a hdf5 file.")
 parser.add_argument(
     "infile",
     type=str,
@@ -64,33 +64,16 @@ parser.add_argument(
     type=str,
     default=None,
     help="Apply a selection to the reference histogram, if the axis exists."
-    "If left empty, the --select will apply to the reference hist."
+    "If left empty, the --select will apply to the reference hist.",
+)
+parser.add_argument("--hist", type=str, default="nominal", help="Histogram to fit.")
+parser.add_argument(
+    "--refHist", type=str, default=None, help="Fit the ratio of --hist to --refHist."
 )
 parser.add_argument(
-    "--hist",
-    type=str,
-    default="nominal",
-    help="Histogram to fit."
+    "--axes", nargs="+", type=str, default=["ptll"], help="Axes to fit."
 )
-parser.add_argument(
-    "--refHist",
-    type=str,
-    default=None,
-    help="Fit the ratio of --hist to --refHist."
-)
-parser.add_argument(
-    "--axes",
-    nargs="+",
-    type=str,
-    default=["ptll"],
-    help="Axes to fit."
-)
-parser.add_argument(
-    "--sample",
-    type=str,
-    default="ZmumuPostVFP",
-    help="Sample to fit."
-)
+parser.add_argument("--sample", type=str, default="ZmumuPostVFP", help="Sample to fit.")
 parser.add_argument(
     "-n",
     "--nprocs",
@@ -112,11 +95,7 @@ parser.add_argument(
     default=None,
     help="Number of seconds to run for.",
 )
-parser.add_argument(
-    "--tensorboard",
-    action='store_true',
-    help="Use tensorboard."
-)
+parser.add_argument("--tensorboard", action="store_true", help="Use tensorboard.")
 parser.add_argument(
     "-p",
     "--postfix",
@@ -130,13 +109,14 @@ args = parser.parse_args()
 with h5py.File(args.infile, "r") as h5file:
     results = load_results_h5py(h5file)
     print(f"Samples in file: {results.keys()}\n")
-    h = results[args.sample]['output'][args.hist].get()
+    h = results[args.sample]["output"][args.hist].get()
     if args.refHist:
-        h_ref = results[args.sample]['output'][args.refHist].get()
+        h_ref = results[args.sample]["output"][args.refHist].get()
 
 # needed for the weights
 if h.storage_type != hist.storage.Weight and h.storage_type != hist.storage.Double:
     raise Exception()
+
 
 # prepare the histogram
 def prepare_hist(_h, axes, selection):
@@ -162,9 +142,14 @@ def prepare_hist(_h, axes, selection):
     _h_unroll = hh.normalize(_h_unroll, scale=1)
     return _h, _h_unroll
 
+
 h, h_unroll = prepare_hist(h, args.axes, args.selection)
 if args.refHist:
-    h_ref, _ = prepare_hist(h_ref, args.axes, args.refHistSelection if args.refHistSelection else args.selection)
+    h_ref, _ = prepare_hist(
+        h_ref,
+        args.axes,
+        args.refHistSelection if args.refHistSelection else args.selection,
+    )
     h = hh.divideHists(h, h_ref)
     h_unroll = hh.unrolledHist(h)
     h_unroll = hh.normalize(h_unroll, scale=1)
@@ -172,7 +157,7 @@ if args.refHist:
     y_err = h_unroll.variances() ** 0.5
 else:
     y = h_unroll.values()
-    y_err = h_unroll.variances()**0.5
+    y_err = h_unroll.variances() ** 0.5
 x = np.array(list(itertools.product(*[ax.centers for ax in h.axes])))
 
 # unique identifier to store run results, input histogram
@@ -186,9 +171,9 @@ if not os.path.isdir(f"pysr_runs/{run_id}/"):
 output_tools.write_lz4_pkl_output(
     f"pysr_runs/{run_id}/hist",
     "input",
-    {"h":h, "h_unroll":h_unroll,"isratio": True if args.refHist else False},
+    {"h": h, "h_unroll": h_unroll, "isratio": True if args.refHist else False},
     "./",
-    args
+    args,
 )
 
 if args.checkpoint:
@@ -196,25 +181,16 @@ if args.checkpoint:
     model = pysr.PySRRegressor()
     model = model.from_file(
         run_directory=args.checkpoint,
-        warm_start=True, # start where we left off
-
+        warm_start=True,  # start where we left off
         # update parameters that are dependent on arguments of this script
         niterations=args.niterations,
         timeout_in_seconds=args.timeout,
-        populations=args.nprocs/10,
+        populations=args.nprocs / 10,
         procs=args.nprocs,
-
     )
     model.set_params(
-        extra_sympy_mappings={
-            'inv': lambda x: 1/x
-        },
-
-        binary_operators=[
-            "+",
-            "*",
-            "^"
-        ],
+        extra_sympy_mappings={"inv": lambda x: 1 / x},
+        binary_operators=["+", "*", "^"],
         unary_operators=[
             "exp",
             "sin",
@@ -225,11 +201,11 @@ if args.checkpoint:
             "min",
             "sinh",
             "tanh",
-            "cosh"
+            "cosh",
         ],
-        constraints={ # TODO play with this
+        constraints={  # TODO play with this
             "^": (-1, 3),
-            #"sin": 5
+            # "sin": 5
         },
         nested_constraints={  # TODO play with this
             "sin": {"sin": 2},
@@ -237,32 +213,25 @@ if args.checkpoint:
             "exp": {"exp": 2},
             "abs": {"abs": 3},
             "^": {"sin": 2, "exp": 2, "log": 2, "tan": 2},
-            "log": {"log": 2}
+            "log": {"log": 2},
         },
     )
 else:
     # initialize a new model
     # see https://ai.damtp.cam.ac.uk/pysr/tuning/
     model = pysr.PySRRegressor(
-
         # search size
         niterations=args.niterations,
         timeout_in_seconds=args.timeout,
-
         # TODO test these parameters
         maxsize=30,
         population_size=len(y),
-        populations=args.nprocs/10,
+        populations=args.nprocs / 10,
         ncycles_per_iteration=5000,
-        #parsimony=0.001,
+        # parsimony=0.001,
         weight_optimize=0.001,
-        
         # operators and constraints
-        binary_operators=[
-            "+",
-            "*",
-            "^"
-        ],
+        binary_operators=["+", "*", "^"],
         unary_operators=[
             "exp",
             "sin",
@@ -270,31 +239,29 @@ else:
             "abs",
             "log",
         ],
-        extra_sympy_mappings={
-            "inv": lambda x: 1 / x
-        },
-        constraints={ # TODO play with this
-            "^": (-1, 2),
-            "sin": 5
-        },
+        extra_sympy_mappings={"inv": lambda x: 1 / x},
+        constraints={"^": (-1, 2), "sin": 5},  # TODO play with this
         nested_constraints={  # TODO play with this
             "sin": {"sin": 1, "exp": 1, "log": 1},
             "exp": {"exp": 1, "sin": 1, "log": 1},
             "abs": {"abs": 3},
             "^": {"sin": 1, "exp": 1, "log": 1},
-            "log": {"log": 1, "exp": 1, "sin": 1}
+            "log": {"log": 1, "exp": 1, "sin": 1},
         },
         # TODO customize loss
-
         # computing
         turbo=True,
         procs=args.nprocs,
         output_directory="pysr_runs",
         run_id=run_id,
-        logger_spec=TensorBoardLoggerSpec(
-            log_dir="pysr_runs/logs",
-            log_interval=1, 
-        ) if args.tensorboard else None
+        logger_spec=(
+            TensorBoardLoggerSpec(
+                log_dir="pysr_runs/logs",
+                log_interval=1,
+            )
+            if args.tensorboard
+            else None
+        ),
     )
 
 model.fit(x, y, weights=y_err)

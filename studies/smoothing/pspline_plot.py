@@ -8,24 +8,12 @@ import mplhep as hep
 hep.style.use(hep.style.ROOT)
 
 parser = argparse.ArgumentParser()
-parser.add_argument(
-    "input_file",
-    type=str
-)
-parser.add_argument(
-    "-o",
-    "--outdir",
-    required=True,
-    type=str
-)
-parser.add_argument(
-    "--selectFirstKnots",
-    default=None,
-    type=int
-)
+parser.add_argument("input_file", type=str)
+parser.add_argument("-o", "--outdir", required=True, type=str)
+parser.add_argument("--selectFirstKnots", default=None, type=int)
 args = parser.parse_args()
 
-with open(args.input_file, 'rb') as f:
+with open(args.input_file, "rb") as f:
     inputs = pickle.load(f)
 
 rmss = [i[1] for i in inputs]
@@ -41,7 +29,8 @@ lambs_rmss = []
 ref_knots = []
 for lam, knots, rms in zip(lams, knotss, rmss):
     if args.selectFirstKnots:
-        if knots[0] != args.selectFirstKnots: continue
+        if knots[0] != args.selectFirstKnots:
+            continue
     if knots not in ref_knots:
         ref_knots.append(knots)
         lambs_by_knots.append([lam])
@@ -62,5 +51,15 @@ ax.legend(loc=(1.01, 0))
 ax.set_yscale("log")
 ax.set_xscale("log")
 fig.tight_layout()
-fig.savefig(os.path.join(args.outdir, args.input_file.replace(".pkl", "") + "_knotsByLambda_" + ".pdf"), bbox_inches='tight')
-fig.savefig(os.path.join(args.outdir, args.input_file.replace(".pkl", "") + "_knotsByLambda_" + ".png"), bbox_inches='tight')
+fig.savefig(
+    os.path.join(
+        args.outdir, args.input_file.replace(".pkl", "") + "_knotsByLambda_" + ".pdf"
+    ),
+    bbox_inches="tight",
+)
+fig.savefig(
+    os.path.join(
+        args.outdir, args.input_file.replace(".pkl", "") + "_knotsByLambda_" + ".png"
+    ),
+    bbox_inches="tight",
+)

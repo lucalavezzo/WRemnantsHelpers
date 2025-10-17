@@ -40,3 +40,11 @@ Executables added to the `PATH` by `setup.sh`.
     run scripts/my_script.sh
     ```
     
+## Code style
+We enforce [Black](https://black.readthedocs.io/en/stable/) for Python formatting. A lightweight Git hook runs Black on staged Python files before each commit.
+
+### Enabling the hook
+1. Ensure `black` is on `PATH`.
+2. Point Git to the repo-provided hooks: `git config core.hooksPath .githooks`
+
+You can always format manually with `black --config pyproject.toml .` if you want to run it yourself.

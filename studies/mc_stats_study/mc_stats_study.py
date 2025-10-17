@@ -8,7 +8,7 @@ hep.style.use(hep.style.ROOT)
 
 BASE_DIR = "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/"
 OUT_DIR = "/home/submit/lavezzo/public_html/alphaS/mc_stats_study/"
-fittype = "4D" # "1D" or "4D" or "2D"
+fittype = "4D"  # "1D" or "4D" or "2D"
 
 fitresults4D = {
     "unfolding_all_fit_half": {
@@ -29,12 +29,12 @@ fitresults4D = {
     "full": {
         "1": "/250505_4DFit_rebin1/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile/fitresults.hdf5",
         "2": "/250505_4DFit_rebin2/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile/fitresults.hdf5",
-        "4": "/250505_4DFit_rebin4/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile/fitresults.hdf5"
+        "4": "/250505_4DFit_rebin4/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile/fitresults.hdf5",
     },
     "half": {
         "1": "/250505_oneMCfileEvery2/250505_4D_rebin1/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile/fitresults.hdf5",
         "2": "/250505_oneMCfileEvery2/250505_4D_rebin2/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile/fitresults.hdf5",
-        "4": "/250505_oneMCfileEvery2/250505_4D_rebin4/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile/fitresults.hdf5"
+        "4": "/250505_oneMCfileEvery2/250505_4D_rebin4/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile/fitresults.hdf5",
     },
     # "full_mcstats": {
     #     "1": "/250505_4DFit_rebin1_MCstats/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile/fitresults.hdf5",
@@ -51,22 +51,22 @@ fitresults1D = {
     "full": {
         "1": "/250506_1DFit_rebin1/ZMassDilepton_ptll/fitresults.hdf5",
         "2": "/250506_1DFit_rebin2/ZMassDilepton_ptll/fitresults.hdf5",
-        "4": "/250506_1DFit_rebin4/ZMassDilepton_ptll/fitresults.hdf5"
+        "4": "/250506_1DFit_rebin4/ZMassDilepton_ptll/fitresults.hdf5",
     },
     "half": {
         "1": "/250505_oneMCfileEvery2/250506_1DFit_rebin1/ZMassDilepton_ptll/fitresults.hdf5",
         "2": "/250505_oneMCfileEvery2/250506_1DFit_rebin2/ZMassDilepton_ptll/fitresults.hdf5",
-        "4": "/250505_oneMCfileEvery2/250506_1DFit_rebin4/ZMassDilepton_ptll/fitresults.hdf5"
+        "4": "/250505_oneMCfileEvery2/250506_1DFit_rebin4/ZMassDilepton_ptll/fitresults.hdf5",
     },
     "full_mcstats": {
         "1": "/250506_1DFit_rebin1_MCstats/ZMassDilepton_ptll/fitresults.hdf5",
         "2": "/250506_1DFit_rebin2_MCstats/ZMassDilepton_ptll/fitresults.hdf5",
-        "4": "/250506_1DFit_rebin4_MCstats/ZMassDilepton_ptll/fitresults.hdf5"
+        "4": "/250506_1DFit_rebin4_MCstats/ZMassDilepton_ptll/fitresults.hdf5",
     },
     "half_mcstats": {
         "1": "/250505_oneMCfileEvery2/250506_1DFit_rebin1_MCstats/ZMassDilepton_ptll/fitresults.hdf5",
         "2": "/250505_oneMCfileEvery2/250506_1DFit_rebin2_MCstats/ZMassDilepton_ptll/fitresults.hdf5",
-        "4": "/250505_oneMCfileEvery2/250506_1DFit_rebin4_MCstats/ZMassDilepton_ptll/fitresults.hdf5"
+        "4": "/250505_oneMCfileEvery2/250506_1DFit_rebin4_MCstats/ZMassDilepton_ptll/fitresults.hdf5",
     },
 }
 fitresults2D = {
@@ -85,22 +85,22 @@ fitresults2D = {
     "full": {
         "1": "/250506_2DFit_rebin1/ZMassDilepton_ptll_yll/fitresults.hdf5",
         "2": "/250506_2DFit_rebin2/ZMassDilepton_ptll_yll/fitresults.hdf5",
-        "4": "/250506_2DFit_rebin4/ZMassDilepton_ptll_yll/fitresults.hdf5"
+        "4": "/250506_2DFit_rebin4/ZMassDilepton_ptll_yll/fitresults.hdf5",
     },
     "half": {
         "1": "/250505_oneMCfileEvery2/250506_2DFit_rebin1/ZMassDilepton_ptll_yll/fitresults.hdf5",
         "2": "/250505_oneMCfileEvery2/250506_2DFit_rebin2/ZMassDilepton_ptll_yll/fitresults.hdf5",
-        "4": "/250505_oneMCfileEvery2/250506_2DFit_rebin4/ZMassDilepton_ptll_yll/fitresults.hdf5"
+        "4": "/250505_oneMCfileEvery2/250506_2DFit_rebin4/ZMassDilepton_ptll_yll/fitresults.hdf5",
     },
     "full_mcstats": {
         "1": "/250506_2DFit_rebin1_MCstats/ZMassDilepton_ptll_yll/fitresults.hdf5",
         "2": "/250506_2DFit_rebin2_MCstats/ZMassDilepton_ptll_yll/fitresults.hdf5",
-        "4": "/250506_2DFit_rebin4_MCstats/ZMassDilepton_ptll_yll/fitresults.hdf5"
+        "4": "/250506_2DFit_rebin4_MCstats/ZMassDilepton_ptll_yll/fitresults.hdf5",
     },
     "half_mcstats": {
         "1": "/250505_oneMCfileEvery2/250506_2DFit_rebin1_MCstats/ZMassDilepton_ptll_yll/fitresults.hdf5",
         "2": "/250505_oneMCfileEvery2/250506_2DFit_rebin2_MCstats/ZMassDilepton_ptll_yll/fitresults.hdf5",
-        "4": "/250505_oneMCfileEvery2/250506_2DFit_rebin4_MCstats/ZMassDilepton_ptll_yll/fitresults.hdf5"
+        "4": "/250505_oneMCfileEvery2/250506_2DFit_rebin4_MCstats/ZMassDilepton_ptll_yll/fitresults.hdf5",
     },
 }
 uncerts = {}
@@ -130,7 +130,7 @@ markers = {
     "unfolding_full": "+",
     "unfolding_half_mcstats": "x",
     "unfolding_full_mcstats": "x",
-    "unfolding_all_fit_half": "1"
+    "unfolding_all_fit_half": "1",
 }
 colors = {
     "full": "blue",
@@ -141,7 +141,7 @@ colors = {
     "unfolding_half": "red",
     "unfolding_full_mcstats": "blue",
     "unfolding_half_mcstats": "red",
-    "unfolding_all_fit_half": "green"
+    "unfolding_all_fit_half": "green",
 }
 
 if fittype == "1D":
@@ -154,15 +154,15 @@ for mc_stat, files in fitresults.items():
 
     uncerts[mc_stat] = {}
 
-    for rebin, file in files.items():   
+    for rebin, file in files.items():
 
-        print(BASE_DIR+file)     
+        print(BASE_DIR + file)
 
-        fitresult, meta = io_tools.get_fitresult(BASE_DIR+file, None, meta=True)
+        fitresult, meta = io_tools.get_fitresult(BASE_DIR + file, None, meta=True)
 
         out = io_tools.read_impacts_poi(
             fitresult,
-            'pdfAlphaS',
+            "pdfAlphaS",
             False,
             pulls=True,
             asym=False,
@@ -170,11 +170,13 @@ for mc_stat, files in fitresults.items():
         )
         pulls, pulls_prefit, constraints, constraints_prefit, impacts, labels = out
 
-        idx = np.where(labels == 'pdfAlphaS')
+        idx = np.where(labels == "pdfAlphaS")
         total = impacts[idx]
         uncerts[mc_stat][rebin] = total * 1.5
 
-fig, (ax, axr) = plt.subplots(2,1,figsize=(15, 10),gridspec_kw={'height_ratios': [2, 1]}, sharex=True)
+fig, (ax, axr) = plt.subplots(
+    2, 1, figsize=(15, 10), gridspec_kw={"height_ratios": [2, 1]}, sharex=True
+)
 ax.set_ylabel(r"Uncertainty on $\alpha_\mathrm{S}$ in $10^{-3}$")
 
 xlabels = [xlabels[b] for b in uncerts["full"].keys()]
@@ -185,25 +187,66 @@ for mc_stat in uncerts.keys():
     y = []
     for rebin in uncerts[mc_stat].keys():
         y.append(uncerts[mc_stat][rebin])
-    ax.scatter(np.arange(len(y)), y, label=mc_stat_labels[mc_stat], marker=markers[mc_stat], color=colors[mc_stat])
+    ax.scatter(
+        np.arange(len(y)),
+        y,
+        label=mc_stat_labels[mc_stat],
+        marker=markers[mc_stat],
+        color=colors[mc_stat],
+    )
 
 if "full_mcstats" in uncerts.keys():
-    ratio_mcstats = [uncerts["full_mcstats"][b] / uncerts["half_mcstats"][b] for b in uncerts['full_mcstats'].keys()]
-    axr.scatter(np.arange(len(ratio_mcstats)), ratio_mcstats, label=f"{mc_stat_labels["full_mcstats"]}/{mc_stat_labels['half_mcstats']}", marker=markers["full_mcstats"], color='purple')
+    ratio_mcstats = [
+        uncerts["full_mcstats"][b] / uncerts["half_mcstats"][b]
+        for b in uncerts["full_mcstats"].keys()
+    ]
+    axr.scatter(
+        np.arange(len(ratio_mcstats)),
+        ratio_mcstats,
+        label=f"{mc_stat_labels["full_mcstats"]}/{mc_stat_labels['half_mcstats']}",
+        marker=markers["full_mcstats"],
+        color="purple",
+    )
 if "unfolding_full_mcstats" in uncerts.keys():
-    ratio_unfolding = [uncerts['unfolding_full_mcstats'][b] / uncerts['unfolding_half_mcstats'][b] for b in uncerts['unfolding_full_mcstats'].keys()]
-    axr.scatter(np.arange(len(ratio_unfolding)), ratio_unfolding, label=f"{mc_stat_labels["unfolding_full_mcstats"]}/{mc_stat_labels['unfolding_half_mcstats']}", marker=markers["unfolding_full_mcstats"], color='purple')
-if 'full' in uncerts.keys():
-    ratio_nomcstats = [uncerts['full'][b] / uncerts['half'][b] for b in uncerts['full'].keys()]
-    axr.scatter(np.arange(len(ratio_nomcstats)), ratio_nomcstats, label=f"{mc_stat_labels["full"]}/{mc_stat_labels['half']}", marker=markers["full"], color='purple')
-if 'unfolding_full' in uncerts.keys():
-    ratio_unfolding = [uncerts['unfolding_full'][b] / uncerts['unfolding_half'][b] for b in uncerts['unfolding_full'].keys()]
-    axr.scatter(np.arange(len(ratio_unfolding)), ratio_unfolding, label=f"{mc_stat_labels["unfolding_full"]}/{mc_stat_labels['unfolding_half']}", marker=markers["unfolding_full"], color='purple')
+    ratio_unfolding = [
+        uncerts["unfolding_full_mcstats"][b] / uncerts["unfolding_half_mcstats"][b]
+        for b in uncerts["unfolding_full_mcstats"].keys()
+    ]
+    axr.scatter(
+        np.arange(len(ratio_unfolding)),
+        ratio_unfolding,
+        label=f"{mc_stat_labels["unfolding_full_mcstats"]}/{mc_stat_labels['unfolding_half_mcstats']}",
+        marker=markers["unfolding_full_mcstats"],
+        color="purple",
+    )
+if "full" in uncerts.keys():
+    ratio_nomcstats = [
+        uncerts["full"][b] / uncerts["half"][b] for b in uncerts["full"].keys()
+    ]
+    axr.scatter(
+        np.arange(len(ratio_nomcstats)),
+        ratio_nomcstats,
+        label=f"{mc_stat_labels["full"]}/{mc_stat_labels['half']}",
+        marker=markers["full"],
+        color="purple",
+    )
+if "unfolding_full" in uncerts.keys():
+    ratio_unfolding = [
+        uncerts["unfolding_full"][b] / uncerts["unfolding_half"][b]
+        for b in uncerts["unfolding_full"].keys()
+    ]
+    axr.scatter(
+        np.arange(len(ratio_unfolding)),
+        ratio_unfolding,
+        label=f"{mc_stat_labels["unfolding_full"]}/{mc_stat_labels['unfolding_half']}",
+        marker=markers["unfolding_full"],
+        color="purple",
+    )
 
-axr.axhline(1, color='black', linestyle='--', linewidth=0.5)
+axr.axhline(1, color="black", linestyle="--", linewidth=0.5)
 ax.set_title(f"{fittype} Fit")
-ax.legend(loc=(1.02, 0), fontsize='x-small')
-axr.set_ylabel("Ratio Full/Half MC", fontsize='small')
+ax.legend(loc=(1.02, 0), fontsize="x-small")
+axr.set_ylabel("Ratio Full/Half MC", fontsize="small")
 fig.tight_layout()
-fig.savefig(OUT_DIR + f"mc_stat_study_{fittype}.png", dpi=300, bbox_inches="tight")   
-fig.savefig(OUT_DIR + f"mc_stat_study_{fittype}.pdf", bbox_inches="tight")   
+fig.savefig(OUT_DIR + f"mc_stat_study_{fittype}.png", dpi=300, bbox_inches="tight")
+fig.savefig(OUT_DIR + f"mc_stat_study_{fittype}.pdf", bbox_inches="tight")

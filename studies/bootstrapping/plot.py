@@ -16,19 +16,21 @@ import mplhep as hep
 import h5py
 import glob
 import re
+
 sys.path.append("../../WRemnants/")
 import combinetf2.io_tools
 
 hep.style.use("CMS")
 
+
 def load_results_from_dir(
-        indirs,
-        fitresult_name='fitresults.hdf5',
-        fitresult_result=None,
-        params=['pdfAlphaS'],
-        skip_toy0=False
-    ):
-    
+    indirs,
+    fitresult_name="fitresults.hdf5",
+    fitresult_result=None,
+    params=["pdfAlphaS"],
+    skip_toy0=False,
+):
+
     fit_values = {}
     fit_variances = {}
 
@@ -52,7 +54,7 @@ def load_results_from_dir(
             continue
 
         print("Reading fit results from", subdir)
-        
+
         try:
 
             # Handle wildcard in fitresult_name
@@ -72,35 +74,42 @@ def load_results_from_dir(
 
                 with h5py.File(fitresult_path, mode="r") as f:
                     avail_fitresult_results = list(f.keys())
-              
+
                 fitresult_results_to_process = []
                 if type(fitresult_result) is str:
-                    
+
                     # Check if fitresult_result is a regex (contains special regex characters)
                     if any(c in fitresult_result for c in ".^$*+?{}[]\\|()"):
                         regex = re.compile(fitresult_result)
                         print(regex)
-                        matched = [r for r in avail_fitresult_results if regex.fullmatch(r)]
+                        matched = [
+                            r for r in avail_fitresult_results if regex.fullmatch(r)
+                        ]
                         if not matched:
-                            print(f"\t\tNo fitresult_result matched regex '{fitresult_result}' in {avail_fitresult_results}")
+                            print(
+                                f"\t\tNo fitresult_result matched regex '{fitresult_result}' in {avail_fitresult_results}"
+                            )
                         fitresult_results_to_process.extend(matched)
                     elif fitresult_result in avail_fitresult_results:
                         fitresult_results_to_process.append(fitresult_result)
                     else:
-                        print(f"\t\tfitresult_result '{fitresult_result}' not found in {avail_fitresult_results}")
+                        print(
+                            f"\t\tfitresult_result '{fitresult_result}' not found in {avail_fitresult_results}"
+                        )
 
                 else:
                     fitresult_results_to_process.append(fitresult_result)
 
-
                 for fitresult_result_to_process in fitresult_results_to_process:
 
                     print(f"\t\tProcessing fit result: {fitresult_result_to_process}")
-                    
+
                     fitresult, meta = combinetf2.io_tools.get_fitresult(
-                        fitresult_path, result=fitresult_result_to_process.replace("results_", ""), meta=True
+                        fitresult_path,
+                        result=fitresult_result_to_process.replace("results_", ""),
+                        meta=True,
                     )
-                    pulls = fitresult['parms'].get()
+                    pulls = fitresult["parms"].get()
                     if params == "*":
                         params = [n for n in pulls.axes[0]]
                     for param in params:
@@ -113,14 +122,15 @@ def load_results_from_dir(
                         fit_variances[param] = np.append(
                             fit_variances[param], pulls[param].variance
                         )
-                        if param == 'pdfAlphaS':
+                        if param == "pdfAlphaS":
                             print(f"\t\t{pulls[param].value}")
-                
+
         except Exception as e:
             print(f"Error reading fit results from {subdir}: {e}")
             continue
 
     return fit_values, fit_variances
+
 
 def plot_alphaS_postfit(fit_values, outdir, postfix=None):
 
@@ -140,7 +150,7 @@ def plot_alphaS_postfit(fit_values, outdir, postfix=None):
     sample_mean = np.mean(fit_values)
     sample_std_dev = np.std(fit_values, ddof=1)
     std_error_mean = sample_std_dev / np.sqrt(len(fit_values))
-    std_error_std_dev = (2 * sample_std_dev**4 / (len(fit_values) - 1))**0.25
+    std_error_std_dev = (2 * sample_std_dev**4 / (len(fit_values) - 1)) ** 0.25
     print(f"Mean of fit values: {sample_mean}")
     print(f"Std of fit values: {sample_std_dev}")
     print(f"Standard error on mean: {std_error_mean}")
@@ -148,20 +158,20 @@ def plot_alphaS_postfit(fit_values, outdir, postfix=None):
     hep.histplot(
         h_toys,
         ax=ax,
-        label= "$\\bar{x}$ = " + \
-            "{:.4f}".format(sample_mean) + \
-            "\n" + \
-            "Standard error on $\\bar{x}$ = " + \
-            "{:.4f}".format(std_error_mean) + \
-            "\n" + \
-            "$\\sigma_x$ = " + \
-            "{:.2e}".format(sample_std_dev) + \
-            "\n" + \
-            "Standard error on $\\sigma_x$ = " + \
-            "{:.2e}".format(std_error_std_dev)
+        label="$\\bar{x}$ = "
+        + "{:.4f}".format(sample_mean)
+        + "\n"
+        + "Standard error on $\\bar{x}$ = "
+        + "{:.4f}".format(std_error_mean)
+        + "\n"
+        + "$\\sigma_x$ = "
+        + "{:.2e}".format(sample_std_dev)
+        + "\n"
+        + "Standard error on $\\sigma_x$ = "
+        + "{:.2e}".format(std_error_std_dev),
     )
-    ax.legend(loc='upper right', fontsize='small')
-    
+    ax.legend(loc="upper right", fontsize="small")
+
     # save the figure
     if not os.path.exists(outdir):
         os.makedirs(outdir)
@@ -170,13 +180,14 @@ def plot_alphaS_postfit(fit_values, outdir, postfix=None):
     if postfix:
         fname += f"_{postfix}"
     print("Saving", fname)
-    fig.savefig(fname + ".pdf", bbox_inches='tight')
-    fig.savefig(fname + ".png", bbox_inches='tight', dpi=300)
+    fig.savefig(fname + ".pdf", bbox_inches="tight")
+    fig.savefig(fname + ".png", bbox_inches="tight", dpi=300)
+
 
 def plot_pulls(fit_values, outdir, postfix=None, nparams=20):
 
     # define leading nparams parameters to plot
-    fit_values = {k:v for k, v in fit_values.items() if 'pdf' in k}
+    fit_values = {k: v for k, v in fit_values.items() if "pdf" in k}
     largest_pull_params = sorted(
         fit_values.keys(), key=lambda x: np.abs(np.mean(fit_values[x])), reverse=True
     )[:nparams]
@@ -186,22 +197,28 @@ def plot_pulls(fit_values, outdir, postfix=None, nparams=20):
     # plot them
     fig, ax = plt.subplots(1, 1, figsize=(12, 10))
     ax.set_xlabel("Mean Pull over toys")
-    ax.axvline(0, color='k', linestyle='--')
+    ax.axvline(0, color="k", linestyle="--")
     ax.set_xlim(-1.2, 1.2)
     for i, param in enumerate(largest_pull_params):
         ax.errorbar(
-            largest_mean_pulls[i], -i, xerr=largest_std_pulls[i], fmt='o', color='black',
-            capsize=5, elinewidth=2, markeredgewidth=2
+            largest_mean_pulls[i],
+            -i,
+            xerr=largest_std_pulls[i],
+            fmt="o",
+            color="black",
+            capsize=5,
+            elinewidth=2,
+            markeredgewidth=2,
         )
     ax.set_yticks(range(-len(largest_pull_params) + 1, 1))
-    ax.set_yticklabels(largest_pull_params[::-1], fontsize='xx-small')
+    ax.set_yticklabels(largest_pull_params[::-1], fontsize="xx-small")
     figname = os.path.join(outdir, "mean_pulls")
     if postfix:
         figname += f"_{postfix}"
     fig.tight_layout()
     print("Saving", figname)
-    fig.savefig(figname + ".pdf", bbox_inches='tight')
-    fig.savefig(figname + ".png", bbox_inches='tight', dpi=300)
+    fig.savefig(figname + ".pdf", bbox_inches="tight")
+    fig.savefig(figname + ".png", bbox_inches="tight", dpi=300)
 
 
 def main():
@@ -210,14 +227,14 @@ def main():
     parser.add_argument(
         "-i",
         "--indir",
-        action='append',
+        action="append",
         required=True,
         help="Name (or grep expression) of the input directory from which to read the fitresults. Supports multiple arguments.",
     )
     parser.add_argument(
         "--fitresultName",
         type=str,
-        default='fitresults.hdf5',
+        default="fitresults.hdf5",
         help="Name (or grep expression) of the fit result file to read from each subdirectory. Default is 'fitresults.hdf5'.",
     )
     parser.add_argument(
@@ -237,23 +254,18 @@ def main():
         "--postfix",
         type=str,
         default=None,
-        help="Postfix to add to the output file names. If not specified, no postfix will be added."
+        help="Postfix to add to the output file names. If not specified, no postfix will be added.",
     )
     parser.add_argument(
-        "-p",
-        "--pulls",
-        action='store_true',
-        help="Plot mean pull over toys"
+        "-p", "--pulls", action="store_true", help="Plot mean pull over toys"
     )
     parser.add_argument(
-        "--noAlphaSHist",
-        action='store_true',
-        help="Do not plot the alphaS histogram"
+        "--noAlphaSHist", action="store_true", help="Do not plot the alphaS histogram"
     )
     parser.add_argument(
         "--skipToy0",
-        action='store_true',
-        help="Skip toy 0 in the fit results. This is useful if you want to skip the first toy, which is usually the non-randomized toy."
+        action="store_true",
+        help="Skip toy 0 in the fit results. This is useful if you want to skip the first toy, which is usually the non-randomized toy.",
     )
     args = parser.parse_args()
 
@@ -264,22 +276,22 @@ def main():
             fitresult_name=args.fitresultName,
             fitresult_result=args.fitresultResult,
             params=["pdfAlphaS"],
-            skip_toy0=args.skipToy0
+            skip_toy0=args.skipToy0,
         )
 
-        plot_alphaS_postfit(fit_values['pdfAlphaS'], args.outdir, args.postfix)
-        
+        plot_alphaS_postfit(fit_values["pdfAlphaS"], args.outdir, args.postfix)
+
     if args.pulls:
 
         fit_values, fit_variances = load_results_from_dir(
             indirs=args.indir,
             fitresult_name=args.fitresultName,
             fitresult_result=args.fitresultResult,
-            params="*"
+            params="*",
         )
 
         plot_pulls(fit_values, args.outdir, args.postfix, nparams=20)
 
-    
+
 if __name__ == "__main__":
     main()

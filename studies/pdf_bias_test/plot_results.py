@@ -21,12 +21,12 @@ DEFAULT_CENTRAL_PDFS = [
 DEFAULT_PSEUDODATA_PDFS = [
     "ct18",
     "ct18z",
-    # "nnpdf31",
-    "nnpdf30",
+    "nnpdf31",
     "nnpdf40",
     "pdf4lhc21",
     "msht20",
-    # "msht20an3lo",
+    "msht20an3lo",
+    "nnpdf30",
 ]
 
 
@@ -47,7 +47,10 @@ def parse_args():
         required=True,
         dest="input_dir",
         help=(
-            f"Directory containing the fit results. (Default: None)"
+            f"Directory containing the directories of fit results, with the format"
+            "<input-dir>/<file-base>_<central-pdf>/fitresult.hdf5."
+            "configured via the script arguments"
+            "(Default: None)"
         ),
     )
     parser.add_argument(
@@ -58,10 +61,10 @@ def parse_args():
     )
     parser.add_argument(
         "--output-dir",
-        default=os.path.join(os.environ['MY_PLOT_DIR'], datetime.now().strftime("%y%m%d_pdf_bias_test")),
-        help=(
-            f"Directory where plots are written. (Default: %(default)s)"
+        default=os.path.join(
+            os.environ["MY_PLOT_DIR"], datetime.now().strftime("%y%m%d_pdf_bias_test")
         ),
+        help=(f"Directory where plots are written. (Default: %(default)s)"),
     )
     parser.add_argument(
         "--central-pdfs",
@@ -76,6 +79,12 @@ def parse_args():
         default=DEFAULT_PSEUDODATA_PDFS,
         metavar="PDF",
         help="Pseudodata PDFs to include on the x-axis of the heatmap. (Default: %(default)s)",
+    )
+    parser.add_argument(
+        "--uncert",
+        default="central-pdf",
+        choices=["total", "central-pdf"],
+        help="Type of uncertainty to use for comparison. (Default: %(default)s)",
     )
 
     args = parser.parse_args()
@@ -99,27 +108,34 @@ def main():
         central_pdf_name = get_pdf_map_name(central_pdf)
         this_central_results = []
         this_central_uncerts = []
-        input_file = os.path.join(args.input_dir, args.file_base + central_pdf, "fitresults.hdf5")
+        input_file = os.path.join(
+            args.input_dir, args.file_base + central_pdf, "fitresults.hdf5"
+        )
         print(input_file)
-        
+
         for pseudodata_pdf in args.pseudodata_pdfs:
-            result = f"nominal_{get_pdf_map_name(pseudodata_pdf)}UncertByHelicity_pdfVar"
+            result = (
+                f"nominal_{get_pdf_map_name(pseudodata_pdf)}UncertByHelicity_pdfVar"
+            )
             fitresult, _ = rabbit.io_tools.get_fitresult(
                 input_file, result=result, meta=True
             )
             parms = fitresult["parms"].get()
             alphas = abs(parms["pdfAlphaS"].value)
-            print(alphas)
-            alphas_uncert = parms["pdfAlphaS"].variance**0.5
-            pdf_uncert = fitresult["global_impacts_grouped"].get()[
-                {'impacts': f"{central_pdf_name}NoAlphaS"}
-            ].values()[0]
-            print(alphas_uncert, pdf_uncert)
+            alphas_uncert = parms["pdfAlphaS"].variance ** 0.5
+            pdf_uncert = (
+                fitresult["global_impacts_grouped"]
+                .get()[{"impacts": f"{central_pdf_name}NoAlphaS"}]
+                .values()[0]
+            )
             alphas *= 0.0015
             alphas_uncert *= 0.0015
             pdf_uncert *= 0.0015
             this_central_results.append(alphas)
-            this_central_uncerts.append(pdf_uncert)
+            if args.uncert == "total":
+                this_central_uncerts.append(alphas_uncert)
+            elif args.uncert == "central-pdf":
+                this_central_uncerts.append(pdf_uncert)
 
         results.append(this_central_results)
         uncerts.append(this_central_uncerts)
@@ -130,7 +146,7 @@ def main():
 
     fig, ax = plt.subplots(
         figsize=(
-            1.1 * (len(args.pseudodata_pdfs)+2),
+            1.1 * (len(args.pseudodata_pdfs) + 2),
             1.1 * len(args.central_pdfs),
         )
     )
@@ -141,7 +157,7 @@ def main():
         cmap="viridis",
     )
     cbar = fig.colorbar(mesh, ax=ax)
-    cbar.set_label(r"$\Delta\alpha_S$/$\sigma_{\mathrm{central\;PDF}}$")
+    cbar.set_label(r"$|\Delta\alpha_S$/$\sigma_{\mathrm{central\;PDF}}|$")
 
     y_positions = np.arange(len(args.central_pdfs))
     x_positions = np.arange(len(args.pseudodata_pdfs))
@@ -151,17 +167,18 @@ def main():
         [get_pdf_map_name(pdf) for pdf in args.central_pdfs], rotation=45, ha="right"
     )
     ax.set_xticks(x_positions)
-    ax.set_xticklabels([get_pdf_map_name(pdf) for pdf in args.pseudodata_pdfs], rotation=45)
+    ax.set_xticklabels(
+        [get_pdf_map_name(pdf) for pdf in args.pseudodata_pdfs], rotation=45
+    )
     ax.set_ylabel("Central PDF")
     ax.set_xlabel("Pseudodata PDF")
     ax.set_title(r"PDF bias test")
 
-    text_threshold = np.mean(results_array)
     for x_idx, _ in enumerate(args.pseudodata_pdfs):
         for y_idx, _ in enumerate(args.central_pdfs):
             value = results_array[y_idx, x_idx]
             uncert = uncerts_array[y_idx, x_idx]
-            color = "white" if value < text_threshold else "black"
+            color = "white" if value < uncert else "red"
             ax.text(
                 x_positions[x_idx],
                 y_positions[y_idx],
@@ -187,9 +204,7 @@ def main():
         args.output_dir,
         fname,
     )
-    print(
-        f"Saved 2D alpha_s histogram to {output_path}(.pdf)(.png)(.log)"
-    )
+    print(f"Saved 2D alpha_s histogram to {output_path}(.pdf)(.png)(.log)")
 
 
 if __name__ == "__main__":

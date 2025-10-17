@@ -16,6 +16,7 @@ DEFAULT_CENTRAL_PDFS = [
 DEFAULT_PSEUDODATA_PDFS = [
     "ct18",
     "ct18z",
+    "nnpdf31",
     "nnpdf30",
     "nnpdf40",
     "pdf4lhc21",
@@ -23,14 +24,18 @@ DEFAULT_PSEUDODATA_PDFS = [
     "msht20an3lo",
 ]
 
+
 def get_pdf_map_name(pdf_key: str) -> str:
     info = theory_tools.pdfMap.get(pdf_key)
     if info:
         return info["name"]
     return f"pdf{pdf_key.upper()}"
 
+
 def parse_args():
-    parser = argparse.ArgumentParser(description="Run fitter workflow over a set of PDFs.")
+    parser = argparse.ArgumentParser(
+        description="Run fitter workflow over a set of PDFs."
+    )
     parser.add_argument(
         "--input-dir",
         required=True,
@@ -57,7 +62,10 @@ def main():
     for pdf_central in args.central_pdfs:
         input_file = f"{args.input_dir}/mz_dilepton_{pdf_central}.hdf5"
         pseudo_data_args = " ".join(
-            ["nominal_" + get_pdf_map_name(p) + "UncertByHelicity" for p in args.pseudodata_pdfs]
+            [
+                "nominal_" + get_pdf_map_name(p) + "UncertByHelicity"
+                for p in args.pseudodata_pdfs
+            ]
         )
 
         extra_setup = (

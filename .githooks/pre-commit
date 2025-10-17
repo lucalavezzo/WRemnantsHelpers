@@ -1,0 +1,23 @@
+#!/bin/bash
+# Lightweight pre-commit hook that formats staged Python files with Black.
+
+set -euo pipefail
+
+REPO_ROOT=$(git rev-parse --show-toplevel)
+mapfile -d '' -t PY_FILES < <(git diff --cached --name-only --diff-filter=ACM -z -- '*.py')
+
+if [[ ${#PY_FILES[@]} -eq 0 ]]; then
+  exit 0
+fi
+
+if ! command -v black >/dev/null 2>&1; then
+  echo "black is not available on PATH; please install it or disable this hook." >&2
+  exit 1
+fi
+
+BLACK_CONFIG="$REPO_ROOT/pyproject.toml"
+black --config "$BLACK_CONFIG" -- "${PY_FILES[@]}"
+
+git add -- "${PY_FILES[@]}"
+
+exit 0

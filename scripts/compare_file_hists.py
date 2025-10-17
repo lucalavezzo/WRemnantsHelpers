@@ -1,5 +1,6 @@
 import os
 import sys
+
 sys.path.append("../../WRemnants/")
 import hist
 import numpy as np
@@ -23,7 +24,8 @@ def load_results_h5py(h5file):
         return ioutils.pickle_load_h5py(h5file["results"])
     else:
         return {k: ioutils.pickle_load_h5py(v) for k, v in h5file.items()}
-    
+
+
 def main():
 
     parser = argparse.ArgumentParser(
@@ -38,7 +40,7 @@ def main():
     parser.add_argument(
         "--narf",
         action="store_true",
-        help="The inputs files were created with narf (a histmaker). Will be read accordingly."
+        help="The inputs files were created with narf (a histmaker). Will be read accordingly.",
     )
     parser.add_argument(
         "--proc",
@@ -72,7 +74,7 @@ def main():
         nargs="+",
         type=str,
         default=[],
-        help="For each bin of these axes, a different histogram will be created with the axes selected via --axes."
+        help="For each bin of these axes, a different histogram will be created with the axes selected via --axes.",
     )
     parser.add_argument(
         "--select",
@@ -80,7 +82,7 @@ def main():
         dest="selection",
         type=str,
         default=[],
-        help="Apply a selection to the histograms, if the axis exists. This option can be applied to any of the axis, not necessarily one of the fitaxes, unlike --axlim. e.g. '--select 'ptll 0 10'"
+        help="Apply a selection to the histograms, if the axis exists. This option can be applied to any of the axis, not necessarily one of the fitaxes, unlike --axlim. e.g. '--select 'ptll 0 10'",
     )
     parser.add_argument(
         "--compareVars",
@@ -110,9 +112,7 @@ def main():
         help="Bin width normalization factor (default: 1).",
     )
     parser.add_argument(
-        "--norm",
-        action='store_true',
-        help="Normalize the hists to unity."
+        "--norm", action="store_true", help="Normalize the hists to unity."
     )
     parser.add_argument(
         "--result",
@@ -123,7 +123,10 @@ def main():
     parser.add_argument(
         "-o",
         "--outdir",
-        default=os.path.join(os.environ.get("MY_PLOT_DIR", "."), f"{datetime.datetime.now().strftime('%y%m%d')}_compare_file_hists/"),
+        default=os.path.join(
+            os.environ.get("MY_PLOT_DIR", "."),
+            f"{datetime.datetime.now().strftime('%y%m%d')}_compare_file_hists/",
+        ),
         type=str,
         help="Output directory for the plots. Default is current directory.",
     )
@@ -136,7 +139,7 @@ def main():
     args = parser.parse_args()
 
     if args.compareVars:
-        args.axes.append('vars')
+        args.axes.append("vars")
 
     if len(args.hist) > 1:
         if len(args.hist) != len(args.infiles):
@@ -147,7 +150,7 @@ def main():
     files_hists = {}
     for infile, hist_name in zip(args.infiles, args.hist):
         print(f"Processing file: {infile}")
-        
+
         hists = {}
 
         if args.narf:
@@ -158,11 +161,13 @@ def main():
                     if args.proc is None:
                         h = results[hist_name]
                     else:
-                        h = results[args.proc]['output'][hist_name].get()
+                        h = results[args.proc]["output"][hist_name].get()
                 except KeyError:
-                    raise KeyError(f"Histogram '{hist_name}' not found in file '{infile}'. Available histograms: {list(results[args.proc]['output'].keys())}")
+                    raise KeyError(
+                        f"Histogram '{hist_name}' not found in file '{infile}'. Available histograms: {list(results[args.proc]['output'].keys())}"
+                    )
         else:
-                
+
             # Load fit result and metadata
             fitresult, meta = rabbit.io_tools.get_fitresult(
                 infile, result=args.result, meta=True
@@ -170,19 +175,25 @@ def main():
 
             # grab the histogram
             try:
-                h = fitresult['physics_models']['Basemodel']['channels']['ch0'][hist_name].get()
+                h = fitresult["physics_models"]["Basemodel"]["channels"]["ch0"][
+                    hist_name
+                ].get()
             except KeyError:
-                raise KeyError(f"Histogram '{hist_name}' not found in fit result. Available histograms: {list(fitresult['physics_models']['Basemodel']['channels']['ch0'].keys())}")
+                raise KeyError(
+                    f"Histogram '{hist_name}' not found in fit result. Available histograms: {list(fitresult['physics_models']['Basemodel']['channels']['ch0'].keys())}"
+                )
 
         # apply selections if specified
         for sel in args.selection:
-            split =  sel.split()
+            split = sel.split()
             if len(split) == 3:
                 sel_ax, sel_lb, sel_ub = split
                 sel_lb = parsing.str_to_complex_or_int(sel_lb)
                 sel_ub = parsing.str_to_complex_or_int(sel_ub)
                 if sel_ax not in h.axes.name:
-                    print(f"Selection axis '{sel_ax}' not found in histogram axes. Available axes: {h.axes.name}")
+                    print(
+                        f"Selection axis '{sel_ax}' not found in histogram axes. Available axes: {h.axes.name}"
+                    )
                 else:
                     h = h[{sel_ax: slice(sel_lb, sel_ub, sum)}]
             else:
@@ -194,16 +205,18 @@ def main():
                     print("Trying to use as string...")
                     pass
                 if sel_ax not in h.axes.name:
-                    print(f"Selection axis '{sel_ax}' not found in histogram axes. Available axes: {h.axes.name}")
+                    print(
+                        f"Selection axis '{sel_ax}' not found in histogram axes. Available axes: {h.axes.name}"
+                    )
                 else:
                     h = h[{sel_ax: sel_val}]
 
-        # take only relevant axes for plotting     
+        # take only relevant axes for plotting
         if len(args.axes):
             h = h.project(*args.axes, *args.selectionAxes)
         if args.norm:
             norm = h.sum()
-            if hasattr(norm, 'value'):
+            if hasattr(norm, "value"):
                 norm = norm.value
             if not (norm > 0):
                 raise ValueError
@@ -211,32 +224,37 @@ def main():
 
         # this really only works for the fitresult
         if args.compareVars:
-            
+
             # convert vars in case they are a grep pattern
             # check if each var exists in the vars axis
             vars_to_compare = []
-            available_vars = [n for n in h.axes['vars']]
+            available_vars = [n for n in h.axes["vars"]]
             for var in args.compareVars:
 
                 # check if it's a regex pattern
-                if any(c in var for c in ['*', '?', '[', ']', '{', '}', '^', '$']):
+                if any(c in var for c in ["*", "?", "[", "]", "{", "}", "^", "$"]):
                     # use regex to find matching vars
                     import re
+
                     pattern = re.compile(var)
-                    vars_to_compare.extend([n for n in available_vars if pattern.match(n)])
+                    vars_to_compare.extend(
+                        [n for n in available_vars if pattern.match(n)]
+                    )
                 else:
                     # check if the var exists in the vars axis
                     if var in available_vars:
                         vars_to_compare.append(var)
                     else:
-                        raise ValueError(f"Variable '{var}' not found in 'vars' axis. Available vars: {available_vars}")
-                    
+                        raise ValueError(
+                            f"Variable '{var}' not found in 'vars' axis. Available vars: {available_vars}"
+                        )
+
             for var in vars_to_compare:
-                hists[var] = h[{'vars': var}]
+                hists[var] = h[{"vars": var}]
 
         else:
             hists[hist_name] = h
-        
+
         files_hists[infile] = hists
 
     if args.labels:
@@ -273,11 +291,11 @@ def main():
 
         fig, ax1, ratio_axes = plot_tools.figureWithRatio(
             _h_ref,
-            "("  + ",".join(args.axes) + ") bin" if len(args.axes) else "bin",
+            "(" + ",".join(args.axes) + ") bin" if len(args.axes) else "bin",
             "Events",
             ylim=np.max(_h_ref.values()) * 1.2,
             rlabel=f"1/{args.labels[0]}",
-            rrange=args.rrange
+            rrange=args.rrange,
         )
         ax2 = ratio_axes[-1]
 
@@ -288,11 +306,12 @@ def main():
             binwnorm=args.binwnorm if len(_h_ref.axes) == 1 else None,
             histtype="step",
             color="black",
-            yerr=not args.norm
+            yerr=not args.norm,
         )
 
         for i, (infile, hists) in enumerate(files_hists.items()):
-            if i == 0: continue # already plotted
+            if i == 0:
+                continue  # already plotted
 
             h = list(hists.values())[0]
             h = h[{ax.name: combination[i] for i, ax in enumerate(selection_axes)}]
@@ -305,7 +324,7 @@ def main():
                 label=args.labels[i] + " - " + list(hists.keys())[0],
                 binwnorm=args.binwnorm if len(h.axes) == 1 else None,
                 histtype="step",
-                yerr=not args.norm
+                yerr=not args.norm,
             )
 
             hr = hh.divideHists(
@@ -316,13 +335,25 @@ def main():
                 flow=False,
                 by_ax_name=False,
             )
-            hep.histplot(hr, ax=ax2, histtype="step", label=args.labels[i] + " - " + list(hists.keys())[0], yerr=not args.norm)
+            hep.histplot(
+                hr,
+                ax=ax2,
+                histtype="step",
+                label=args.labels[i] + " - " + list(hists.keys())[0],
+                yerr=not args.norm,
+            )
 
         plot_tools.fix_axes(ax1, ax2, fig)
         ax1.legend()
-        ax1.invert_yaxis() # I have no idea why I have to do this
-        _postfix = "_"+args.postfix if args.postfix else ""
-        selection_label = "_".join([f"{ax.name}_{combination[i]}" for i, ax in enumerate(selection_axes)]) if selection_axes else ""
+        ax1.invert_yaxis()  # I have no idea why I have to do this
+        _postfix = "_" + args.postfix if args.postfix else ""
+        selection_label = (
+            "_".join(
+                [f"{ax.name}_{combination[i]}" for i, ax in enumerate(selection_axes)]
+            )
+            if selection_axes
+            else ""
+        )
         if selection_label:
             selection_label = f"_{selection_label}"
         else:
@@ -334,15 +365,12 @@ def main():
         fname = f"{var}{selection_label}{_postfix}"
         oname = os.path.join(args.outdir, fname)
         fig.tight_layout()
-        fig.savefig(oname + ".png", dpi=300, bbox_inches='tight')
-        fig.savefig(oname + ".pdf", bbox_inches='tight')
+        fig.savefig(oname + ".png", dpi=300, bbox_inches="tight")
+        fig.savefig(oname + ".pdf", bbox_inches="tight")
         plt.close(fig)
-        output_tools.write_index_and_log(
-            args.outdir,
-            fname,
-            args=args
-        )
+        output_tools.write_index_and_log(args.outdir, fname, args=args)
         print(f"Saved {oname}(.png)(.log)")
+
 
 if __name__ == "__main__":
     main()

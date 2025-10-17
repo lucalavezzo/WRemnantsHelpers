@@ -7,7 +7,7 @@ pdfs_to_test = [
     "nnpdf40",
     "pdf4lhc21",
     "msht20",
-    "msht20an3lo"
+    "msht20an3lo",
 ]
 
 pdfs_for_uncs = [
@@ -15,16 +15,12 @@ pdfs_for_uncs = [
     "msht20mbrange_renorm",
 ]
 
-extra_pdfs = [
-    "nnpdf30",
-    "atlasWZj20",
-    "herapdf20",
-    "herapdf20ext"
-]
+extra_pdfs = ["nnpdf30", "atlasWZj20", "herapdf20", "herapdf20ext"]
 
 all_pdfs = pdfs_to_test + pdfs_for_uncs + extra_pdfs
 for i, central_pdf in enumerate(pdfs_to_test):
-    if i == 0: continue # testing
+    if i == 0:
+        continue  # testing
 
     other_pdfs = [pdf for pdf in all_pdfs if pdf != central_pdf]
 
