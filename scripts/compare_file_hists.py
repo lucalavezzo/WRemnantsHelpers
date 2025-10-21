@@ -195,7 +195,7 @@ def main():
                         f"Selection axis '{sel_ax}' not found in histogram axes. Available axes: {h.axes.name}"
                     )
                 else:
-                    h = h[{sel_ax: slice(sel_lb, sel_ub, sum)}]
+                    h = h[{sel_ax: slice(sel_lb, sel_ub)}]
             else:
                 sel_ax, sel_val = split
                 try:
@@ -289,20 +289,32 @@ def main():
         if len(_h_ref.axes) > 1:
             _h_ref = hh.unrolledHist(_h_ref, binwnorm=args.binwnorm)
 
+        axes_labels = []
+        for h_ax in _h_ref.axes:
+            if h_ax.name in args.axes:
+                if h_ax.label:
+                    axes_labels.append(h_ax.label)
+                else:
+                    axes_labels.append(h_ax.name)
+        if len(axes_labels) > 1:
+            xlabel = "(" + ",".join(axes_labels) + ") bin"
+        else:
+            xlabel = axes_labels[0]
         fig, ax1, ratio_axes = plot_tools.figureWithRatio(
             _h_ref,
-            "(" + ",".join(args.axes) + ") bin" if len(args.axes) else "bin",
+            xlabel,
             "Events",
             ylim=np.max(_h_ref.values()) * 1.2,
-            rlabel=f"1/{args.labels[0]}",
+            rlabel=f"1/ref.",
             rrange=args.rrange,
+            base_size=10,
         )
         ax2 = ratio_axes[-1]
 
         hep.histplot(
             _h_ref,
             ax=ax1,
-            label=args.labels[0] + " - " + list(files_hists[args.infiles[0]].keys())[0],
+            label=args.labels[0] + " (ref.)",
             binwnorm=args.binwnorm if len(_h_ref.axes) == 1 else None,
             histtype="step",
             color="black",
@@ -321,7 +333,7 @@ def main():
             hep.histplot(
                 h,
                 ax=ax1,
-                label=args.labels[i] + " - " + list(hists.keys())[0],
+                label=args.labels[i],
                 binwnorm=args.binwnorm if len(h.axes) == 1 else None,
                 histtype="step",
                 yerr=not args.norm,

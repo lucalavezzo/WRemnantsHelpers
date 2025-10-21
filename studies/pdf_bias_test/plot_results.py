@@ -1,14 +1,19 @@
 import argparse
 import os
 from datetime import datetime
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
+import mplhep as hep
 
 import rabbit
 import rabbit.io_tools
 import wums.output_tools
 from wremnants import theory_tools
 
+hep.style.use("CMS")
+
+ALPHA_S = 0.118
 DEFAULT_CENTRAL_PDFS = [
     "ct18",
     "ct18z",
@@ -17,6 +22,7 @@ DEFAULT_CENTRAL_PDFS = [
     "pdf4lhc21",
     "msht20",
     "msht20an3lo",
+    "herapdf20",
 ]
 DEFAULT_PSEUDODATA_PDFS = [
     "ct18",
@@ -34,6 +40,13 @@ def get_pdf_map_name(pdf_key: str) -> str:
     info = theory_tools.pdfMap.get(pdf_key)
     if info:
         return info["name"]
+    return f"pdf{pdf_key.upper()}"
+
+
+def get_pdf_display_name(pdf_key: str) -> str:
+    info = theory_tools.pdfMap.get(pdf_key)
+    if info:
+        return info["name"].strip("pdf")
     return f"pdf{pdf_key.upper()}"
 
 
@@ -82,9 +95,21 @@ def parse_args():
     )
     parser.add_argument(
         "--uncert",
-        default="central-pdf",
-        choices=["total", "central-pdf"],
-        help="Type of uncertainty to use for comparison. (Default: %(default)s)",
+        default="pdf-only",
+        choices=["total", "pdf-only"],
+        help="Type of uncertainty from the central PDF set to normalize by. (Default: %(default)s)",
+    )
+    parser.add_argument(
+        "--xlim",
+        nargs=2,
+        type=float,
+        default=None,
+        help="Set x-axis limits for the scatter plot. (Default: automatic)",
+    )
+    parser.add_argument(
+        "--postfix",
+        default="",
+        help="Postfix to add to output filenames. (Default: none)",
     )
 
     args = parser.parse_args()
@@ -121,7 +146,7 @@ def main():
                 input_file, result=result, meta=True
             )
             parms = fitresult["parms"].get()
-            alphas = abs(parms["pdfAlphaS"].value)
+            alphas = parms["pdfAlphaS"].value
             alphas_uncert = parms["pdfAlphaS"].variance ** 0.5
             pdf_uncert = (
                 fitresult["global_impacts_grouped"]
@@ -134,7 +159,7 @@ def main():
             this_central_results.append(alphas)
             if args.uncert == "total":
                 this_central_uncerts.append(alphas_uncert)
-            elif args.uncert == "central-pdf":
+            elif args.uncert == "pdf-only":
                 this_central_uncerts.append(pdf_uncert)
 
         results.append(this_central_results)
@@ -146,37 +171,41 @@ def main():
 
     fig, ax = plt.subplots(
         figsize=(
-            1.1 * (len(args.pseudodata_pdfs) + 2),
-            1.1 * len(args.central_pdfs),
+            2 * (len(args.pseudodata_pdfs) + 2),
+            2 * len(args.central_pdfs),
         )
     )
     mesh = ax.imshow(
-        data_to_plot,
+        np.abs(data_to_plot),
         origin="lower",
         aspect="auto",
         cmap="viridis",
     )
     cbar = fig.colorbar(mesh, ax=ax)
-    cbar.set_label(r"$|\Delta\alpha_S$/$\sigma_{\mathrm{central\;PDF}}|$")
+    if args.uncert == "total":
+        cbar.set_label(r"$|\Delta\alpha_S$/$\sigma_{\mathrm{total}}|$")
+    elif args.uncert == "pdf-only":
+        cbar.set_label(r"$|\Delta\alpha_S$/$\sigma_{\mathrm{central\;PDF}}|$")
 
     y_positions = np.arange(len(args.central_pdfs))
     x_positions = np.arange(len(args.pseudodata_pdfs))
 
     ax.set_yticks(y_positions)
     ax.set_yticklabels(
-        [get_pdf_map_name(pdf) for pdf in args.central_pdfs], rotation=45, ha="right"
+        [get_pdf_display_name(pdf) for pdf in args.central_pdfs],
+        rotation=45,
+        ha="right",
     )
     ax.set_xticks(x_positions)
     ax.set_xticklabels(
-        [get_pdf_map_name(pdf) for pdf in args.pseudodata_pdfs], rotation=45
+        [get_pdf_display_name(pdf) for pdf in args.pseudodata_pdfs], rotation=45
     )
-    ax.set_ylabel("Central PDF")
-    ax.set_xlabel("Pseudodata PDF")
-    ax.set_title(r"PDF bias test")
+    ax.set_ylabel("Central PDF", loc="center")
+    ax.set_xlabel("Pseudodata PDF", loc="center")
 
     for x_idx, _ in enumerate(args.pseudodata_pdfs):
         for y_idx, _ in enumerate(args.central_pdfs):
-            value = results_array[y_idx, x_idx]
+            value = np.abs(results_array[y_idx, x_idx])
             uncert = uncerts_array[y_idx, x_idx]
             color = "white" if value < uncert else "red"
             ax.text(
@@ -186,7 +215,7 @@ def main():
                 ha="center",
                 va="center",
                 color=color,
-                fontsize=9,
+                fontsize=14,
             )
 
     ax.set_ylim(-0.5, len(args.central_pdfs) - 0.5)
@@ -194,17 +223,78 @@ def main():
 
     plt.tight_layout()
     fname = "alphas_heatmap"
+    fname += f"_{args.uncert}Uncert"
+    if args.postfix:
+        fname += f"_{args.postfix}"
     output_path = os.path.join(
         args.output_dir,
         fname,
     )
-    fig.savefig(output_path + ".pdf")
-    fig.savefig(output_path + ".png", dpi=100)
+    fig.savefig(output_path + ".pdf", bbox_inches="tight")
+    fig.savefig(output_path + ".png", bbox_inches="tight", dpi=100)
     wums.output_tools.write_index_and_log(
         args.output_dir,
         fname,
     )
     print(f"Saved 2D alpha_s histogram to {output_path}(.pdf)(.png)(.log)")
+
+    # scatter plot
+    cmap = plt.get_cmap("tab10")
+    colors = cmap(np.linspace(0, 1, len(args.pseudodata_pdfs)))
+    height = 1.5 * len(args.central_pdfs)
+    fig, ax = plt.subplots(
+        figsize=(
+            15,
+            height,
+        )
+    )
+    for central_pdf_idx, central_pdf in enumerate(args.central_pdfs):
+        for pseudodata_pdf_idx, pseudodata_pdf in enumerate(args.pseudodata_pdfs):
+            x = results_array[central_pdf_idx, pseudodata_pdf_idx] + ALPHA_S
+            y = central_pdf_idx + pseudodata_pdf_idx * (
+                1 / (len(args.pseudodata_pdfs) + 3)
+            )
+            xerr = uncerts_array[central_pdf_idx, pseudodata_pdf_idx]
+            ax.errorbar(x, y, xerr=xerr, fmt="o", color=colors[pseudodata_pdf_idx])
+    ax.axvline(x=ALPHA_S, color="black", linestyle="--")
+    ax.set_xlabel(r"$\alpha_S$", loc="center")
+    ax.set_ylabel("Central PDF", loc="center")
+    ax.set_yticks(np.arange(len(args.central_pdfs)))
+    ax.set_yticklabels([get_pdf_display_name(pdf) for pdf in args.central_pdfs])
+    ax.legend(
+        handles=[
+            matplotlib.lines.Line2D(
+                [],
+                [],
+                color=colors[i],
+                marker="o",
+                linestyle="",
+                label=get_pdf_display_name(pdf),
+            )
+            for i, pdf in enumerate(args.pseudodata_pdfs)
+        ],
+        labels=[get_pdf_display_name(pdf) for pdf in args.pseudodata_pdfs],
+        loc=(1.01, 0),
+        title="Pseudodata PDF",
+    )
+    if args.xlim:
+        ax.set_xlim(args.xlim)
+    fname = "alphas_scatter"
+    fname += f"_{args.uncert}Uncert"
+    if args.postfix:
+        fname += f"_{args.postfix}"
+    output_path = os.path.join(
+        args.output_dir,
+        fname,
+    )
+    fig.tight_layout()
+    fig.savefig(output_path + ".pdf", bbox_inches="tight")
+    fig.savefig(output_path + ".png", bbox_inches="tight", dpi=100)
+    wums.output_tools.write_index_and_log(
+        args.output_dir,
+        fname,
+    )
+    print(f"Saved alpha_s scatter plot to {output_path}(.pdf)(.png)(.log)")
 
 
 if __name__ == "__main__":

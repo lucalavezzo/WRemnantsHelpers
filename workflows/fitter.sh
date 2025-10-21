@@ -5,6 +5,7 @@ usage() {
     echo "Usage: fitter.sh <infile> -o <output_dir>"
     echo "-e <extra arguments for setupRabbit.py> -f <extra arguments for rabbit.py>"
     echo "--noSetup <skip setupRabbit.py call, carrot is infile>"
+    echo "--noFit <skip rabbit_fit.py call>"
     echo "--2D <run 2D fit, ptll-yll>"
     echo "-h, --help <show this help message>"
     exit 1
@@ -20,6 +21,7 @@ shift
 do_setup=true
 do_2D=false
 do_impacts=false
+do_fit=true
 
 PARSED=$(getopt -o o:e:f:h --long output:,extra-setup:,extra-fit:,noSetup,2D,help -- "$@")
 if [[ $? -ne 0 ]]; then
@@ -44,6 +46,10 @@ while true; do
             ;;
         --noSetup)
             do_setup=false
+            shift
+            ;;
+        --noFit)
+            do_fit=false
             shift
             ;;
         --2D)
@@ -107,12 +113,16 @@ else
     carrot=$input_file
 fi
 
-echo "Rabbit file: $carrot"
-output=$(dirname "$carrot")
-echo "Output: $output"
+if $do_fit; then
+    echo "Rabbit file: $carrot"
+    output=$(dirname "$carrot")
+    echo "Output: $output"
 
-echo
-echo "Running the fit..."
-fit_command="rabbit_fit.py $carrot --computeVariations -m Project ch0 ptll --computeHistErrors --doImpacts -o $output --globalImpacts --saveHists --saveHistsPerProcess $extra_fit"
-echo "$fit_command"
-fit_output=$($fit_command 2>&1 | tee /dev/tty)
+    echo
+    echo "Running the fit..."
+    fit_command="rabbit_fit.py $carrot --computeVariations -m Project ch0 ptll --computeHistErrors --doImpacts -o $output --globalImpacts --saveHists --saveHistsPerProcess $extra_fit"
+    echo "$fit_command"
+    fit_output=$($fit_command 2>&1 | tee /dev/tty)
+else
+    echo "Skipping fit."
+fi

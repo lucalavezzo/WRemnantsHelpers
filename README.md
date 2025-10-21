@@ -41,7 +41,7 @@ Executables added to the `PATH` by `setup.sh`.
     ```
     
 ## Code style
-We enforce [Black](https://black.readthedocs.io/en/stable/) for Python formatting. A lightweight Git hook runs Black on staged Python files before each commit.
+Use [Black](https://black.readthedocs.io/en/stable/) for Python formatting. A lightweight Git hook runs Black on staged Python files before each commit. It is not enforced.
 
 ### Enabling the hook
 1. Ensure `black` is on `PATH`.

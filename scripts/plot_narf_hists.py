@@ -261,6 +261,7 @@ def main():
                     if axis_name.isdigit():
                         axis_name = int(axis_name)
                     h_ref = h_ref[{axis_name: np.s_[:: hist.rebin(int(rebin[1]))]}]
+
             fig, ax1, ratio_axes = plot_tools.figureWithRatio(
                 h_ref,
                 "(" + ",".join(args.axes) + ") bin" if len(args.axes) else "bin",
@@ -277,7 +278,7 @@ def main():
                 ax=ax1,
                 label=labels_to_plot[0] + " (ref.)",
                 histtype="step",
-                binwnorm=args.binwnorm if len(h_ref.axes) > 1 else None,
+                binwnorm=args.binwnorm if len(h_ref.axes) == 1 else None,
                 color="black",
                 yerr=not args.noErrorBars,
             )
@@ -296,7 +297,7 @@ def main():
                             sel_ax, sel_lb, sel_ub = sel
                             sel_lb = parsing.str_to_complex_or_int(sel_lb)
                             sel_ub = parsing.str_to_complex_or_int(sel_ub)
-                            h = h[{sel_ax: slice(sel_lb, sel_ub, sum)}]
+                            h = h[{sel_ax: slice(sel_lb, sel_ub)}]
                         elif len(sel) == 2:
                             sel_ax, sel_val = sel
                             try:
@@ -322,7 +323,7 @@ def main():
                     ax=ax1,
                     label=labels_to_plot[ihist],
                     histtype="step",
-                    binwnorm=args.binwnorm if len(h_ref.axes) > 1 else None,
+                    binwnorm=args.binwnorm if len(h_ref.axes) == 1 else None,
                     yerr=not args.noErrorBars,
                 )
 

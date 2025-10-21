@@ -11,6 +11,7 @@ DEFAULT_CENTRAL_PDFS = [
     "pdf4lhc21",
     "msht20",
     "msht20an3lo",
+    "herapdf20",
 ]
 
 DEFAULT_PSEUDODATA_PDFS = [
@@ -69,9 +70,10 @@ def main():
         )
 
         extra_setup = (
-            f"--pseudoData {pseudo_data_args} "
-            f"--postfix pdfBiasTest_Zmumu_{pdf_central} "
-            f"--pseudoDataIdxs 0 --pseudoDataAxes pdfVar --filterProcGroups Zmumu"
+            f"--pseudoData {pseudo_data_args} --pseudoDataIdxs 0 --pseudoDataAxes pdfVar "
+            f"--scalePdf 1.0 "
+            f"--filterProcGroups Zmumu "
+            f"--postfix pdfBiasTest_scalePdf1p0_Zmumu_{pdf_central} "
         )
         extra_fit = "--pseudoData -t 0 --unblind"
         fit_command = (
