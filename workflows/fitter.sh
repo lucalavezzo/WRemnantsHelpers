@@ -99,10 +99,10 @@ if $do_setup; then
         fitvar='ptll-yll-cosThetaStarll_quantile-phiStarll_quantile'
     fi
 
-    setup_commmand="python ${WREM_BASE}/scripts/rabbit/setupRabbit.py -i $input_file --fitvar $fitvar -o $output_dir --fitAlphaS $extra_setup"
+    setup_command="python ${WREM_BASE}/scripts/rabbit/setupRabbit.py -i $input_file --fitvar $fitvar -o $output_dir --noi alphaS $extra_setup"
 
-    echo "$setup_commmand"
-    setup_output=$($setup_commmand 2>&1 | tee /dev/tty)
+    echo "$setup_command"
+    setup_output=$($setup_command 2>&1 | tee /dev/tty)
     
     # extract the output file name, and the output directory, where we will put the fit results
     carrot=$(echo "$setup_output" | grep -oP '(?<=Write output file ).*')

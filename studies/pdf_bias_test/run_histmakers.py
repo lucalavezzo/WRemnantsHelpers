@@ -7,7 +7,7 @@ pdfs_to_test = [
     "nnpdf40",
     "pdf4lhc21",
     "msht20",
-    "msht20an3lo",
+    "herapdf20",
 ]
 
 pdfs_for_uncs = [
@@ -15,16 +15,17 @@ pdfs_for_uncs = [
     "msht20mbrange_renorm",
 ]
 
-extra_pdfs = ["nnpdf30", "atlasWZj20", "herapdf20", "herapdf20ext"]
+extra_pdfs = ["nnpdf30", "atlasWZj20", "herapdf20ext", "msht20an3lo"]
 
 all_pdfs = pdfs_to_test + pdfs_for_uncs + extra_pdfs
 for i, central_pdf in enumerate(pdfs_to_test):
-    if i == 0:
-        continue  # testing
+
+    if central_pdf != "herapdf20":
+        continue
 
     other_pdfs = [pdf for pdf in all_pdfs if pdf != central_pdf]
 
-    command = f"{os.environ['MY_WORK_DIR']}/workflows/histmaker.sh -e ' --filterProcs ZmumuPostVFP -j 300 --pdfs {central_pdf} {' '.join(other_pdfs)} --postfix {central_pdf}' "
+    command = f"{os.environ['MY_WORK_DIR']}/workflows/histmaker.sh -e ' --filterProcs ZmumuPostVFP dataPostVFP -j 300 --pdfs {central_pdf} {' '.join(other_pdfs)} --postfix {central_pdf}' "
     try:
         os.system(command)
     except Exception as e:

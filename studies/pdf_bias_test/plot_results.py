@@ -21,7 +21,6 @@ DEFAULT_CENTRAL_PDFS = [
     "nnpdf40",
     "pdf4lhc21",
     "msht20",
-    "msht20an3lo",
     "herapdf20",
 ]
 DEFAULT_PSEUDODATA_PDFS = [
@@ -31,8 +30,7 @@ DEFAULT_PSEUDODATA_PDFS = [
     "nnpdf40",
     "pdf4lhc21",
     "msht20",
-    "msht20an3lo",
-    "nnpdf30",
+    "herapdf20",
 ]
 
 
@@ -96,7 +94,7 @@ def parse_args():
     parser.add_argument(
         "--uncert",
         default="pdf-only",
-        choices=["total", "pdf-only"],
+        choices=["total", "pdf-only", "pdf-only-trad", "contour"],
         help="Type of uncertainty from the central PDF set to normalize by. (Default: %(default)s)",
     )
     parser.add_argument(
@@ -127,6 +125,8 @@ def main():
     args = parse_args()
     os.makedirs(args.output_dir, exist_ok=True)
 
+    asym_uncert = True if args.uncert in ["contour"] else False
+
     results = []
     uncerts = []
     for central_pdf in args.central_pdfs:
@@ -146,21 +146,33 @@ def main():
                 input_file, result=result, meta=True
             )
             parms = fitresult["parms"].get()
+
             alphas = parms["pdfAlphaS"].value
-            alphas_uncert = parms["pdfAlphaS"].variance ** 0.5
-            pdf_uncert = (
-                fitresult["global_impacts_grouped"]
-                .get()[{"impacts": f"{central_pdf_name}NoAlphaS"}]
-                .values()[0]
-            )
             alphas *= 0.0015
-            alphas_uncert *= 0.0015
-            pdf_uncert *= 0.0015
             this_central_results.append(alphas)
+
             if args.uncert == "total":
-                this_central_uncerts.append(alphas_uncert)
+                alphas_uncert = parms["pdfAlphaS"].variance ** 0.5
             elif args.uncert == "pdf-only":
-                this_central_uncerts.append(pdf_uncert)
+                alphas_uncert = (
+                    fitresult["global_impacts_grouped"]
+                    .get()[{"impacts": f"{central_pdf_name}NoAlphaS"}]
+                    .values()[0]
+                )
+            elif args.uncert == "pdf-only-trad":
+                alphas_uncert = (
+                    fitresult["impacts_grouped"]
+                    .get()[{"impacts": f"{central_pdf_name}NoAlphaS"}]
+                    .values()[0]
+                )
+            elif args.uncert == "contour":
+                alphas_uncert = (
+                    fitresult["contour_scan"]
+                    .get()[{"parms": "pdfAlphaS"}]
+                    .values()[0][0]
+                )
+            alphas_uncert *= 0.0015
+            this_central_uncerts.append(alphas_uncert)
 
         results.append(this_central_results)
         uncerts.append(this_central_uncerts)
@@ -168,6 +180,19 @@ def main():
     results_array = np.array(results)
     uncerts_array = np.array(uncerts)
     data_to_plot = results_array
+
+    print(f"{args.uncert} uncertainties on pdfAlphaS for Asimov fits:")
+    for ipdf in range(len(args.central_pdfs)):
+        for jpdf in range(len(args.pseudodata_pdfs)):
+            if args.central_pdfs[ipdf] == args.pseudodata_pdfs[jpdf]:
+                uncert = uncerts_array[ipdf, jpdf]
+                if asym_uncert:
+                    print(
+                        f"{args.central_pdfs[ipdf]}\t\t"
+                        f"+{uncert[1]:.5f}/-{uncert[0]:.5f}"
+                    )
+                else:
+                    print(f"{args.central_pdfs[ipdf]}\t\t{uncert:.5f}")
 
     fig, ax = plt.subplots(
         figsize=(
@@ -185,6 +210,8 @@ def main():
     if args.uncert == "total":
         cbar.set_label(r"$|\Delta\alpha_S$/$\sigma_{\mathrm{total}}|$")
     elif args.uncert == "pdf-only":
+        cbar.set_label(r"$|\Delta\alpha_S$/$\sigma_{\mathrm{central\;PDF\;global}}|$")
+    elif args.uncert == "pdf-only-trad":
         cbar.set_label(r"$|\Delta\alpha_S$/$\sigma_{\mathrm{central\;PDF}}|$")
 
     y_positions = np.arange(len(args.central_pdfs))
@@ -205,18 +232,35 @@ def main():
 
     for x_idx, _ in enumerate(args.pseudodata_pdfs):
         for y_idx, _ in enumerate(args.central_pdfs):
-            value = np.abs(results_array[y_idx, x_idx])
+            value = results_array[y_idx, x_idx]
             uncert = uncerts_array[y_idx, x_idx]
-            color = "white" if value < uncert else "red"
-            ax.text(
-                x_positions[x_idx],
-                y_positions[y_idx],
-                f"{value:.5f}\n$\\pm${uncert:.5f}",
-                ha="center",
-                va="center",
-                color=color,
-                fontsize=14,
-            )
+            if asym_uncert:
+                uncert_up = uncert[1] if uncert[1] > 0 else uncert[0]
+                uncert_down = uncert[0] if uncert[0] > 0 else uncert[1]
+                color = (
+                    "white" if (value < uncert_up and value > uncert_down) else "red"
+                )
+                ax.text(
+                    x_positions[x_idx],
+                    y_positions[y_idx],
+                    f"{value:.5f}\n$^{{+{uncert_up:.5f}}}_{{-{uncert_down:.5f}}}$",
+                    ha="center",
+                    va="center",
+                    color=color,
+                    fontsize=14,
+                )
+            else:
+                value = np.abs(value)
+                color = "white" if value < uncert else "red"
+                ax.text(
+                    x_positions[x_idx],
+                    y_positions[y_idx],
+                    f"{value:.5f}\n$\\pm${uncert:.5f}",
+                    ha="center",
+                    va="center",
+                    color=color,
+                    fontsize=14,
+                )
 
     ax.set_ylim(-0.5, len(args.central_pdfs) - 0.5)
     ax.set_xlim(-0.5, len(args.pseudodata_pdfs) - 0.5)
@@ -255,7 +299,13 @@ def main():
                 1 / (len(args.pseudodata_pdfs) + 3)
             )
             xerr = uncerts_array[central_pdf_idx, pseudodata_pdf_idx]
-            ax.errorbar(x, y, xerr=xerr, fmt="o", color=colors[pseudodata_pdf_idx])
+            ax.errorbar(
+                x,
+                y,
+                xerr=abs(xerr[..., np.newaxis]),
+                fmt="o",
+                color=colors[pseudodata_pdf_idx],
+            )
     ax.axvline(x=ALPHA_S, color="black", linestyle="--")
     ax.set_xlabel(r"$\alpha_S$", loc="center")
     ax.set_ylabel("Central PDF", loc="center")

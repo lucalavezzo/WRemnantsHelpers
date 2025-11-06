@@ -10,7 +10,6 @@ DEFAULT_CENTRAL_PDFS = [
     "nnpdf40",
     "pdf4lhc21",
     "msht20",
-    "msht20an3lo",
     "herapdf20",
 ]
 
@@ -18,11 +17,10 @@ DEFAULT_PSEUDODATA_PDFS = [
     "ct18",
     "ct18z",
     "nnpdf31",
-    "nnpdf30",
     "nnpdf40",
     "pdf4lhc21",
     "msht20",
-    "msht20an3lo",
+    "herapdf20",
 ]
 
 
@@ -43,6 +41,11 @@ def parse_args():
         help="Directory containing mz_dilepton_<pdf>.hdf5 inputs.",
     )
     parser.add_argument(
+        "--postfix",
+        default=None,
+        help="Postfix for output sub-directory.",
+    )
+    parser.add_argument(
         "--central-pdfs",
         nargs="+",
         default=DEFAULT_CENTRAL_PDFS,
@@ -53,6 +56,11 @@ def parse_args():
         nargs="+",
         default=DEFAULT_PSEUDODATA_PDFS,
         help="PDF set names to use for pseudo-data.",
+    )
+    parser.add_argument(
+        "--asym",
+        action="store_true",
+        help="For use with asymmetric uncertainties. Performs a contour scan on pdfAlphaS.",
     )
     return parser.parse_args()
 
@@ -69,18 +77,22 @@ def main():
             ]
         )
 
+        postfix = f"pdfBiasTest_Zmumu"
+        if args.postfix:
+            postfix += f"_{args.postfix}"
+        postfix += f"_{pdf_central}"
         extra_setup = (
             f"--pseudoData {pseudo_data_args} --pseudoDataIdxs 0 --pseudoDataAxes pdfVar "
-            f"--scalePdf 1.0 "
             f"--filterProcGroups Zmumu "
-            f"--postfix pdfBiasTest_scalePdf1p0_Zmumu_{pdf_central} "
+            f"--postfix {postfix} "
         )
-        extra_fit = "--pseudoData -t 0 --unblind"
+        extra_fit = "--pseudoData -t 0 --unblind "
+        if args.asym:
+            extra_fit += "--scan pdfAlphaS --contourScan pdfAlphaS -v 4 --scanRange 3.0 --scanPoints 45 "
         fit_command = (
             f"{os.environ['MY_WORK_DIR']}/workflows/fitter.sh "
             f"{input_file} -e '{extra_setup}' -f '{extra_fit}'"
         )
-
         try:
             os.system(fit_command)
         except Exception as e:

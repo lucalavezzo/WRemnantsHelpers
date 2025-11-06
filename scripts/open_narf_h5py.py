@@ -1,4 +1,4 @@
-import os, sys
+import os, sys, re
 
 sys.path.append("../../WRemnants/")
 import argparse
@@ -37,6 +37,12 @@ parser.add_argument(
     help="Filter processes to show info about. Supports multiple process names.",
 )
 parser.add_argument(
+    "--filterProcsRegex",
+    nargs="+",
+    default=[],
+    help="Filter processes to show info about using regex. Supports multiple regex patterns.",
+)
+parser.add_argument(
     "--excludeProcs",
     nargs="+",
     default=["meta_info"],
@@ -50,16 +56,45 @@ parser.add_argument(
     help="Filter histograms to print. Supports one string that will be checked against all histogram names in the file.",
 )
 parser.add_argument(
+    "--filterHistsRegex",
+    nargs="+",
+    type=str,
+    default=None,
+    help="Filter histograms to print using regex. Supports multiple regex patterns that will be checked against all histogram names in the file.",
+)
+parser.add_argument(
+    "--excludeHists",
+    nargs="+",
+    type=str,
+    default=None,
+    help="Exclude histograms to print. Supports one string that will be checked against all histogram names in the file.",
+)
+parser.add_argument(
     "--outfile",
     type=str,
     default=None,
     help="If provided, will copy the processes and histograms selected into a new file.",
+)
+parser.add_argument(
+    "--path",
+    type=str,
+    default=None,
+    help="Navigate to the --path inside the HDF5 file.",
 )
 args = parser.parse_args()
 
 with h5py.File(args.infile, "r") as h5file:
     results = load_results_h5py(h5file)
     print(f"Samples in file: {results.keys()}\n")
+
+    if args.path:
+        cwp = results
+        for p in args.path.split("/"):
+            print(f"Navigating to {p}")
+            cwp = cwp[p]
+        print(f"Contents at {args.path}: {cwp.keys()}")
+        for k in cwp.keys():
+            print(k, str(cwp[k])[:1000])
 
     if args.outfile:
         output = {}
@@ -73,6 +108,14 @@ with h5py.File(args.infile, "r") as h5file:
         for sample in results.keys():
             if args.filterProcs and sample not in args.filterProcs:
                 continue
+            if args.filterProcsRegex:
+                matched = False
+                for pattern in args.filterProcsRegex:
+                    if re.search(pattern, sample):
+                        matched = True
+                        break
+                if not matched:
+                    continue
             if args.excludeProcs and sample in args.excludeProcs:
                 continue
             print(f"Sample: {sample}")
@@ -85,6 +128,21 @@ with h5py.File(args.infile, "r") as h5file:
                     hists = [
                         h for h in hists for filter in args.filterHists if filter in h
                     ]
+                if args.excludeHists:
+                    hists = [
+                        h
+                        for h in hists
+                        for exclude in args.excludeHists
+                        if exclude not in h
+                    ]
+                if args.filterHistsRegex:
+                    filtered_hists = []
+                    for h in hists:
+                        for pattern in args.filterHistsRegex:
+                            if re.search(pattern, h):
+                                filtered_hists.append(h)
+                                break
+                    hists = filtered_hists
 
                 print(f"Histograms: {hists}\n")
                 if args.printHists:
@@ -106,9 +164,11 @@ with h5py.File(args.infile, "r") as h5file:
             elif type(results[sample]) == Hist:
                 if args.printHists:
                     print(results[sample])
-            print()
 
             if args.outfile:
                 mode = "r+" if os.path.isfile(args.outfile) else "w"
                 with h5py.File(args.outfile, mode) as h5out:
                     wums.ioutils.pickle_dump_h5py(sample, output, h5out)
+                print("Wrote selected histograms to ", args.outfile)
+
+            print()

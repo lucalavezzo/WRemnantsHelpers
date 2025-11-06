@@ -255,6 +255,8 @@ def main():
         else:
             hists[hist_name] = h
 
+        if infile in files_hists:
+            infile += "_2"
         files_hists[infile] = hists
 
     if args.labels:
@@ -286,8 +288,6 @@ def main():
     for combination in combinations:
 
         _h_ref = h_ref[{ax.name: combination[i] for i, ax in enumerate(selection_axes)}]
-        if len(_h_ref.axes) > 1:
-            _h_ref = hh.unrolledHist(_h_ref, binwnorm=args.binwnorm)
 
         axes_labels = []
         for h_ax in _h_ref.axes:
@@ -296,10 +296,18 @@ def main():
                     axes_labels.append(h_ax.label)
                 else:
                     axes_labels.append(h_ax.name)
+        if len(axes_labels) == 0:
+            raise Exception(
+                "No axes to plot found. Available axes: " + ", ".join(_h_ref.axes.name)
+            )
         if len(axes_labels) > 1:
             xlabel = "(" + ",".join(axes_labels) + ") bin"
         else:
             xlabel = axes_labels[0]
+
+        if len(_h_ref.axes) > 1:
+            _h_ref = hh.unrolledHist(_h_ref, binwnorm=args.binwnorm)
+
         fig, ax1, ratio_axes = plot_tools.figureWithRatio(
             _h_ref,
             xlabel,
