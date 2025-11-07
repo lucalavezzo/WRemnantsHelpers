@@ -55,6 +55,11 @@ def main():
         print(f"Running command: {command}")
         os.system(command)
 
+        if args.skim:
+            skim_command = f"python {os.environ['MY_WORK_DIR']}/scripts/open_narf_h5py.py {args.outdir}/w_z_gen_dists_{pred}_maxFiles_m1.hdf5 --filterHists pdfas --outfile {args.outdir}/w_z_gen_dists_{pred}_maxFiles_m1_skimmed.hdf5"
+            print(f"Running skimming command: {skim_command}")
+            os.system(skim_command)
+
     print("All done!")
 
 
