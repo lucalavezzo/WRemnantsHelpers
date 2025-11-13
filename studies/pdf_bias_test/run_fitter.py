@@ -48,12 +48,14 @@ def parse_args():
     parser.add_argument(
         "--central-pdfs",
         nargs="+",
+        choices=DEFAULT_CENTRAL_PDFS,
         default=DEFAULT_CENTRAL_PDFS,
         help="PDF set names to use as central inputs.",
     )
     parser.add_argument(
         "--pseudodata-pdfs",
         nargs="+",
+        choices=DEFAULT_PSEUDODATA_PDFS,
         default=DEFAULT_PSEUDODATA_PDFS,
         help="PDF set names to use for pseudo-data.",
     )

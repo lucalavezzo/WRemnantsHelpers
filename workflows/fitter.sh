@@ -44,6 +44,10 @@ while true; do
             extra_fit="$2"
             shift 2
             ;;
+        -p|--postfix)
+            postfix="$2"
+            shift 2
+            ;;
         --noSetup)
             do_setup=false
             shift

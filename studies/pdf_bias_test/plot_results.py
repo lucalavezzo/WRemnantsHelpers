@@ -14,6 +14,7 @@ from wremnants import theory_tools
 hep.style.use("CMS")
 
 ALPHA_S = 0.118
+ALPHA_S_UNCERT_SCALE = 0.002
 DEFAULT_CENTRAL_PDFS = [
     "ct18",
     "ct18z",
@@ -80,6 +81,7 @@ def parse_args():
     parser.add_argument(
         "--central-pdfs",
         nargs="+",
+        choices=DEFAULT_CENTRAL_PDFS,
         default=DEFAULT_CENTRAL_PDFS,
         metavar="PDF",
         help="Central PDFs to include on the y-axis of the heatmap. (Default: %(default)s)",
@@ -87,6 +89,7 @@ def parse_args():
     parser.add_argument(
         "--pseudodata-pdfs",
         nargs="+",
+        choices=DEFAULT_PSEUDODATA_PDFS,
         default=DEFAULT_PSEUDODATA_PDFS,
         metavar="PDF",
         help="Pseudodata PDFs to include on the x-axis of the heatmap. (Default: %(default)s)",
@@ -148,7 +151,7 @@ def main():
             parms = fitresult["parms"].get()
 
             alphas = parms["pdfAlphaS"].value
-            alphas *= 0.0015
+            alphas *= ALPHA_S_UNCERT_SCALE
             this_central_results.append(alphas)
 
             if args.uncert == "total":
@@ -171,7 +174,7 @@ def main():
                     .get()[{"parms": "pdfAlphaS"}]
                     .values()[0][0]
                 )
-            alphas_uncert *= 0.0015
+            alphas_uncert *= ALPHA_S_UNCERT_SCALE
             this_central_uncerts.append(alphas_uncert)
 
         results.append(this_central_results)

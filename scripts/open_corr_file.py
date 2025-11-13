@@ -36,3 +36,4 @@ if args.path:
     if hasattr(subdata, "keys"):
         print(f"Keys at path {args.path}:")
         pprint.pprint(subdata.keys())
+    print(subdata)
