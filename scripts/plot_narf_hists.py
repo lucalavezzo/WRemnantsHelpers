@@ -461,7 +461,7 @@ def main():
             output_tools.write_index_and_log(
                 args.outdir, proc + "_" + "_".join(hists_to_plot) + _postfix, args=args
             )
-            print(f"Saved {oname}(.log)(.png)(.log)")
+            print(f"Saved {oname}(.png)(.png)(.log)")
 
 
 if __name__ == "__main__":

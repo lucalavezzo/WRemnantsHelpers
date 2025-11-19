@@ -21,7 +21,7 @@ all_pdfs = pdfs_to_test + pdfs_for_uncs + extra_pdfs
 for i, central_pdf in enumerate(pdfs_to_test):
 
     # TEST only run msht20 and msht20an3lo
-    if central_pdf not in ["msht20", "msht20an3lo"]:
+    if central_pdf not in ["ct18z"]:
         continue
 
     command_extra = ""

@@ -389,7 +389,7 @@ def main():
         fig.savefig(oname + ".pdf", bbox_inches="tight")
         plt.close(fig)
         output_tools.write_index_and_log(args.outdir, fname, args=args)
-        print(f"Saved {oname}(.png)(.log)")
+        print(f"Saved {oname}(.png)(.pdf)(.log)")
 
 
 if __name__ == "__main__":
