@@ -20,10 +20,6 @@ extra_pdfs = ["nnpdf30", "atlasWZj20", "herapdf20ext", "msht20an3lo"]
 all_pdfs = pdfs_to_test + pdfs_for_uncs + extra_pdfs
 for i, central_pdf in enumerate(pdfs_to_test):
 
-    # TEST only run msht20 and msht20an3lo
-    if central_pdf not in ["ct18z"]:
-        continue
-
     command_extra = ""
     if central_pdf == "msht20":
         command_extra = " --theoryCorr scetlib_dyturbo scetlib_dyturboMSHT20Vars scetlib_dyturboMSHT20_pdfas scetlib_dyturboCT18Z_pdfas"

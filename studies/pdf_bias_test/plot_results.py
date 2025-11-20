@@ -104,7 +104,7 @@ def parse_args():
         "--xlim",
         nargs=2,
         type=float,
-        default=None,
+        default=(0.115, 0.121),
         help="Set x-axis limits for the scatter plot. (Default: automatic)",
     )
     parser.add_argument(
@@ -191,11 +191,11 @@ def main():
                 uncert = uncerts_array[ipdf, jpdf]
                 if asym_uncert:
                     print(
-                        f"{args.central_pdfs[ipdf]}\t\t"
+                        f"{args.central_pdfs[ipdf]:<15}\t\t"
                         f"+{uncert[1]:.5f}/-{uncert[0]:.5f}"
                     )
                 else:
-                    print(f"{args.central_pdfs[ipdf]}\t\t{uncert:.5f}")
+                    print(f"{args.central_pdfs[ipdf]:<15} {uncert:>10.5f}")
 
     fig, ax = plt.subplots(
         figsize=(

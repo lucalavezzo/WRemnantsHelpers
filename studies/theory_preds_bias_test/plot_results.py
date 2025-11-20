@@ -15,20 +15,20 @@ hep.style.use("CMS")
 
 ALPHA_S = 0.118
 DEFAULT_CENTRAL_PREDS = [
-    "scetlib_dyturboCT18Z_pdfasCorr",
-    "scetlib_dyturboMSHT20_pdfasCorr",
-    "scetlib_dyturboN3p1LL_pdfasCorr",
-    "scetlib_dyturboN4p0LL_pdfasCorr",
-    "scetlib_nnlojetN3p1LLN3LO_pdfasCorr",
-    "scetlib_nnlojetN4p0LLN3LO_pdfasCorr",
+    "scetlib_dyturbo",
+    "scetlib_dyturboMSHT20",
+    "scetlib_dyturboN3p1LL",
+    "scetlib_dyturboN4p0LL",
+    "scetlib_nnlojetN3p1LLN3LO",
+    "scetlib_nnlojetN4p0LLN3LO",
 ]
 DEFAULT_PSEUDODATA_PREDS = [
-    "scetlib_dyturboCT18Z_pdfasCorr",
-    "scetlib_dyturboMSHT20_pdfasCorr",
-    "scetlib_dyturboN3p1LL_pdfasCorr",
-    "scetlib_dyturboN4p0LL_pdfasCorr",
-    "scetlib_nnlojetN3p1LLN3LO_pdfasCorr",
-    "scetlib_nnlojetN4p0LLN3LO_pdfasCorr",
+    "scetlib_dyturbo",
+    "scetlib_dyturboMSHT20",
+    "scetlib_dyturboN3p1LL",
+    "scetlib_dyturboN4p0LL",
+    "scetlib_nnlojetN3p1LLN3LO",
+    "scetlib_nnlojetN4p0LLN3LO",
 ]
 
 
@@ -75,7 +75,7 @@ def parse_args():
     )
     parser.add_argument(
         "--uncert",
-        default="total",
+        default="pTModeling",
         choices=["total", "contour", "pTModeling"],
         help="Type of uncertainty from the central pred set to normalize by. (Default: %(default)s)",
     )
@@ -83,8 +83,8 @@ def parse_args():
         "--xlim",
         nargs=2,
         type=float,
-        default=None,
-        help="Set x-axis limits for the scatter plot. (Default: automatic)",
+        default=(0.115, 0.121),
+        help="Set x-axis limits for the scatter plot. (Default: %(default)s)",
     )
     parser.add_argument(
         "--postfix",
@@ -120,7 +120,7 @@ def main():
         print(input_file)
 
         for pseudodata_pred in args.pseudodata_preds:
-            result = f"nominal_{pseudodata_pred}ByHelicity_vars"
+            result = f"nominal_{pseudodata_pred}Corr_vars"
             fitresult, _ = rabbit.io_tools.get_fitresult(
                 input_file, result=result, meta=True
             )

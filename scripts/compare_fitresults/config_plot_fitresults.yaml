@@ -9,6 +9,13 @@ fit_results:
     label: "Detector-level Z"
     marker: "+"
     color: "black"
+
+  reco_Z_newNP:
+    file: "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS//251118_histmaker_dilepton/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile_pdfByHelicity_asByHelicity/fitresults.hdf5"
+    label: "Detector-level Z\n(new NP model)"
+    marker: "^"
+    color: "black"
+    alpha_s_sigma: 2.0
     
   theory_Z:
     file: "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS//250921_histmaker_dilepton_unfolding/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile/fitresults.hdf5"

@@ -27,8 +27,13 @@ while getopts "u:o:e:f:" opt; do
     esac
 done
 
+if [ -z "$output_dir" ]; then
+    output_dir=$(dirname $input_file)
+    echo "Set output directory to: $output_dir"
+fi
+
 # unfolding command
-unfolding_setup_command="python $WREM_BASE/scripts/rabbit/setupRabbit.py -i $input_file -o $output_dir --analysisMode unfolding --poiAsNoi --fitvar 'ptll-yll-cosThetaStarll_quantile-phiStarll_quantile' --genAxes 'ptVGen-absYVGen-helicitySig' --scaleNormXsecHistYields '0.05' --allowNegativeExpectation --realData --systematicType normal"
+unfolding_setup_command="python $WREM_BASE/scripts/rabbit/setupRabbit.py -i $input_file -o $output_dir --analysisMode unfolding --poiAsNoi --fitvar 'ptll-yll-cosThetaStarll_quantile-phiStarll_quantile' --genAxes 'ptVGen-absYVGen-helicitySig' --scaleNormXsecHistYields '0.05' --allowNegativeExpectation --realData --systematicType normal --postfix unfoldingThroughMC --npUnc LatticeEigvars --pdfUncFromCorr "
 echo "Executing command: $unfolding_setup_command"
 unfolding_setup_command_output=$(eval "$unfolding_setup_command 2>&1" | tee /dev/tty)
 
@@ -42,7 +47,7 @@ echo "Output: $output"
 echo
 
 
-unfolding_command="rabbit_fit.py ${unfolding_combine_file} -o ${output} --binByBinStatType normal -t -1 --doImpacts --globalImpacts --saveHists --computeHistErrors --computeHistImpacts --computeHistCov -m Select 'ch0_masked' 'helicitySig:slice(0,1)' --postfix asimov ${extra_fit}"
+unfolding_command="rabbit_fit.py ${unfolding_combine_file} -o ${output} --binByBinStatType normal-multiplicative -t -1 --doImpacts --globalImpacts --saveHists --computeHistErrors --computeHistImpacts --computeHistCov -m Select 'ch0_masked' 'helicitySig:slice(0,1)' --postfix asimov ${extra_fit}"
 echo "Executing command: $unfolding_command"
 unfolding_command_output=$(eval "$unfolding_command 2>&1" | tee /dev/tty)
 echo
@@ -55,7 +60,7 @@ output=$(dirname "$unfolding_fitresult")
 echo "Output: $output"
 echo
 
-setup_command="python $WREM_BASE/scripts/rabbit/setupRabbit.py -i $input_file -o ${output} --fitresult ${unfolding_fitresult} 'Select helicitySig:slice(0,1)' 'ch0_masked' --fitvar ptVGen-absYVGen-helicitySig --axlim -1000 1000 -1000 1000 0 1 --fitAlphaS --postfix theoryfit --baseName prefsr"
+setup_command="python $WREM_BASE/scripts/rabbit/setupRabbit.py -i $input_file -o ${output} --fitresult ${unfolding_fitresult} 'Select helicitySig:slice(0,1)' 'ch0_masked' --fitvar ptVGen-absYVGen-helicitySig --axlim -1000 1000 -1000 1000 0 1 --noi alphaS --postfix theoryfit --baseName prefsr --npUnc LatticeEigvars --pdfUncFromCorr"
 echo "Executing command: $setup_command"
 setup_command_output=$(eval "$setup_command 2>&1" | tee /dev/tty)
 echo
@@ -68,7 +73,7 @@ output=$(dirname "$combine_file")
 echo "Output: $output"
 echo
 
-combine_command="rabbit_fit.py ${combine_file} -o ${output} --doImpacts --globalImpacts --saveHists --computeHistErrors --computeVariations --chisqFit --externalCovariance -t -1 -m Basemodel -m Project ch0 ptVGen -m Project ch0 absYVGen ${extra_fit}"
+combine_command="rabbit_fit.py ${combine_file} -o ${output} --doImpacts --globalImpacts --saveHists --computeHistErrors --computeVariations --covarianceFit -t -1 -m Basemodel -m Project ch0 ptVGen -m Project ch0 absYVGen ${extra_fit}"
 echo "Executing command: $combine_command"
 combine_command_output=$(eval "$combine_command 2>&1" | tee /dev/tty)
 echo

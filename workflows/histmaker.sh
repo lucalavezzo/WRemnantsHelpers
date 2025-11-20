@@ -30,10 +30,8 @@ fi
 current_date=$(date +"%y%m%d")
 output_dir="${MY_OUT_DIR}/${current_date}_histmaker_dilepton/"
 if [ -n "$postfix" ]; then
-    output_dir=${output_dir}_${postfix}/
     postfix="--postfix ${postfix}"
 else
-    output_dir=$output_dir/
     postfix=""
 fi
 mkdir -p $output_dir

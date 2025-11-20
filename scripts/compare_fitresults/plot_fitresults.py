@@ -6,6 +6,7 @@ import sys, os
 import argparse
 import yaml
 import datetime
+from wums import output_tools
 
 hep.style.use(hep.style.CMS)
 
@@ -91,8 +92,6 @@ def main(args):
     config = load_config(args.config)
 
     # Extract settings from config
-    alpha_s = config.get("alpha_s", ALPHA_S)
-    alpha_s_sigma = config.get("alpha_s_sigma", ALPHA_S_SIGMA)
     plot_title = config.get("plot_title", "MC Statistics Study")
 
     # Get fit results and assign defaults
@@ -104,6 +103,7 @@ def main(args):
 
     for name, result in fit_results.items():
         file_path = result["file"]
+        alpha_s_sigma = result.get("alpha_s_sigma", ALPHA_S_SIGMA)
 
         print(f"Processing: {file_path}")
 
@@ -179,6 +179,7 @@ def main(args):
     fig.savefig(
         os.path.join(output_dir, f"fitresults{postfix}.pdf"), bbox_inches="tight"
     )
+    output_tools.write_index_and_log(args.output_dir, f"fitresults{postfix}", args=args)
 
     print(f"Plots saved to {output_dir}")
 
@@ -196,8 +197,8 @@ def parse_args():
     parser.add_argument(
         "-o",
         "--output-dir",
-        default=f"{datetime.date.today().strftime("%y%m%d")}_fitresults",
-        help="Output directory for plots (overrides config)",
+        default=f"{os.environ['MY_PLOT_DIR']}{datetime.date.today().strftime('%y%m%d')}_fitresults",
+        help="Output directory for plots. (default: %(default)s)",
     )
     parser.add_argument("--postfix", default="", help="Postfix for output filenames")
     return parser.parse_args()

@@ -30,7 +30,7 @@ if [ -z "$output_dir" ]; then
 fi
 
 # unfolding command
-unfolding_setup_command="python $WREM_BASE/scripts/rabbit/setupRabbit.py -i $input_file -o $output_dir --analysisMode unfolding --poiAsNoi --fitvar 'ptll-yll-cosThetaStarll_quantile-phiStarll_quantile' --genAxes 'ptVGen-absYVGen-helicitySig' --scaleNormXsecHistYields '0.05' --allowNegativeExpectation --realData --systematicType normal"
+unfolding_setup_command="python $WREM_BASE/scripts/rabbit/setupRabbit.py -i $input_file -o $output_dir --analysisMode unfolding --poiAsNoi --fitvar 'ptll-yll-cosThetaStarll_quantile-phiStarll_quantile' --genAxes 'ptVGen-absYVGen-helicitySig' --scaleNormXsecHistYields '0.05' --allowNegativeExpectation --realData --systematicType normal --npUnc LatticeEigvars --pdfUncFromCorr"
 echo "Executing command: $unfolding_setup_command"
 unfolding_setup_command_output=$(eval "$unfolding_setup_command 2>&1" | tee /dev/tty)
 
@@ -43,7 +43,7 @@ output=$(dirname "$unfolding_combine_file")
 echo "Output: $output"
 echo
 
-unfolding_command="rabbit_fit.py ${unfolding_combine_file} -o ${output} --binByBinStatType normal -t -1 --doImpacts --globalImpacts --saveHists --computeHistErrors --computeHistImpacts --computeHistCov -m Select 'ch0_masked' 'helicitySig:slice(0,1)' --postfix asimov ${extra_fit}"
+unfolding_command="rabbit_fit.py ${unfolding_combine_file} -o ${output} --binByBinStatType normal-multiplicative -t -1 --doImpacts --globalImpacts --saveHists --computeHistErrors --computeHistImpacts --computeHistCov -m Select 'ch0_masked' 'helicitySig:slice(0,1)' --postfix asimov ${extra_fit}"
 echo "Executing command: $unfolding_command"
 unfolding_command_output=$(eval "$unfolding_command 2>&1" | tee /dev/tty)
 echo
@@ -55,7 +55,7 @@ echo "Unfolded fit result: $unfolding_fitresult"
 unfolding_output_dir=$(dirname "$unfolding_fitresult")
 echo
 
-theory_setup_command="python ${WREM_BASE}/scripts/rabbit/feedRabbitTheory.py ${unfolding_fitresult} --predGenerator 'scetlib_dyturbo' -o ${unfolding_output_dir} --systematicType log_normal --fitresultModel CompositeModel ${extra_setup}"
+theory_setup_command="python ${WREM_BASE}/scripts/rabbit/feedRabbitTheory.py --infile ${unfolding_fitresult} --predGenerator 'scetlib_dyturboN3p0LL_LatticeNP' -o ${unfolding_output_dir} --systematicType log_normal --fitresultModel 'Select helicitySig:slice(0,1)' --fitresultChannelSigmaUL ch0_masked ${extra_setup}"
 echo "Executing command: $theory_setup_command"
 theory_setup_command_output=$(eval "$theory_setup_command 2>&1" | tee /dev/tty)
 
@@ -65,7 +65,7 @@ echo $theory_file
 theory_file=$(echo "$theory_file" | sed 's/\x1B\[[0-9;]*[a-zA-Z]//g') # sanitize the output
 echo "Unfolded file: $theory_file"
 
-fit_command="rabbit_fit.py ${theory_file} -o ${unfolding_output_dir} --externalCovariance --doImpacts --chisqFit --globalImpacts --saveHists --computeVariations --computeHistErrors"
+fit_command="rabbit_fit.py ${theory_file} -o ${unfolding_output_dir} --doImpacts --covarianceFit --globalImpacts --saveHists --computeVariations --computeHistErrors"
 echo "Executing command: $fit_command"
 fit_command_output=$(eval "$fit_command 2>&1" | tee /dev/tty)
 echo

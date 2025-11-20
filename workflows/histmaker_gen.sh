@@ -27,13 +27,13 @@ fi
 current_date=$(date +"%y%m%d")
 output_dir=$MY_OUT_DIR/${current_date}_histmaker_gen/
 if [ -n "$postfix" ]; then
-    output_dir=${output_dir}_${postfix}/
+    postfix="--postfix ${postfix}"
 else
-    output_dir=$output_dir/
+    postfix=""
 fi
 mkdir -p $output_dir
 echo "Output directory: $output_dir"
 
-command="python ${WREM_BASE}scripts/histmakers/w_z_gen_dists.py --dataPath /scratch/submit/cms/wmass/NanoAOD/ -o ${output_dir} -j -1 --maxFiles -1 --filterProcs  ZmumuPostVFP --useUnfoldingBinning"
+command="python ${WREM_BASE}scripts/histmakers/w_z_gen_dists.py --dataPath /scratch/submit/cms/wmass/NanoAOD/ -o ${output_dir} -j -1 --maxFiles -1 --filterProcs  ZmumuPostVFP --useUnfoldingBinning ${postfix}"
 echo "Executing command: $command"
 eval $command
