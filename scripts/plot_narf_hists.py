@@ -1,3 +1,4 @@
+from cProfile import label
 import sys
 
 sys.path.append("../../WRemnants/")
@@ -91,6 +92,13 @@ def main():
         type=str,
         default=[],
         help="Name of histograms to display in legend. Must be of same length as --hists.",
+    )
+    parser.add_argument(
+        "--legLoc",
+        type=float,
+        nargs=2,
+        default=None,
+        help="Location of the legend. Default is outside the plot on the right.",
     )
     parser.add_argument(
         "--xlim",
@@ -288,7 +296,7 @@ def main():
                 h_ref,
                 "(" + ",".join(args.axes) + ") bin" if len(args.axes) else "bin",
                 "Events",
-                ylim=np.max(h_ref.values()) * 1.3,
+                ylim=np.max(h_ref.values()) * 1.1,
                 rlabel=f"1/ref.",
                 rrange=args.rrange,
                 base_size=10,
@@ -428,7 +436,7 @@ def main():
             else:
                 x_ticks_ndp = None
             plot_tools.fix_axes(ax1, ax2, fig, logy=args.logy, x_ticks_ndp=x_ticks_ndp)
-            plot_tools.add_cms_decor(ax1, "Preliminary", lumi=16.8, loc=2)
+            plot_tools.add_cms_decor(ax1, "Preliminary", lumi=16.8, loc=0)
             # Build legend so selections are included inside it.
             handles, labels = ax1.get_legend_handles_labels()
             # Append per-hist selections under each histogram label (if provided)
@@ -445,7 +453,12 @@ def main():
                 handles.insert(0, dummy)
                 labels.insert(0, global_sel_label)
 
-            ax1.legend(handles, labels, loc=(1.01, 0), fontsize="small")
+            ax1.legend(
+                handles,
+                labels,
+                loc=args.legLoc if args.legLoc else (1.01, 0),
+                fontsize="small",
+            )
             ax1.invert_yaxis()  # I have no idea why I have to do this
             if args.ylim:
                 ax1.set_ylim(args.ylim)

@@ -3,37 +3,31 @@
 # Fit results configuration
 # Each entry is a fit result with its file path and optional plotting parameters
 fit_results:
-  
+
   reco_Z:
-    file: "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS//250921_histmaker_dilepton/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile/fitresults.hdf5"
+    file: "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS//251118_histmaker_dilepton/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile_pdfByHelicity_asByHelicity/fitresults.hdf5"
     label: "Detector-level Z"
     marker: "+"
     color: "black"
-
-  reco_Z_newNP:
-    file: "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS//251118_histmaker_dilepton/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile_pdfByHelicity_asByHelicity/fitresults.hdf5"
-    label: "Detector-level Z\n(new NP model)"
-    marker: "^"
-    color: "black"
-    alpha_s_sigma: 2.0
     
   theory_Z:
-    file: "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS//250921_histmaker_dilepton_unfolding/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile/fitresults.hdf5"
+    file: "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS//251119_histmaker_dilepton_unfolding/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile_unfoldingThroughMC/ZMassDilepton_ptVGen_absYVGen_helicitySig_theoryfit/fitresults.hdf5"
     label: "Theory fit Z"
     marker: "x"
     color: "black"
     
   reco_WZ:
-    file: "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS//250922_WZCombinedFit/Combination_ZMassDileptonWMass/fitresults.hdf5"
+    file: "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/251121_WZCombinedFit/Combination_ZMassDileptonWMass/fitresults.hdf5"
     label: "Detector-level W+Z"
     marker: "P"
     color: "black"
     
   theory_WZ:
     file: "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS//250922_WZCombinedTheoryFit/Combination_ZMassDileptonWMass/fitresults.hdf5"
-    label: "Theory fit W+Z"
+    label: "Theory fit W+Z\n(old NP model)"
     marker: "X"
     color: "black"
+    alpha_s_sigma: 1.5 
 
 # Example with auto-assigned markers and colors (commented out)
 # auto_assigned_example:

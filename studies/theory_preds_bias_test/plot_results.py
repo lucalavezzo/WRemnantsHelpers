@@ -14,6 +14,7 @@ from wremnants import theory_tools
 hep.style.use("CMS")
 
 ALPHA_S = 0.118
+ALPHA_S_SCALING = 0.002
 DEFAULT_CENTRAL_PREDS = [
     "scetlib_dyturbo",
     "scetlib_dyturboMSHT20",
@@ -127,7 +128,7 @@ def main():
             parms = fitresult["parms"].get()
 
             alphas = parms["pdfAlphaS"].value
-            alphas *= 0.0015
+            alphas *= ALPHA_S_SCALING
             this_central_results.append(alphas)
 
             if args.uncert == "total":
@@ -144,7 +145,7 @@ def main():
                     .get()[{"parms": "pdfAlphaS"}]
                     .values()[0][0]
                 )
-            alphas_uncert *= 0.0015
+            alphas_uncert *= ALPHA_S_SCALING
             this_central_uncerts.append(alphas_uncert)
 
         results.append(this_central_results)
@@ -192,13 +193,13 @@ def main():
 
     ax.set_yticks(y_positions)
     ax.set_yticklabels(
-        [pred.replace("_pdfasCorr", "") for pred in args.central_preds],
+        [pred.replace("Corr", "") for pred in args.central_preds],
         rotation=45,
         ha="right",
     )
     ax.set_xticks(x_positions)
     ax.set_xticklabels(
-        [pred.replace("_pdfasCorr", "") for pred in args.pseudodata_preds], rotation=45
+        [pred.replace("Corr", "") for pred in args.pseudodata_preds], rotation=45
     )
     ax.set_ylabel("Central pred.", loc="center")
     ax.set_xlabel("Pseudodata pred.", loc="center")
@@ -253,7 +254,7 @@ def main():
     # scatter plot
     cmap = plt.get_cmap("tab10")
     colors = cmap(np.linspace(0, 1, len(args.pseudodata_preds)))
-    height = 1.5 * len(args.central_preds)
+    height = max(5, 1.5 * len(args.central_preds))
     fig, ax = plt.subplots(
         figsize=(
             15,

@@ -57,10 +57,10 @@ def main():
 
         command = f"python {os.environ['WREM_BASE']}/scripts/histmakers/w_z_gen_dists.py --useCorrByHelicityBinning --theoryCorr {pred} -o {args.outdir} --maxFiles '-1' -j 300 --filterProcs ZmumuPostVFP WplusmunuPostVFP WminusmunuPostVFP --addHelicityAxis --pdf {pdf}"
         print(f"Running command: {command}")
-        # os.system(command)
+        os.system(command)
 
         if args.skim:
-            skim_command = f"python {os.environ['MY_WORK_DIR']}/scripts/open_narf_h5py.py {args.outdir}/w_z_gen_dists_{pred + "Corr"}_maxFiles_m1_{pdf}.hdf5 --filterHistsRegex '^(.*pdfas.*|nominal_gen_theory_uncorr)$' --outfile {args.outdir}/w_z_gen_dists_{pred + "Corr"}_maxFiles_m1_skimmed.hdf5"
+            skim_command = f"python {os.environ['MY_WORK_DIR']}/scripts/open_narf_h5py.py {args.outdir}/w_z_gen_dists_{pred + "Corr"}_maxFiles_m1.hdf5 --filterHistsRegex '^(.*pdfas.*|nominal_gen_theory_uncorr)$' --outfile {args.outdir}/w_z_gen_dists_{pred + "Corr"}_maxFiles_m1_skimmed.hdf5"
             print(f"Running skimming command: {skim_command}")
             os.system(skim_command)
 

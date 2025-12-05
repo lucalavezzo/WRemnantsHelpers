@@ -96,7 +96,7 @@ def parse_args():
     )
     parser.add_argument(
         "--uncert",
-        default="pdf-only",
+        default="pdf-only-trad",
         choices=["total", "pdf-only", "pdf-only-trad", "contour"],
         help="Type of uncertainty from the central PDF set to normalize by. (Default: %(default)s)",
     )
@@ -288,7 +288,7 @@ def main():
     # scatter plot
     cmap = plt.get_cmap("tab10")
     colors = cmap(np.linspace(0, 1, len(args.pseudodata_pdfs)))
-    height = 1.5 * len(args.central_pdfs)
+    height = max(5, 1.5 * len(args.central_pdfs))
     fig, ax = plt.subplots(
         figsize=(
             15,

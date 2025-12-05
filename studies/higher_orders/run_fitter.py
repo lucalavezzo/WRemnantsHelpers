@@ -13,16 +13,6 @@ DEFAULT_CENTRAL_PREDS = [
     "scetlib_nnlojetN4p0LLN3LO",
     "scetlib_dyturboN3p0LL_LatticeNP",
 ]
-DEFAULT_PSEUDODATA_PREDS = [
-    "scetlib_dyturbo",
-    "scetlib_dyturboMSHT20",
-    "scetlib_dyturboMSHT20an3lo",
-    "scetlib_dyturboN3p1LL",
-    "scetlib_dyturboN4p0LL",
-    "scetlib_nnlojetN3p1LLN3LO",
-    "scetlib_nnlojetN4p0LLN3LO",
-    "scetlib_dyturboN3p0LL_LatticeNP",
-]
 
 
 def get_pred_map_name(pred_key: str) -> str:
@@ -53,12 +43,6 @@ def parse_args():
         help="PDF set names to use as central inputs. (default: %(default)s)",
     )
     parser.add_argument(
-        "--pseudodata-preds",
-        nargs="+",
-        default=DEFAULT_PSEUDODATA_PREDS,
-        help="PDF set names to use for pseudo-data. (default: %(default)s)",
-    )
-    parser.add_argument(
         "--asym",
         action="store_true",
         help="For use with asymmetric uncertainties. Performs a contour scan on predAlphaS.",
@@ -72,22 +56,15 @@ def main():
     for pred_central in args.central_preds:
         print(f"Processing {pred_central}")
         input_file = f"{args.input_dir}/mz_dilepton_{pred_central}.hdf5"
-        pseudo_data_args = " ".join(
-            ["nominal_" + p + "Corr" for p in args.pseudodata_preds]
-        )
 
-        postfix = f"predBiasTest_Zmumu"
+        postfix = f"Zmumu"
         if args.postfix:
             postfix += f"_{args.postfix}"
         postfix += f"_{pred_central}"
-        extra_setup = (
-            f"--pseudoData {pseudo_data_args} --pseudoDataIdxs 0 --pseudoDataAxes vars "
-            f"--filterProcGroups Zmumu "
-            f"--postfix {postfix} "
-        )
+        extra_setup = f"--filterProcGroups Zmumu " f"--postfix {postfix} "
         if "lattice" in pred_central.lower():
             extra_setup += "--npUnc LatticeEigvars --pdfUncFromCorr"
-        extra_fit = "--pseudoData -t 0 --unblind "
+        extra_fit = ""
         if args.asym:
             extra_fit += "--scan pdfAlphaS --contourScan pdfAlphaS -v 4 --scanRange 3.0 --scanPoints 45 "
         fit_command = (

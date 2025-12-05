@@ -96,7 +96,7 @@ if $do_setup; then
         fitvar_Z='ptll-yll-cosThetaStarll_quantile-phiStarll_quantile'
     fi
 
-    setup_commmand="python ${WREM_BASE}/scripts/rabbit/setupRabbit.py -i $input_file_Z $input_file_W --fitvar $fitvar_Z eta-pt-charge -o $output_dir --fitAlphaS $extra_setup"
+    setup_commmand="python ${WREM_BASE}/scripts/rabbit/setupRabbit.py -i $input_file_Z $input_file_W --fitvar $fitvar_Z eta-pt-charge -o $output_dir --noi alphaS $extra_setup"
 
     echo "$setup_commmand"
     setup_output=$($setup_commmand 2>&1 | tee /dev/tty)

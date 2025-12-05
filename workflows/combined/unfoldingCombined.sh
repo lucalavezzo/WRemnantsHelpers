@@ -2,12 +2,13 @@
 # The fit for alphaS is performed only on the sigma UL in ptVgen-absYVgen using the same MC events
 
 if [ -z "$1" ]; then
-    echo "Usage: unfolding_2D.sh <input_file> -o <output_dir> -e <extra setupRabbit arguments> -f <extra rabbit_fit arguments>"
+    echo "Usage: unfolding_2D.sh <input_file_Z> <input_file_W> -o <output_dir> -e <extra setupRabbit arguments> -f <extra rabbit_fit arguments>"
     exit 1
 fi
 
-input_file="$1"
-shift
+input_file_Z="$1"
+input_file_W="$2"
+shift 2
 
 while getopts "u:o:e:f:" opt; do
     case $opt in
@@ -28,12 +29,13 @@ while getopts "u:o:e:f:" opt; do
 done
 
 if [ -z "$output_dir" ]; then
-    output_dir=$(dirname $input_file)
+    output_dir=$(dirname $input_file_Z)
     echo "Set output directory to: $output_dir"
 fi
 
 # unfolding command
-unfolding_setup_command="python $WREM_BASE/scripts/rabbit/setupRabbit.py -i $input_file -o $output_dir --analysisMode unfolding --poiAsNoi --fitvar 'ptll-yll-cosThetaStarll_quantile-phiStarll_quantile' --genAxes 'ptVGen-absYVGen-helicitySig' --scaleNormXsecHistYields '0.05' --allowNegativeExpectation --realData --systematicType normal --postfix unfoldingThroughMC "
+unfolding_setup_command="python $WREM_BASE/scripts/rabbit/setupRabbit.py -i $input_file_Z $input_file_W -o $output_dir --analysisMode unfolding unfoldingLevel prefsr --poiAsNoi --poiAsNoi --fitvar 'ptll-yll-cosThetaStarll_quantile-phiStarll_quantile' 'eta-pt-charge' --genAxes 'ptVGen-absYVGen-helicitySig' 'absEtaGen-ptGen-qGen' --scaleNormXsecHistYields '0.05' --allowNegativeExpectation --realData --systematicType normal --unfoldSimultaneousWandZ "
+
 echo "Executing command: $unfolding_setup_command"
 unfolding_setup_command_output=$(eval "$unfolding_setup_command 2>&1" | tee /dev/tty)
 
@@ -47,7 +49,7 @@ echo "Output: $output"
 echo
 
 
-unfolding_command="rabbit_fit.py ${unfolding_combine_file} -o ${output} --binByBinStatType normal-multiplicative -t -1 --doImpacts --globalImpacts --saveHists --computeHistErrors --computeHistImpacts --computeHistCov -m Select 'ch0_masked' 'helicitySig:slice(0,1)' --postfix asimov ${extra_fit}"
+unfolding_command="rabbit_fit.py ${unfolding_combine_file} -o ${output} --binByBinStatType normal-multiplicative -t -1 --doImpacts --globalImpacts --saveHists --computeHistErrors --computeHistImpacts --computeHistCov --compositeModel -m Select 'ch0_masked' 'helicitySig:slice(0,1)' -m Select 'ch1_masked'  --postfix asimov ${extra_fit}"
 echo "Executing command: $unfolding_command"
 unfolding_command_output=$(eval "$unfolding_command 2>&1" | tee /dev/tty)
 echo
@@ -60,7 +62,7 @@ output=$(dirname "$unfolding_fitresult")
 echo "Output: $output"
 echo
 
-setup_command="python $WREM_BASE/scripts/rabbit/setupRabbit.py -i $input_file -o ${output} --fitresult ${unfolding_fitresult} 'Select helicitySig:slice(0,1)' 'ch0_masked' --fitvar ptVGen-absYVGen-helicitySig --axlim -1000 1000 -1000 1000 0 1 --noi alphaS --postfix theoryfit --baseName prefsr"
+setup_command="python ${WREM_BASE}/scripts/rabbit/feedRabbitTheory.py ${unfolding_fitresult} --predGenerator 'scetlib_dyturboN3p0LL_LatticeNP' -o '${output}' --systematicType 'log_normal' --fitresultModel CompositeModel --fitW"
 echo "Executing command: $setup_command"
 setup_command_output=$(eval "$setup_command 2>&1" | tee /dev/tty)
 echo

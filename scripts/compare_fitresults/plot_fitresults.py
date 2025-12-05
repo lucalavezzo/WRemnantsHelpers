@@ -11,7 +11,7 @@ from wums import output_tools
 hep.style.use(hep.style.CMS)
 
 ALPHA_S = 0.118
-ALPHA_S_SIGMA = 1.5
+ALPHA_S_SIGMA = 2.0
 
 
 def load_config(config_path):

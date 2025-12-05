@@ -29,6 +29,7 @@ fi
 # create a subdirectory in the output directory with the current date
 current_date=$(date +"%y%m%d")
 output_dir="${MY_OUT_DIR}/${current_date}_histmakerMW/"
+output_dir="/scratch/submit/cms/alphaS//${current_date}_histmakerMW/"
 if [ -n "$postfix" ]; then
     output_dir=${output_dir}_${postfix}/
     postfix="--postfix ${postfix}"
