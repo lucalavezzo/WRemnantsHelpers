@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import mplhep as hep
 import rabbit.io_tools
 import argparse
+import pprint
 import wums.ioutils
 
 parser = argparse.ArgumentParser(
@@ -56,9 +57,21 @@ if args.path:
     print()
     full_path = args.path.split("/")
     h = fitresult
+
+    print("-" * 20)
     print(f"Navigating to path: {args.path}")
+    print()
+
     for p in full_path:
+        print("-" * 20)
+        print(f"At path: {p}")
         h = h[p]
         if type(h) is wums.ioutils.H5PickleProxy:
             h = h.get()
-        print(p, h)
+
+        if type(h) is dict:
+            print(p, "has keys:", list(h.keys()))
+            pprint.pprint(h)
+        else:
+            print(f"{p}: {h}")
+        print()

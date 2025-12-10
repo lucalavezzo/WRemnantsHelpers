@@ -34,7 +34,7 @@ if [ -z "$output_dir" ]; then
 fi
 
 # unfolding command
-unfolding_setup_command="python $WREM_BASE/scripts/rabbit/setupRabbit.py -i $input_file_Z $input_file_W -o $output_dir --analysisMode unfolding unfoldingLevel prefsr --poiAsNoi --poiAsNoi --fitvar 'ptll-yll-cosThetaStarll_quantile-phiStarll_quantile' 'eta-pt-charge' --genAxes 'ptVGen-absYVGen-helicitySig' 'absEtaGen-ptGen-qGen' --scaleNormXsecHistYields '0.05' --allowNegativeExpectation --realData --systematicType normal --unfoldSimultaneousWandZ "
+unfolding_setup_command="python $WREM_BASE/scripts/rabbit/setupRabbit.py -i $input_file_Z $input_file_W -o $output_dir --analysisMode unfolding --unfoldingLevel prefsr --poiAsNoi --poiAsNoi --fitvar 'ptll-yll-cosThetaStarll_quantile-phiStarll_quantile' 'eta-pt-charge' --genAxes 'ptVGen-absYVGen-helicitySig' 'absEtaGen-ptGen-qGen' --scaleNormXsecHistYields '0.05' --allowNegativeExpectation --realData --systematicType normal --unfoldSimultaneousWandZ "
 
 echo "Executing command: $unfolding_setup_command"
 unfolding_setup_command_output=$(eval "$unfolding_setup_command 2>&1" | tee /dev/tty)
@@ -60,22 +60,4 @@ unfolding_fitresult=$(echo "$unfolding_fitresult" | sed 's/\x1B\[[0-9;]*[a-zA-Z]
 echo "Unfolded fit result: $unfolding_fitresult"
 output=$(dirname "$unfolding_fitresult")
 echo "Output: $output"
-echo
-
-setup_command="python ${WREM_BASE}/scripts/rabbit/feedRabbitTheory.py ${unfolding_fitresult} --predGenerator 'scetlib_dyturboN3p0LL_LatticeNP' -o '${output}' --systematicType 'log_normal' --fitresultModel CompositeModel --fitW"
-echo "Executing command: $setup_command"
-setup_command_output=$(eval "$setup_command 2>&1" | tee /dev/tty)
-echo
-
-# extract the output file name, and the output directory, where we will put the fit results
-combine_file=$(echo "$setup_command_output" | grep -oP '(?<=Write output file ).*')
-combine_file=$(echo "$combine_file" | sed 's/\x1B\[[0-9;]*[a-zA-Z]//g') # sanitize the output
-echo "Combine file: $combine_file"
-output=$(dirname "$combine_file")
-echo "Output: $output"
-echo
-
-combine_command="rabbit_fit.py ${combine_file} -o ${output} --doImpacts --globalImpacts --saveHists --computeHistErrors --computeVariations --covarianceFit -t -1 -m Basemodel -m Project ch0 ptVGen -m Project ch0 absYVGen ${extra_fit}"
-echo "Executing command: $combine_command"
-combine_command_output=$(eval "$combine_command 2>&1" | tee /dev/tty)
 echo

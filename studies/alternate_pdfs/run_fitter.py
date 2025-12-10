@@ -56,7 +56,7 @@ def main():
     for pdf_central in args.central_pdfs:
         input_file = f"{args.input_dir}/mz_dilepton_{pdf_central}.hdf5"
 
-        postfix = f"pdfBiasTest_Zmumu"
+        postfix = f"Zmumu"
         if args.postfix:
             postfix += f"_{args.postfix}"
         postfix += f"_{pdf_central}"

@@ -4,6 +4,8 @@ from datetime import datetime
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
+import matplotlib.lines as mlines
+from matplotlib.legend_handler import HandlerPatch
 import mplhep as hep
 
 import rabbit
@@ -69,7 +71,7 @@ def parse_args():
     parser.add_argument(
         "--output-dir",
         default=os.path.join(
-            os.environ["MY_PLOT_DIR"], datetime.now().strftime("%y%m%d_higher_orders")
+            os.environ["MY_PLOT_DIR"], datetime.now().strftime("%y%m%d_alternate_pdfs")
         ),
         help=(f"Directory where plots are written. (Default: %(default)s)"),
     )
@@ -80,10 +82,10 @@ def parse_args():
         help="Central pdfs to include on the y-axis of the heatmap. (Default: %(default)s)",
     )
     parser.add_argument(
-        "--uncert",
-        default="pdf-only-trad",
-        choices=["total", "pdf-only", "pdf-only-trad", "contour"],
-        help="Type of uncertainty from the central PDF set to normalize by. (Default: %(default)s)",
+        "--impact-type",
+        default="traditional",
+        choices=["traditional", "global"],
+        help="Type of impact to show, traditional or global. (Default: %(default)s)",
     )
     parser.add_argument(
         "--ylim",
@@ -107,12 +109,59 @@ def parse_args():
     return args
 
 
+class HandlerPatchWithLine(HandlerPatch):
+    """Legend handler drawing a line across a patch."""
+
+    def create_artists(
+        self, legend, orig_handle, xdescent, ydescent, width, height, fontsize, trans
+    ):
+        patch = super().create_artists(
+            legend, orig_handle, xdescent, ydescent, width, height, fontsize, trans
+        )[0]
+        line = mlines.Line2D(
+            [xdescent, xdescent + width],
+            [ydescent + height / 2.0, ydescent + height / 2.0],
+            linestyle=getattr(orig_handle, "_legend_line_style", "--"),
+            color=getattr(orig_handle, "_legend_line_color", "black"),
+            linewidth=getattr(orig_handle, "_legend_line_width", 2),
+            transform=trans,
+        )
+        return [patch, line]
+
+
+def draw_bar_edges(
+    ax, rect, *, horizontal_style="--", vertical_style="-", **line_kwargs
+):
+    """Draw bar edges with separate linestyles for horizontal and vertical sides."""
+    x_left = rect.get_x()
+    x_right = x_left + rect.get_width()
+    y_bottom = rect.get_y()
+    y_top = y_bottom + rect.get_height()
+    ax.hlines(
+        [y_bottom, y_top],
+        x_left,
+        x_right,
+        linestyles=horizontal_style,
+        linewidth=2,
+        **line_kwargs,
+    )
+    ax.vlines(
+        [x_left, x_right],
+        y_bottom,
+        y_top,
+        linestyles=vertical_style,
+        linewidth=1,
+        **line_kwargs,
+    )
+
+
 def main():
     args = parse_args()
     os.makedirs(args.output_dir, exist_ok=True)
 
     results = []
-    uncerts = []
+    tot_uncerts = []
+    pdf_uncerts = []
     for central_pdf in args.central_pdfs:
         input_file = os.path.join(
             args.input_dir, args.file_base + central_pdf, "fitresults.hdf5"
@@ -130,60 +179,59 @@ def main():
         alphas *= ALPHA_S_SCALING
         results.append(alphas)
 
-        if args.uncert == "total":
-            alphas_uncert = parms["pdfAlphaS"].variance ** 0.5
-        elif args.uncert == "pdf-only":
-            alphas_uncert = (
+        alphas_tot_uncert = parms["pdfAlphaS"].variance ** 0.5
+        if args.impact_type == "global":
+            alphas_pdf_uncert = (
                 fitresult["global_impacts_grouped"]
                 .get()[{"impacts": f"{central_pdf_name}NoAlphaS"}]
                 .values()[0]
             )
-        elif args.uncert == "pdf-only-trad":
-            alphas_uncert = (
+        elif args.impact_type == "traditional":
+            alphas_pdf_uncert = (
                 fitresult["impacts_grouped"]
                 .get()[{"impacts": f"{central_pdf_name}NoAlphaS"}]
                 .values()[0]
             )
-        elif args.uncert == "contour":
-            alphas_uncert = (
-                fitresult["contour_scan"].get()[{"parms": "pdfAlphaS"}].values()[0][0]
-            )
-        alphas_uncert *= ALPHA_S_SCALING
-        uncerts.append(alphas_uncert)
+
+        alphas_tot_uncert *= ALPHA_S_SCALING
+        alphas_pdf_uncert *= ALPHA_S_SCALING
+        tot_uncerts.append(alphas_tot_uncert)
+        pdf_uncerts.append(alphas_pdf_uncert)
 
     results_array = np.array(results)
-    uncerts_array = np.array(uncerts)
+    tot_uncerts_array = np.array(tot_uncerts)
+    pdf_uncerts_array = np.array(pdf_uncerts)
 
-    def format_alphas_value(value, uncert):
-        """Return latex-safe alpha_s value with symmetric or asymmetric uncertainty."""
+    def format_alphas_value(value, tot_uncert, pdf_uncert):
+        """Return latex-safe alpha_s value with symmetric or asymmetric tot_uncertainty."""
         central_value = ALPHA_S + float(np.squeeze(value))
-        uncert_array = np.atleast_1d(uncert).astype(float).flatten()
-        if uncert_array.size == 1:
-            return f"${central_value:.5f} \\pm {abs(uncert_array[0]):.5f}$"
-        lower, upper = uncert_array[0], uncert_array[1]
+        tot_uncert_array = np.atleast_1d(tot_uncert).astype(float).flatten()
+        pdf_uncert_array = np.atleast_1d(pdf_uncert).astype(float).flatten()
+        if tot_uncert_array.size == 1:
+            return f"${central_value:.5f} \\pm {abs(tot_uncert_array[0]):.5f} ({abs(pdf_uncert_array[0]):.5f})$"
+        lower, upper = tot_uncert_array[0], tot_uncert_array[1]
         return f"${central_value:.5f}^{{+{abs(upper):.5f}}}_{{-{abs(lower):.5f}}}$"
 
     latex_lines = []
-    for central_pdf, value, uncert in zip(
-        args.central_pdfs, results_array, uncerts_array
+    for central_pdf, value, tot_uncert, pdf_uncert in zip(
+        args.central_pdfs, results_array, tot_uncerts_array, pdf_uncerts_array
     ):
         latex_lines.append(
-            f"{LABELS[central_pdf].replace('_', '\\_')} & {format_alphas_value(value, uncert)} \\\\"
+            f"{XLABELS[central_pdf].replace('_', '\\_')} & {format_alphas_value(value, tot_uncert, pdf_uncert)} \\\\"
         )
     print("\nLaTeX table:\n" + "\n".join(latex_lines))
 
     # bar plot: bars encode uncertainty, horizontal line marks central value
-    fig, ax = plt.subplots(figsize=(16, 6))
+    fig, ax = plt.subplots(figsize=(12, 7))
     bar_positions = np.arange(len(args.central_pdfs))
     bar_width = 1.0  # edges touch when x-limits are set to +/-0.5 from first/last bar
-    colors = plt.cm.tab20(np.linspace(0, 1, len(args.central_pdfs)))
-    for idx, (central_pdf, color) in enumerate(zip(args.central_pdfs, colors)):
+    for idx, central_pdf in enumerate(args.central_pdfs):
         central = float(np.squeeze(results_array[idx] + ALPHA_S))
-        uncert_array = np.atleast_1d(uncerts_array[idx]).astype(float).flatten()
-        if uncert_array.size == 1:
-            lower = upper = abs(uncert_array[0])
+        tot_uncert_array = np.atleast_1d(tot_uncerts_array[idx]).astype(float).flatten()
+        if tot_uncert_array.size == 1:
+            lower = upper = abs(tot_uncert_array[0])
         else:
-            lower, upper = abs(uncert_array[0]), abs(uncert_array[1])
+            lower, upper = abs(tot_uncert_array[0]), abs(tot_uncert_array[1])
         bottom = central - lower
         height = lower + upper
         ax.bar(
@@ -191,9 +239,34 @@ def main():
             height,
             width=bar_width,
             bottom=bottom,
-            color=color,
+            color="gray",
             edgecolor="black",
             alpha=0.35,
+        )
+        pdf_uncert_array = np.atleast_1d(pdf_uncerts_array[idx]).astype(float).flatten()
+        if pdf_uncert_array.size == 1:
+            lower = upper = abs(pdf_uncert_array[0])
+        else:
+            lower, upper = abs(pdf_uncert_array[0]), abs(pdf_uncert_array[1])
+        bottom = central - lower
+        height = lower + upper
+        pdf_bar = ax.bar(
+            bar_positions[idx],
+            height,
+            width=bar_width,
+            bottom=bottom,
+            color="darkgray",
+            edgecolor="none",
+            linewidth=0,
+            alpha=0.7,
+        )[0]
+        draw_bar_edges(
+            ax,
+            pdf_bar,
+            color="black",
+            horizontal_style="--",
+            vertical_style="-",
+            zorder=3,
         )
         ax.plot(
             [
@@ -201,10 +274,10 @@ def main():
                 bar_positions[idx] + bar_width / 2,
             ],
             [central, central],
-            color=color,
+            color="black",
             linewidth=2,
         )
-    ax.axhline(
+    pdg_line = ax.axhline(
         y=ALPHA_S_PDG,
         color="black",
         label=f"PDG average: " + ALPHA_S_TEX + f"={ALPHA_S_PDG}",
@@ -221,12 +294,35 @@ def main():
     ax.set_xlim(-0.5, len(args.central_pdfs) - 0.5)
     if args.ylim:
         ax.set_ylim(args.ylim)
-    ax.legend(
-        fontsize="small",
-        loc="upper center",
+    total_handle = matplotlib.patches.Patch(
+        facecolor="gray",
+        edgecolor="black",
+        alpha=0.35,
+        label="Total uncertainty",
     )
-    fname = "ho_alphas_results"
-    fname += f"_{args.uncert}Uncert"
+    pdf_handle = matplotlib.patches.Patch(
+        facecolor="darkgray",
+        edgecolor="black",
+        alpha=0.7,
+        label="PDF uncertainty",
+    )
+    pdf_handle._legend_line_style = "--"
+    pdf_handle._legend_line_color = "black"
+    pdf_handle._legend_line_width = 2
+    ax.legend(
+        handles=[total_handle, pdf_handle, pdg_line],
+        labels=[
+            "Total uncertainty",
+            "PDF uncertainty",
+            pdg_line.get_label(),
+        ],
+        fontsize="x-small",
+        loc="lower left",
+        bbox_to_anchor=(1.01, 0),
+        handler_map={pdf_handle: HandlerPatchWithLine()},
+    )
+    fname = "alt_pdfs_alphas_results"
+    fname += f"_{args.impact_type}Impacts"
     if args.postfix:
         fname += f"_{args.postfix}"
     output_path = os.path.join(

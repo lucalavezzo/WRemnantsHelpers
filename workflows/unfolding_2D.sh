@@ -33,7 +33,7 @@ if [ -z "$output_dir" ]; then
 fi
 
 # unfolding command
-unfolding_setup_command="python $WREM_BASE/scripts/rabbit/setupRabbit.py -i $input_file -o $output_dir --analysisMode unfolding --poiAsNoi --fitvar 'ptll-yll-cosThetaStarll_quantile-phiStarll_quantile' --genAxes 'ptVGen-absYVGen-helicitySig' --scaleNormXsecHistYields '0.05' --allowNegativeExpectation --realData --systematicType normal --postfix unfoldingThroughMC "
+unfolding_setup_command="python $WREM_BASE/scripts/rabbit/setupRabbit.py -i $input_file -o $output_dir --analysisMode unfolding --poiAsNoi --fitvar 'ptll-yll-cosThetaStarll_quantile-phiStarll_quantile' --genAxes 'ptVGen-absYVGen-helicitySig' --scaleNormXsecHistYields '0.05' --allowNegativeExpectation --realData --systematicType normal --npUnc LatticeEigvars --pdfUncFromCorr "
 echo "Executing command: $unfolding_setup_command"
 unfolding_setup_command_output=$(eval "$unfolding_setup_command 2>&1" | tee /dev/tty)
 
@@ -60,7 +60,7 @@ output=$(dirname "$unfolding_fitresult")
 echo "Output: $output"
 echo
 
-setup_command="python $WREM_BASE/scripts/rabbit/setupRabbit.py -i $input_file -o ${output} --fitresult ${unfolding_fitresult} 'Select helicitySig:slice(0,1)' 'ch0_masked' --fitvar ptVGen-absYVGen-helicitySig --axlim -1000 1000 -1000 1000 0 1 --noi alphaS --postfix theoryfit --baseName prefsr"
+setup_command="python $WREM_BASE/scripts/rabbit/setupRabbit.py -i $input_file -o ${output} --fitresult ${unfolding_fitresult} 'Select helicitySig:slice(0,1)' 'ch0_masked' --fitvar ptVGen-absYVGen-helicitySig --axlim -1000 1000 -1000 1000 0 1 --noi alphaS --postfix theoryfitViaMC --baseName prefsr --npUnc LatticeEigvars --pdfUncFromCorr"
 echo "Executing command: $setup_command"
 setup_command_output=$(eval "$setup_command 2>&1" | tee /dev/tty)
 echo
