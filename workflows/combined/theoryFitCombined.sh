@@ -35,7 +35,7 @@ else
 fi
 
 # unfolding command
-unfolding_setup_command="python $WREM_BASE/scripts/rabbit/setupRabbit.py -i $input_file_Z $input_file_W -o $output_dir --analysisMode unfolding --unfoldingLevel prefsr --poiAsNoi --fitvar 'ptll-yll-cosThetaStarll_quantile-phiStarll_quantile' 'eta-pt-charge' --genAxes 'ptVGen-absYVGen-helicitySig' 'absEtaGen-ptGen-qGen' --scaleNormXsecHistYields '0.05' --allowNegativeExpectation --realData --systematicType normal --unfoldSimultaneousWandZ --npUnc LatticeEigvars --pdfUncFromCorr" 
+unfolding_setup_command="python $WREM_BASE/scripts/rabbit/setupRabbit.py -i $input_file_Z $input_file_W -o $output_dir --analysisMode unfolding --unfoldingLevel prefsr --poiAsNoi --fitvar 'ptll-yll-cosThetaStarll_quantile-phiStarll_quantile' 'eta-pt-charge' --genAxes 'ptVGen-absYVGen-helicitySig' 'absEtaGen-ptGen-qGen' --scaleNormXsecHistYields '0.05' --allowNegativeExpectation --realData --systematicType normal --unfoldSimultaneousWandZ" 
 echo "Executing command: $unfolding_setup_command"
 unfolding_setup_command_output=$(eval "$unfolding_setup_command 2>&1" | tee /dev/tty)
 
@@ -60,7 +60,7 @@ echo "Unfolded fit result: $unfolding_fitresult"
 unfolding_output_dir=$(dirname "$unfolding_fitresult")
 echo
 
-theory_setup_command="python ${WREM_BASE}/scripts/rabbit/feedRabbitTheory.py --infile ${unfolding_fitresult} --predGenerator 'scetlib_dyturbo' -o ${unfolding_output_dir} --systematicType log_normal --fitresultModel CompositeModel --fitW  ${extra_setup}"
+theory_setup_command="python ${WREM_BASE}/scripts/rabbit/feedRabbitTheory.py --infile ${unfolding_fitresult} --predGenerator 'scetlib_dyturbo' -o ${unfolding_output_dir} --systematicType log_normal -m CompositeModel --fitW --noi alphaS mW  ${extra_setup}"
 echo "Executing command: $theory_setup_command"
 theory_setup_command_output=$(eval "$theory_setup_command 2>&1" | tee /dev/tty)
 
@@ -70,7 +70,7 @@ echo $theory_file
 theory_file=$(echo "$theory_file" | sed 's/\x1B\[[0-9;]*[a-zA-Z]//g') # sanitize the output
 echo "Unfolded file: $theory_file"
 
-fit_command="rabbit_fit.py ${theory_file} -o ${unfolding_output_dir} --externalCovariance --doImpacts --chisqFit --globalImpacts --saveHists --computeVariations --computeHistErrors"
+fit_command="rabbit_fit.py ${theory_file} -o ${unfolding_output_dir} --covarianceFit --doImpacts --globalImpacts --saveHists --computeVariations --computeHistErrors"
 echo "Executing command: $fit_command"
 fit_command_output=$(eval "$fit_command 2>&1" | tee /dev/tty)
 echo

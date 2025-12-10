@@ -49,7 +49,7 @@ echo "Output: $output"
 echo
 
 
-unfolding_command="rabbit_fit.py ${unfolding_combine_file} -o ${output} --binByBinStatType normal-multiplicative -t -1 --doImpacts --globalImpacts --saveHists --computeHistErrors --computeHistImpacts --computeHistCov --compositeModel -m Select 'ch0_masked' 'helicitySig:slice(0,1)' -m Select 'ch1_masked'  --postfix asimov ${extra_fit}"
+unfolding_command="rabbit_fit.py ${unfolding_combine_file} -o ${output} --binByBinStatType normal-multiplicative -t -1 --doImpacts --globalImpacts --saveHists --computeHistErrors --computeHistImpacts --computeHistCov --compositeModel -m Select 'ch0_masked' 'helicitySig:slice(0,1)' -m Select 'ch1_masked' --postfix asimov ${extra_fit}"
 echo "Executing command: $unfolding_command"
 unfolding_command_output=$(eval "$unfolding_command 2>&1" | tee /dev/tty)
 echo
