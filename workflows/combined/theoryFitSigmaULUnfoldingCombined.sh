@@ -1,3 +1,6 @@
+#!/bin/bash
+# Performs the unfolding of W and Z data combined, followed by a theory fit on sigmaUL only to extract alphaS
+
 input_file_Z="$1"
 shift
 input_file_W="$1"
@@ -30,7 +33,7 @@ if [ -n "$output_dir" ]; then
     echo "Output directory: $output_dir"
 else
     current_date=$(date +"%y%m%d")
-    output_dir="${MY_OUT_DIR}/${current_date}_WZCombinedUnfolding_WZCombinedTheoryFit/"
+    output_dir="${MY_OUT_DIR}/${current_date}_WZCombinedUnfolding_SigmaULTheoryFit/"
     echo "Output directory: $output_dir"
 fi
 
@@ -48,7 +51,7 @@ output=$(dirname "$unfolding_combine_file")
 echo "Output: $output"
 echo
 
-unfolding_command="rabbit_fit.py ${unfolding_combine_file} -o ${output} --binByBinStatType normal-multiplicative -t -1 --doImpacts --globalImpacts --saveHists --computeHistErrors --computeHistImpacts --computeHistCov --compositeModel  -m Select 'ch0_masked' 'helicitySig:0' -m Select 'ch1_masked' --postfix asimov ${extra_fit}"
+unfolding_command="rabbit_fit.py ${unfolding_combine_file} -o ${output} --binByBinStatType normal-multiplicative -t -1 --doImpacts --globalImpacts --saveHists --computeHistErrors --computeHistImpacts --computeHistCov -m Select 'ch0_masked' 'helicitySig:0' --postfix asimov ${extra_fit}"
 echo "Executing command: $unfolding_command"
 unfolding_command_output=$(eval "$unfolding_command 2>&1" | tee /dev/tty)
 echo
@@ -60,7 +63,7 @@ echo "Unfolded fit result: $unfolding_fitresult"
 unfolding_output_dir=$(dirname "$unfolding_fitresult")
 echo
 
-theory_setup_command="python ${WREM_BASE}/scripts/rabbit/feedRabbitTheory.py --infile ${unfolding_fitresult} --predGenerator 'scetlib_dyturbo' -o ${unfolding_output_dir} --systematicType log_normal -m CompositeModel --fitW --noi alphaS mW  ${extra_setup}"
+theory_setup_command="python ${WREM_BASE}/scripts/rabbit/feedRabbitTheory.py --infile ${unfolding_fitresult} --predGenerator 'scetlib_dyturbo' -o ${unfolding_output_dir} --systematicType log_normal -m 'Select helicitySig:0' --channelSigmaUL ch0_masked --noi alphaS ${extra_setup}"
 echo "Executing command: $theory_setup_command"
 theory_setup_command_output=$(eval "$theory_setup_command 2>&1" | tee /dev/tty)
 

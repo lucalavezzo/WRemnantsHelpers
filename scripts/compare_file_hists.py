@@ -346,7 +346,6 @@ def main():
                 histtype="step",
                 yerr=not args.norm,
             )
-
             hr = hh.divideHists(
                 h,
                 _h_ref,
@@ -366,6 +365,8 @@ def main():
         plot_tools.fix_axes(ax1, ax2, fig)
         ax1.legend()
         ax1.invert_yaxis()  # I have no idea why I have to do this
+        if args.norm:
+            ax1.set_ylim(0, np.max(_h_ref.values()) * 1.2)
         _postfix = "_" + args.postfix if args.postfix else ""
         selection_label = (
             "_".join(

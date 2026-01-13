@@ -296,9 +296,10 @@ def main():
         )
     )
     for central_pdf_idx, central_pdf in enumerate(args.central_pdfs):
+        ax.axhline(y=central_pdf_idx, color="gray", linestyle="--", linewidth=0.5)
         for pseudodata_pdf_idx, pseudodata_pdf in enumerate(args.pseudodata_pdfs):
             x = results_array[central_pdf_idx, pseudodata_pdf_idx] + ALPHA_S
-            y = central_pdf_idx + pseudodata_pdf_idx * (
+            y = central_pdf_idx + (pseudodata_pdf_idx + 1) * (
                 1 / (len(args.pseudodata_pdfs) + 3)
             )
             xerr = uncerts_array[central_pdf_idx, pseudodata_pdf_idx]
@@ -314,6 +315,8 @@ def main():
     ax.set_ylabel("Central PDF", loc="center")
     ax.set_yticks(np.arange(len(args.central_pdfs)))
     ax.set_yticklabels([get_pdf_display_name(pdf) for pdf in args.central_pdfs])
+    ax.yaxis.set_major_locator(matplotlib.ticker.MaxNLocator(integer=True))
+    ax.yaxis.set_minor_locator(matplotlib.ticker.NullLocator())
     ax.legend(
         handles=[
             matplotlib.lines.Line2D(

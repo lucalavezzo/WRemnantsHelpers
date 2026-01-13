@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 from datetime import datetime
 
 from wums import logging, output_tools, plot_tools  # isort: skip
+from wums import boostHistHelpers as hh
 from utilities import parsing
 
 parser = argparse.ArgumentParser(description="Read in a .pkl.lz4 file.")
@@ -37,7 +38,7 @@ parser.add_argument(
 parser.add_argument(
     "--axes",
     nargs="+",
-    default=["qT"],
+    default=[],
     help="Axes to keep before plotting. Remaining axes are unrolled.",
 )
 parser.add_argument(
@@ -108,7 +109,6 @@ for i, infile in enumerate(args.infiles):
     if hasattr(subdata, "keys"):
         print(f"Keys at path {args.path}:")
         pprint.pprint(subdata.keys())
-    print(subdata)
     h_selection = []
     if args.selectByHist:
         # support multiple selections per-hist separated by ';'
@@ -119,6 +119,7 @@ for i, infile in enumerate(args.infiles):
     if args.selection:
         h_selection.extend(args.selection)
     for sel in h_selection:
+        print(sel)
         sel = sel.split()
         if len(sel) == 3:
             sel_ax, sel_lb, sel_ub = sel
@@ -133,10 +134,11 @@ for i, infile in enumerate(args.infiles):
                 print(e)
                 print("Trying to use as string...")
                 pass
-            print(sel_ax, sel_val)
             subdata = subdata[{sel_ax: sel_val}]
     if args.axes:
+        print(f"Projecting to axes: {args.axes}")
         subdata = subdata.project(*args.axes)
+    subdata = hh.unrolledHist(subdata, binwnorm=1)
     hists.append(subdata)
 
 fig = plot_tools.makePlotWithRatioToRef(
