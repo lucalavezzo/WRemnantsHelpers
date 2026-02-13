@@ -1,0 +1,137 @@
+# Run log: Z b-mass uncertainty study
+
+## 2026-02-13
+- Created study folder:
+  - `agents/studies/z_bmass_uncertainty/`
+- Added initial study state in:
+  - `agents/studies/z_bmass_uncertainty/README.md`
+- Updated policy docs to require incremental live updates during studies:
+  - `AGENTS.md`
+  - `agents/session_bootstrap.md`
+- Context captured from discussion:
+  - Nominal sample: MiNNLO Z in 5FS, massless b.
+  - Alternate sample: MiNNLO Z+bbar in 4FS, massive b.
+  - Primary references: arXiv:1904.09382 and arXiv:2404.08598.
+- Inspected current z_bb study scripts:
+  - `studies/z_bb/make_hists.py`
+  - `studies/z_bb/plot_narf.py`
+  - `studies/z_bb/make_zbb_corr.py`
+- Verified existing B-hadron histograms in current HDF5 outputs:
+  - available: `leadB_pt`, `subB_pt`, `subB_aeta`;
+  - not available yet: event-level B-hadron multiplicity and softest-B pT.
+- Checked exact `bottom_sel` implementation in canonical WRemnants histmaker:
+  - file: `$WREM_BASE/scripts/histmakers/w_z_gen_dists.py`;
+  - helper definitions: `$WREM_BASE/wremnants/include/theoryTools.hpp`;
+  - logic: B hadrons from `GenPart` with `status in {1,2}` and `bottom_sel = (subB_pt > 5)`.
+- Added new diagnostic script for this study:
+  - `studies/z_bb/plot_b_hadrons_from_nanoaod.py`
+  - purpose: compare 5FS vs 4FS using NanoAOD GEN particles for:
+    - `N(B hadrons, pT > threshold)`,
+    - leading/subleading B-hadron pT,
+    - softest B-hadron pT.
+- Validation:
+  - syntax check passed with `python -m py_compile studies/z_bb/plot_b_hadrons_from_nanoaod.py`.
+  - quick runtime in Codex sandbox was I/O-limited when scanning NanoAOD; plan is to run this in regular container session.
+- User-directed course correction:
+  - do not use a separate standalone histmaker workflow for this study.
+  - use and modify canonical `w_z_gen_dists.py`, then consume outputs from `studies/z_bb/plot_narf.py`.
+- Implemented in canonical histmaker (`$WREM_BASE/scripts/histmakers/w_z_gen_dists.py`):
+  - added B-hadron diagnostics for `pT > 5 GeV`:
+    - `nBhad_pt5`,
+    - `leadB_pt5`,
+    - `subB_pt5`,
+    - `softB_pt5`.
+  - kept current swap selection unchanged:
+    - `bottom_sel` is still `(subB_pt > 5)`.
+- Implemented in `studies/z_bb/plot_narf.py`:
+  - plot new diagnostics with sample comparison and ratio.
+  - print weighted fractions `f(nB>=1)` and `f(nB>=2)` from `nBhad_pt5`.
+  - skip missing histograms gracefully (for older pre-update files).
+- Removed standalone script to align with requested workflow:
+  - deleted `studies/z_bb/plot_b_hadrons_from_nanoaod.py`.
+- Quick validation of updated plotter against existing (older) HDF5 inputs:
+  - command run with writable output override:
+    - `MY_PLOT_DIR=/tmp python studies/z_bb/plot_narf.py --massive-file /scratch/submit/cms/alphaS//260212_gen_massiveBottom/w_z_gen_dists_maxFiles_m1_hadrons_massive.hdf5 --massless-file /scratch/submit/cms/alphaS//260212_gen_massiveBottom/w_z_gen_dists_maxFiles_1000_nnpdf31_hadrons_massless.hdf5 --tag legacy_check`
+  - behavior:
+    - new histograms were gracefully skipped (`nBhad_pt5`, `leadB_pt5`, `subB_pt5`, `softB_pt5`) because legacy files do not contain them yet.
+    - existing swap diagnostics still ran and printed:
+      - `% selected for swap` (massive sample): `1.0`
+      - `% selected for swap` (massless sample): `0.02867`
+- Added tagged-run support:
+  - `studies/z_bb/make_hists.py` now takes `--tag` and prints produced file paths.
+  - `studies/z_bb/plot_narf.py` now takes explicit input files and `--tag`.
+- Added helper runner:
+  - `agents/run_zbb_bhad_diag.sh`
+  - purpose: run tagged histmaking + plotting end-to-end in normal container session.
+- Attempted execution from Codex environment:
+  - direct histmaker runs segfaulted (exit 129) even at low stats/threads.
+  - Singularity/Apptainer binaries are unavailable in this Codex runtime, so container execution cannot be launched from here.
+  - consequence: new `nBhad_pt5` distributions are not yet produced in this session; requires running helper script in your usual container shell.
+- Resumed run in container via Codex:
+  - initial full-stat attempt with tag `bhad_diag_260213_141645` failed during massive histmaker with:
+    - `runtime_error: Cannot index RVecN of size 493 with condition vector of different size (3)`.
+- Debugged and patched canonical histmaker outside this repo:
+  - file: `/home/submit/lavezzo/alphaS/gh/WRemnants/scripts/histmakers/w_z_gen_dists.py`
+  - change: `df.Define("bHad_pt", "GenPart_pt[bHadIdx]")` -> `df.Define("bHad_pt", "Take(GenPart_pt, bHadIdx)")`
+  - reason: `bHadIdx` is an index vector, not a same-length boolean mask.
+- Tried full-stat rerun with new tag `bhad_diag_260213_143059`:
+  - massive stage started correctly, but runtime was long for interactive iteration (`--maxFiles -1` on 118 files), so stopped and moved to a faster tagged run.
+- Completed tagged reduced-stat end-to-end run:
+  - command:
+    - `python studies/z_bb/make_hists.py --tag bhad_diag_260213_143453 --max-files-massive 20 --max-files-massless 200 --nthreads 8`
+    - `python studies/z_bb/plot_narf.py --massive-file /scratch/submit/cms/alphaS/260213_gen_massiveBottom/w_z_gen_dists_maxFiles_20_hadronsSel_massive_bhad_diag_260213_143453.hdf5 --massless-file /scratch/submit/cms/alphaS/260213_gen_massiveBottom/w_z_gen_dists_maxFiles_200_nnpdf31_hadronsSel_massless_bhad_diag_260213_143453.hdf5 --tag bhad_diag_260213_143453`
+  - produced files:
+    - `/scratch/submit/cms/alphaS/260213_gen_massiveBottom/w_z_gen_dists_maxFiles_20_hadronsSel_massive_bhad_diag_260213_143453.hdf5`
+    - `/scratch/submit/cms/alphaS/260213_gen_massiveBottom/w_z_gen_dists_maxFiles_200_nnpdf31_hadronsSel_massless_bhad_diag_260213_143453.hdf5`
+  - plot output directory:
+    - `/home/submit/lavezzo/public_html/alphaS/260213_z_bb/hadrons/bhad_diag_260213_143453/`
+  - printed diagnostics:
+    - `Nominal MiNNLO: f(nB>=1)=0.0484, f(nB>=2)=0.0404`
+    - `Massive b's MiNNLO: f(nB>=1)=0.9333, f(nB>=2)=0.8137`
+    - `% selected for swap` massive: `0.8137505`
+    - `% selected for swap` massless: `0.0407655`
+    - ratio of events with at least one b or bbar (massless/massive): `3.86219`
+- Computed quick shape summary from produced tagged files:
+  - `ptVgen` corrected/nominal ratio: min=`0.936007`, max=`0.989036`, mean=`0.970173`
+  - `absYVgen` corrected/nominal ratio: min=`0.963338`, max=`0.984034`, mean=`0.970869`
+- Plot readability update (no new hist production):
+  - changed `studies/z_bb/plot_narf.py` to draw `nBhad_pt5` with `logy=True`.
+  - reran plotter with existing hist files using tag `bhad_diag_260213_143453_logyNB_260213_144851`.
+  - output:
+    - `/home/submit/lavezzo/public_html/alphaS/260213_z_bb/hadrons/bhad_diag_260213_143453_logyNB_260213_144851/`
+- Documentation/policy update from discussion:
+  - Updated `AGENTS.md` and `agents/session_bootstrap.md` to require:
+    - explicit guiding questions per study;
+    - continuous logging of newly learned knowledge and emerging questions with status.
+  - Applied this structure to `agents/studies/z_bmass_uncertainty/README.md`.
+- New requested overlap diagnostics (hadron-level, not jet-level):
+  - Clarified that the requested `ΔR_bb`, `m_bb`, `pT_b` plots should be built from B hadrons.
+  - Patched canonical histmaker:
+    - `/home/submit/lavezzo/alphaS/gh/WRemnants/scripts/histmakers/w_z_gen_dists.py`
+    - added `nBhad_pt5>=2` hadron-level histograms:
+      - `m_bb_had`, `dR_bb_had`, `leadB_pt5_b2`, `subB_pt5_b2`.
+  - Patched plotter:
+    - `studies/z_bb/plot_narf.py`
+    - added plotting entries for:
+      - `m_bb_had`, `dR_bb_had`, `leadB_pt5_b2`, `subB_pt5_b2`.
+- Produced new tagged run:
+  - tag: `bhad_bbkin_260213_150629`
+  - histmaker command:
+    - `python studies/z_bb/make_hists.py --tag bhad_bbkin_260213_150629 --max-files-massive 20 --max-files-massless 200 --nthreads 8`
+  - plot command:
+    - `python studies/z_bb/plot_narf.py --massive-file /scratch/submit/cms/alphaS/260213_gen_massiveBottom/w_z_gen_dists_maxFiles_20_hadronsSel_massive_bhad_bbkin_260213_150629.hdf5 --massless-file /scratch/submit/cms/alphaS/260213_gen_massiveBottom/w_z_gen_dists_maxFiles_200_nnpdf31_hadronsSel_massless_bhad_bbkin_260213_150629.hdf5 --tag bhad_bbkin_260213_150629`
+  - output hdf5:
+    - `/scratch/submit/cms/alphaS/260213_gen_massiveBottom/w_z_gen_dists_maxFiles_20_hadronsSel_massive_bhad_bbkin_260213_150629.hdf5`
+    - `/scratch/submit/cms/alphaS/260213_gen_massiveBottom/w_z_gen_dists_maxFiles_200_nnpdf31_hadronsSel_massless_bhad_bbkin_260213_150629.hdf5`
+  - plot directory:
+    - `/home/submit/lavezzo/public_html/alphaS/260213_z_bb/hadrons/bhad_bbkin_260213_150629/`
+- Physics outcome from `bhad_bbkin_260213_150629` (hadron-level `nBhad_pt5>=2` region):
+  - Selected-yield normalization mismatch persists:
+    - `Y_5FS / Y_4FS ≈ 3.94` for `leadB_pt5_b2`, `subB_pt5_b2`, `m_bb_had`, `dR_bb_had`.
+  - 4FS shapes are harder/wider than 5FS after unit normalization:
+    - `leadB_pt5_b2` means: `25.18 GeV` (4FS) vs `20.55 GeV` (5FS).
+    - `subB_pt5_b2` means: `21.35 GeV` (4FS) vs `17.76 GeV` (5FS).
+    - `m_bb_had` means: `25.26 GeV` (4FS) vs `21.81 GeV` (5FS).
+    - `dR_bb_had` means: `0.595` (4FS) vs `0.511` (5FS).
+  - Interpretation:
+    - even in an explicitly hadron-level `bb`-like overlap region, 4FS and 5FS are not shape-identical; differences are moderate-to-strong in `pT_b` and `m_bb`, milder in `ΔR_bb`.

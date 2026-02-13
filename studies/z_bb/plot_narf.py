@@ -1,20 +1,56 @@
+import argparse
 import os
 from datetime import datetime
 import matplotlib.pyplot as plt
 import mplhep as hep
+import numpy as np
 
 from wums import boostHistHelpers as hh
 from utilities.io_tools import input_tools
 from wums import logging, output_tools, plot_tools  # isort: skip
 
-f_mass = "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS//260124_gen_massiveBottom/w_z_gen_dists_maxFiles_m1_massive.hdf5"
-f_massless = "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260124_gen_massiveBottom/w_z_gen_dists_maxFiles_1000_nnpdf31_massless.hdf5"
-normalize = False
+
+def parse_args():
+    parser = argparse.ArgumentParser(description="Plot z_bb comparison histograms.")
+    parser.add_argument(
+        "--massive-file",
+        required=True,
+        help="HDF5 file for massive-b sample (Zbb_MiNNLO).",
+    )
+    parser.add_argument(
+        "--massless-file",
+        required=True,
+        help="HDF5 file for massless sample (Zmumu_MiNNLO).",
+    )
+    parser.add_argument(
+        "--outdir",
+        default=None,
+        help="Output directory. Default: $MY_PLOT_DIR/<date>_z_bb/hadrons/<tag>",
+    )
+    parser.add_argument(
+        "--tag",
+        default=datetime.now().strftime("%H%M%S"),
+        help="Tag to append in default output path.",
+    )
+    parser.add_argument(
+        "--normalize",
+        action="store_true",
+        help="Normalize swapped massive component to nominal bottom component.",
+    )
+    return parser.parse_args()
+
+
+args = parse_args()
+f_mass = args.massive_file
+f_massless = args.massless_file
+normalize = args.normalize
 
 res_massive, meta, _ = input_tools.read_infile(f_mass)
 res_massless, meta, _ = input_tools.read_infile(f_massless)
 
-outdir = os.path.join(os.environ["MY_PLOT_DIR"], datetime.now().strftime("%y%m%d_z_bb"))
+outdir = args.outdir or os.path.join(
+    os.environ["MY_PLOT_DIR"], datetime.now().strftime("%y%m%d_z_bb/hadrons/"), args.tag
+)
 if not os.path.exists(outdir):
     os.makedirs(outdir)
     print(f"Output directory '{outdir}' created.")
@@ -27,58 +63,112 @@ def read_h(res, proc, h):
     return h
 
 
-h_massless_gen_bhadrons = read_h(
-    res_massless,
-    f"ZmumuPostVFP",
-    res_massless[f"ZmumuPostVFP"]["output"][f"n_gen_bhadrons"].get(),
-)
-h_massless_lhe_b = read_h(
-    res_massless,
-    f"ZmumuPostVFP",
-    res_massless[f"ZmumuPostVFP"]["output"][f"n_lhe_b"].get(),
-)
-h_massless_lhe_init_fin_b = read_h(
-    res_massless,
-    f"ZmumuPostVFP",
-    res_massless[f"ZmumuPostVFP"]["output"][f"n_lhe_init_fin_b"].get(),
-)
-h_massive_lhe_init_fin_b = read_h(
-    res_massive,
-    f"Zbb_MiNNLO",
-    res_massive[f"Zbb_MiNNLO"]["output"][f"n_lhe_init_fin_b"].get(),
-)
-print("Fraction of events with at least 1 B hadron (status 1, 2):")
-print(h_massless_gen_bhadrons[1j:].sum().value / h_massless_gen_bhadrons.sum().value)
-print("Fraction of events with at least 1 LHE b/bbar quark (status 1, -1):")
-print(1 - h_massless_lhe_init_fin_b[0, 0].value / h_massless_lhe_init_fin_b.sum().value)
-print(
-    "Fraction of events with at least 1 LHE b/bbar quark in initial state (status -1):"
-)
-print(
-    h_massless_lhe_init_fin_b[1j:, sum].sum().value
-    / h_massless_lhe_init_fin_b.sum().value
-)
-print("Fraction of events with at least 1 LHE b/bbar quark in final state (status 1):")
-print(
-    h_massless_lhe_init_fin_b[sum, 1j:].sum().value
-    / h_massless_lhe_init_fin_b.sum().value
-)
-print(
-    "Ratio of events with at least 1 LHE b/bbar quark (status 1, -1) between massless and massive:"
-)
-print(h_massless_lhe_init_fin_b[0j, 2j].value / h_massive_lhe_init_fin_b[0j, 2j].value)
-exit()
+def print_nB_table(h, label):
+    centers = h.axes[0].centers
+    vals = h.values()
+    total = np.sum(vals)
+    print(f"\n{label}: nBhad_pt5 weighted bin contents")
+    for c, v in zip(centers, vals):
+        frac = (v / total) if total != 0 else np.nan
+        print(f"  nB={int(round(c))}: yield={v:.6e}, frac={frac:.6f}")
 
-# n bottom
-for var, xlabel in zip(
-    ["n_lhe_bottom", "n_lhe_antibottom", "n_lhe_b", "n_gen_bhadrons"],
-    [
-        "Number of LHE $b$ quarks",
-        "Number of LHE $\\bar{b}$ quarks",
-        "Number of LHE $b+\\bar{b}$ quarks",
-        "Number of gen-level B hadrons (status 1, 2)",
-    ],
-):
+
+# 2d
+# for var in [
+#     "n_lhe_init_bbbar_vs_n_lhe_fin_bbbar"
+# ]:
+#     h_massless = read_h(
+#         res_massless,
+#         f"Zmumu_MiNNLO",
+#         res_massless[f"Zmumu_MiNNLO"]["output"][f"{var}"].get(),
+#     )
+#     fig = plt.figure()
+#     ax = fig.add_subplot()
+#     for bin in range(len(h_massless.axes[0].centers)):
+#         hep.histplot(
+#             h_massless[bin, :],
+#             label=f"n_lhe_init_bbbar = {bin}",
+#             ax=ax
+#         )
+#     ax.set_yscale("log")
+#     ax.legend()
+#     rel_oname = f"samples_comparison_{var}"
+#     oname = os.path.join(outdir, rel_oname)
+#     if not os.path.exists(outdir):
+#         os.makedirs(outdir)
+#         print(f"Output directory '{outdir}' created.")
+#     fig.savefig(oname + ".pdf", bbox_inches="tight")
+#     fig.savefig(oname + ".png", bbox_inches="tight", dpi=300)
+#     plt.close(fig)
+#     output_tools.write_index_and_log(outdir, rel_oname)
+
+# massless only
+# for var, xlabel in zip(
+#     [
+#         "lhe_fin_bbbar_pt",
+#         "lhe_fin_bbbar_abseta",
+#     ],
+#     [
+#         "Final b/bbar pt",
+#         "Final b/bbar abseta"
+#     ],
+# ):
+#     print("Plotting", var)
+
+#     h_massless = read_h(
+#         res_massless,
+#         f"Zmumu_MiNNLO",
+#         res_massless[f"Zmumu_MiNNLO"]["output"][f"{var}"].get(),
+#     )
+
+#     fig = plot_tools.makePlotWithRatioToRef(
+#         [h_massless],
+#         labels=["Nominal MiNNLO",],
+#         ratio_legend=False,
+#         nlegcols=1,
+#         legtext_size=16,
+#         binwnorm=1,
+#         rrange=[[0.2, 1.5]],
+#         xlabel=xlabel,
+#     )
+#     rel_oname = f"samples_comparison_{var}"
+#     oname = os.path.join(outdir, rel_oname)
+#     if not os.path.exists(outdir):
+#         os.makedirs(outdir)
+#         print(f"Output directory '{outdir}' created.")
+#     fig.savefig(oname + ".pdf", bbox_inches="tight")
+#     fig.savefig(oname + ".png", bbox_inches="tight", dpi=300)
+#     plt.close(fig)
+#     output_tools.write_index_and_log(outdir, rel_oname)
+
+
+plot_specs = [
+    ("nBhad_pt5", "Number of B hadrons (pT > 5 GeV)", True),
+    ("leadB_pt5", "Leading B hadron pT (pT > 5 GeV)", True),
+    ("subB_pt5", "Subleading B hadron pT (pT > 5 GeV)", True),
+    ("softB_pt5", "Softest B hadron pT (pT > 5 GeV)", True),
+    ("leadB_pt5_b2", "Leading B hadron pT (nB>=2, pT > 5 GeV)", True),
+    ("subB_pt5_b2", "Subleading B hadron pT (nB>=2, pT > 5 GeV)", True),
+    ("m_bb_had", "m_bb from leading/subleading B hadrons (nB>=2, pT > 5 GeV)", True),
+    (
+        "dR_bb_had",
+        "DeltaR_bb from leading/subleading B hadrons (nB>=2, pT > 5 GeV)",
+        True,
+    ),
+]
+
+
+# 1D hists
+for var, xlabel, logy in plot_specs:
+    print("Plotting", var)
+
+    if (
+        var not in res_massive["Zbb_MiNNLO"]["output"]
+        or var not in res_massless["Zmumu_MiNNLO"]["output"]
+    ):
+        print(f"Skipping {var}: histogram not found in one of the inputs")
+        continue
+
     h_massive = read_h(
         res_massive,
         f"Zbb_MiNNLO",
@@ -86,9 +176,12 @@ for var, xlabel in zip(
     )
     h_massless = read_h(
         res_massless,
-        f"ZmumuPostVFP",
-        res_massless[f"ZmumuPostVFP"]["output"][f"{var}"].get(),
+        f"Zmumu_MiNNLO",
+        res_massless[f"Zmumu_MiNNLO"]["output"][f"{var}"].get(),
     )
+
+    print(h_massless)
+
     fig = plot_tools.makePlotWithRatioToRef(
         [h_massless, h_massive],
         labels=["Nominal MiNNLO", "Massive b's MiNNLO"],
@@ -96,8 +189,8 @@ for var, xlabel in zip(
         nlegcols=1,
         legtext_size=16,
         binwnorm=1,
-        logy=True,
-        ylim=(1e5, 3e10),
+        logy=logy,
+        rrange=[[0.2, 1.5]],
         xlabel=xlabel,
     )
     rel_oname = f"samples_comparison_{var}"
@@ -111,6 +204,44 @@ for var, xlabel in zip(
     output_tools.write_index_and_log(outdir, rel_oname)
 
 
+if (
+    "nBhad_pt5" in res_massive["Zbb_MiNNLO"]["output"]
+    and "nBhad_pt5" in res_massless["Zmumu_MiNNLO"]["output"]
+):
+    h_nB_massive = read_h(
+        res_massive,
+        "Zbb_MiNNLO",
+        res_massive["Zbb_MiNNLO"]["output"]["nBhad_pt5"].get(),
+    )
+    h_nB_massless = read_h(
+        res_massless,
+        "Zmumu_MiNNLO",
+        res_massless["Zmumu_MiNNLO"]["output"]["nBhad_pt5"].get(),
+    )
+
+    def frac_nB_geq(h, nmin):
+        centers = h.axes[0].centers
+        vals = h.values()
+        den = np.sum(vals)
+        if den == 0:
+            return np.nan
+        return np.sum(vals[centers >= nmin]) / den
+
+    print("B-hadron multiplicity fractions from nBhad_pt5:")
+    print(
+        "Nominal MiNNLO: f(nB>=1)={:.4f}, f(nB>=2)={:.4f}".format(
+            frac_nB_geq(h_nB_massless, 1), frac_nB_geq(h_nB_massless, 2)
+        )
+    )
+    print(
+        "Massive b's MiNNLO: f(nB>=1)={:.4f}, f(nB>=2)={:.4f}".format(
+            frac_nB_geq(h_nB_massive, 1), frac_nB_geq(h_nB_massive, 2)
+        )
+    )
+    print_nB_table(h_nB_massless, "Nominal MiNNLO")
+    print_nB_table(h_nB_massive, "Massive b's MiNNLO")
+
+
 h_massive = read_h(
     res_massive,
     f"Zbb_MiNNLO",
@@ -118,13 +249,18 @@ h_massive = read_h(
 )
 h_massless = read_h(
     res_massless,
-    f"ZmumuPostVFP",
-    res_massless[f"ZmumuPostVFP"]["output"]["nominal_gen"].get(),
+    f"Zmumu_MiNNLO",
+    res_massless[f"Zmumu_MiNNLO"]["output"]["nominal_gen"].get(),
 )
 
+print("Ratio of events with at least 1 b or bbar: ")
 print(
     h_massless[{"bottom_sel": 1}].sum().value / h_massive[{"bottom_sel": 1}].sum().value
 )
+print("% of massive MiNNLO sample being selected for swap:")
+print(h_massive[{"bottom_sel": 1}].sum().value / h_massive.sum().value)
+print("% of massless MiNNLO sample being selected for swap:")
+print(h_massless[{"bottom_sel": 1}].sum().value / h_massless.sum().value)
 
 # comparison of 1b,1bbar events
 for vars in [["ptVgen"], ["absYVgen"]]:
@@ -175,7 +311,7 @@ for vars in [["ptVgen"], ["absYVgen"]]:
         [nominal, nominal_nobottom, corrected],
         labels=[
             "Nominal MiNNLO (inclusive)",
-            "Nominal MiNNLO (0b)",
+            "Nominal MiNNLO (b's subtracted)",
             "Corrected MiNNLO (inclusive)",
         ],
         rrange=[[0.95, 1.05]],
@@ -194,48 +330,48 @@ for vars in [["ptVgen"], ["absYVgen"]]:
     plt.close(fig)
     output_tools.write_index_and_log(outdir, rel_oname)
 
-# ratio 2d plot
-vars = ["ptVgen", "absYVgen"]
-nominal = h_massless.project(*vars)
-nominal_nobottom = h_massless[{"bottom_sel": 0}].project(*vars)
-massive = h_massive[{"bottom_sel": 1}].project(*vars)
-corrected = hh.addHists(nominal_nobottom, massive)
-h2_ratio = hh.divideHists(corrected, nominal)
-fig = hep.hist2dplot(h2_ratio)
-rel_oname = "inclusive_2d_" + "_".join(vars)
-oname = os.path.join(outdir, rel_oname)
-plt.xlim(0, 100)
-plt.savefig(oname + ".pdf", bbox_inches="tight")
-plt.savefig(oname + ".png", bbox_inches="tight", dpi=300)
-output_tools.write_index_and_log(outdir, rel_oname)
-plt.close()
-for var in vars:
-    h_ratio = hh.divideHists(corrected.project(var), nominal.project(var))
-    hep.histplot(h_ratio)
-    plt.axhline(1, color="black", alpha=0.5, linestyle="--")
-    plt.xlim(0, 100) if var == "ptVgen" else None
-    plt.ylim(0.9, 1.1)
-    rel_oname = "inclusive_ratio_" + var
-    oname = os.path.join(outdir, rel_oname)
-    plt.savefig(oname + ".pdf", bbox_inches="tight")
-    plt.savefig(oname + ".png", bbox_inches="tight", dpi=300)
-    plt.close()
-    output_tools.write_index_and_log(outdir, rel_oname)
+# # ratio 2d plot
+# vars = ["ptVgen", "absYVgen"]
+# nominal = h_massless.project(*vars)
+# nominal_nobottom = h_massless[{"bottom_sel": 0}].project(*vars)
+# massive = h_massive[{"bottom_sel": 1}].project(*vars)
+# corrected = hh.addHists(nominal_nobottom, massive)
+# h2_ratio = hh.divideHists(corrected, nominal)
+# fig = hep.hist2dplot(h2_ratio)
+# rel_oname = "inclusive_2d_" + "_".join(vars)
+# oname = os.path.join(outdir, rel_oname)
+# plt.xlim(0, 100)
+# plt.savefig(oname + ".pdf", bbox_inches="tight")
+# plt.savefig(oname + ".png", bbox_inches="tight", dpi=300)
+# output_tools.write_index_and_log(outdir, rel_oname)
+# plt.close()
+# for var in vars:
+#     h_ratio = hh.divideHists(corrected.project(var), nominal.project(var))
+#     hep.histplot(h_ratio)
+#     plt.axhline(1, color="black", alpha=0.5, linestyle="--")
+#     plt.xlim(0, 100) if var == "ptVgen" else None
+#     plt.ylim(0.9, 1.1)
+#     rel_oname = "inclusive_ratio_" + var
+#     oname = os.path.join(outdir, rel_oname)
+#     plt.savefig(oname + ".pdf", bbox_inches="tight")
+#     plt.savefig(oname + ".png", bbox_inches="tight", dpi=300)
+#     plt.close()
+#     output_tools.write_index_and_log(outdir, rel_oname)
 
-outpath = "."
-generator = "MiNNLO_Zbb"
-import numpy as np
+# outpath = "."
+# generator = "MiNNLO_Zbb"
+# import numpy as np
 
-h2_ratio_out_vals = h2_ratio.project("absYVgen", "ptVgen").values()[
-    np.newaxis, :, :, np.newaxis
-]  # (Q, Y, pt, vars)
-output_dict = {
-    f"{generator}_minnlo_ratio": h2_ratio,
-    f"{generator}_hist": corrected,
-    "minnlo_ref_hist": nominal,
-}
-outfile = f"{outpath}/{generator}_CorrZ.pkl.lz4"
-output_tools.write_lz4_pkl_output(outfile, "Z", output_dict, outdir, [], {})
+# h2_ratio_out_vals = h2_ratio.project("absYVgen", "ptVgen").values()[
+#     np.newaxis, :, :, np.newaxis
+# ]  # (Q, Y, pt, vars)
+# output_dict = {
+#     f"{generator}_minnlo_ratio": h2_ratio,
+#     f"{generator}_hist": corrected,
+#     "minnlo_ref_hist": nominal,
+# }
+# outfile = f"{outpath}/{generator}_CorrZ.pkl.lz4"
+# output_tools.write_lz4_pkl_output(outfile, "Z", output_dict, outdir, [], {})
 
 # # angular coefficients
 # h_massive = read_h(

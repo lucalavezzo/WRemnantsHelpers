@@ -1,10 +1,11 @@
 echo "--- WRemnants"
-source ../WRemnants/setup.sh
+source ../gh/WRemnants/setup.sh
 echo
 echo "--- WRemnantsHelpers"
 export MY_WORK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export MY_PLOT_DIR="/home/submit/$USER/public_html/alphaS/"
-export MY_OUT_DIR="/ceph/submit/data/group/cms/store/user/$USER/alphaS/"
+# export MY_OUT_DIR="/ceph/submit/data/group/cms/store/user/$USER/alphaS/"
+export MY_OUT_DIR="/scratch/submit/cms/alphaS/" # temporary while ceph is down
 export MY_AN_DIR="$(dirname "${MY_WORK_DIR}")/AN-25-085/"
 export NANO_DIR="/scratch/submit/cms/wmass/NanoAOD/"
 export SCRATCH_DIR="/scratch/submit/cms/"

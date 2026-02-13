@@ -1,3 +1,8 @@
+"""
+Make Zbb correction histogram by comparing massive and massless Z samples, and save the ratio and corrected histograms in a pkl.lz4 file.
+Takes as input the gen level histograms from w_z_gen_dists.py histmaker ran with --addBottomAxis.
+"""
+
 import os
 
 import hist
@@ -30,7 +35,7 @@ def parse_args():
     parser.add_argument(
         "--massless-proc",
         type=str,
-        default="ZmumuPostVFP",
+        default="Zmumu_MiNNLO",
         help="Process name for the massless sample.",
     )
     parser.add_argument(
@@ -116,8 +121,8 @@ def main():
 
     vars_2d = ["ptVgen", "absYVgen"]
     nominal = h_massless.project(*vars_2d)
-    nominal_nobottom = h_massless[{"bottom": 0}].project(*vars_2d)
-    massive = h_massive[{"bottom": 1}].project(*vars_2d)
+    nominal_nobottom = h_massless[{"bottom_sel": 0}].project(*vars_2d)
+    massive = h_massive[{"bottom_sel": 1}].project(*vars_2d)
     corrected = hh.addHists(nominal_nobottom, massive)
     h2_ratio = hh.divideHists(corrected, nominal)
 
@@ -136,7 +141,6 @@ def main():
         "massive_meta": meta_massive[0] if meta_massive else None,
         "massless_meta": meta_massless[0] if meta_massless else None,
     }
-    # print(ratio_out[{'Q': 10001j}].values())
     os.makedirs(args.outpath, exist_ok=True)
     outfile = args.outfile
     if outfile is None:

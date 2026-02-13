@@ -23,7 +23,7 @@ do_2D=false
 do_impacts=false
 do_fit=true
 
-PARSED=$(getopt -o o:e:f:h:p --long output:,extra-setup:,extra-fit:,postfix:,noSetup,2D,help -- "$@")
+PARSED=$(getopt -o o:e:f:hp: --long output:,extra-setup:,extra-fit:,postfix:,noSetup,2D,help -- "$@")
 if [[ $? -ne 0 ]]; then
     echo "Failed to parse arguments." >&2
     exit 1
@@ -111,7 +111,12 @@ if $do_setup; then
     setup_command="python ${WREM_BASE}/scripts/rabbit/setupRabbit.py -i $input_file --fitvar $fitvar -o $output_dir --noi alphaS $postfix_arg $extra_setup"
 
     echo "$setup_command"
-    setup_output=$($setup_command 2>&1 | tee /dev/tty)
+    if [ -t 1 ]; then
+        setup_output=$($setup_command 2>&1 | tee /dev/tty)
+    else
+        setup_output=$($setup_command 2>&1)
+        echo "$setup_output"
+    fi
     
     # extract the output file name, and the output directory, where we will put the fit results
     carrot=$(echo "$setup_output" | grep -oP '(?<=Write output file ).*')
@@ -131,7 +136,12 @@ if $do_fit; then
     echo "Running the fit..."
     fit_command="rabbit_fit.py $carrot --computeVariations -m Project ch0 ptll --computeHistErrors --doImpacts -o $output --globalImpacts --saveHists --saveHistsPerProcess $extra_fit"
     echo "$fit_command"
-    fit_output=$($fit_command 2>&1 | tee /dev/tty)
+    if [ -t 1 ]; then
+        fit_output=$($fit_command 2>&1 | tee /dev/tty)
+    else
+        fit_output=$($fit_command 2>&1)
+        echo "$fit_output"
+    fi
 else
     echo "Skipping fit."
 fi

@@ -2,3 +2,4 @@
 *.log
 logs/
 outputs/
+__pycache__
