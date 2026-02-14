@@ -49,6 +49,12 @@ Read AGENTS.md and agents/session_bootstrap.md first.
 Then help me with: <task>.
 ```
 
+For study-slide sessions, include:
+
+```text
+Also read agents/study_slides.md and prepare/update slides for agents/studies/<topic>/.
+```
+
 ## 4) Study Task Template
 Fill this before asking Codex to automate a workflow:
 
@@ -68,3 +74,5 @@ Validation checks:
 - For each active study README:
   - maintain a small "Guiding questions" section near the top;
   - log newly learned facts and emerging questions, with status (`answered`, `partial`, `open`).
+  - when a new hypothesis/check is requested, add it to the study notes before execution and update the status immediately after the run.
+- If slide output is requested, keep `agents/studies/<topic>/slides/outline.json` updated and regenerate `.tex` with `scripts/study_slides.py`.

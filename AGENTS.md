@@ -36,6 +36,7 @@ bin/run --help
 - For workflow context, ask Codex to read `agents/workflow_nominal.md`.
 - For frozen commands and expected behavior, ask Codex to read `agents/nominal_config.md`.
 - For step-by-step pass/fail criteria, ask Codex to read `agents/validation.md`.
+- For study slide generation, ask Codex to read `agents/study_slides.md`.
 - Keep workflow-critical commands and conventions in those files, not only in chat.
 - When canonical paths change (for example WRemnants location), update `setup.sh` first, then update docs.
 
@@ -52,10 +53,12 @@ bin/run --help
   - `runlog.md`: dated command log with output locations and brief interpretation.
 - Optional file:
   - `results_index.md`: add only when outputs/plots become numerous and hard to track.
+  - `slides/outline.json`: slide blueprint used by `scripts/study_slides.py` to generate a study summary deck.
 - Live-update rule:
   - During study sessions, Codex should update the study files incrementally as new understanding is gained (not only at the end of the chat).
   - Record both technical decisions and physics assumptions in `README.md`, and append executed commands/quick outcomes to `runlog.md`.
   - Continuously capture newly learned facts and emerging questions from discussion and outputs; mark whether each question is answered, partially answered, or open.
+  - For every newly requested check or hypothesis, add a corresponding note entry before running commands and then update that same entry with outcome/status immediately after results are available.
 - Guiding-questions rule:
   - Each study must define a short list of guiding questions near the top of `README.md`.
   - As new questions appear during discussion, add them to the study notes and track their status.
@@ -64,6 +67,7 @@ bin/run --help
   - Run the study workflow end-to-end (hist production and plotting/summary), using a fresh unique run tag/postfix on every run for traceability.
   - Inspect outputs directly (plots and/or printed histogram values).
   - Update study docs with new knowledge and question status.
+  - When requested, update `slides/outline.json`, regenerate slides via `scripts/study_slides.py`, and iterate with the user on slide content.
   - Summarize concise physics takeaways and propose concrete suggestions for the next iteration.
 - In new Codex sessions, when a study is requested, follow this structure unless explicitly overridden.
 
@@ -78,3 +82,4 @@ bin/run --help
 - **2026-02-13:** Added container-first setup order, canonical path policy, and Codex session handoff notes.
 - **2026-02-13:** Added live-update policy for `agents/studies/<topic>/` documentation during active studies.
 - **2026-02-13:** Documented that `$WREM_BASE` is inside the editable workspace for Codex sessions.
+- **2026-02-13:** Added study-to-slides workflow (`agents/study_slides.md`) and `slides/outline.json` convention.

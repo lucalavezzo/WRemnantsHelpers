@@ -135,3 +135,269 @@
     - `dR_bb_had` means: `0.595` (4FS) vs `0.511` (5FS).
   - Interpretation:
     - even in an explicitly hadron-level `bb`-like overlap region, 4FS and 5FS are not shape-identical; differences are moderate-to-strong in `pT_b` and `m_bb`, milder in `ΔR_bb`.
+- User-requested selection update and swap test:
+  - Updated canonical histmaker `bottom_sel` to:
+    - `(subB_pt5 > 10.f)` in `/home/submit/lavezzo/alphaS/gh/WRemnants/scripts/histmakers/w_z_gen_dists.py`.
+  - Ran:
+    - `python studies/z_bb/make_hists.py --tag bhad_sel10_260213_152614 --max-files-massive 20 --max-files-massless 200 --nthreads 8`
+    - `python studies/z_bb/plot_narf.py --massive-file /scratch/submit/cms/alphaS/260213_gen_massiveBottom/w_z_gen_dists_maxFiles_20_hadronsSel_massive_bhad_sel10_260213_152614.hdf5 --massless-file /scratch/submit/cms/alphaS/260213_gen_massiveBottom/w_z_gen_dists_maxFiles_200_nnpdf31_hadronsSel_massless_bhad_sel10_260213_152614.hdf5 --tag bhad_sel10_normswap_260213_152614 --normalize`
+  - Output plot dir:
+    - `/home/submit/lavezzo/public_html/alphaS/260213_z_bb/hadrons/bhad_sel10_normswap_260213_152614/`
+  - Physics outcome:
+    - selection fractions: `f4FS=0.562745`, `f5FS=0.023616`.
+    - selected-yield ratio (`5FS/4FS`) from plot output: `3.23535`.
+    - normalized swap `pT_Z` corrected/nominal:
+      - min/max/mean: `0.996836 / 1.022274 / 0.999829`.
+      - means by range:
+        - `0-10 GeV`: `0.997448`
+        - `10-30 GeV`: `0.998334`
+        - `30-60 GeV`: `1.005021`
+        - `60-100 GeV`: `1.013555`
+    - unnormalized swap reference:
+      - min/max/mean: `0.952490 / 0.996737 / 0.984145`.
+- Added broad all-variable diagnostics and produced plots:
+  - canonical histmaker patch:
+    - `/home/submit/lavezzo/alphaS/gh/WRemnants/scripts/histmakers/w_z_gen_dists.py`
+    - added gen b-jet and LHE bb histograms (`n_bjets`, `m_bb_jet`, `dR_bb_jet`, `lead/sublead_bjet_{pt,eta}`, `n_lhe_*bbbar`, `lhe_bbbar_fin_{min,max}_pt`, `m_bb_lhe`, `dR_bb_lhe`).
+  - plotter patch:
+    - `studies/z_bb/plot_narf.py`
+    - added all new variables to `plot_specs`.
+  - run:
+    - `python studies/z_bb/make_hists.py --tag bhad_allvars_260213_160518 --max-files-massive 20 --max-files-massless 200 --nthreads 8`
+    - `python studies/z_bb/plot_narf.py --massive-file /scratch/submit/cms/alphaS/260213_gen_massiveBottom/w_z_gen_dists_maxFiles_20_hadronsSel_massive_bhad_allvars_260213_160518.hdf5 --massless-file /scratch/submit/cms/alphaS/260213_gen_massiveBottom/w_z_gen_dists_maxFiles_200_nnpdf31_hadronsSel_massless_bhad_allvars_260213_160518.hdf5 --tag bhad_allvars_260213_160518`
+  - output:
+    - `/home/submit/lavezzo/public_html/alphaS/260213_z_bb/hadrons/bhad_allvars_260213_160518/`
+  - first-pass physics summary:
+    - `mean(n_bjets)`: `0.4609` (4FS) vs `0.0160` (5FS).
+    - `mean(m_bb_jet)`: `8.13` (4FS) vs `2.68` (5FS).
+    - `mean(dR_bb_jet)`: `0.183` (4FS) vs `0.054` (5FS).
+    - `mean(m_bb_lhe)`: `68.75` (4FS) vs `67.75` (5FS).
+    - `mean(dR_bb_lhe)`: `2.685` (4FS) vs `2.673` (5FS).
+    - `mean(n_lhe_fin_bbbar)`: `2.000` (4FS) vs `0.038` (5FS).
+- Added first study-to-slides prototype for this study:
+  - created `agents/studies/z_bmass_uncertainty/slides/outline.json` with initial slide structure and plot selections.
+  - created `agents/studies/z_bmass_uncertainty/slides/README.md` with regenerate commands.
+  - generated Beamer source via:
+    - `python scripts/study_slides.py --study-dir agents/studies/z_bmass_uncertainty`
+  - output:
+    - `agents/studies/z_bmass_uncertainty/slides/z_b_mass_uncertainty_study.tex`
+- Added reusable workflow docs and policy hooks:
+  - `agents/study_slides.md`
+  - updates in `AGENTS.md` and `agents/session_bootstrap.md`.
+- Compilation check:
+  - local and current container environments do not provide `pdflatex`; script now reports this clearly when `--compile` is requested.
+
+## 2026-02-14
+- User-requested correction to study focus:
+  - verify Z-decay lepton flavor in massive sample (`Zbb_MiNNLO`) before further nuisance-iteration work.
+- Policy/documentation update to enforce traceability for new checks:
+  - `AGENTS.md`: added rule to log each newly requested hypothesis/check before execution and update status immediately after results.
+  - `agents/session_bootstrap.md`: mirrored the same requirement in runbook update policy.
+- Added dedicated flavor-check utility:
+  - `studies/z_bb/check_massive_z_lepton_flavor.py`
+  - method: count LHE final-state leptons (`abs(LHEPart_pdgId) == 11,13,15` with `LHEPart_status==1`).
+- Added execution helper:
+  - `agents/run_massive_lepton_flavor_check.sh`
+  - runs massive-only histmaker (`Zbb_MiNNLO`) plus the flavor checker.
+- Executed in Singularity:
+  - `singularity run --bind /scratch/,/work/,/home/,/ceph/ /cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/bendavid/cmswmassdocker/wmassdevrolling\:latest /bin/bash /home/submit/lavezzo/alphaS/WRemnantsHelpers/agents/run_massive_lepton_flavor_check.sh lepflv_260214_1 20 8`
+- Massive-only hist output:
+  - `/scratch/submit/cms/alphaS/260214_gen_massiveBottom/w_z_gen_dists_maxFiles_20_hadronsSel_massive_lepflv_260214_1.hdf5`
+- Flavor-check result (`970000` events from 20 files):
+  - `mu-only (2 mu): 0`
+  - `e-only (2 e): 970000`
+  - `tau-only (2 tau): 0`
+  - `mixed/other: 0`
+- Conclusion:
+  - In this tested configuration, `Zbb_MiNNLO` is not muon-decay matched; it is `Z->ee` only at LHE final state.
+- User-requested slide output check (2026-02-14):
+  - Request: provide PDF slide output in `$MY_PLOT_DIR` using dated output-directory convention.
+  - Environment finding: no LaTeX engine (`pdflatex`/`xelatex`/`lualatex`) available in current shell or `wmassdevrolling` container.
+  - Action taken: generated a review PDF preview from `slides/outline.json` and copied `.tex` to dated output dir.
+  - Output files:
+    - `/home/submit/lavezzo/public_html/alphaS/260214_study_slides/z_b_mass_uncertainty_study_preview.pdf`
+    - `/home/submit/lavezzo/public_html/alphaS/260214_study_slides/z_b_mass_uncertainty_study.tex`
+  - Validation:
+    - `pdfinfo` reports `Pages: 7` for the preview PDF.
+  - Status:
+    - `partial` for true Beamer compilation (blocked by missing TeX engine),
+    - `answered` for immediate PDF review artifact in standard output location.
+- User-requested check (2026-02-14): switch from preview rendering to true Beamer `pdflatex` output and publish under `$MY_PLOT_DIR/<YYMMDD>_study_slides/`.
+  - Status before run: `open`.
+  - Outcome update:
+    - `pdflatex` is now available (`/usr/bin/pdflatex`) and true Beamer compilation succeeded.
+    - Fixed a LaTeX escaping bug in `scripts/study_slides.py` (`\_`/other special chars were over-escaped and caused compile failure).
+    - Published compiled PDF:
+      - `/home/submit/lavezzo/public_html/alphaS/260214_study_slides/z_b_mass_uncertainty_study.pdf`
+    - Validation:
+      - `pdfinfo` shows `Producer: pdfTeX-1.40.21`, `Pages: 7`.
+  - Status after run: `answered`.
+- User-requested slide reorganization (2026-02-14):
+  - Request: draft first-iteration deck with ordering `goal -> definitions -> (optional short selection scope) -> LHE block -> jets block -> B-hadron block`, then add more slides in a later iteration.
+  - Status before run: `open`.
+  - Outcome update:
+    - Updated `slides/outline.json` with first-iteration structure requested by user:
+      - goal/strategy and sample-definition slides,
+      - short scope slide,
+      - grouped figure blocks in order: LHE -> jets -> B hadrons.
+    - Set explicit date string in title page (`February 14, 2026`) to avoid `\\today` rendering issues.
+    - Regenerated and compiled with real `pdflatex`.
+    - Published output:
+      - `/home/submit/lavezzo/public_html/alphaS/260214_study_slides/z_b_mass_uncertainty_study.pdf`
+    - Validation:
+      - `pdfinfo` reports title `Z b-mass Uncertainty Study - Draft 1: Sample Comparison Structure`, `Pages: 10`.
+  - Status after run: `answered`.
+- User-requested check (2026-02-14): add explicit object-selection/definition notes on every object-plot slide (LHE, jets, B hadrons) so each histogram has interpretable selection context.
+  - Status before run: `open`.
+  - Outcome update:
+    - Updated slide generator (`scripts/study_slides.py`) to support `selection_note` on figure/two-figure slides.
+    - Added explicit selection/definition notes to all object plot slides in `slides/outline.json` for:
+      - LHE bb observables,
+      - gen b-jet observables,
+      - B-hadron observables.
+    - Regenerated and compiled with `pdflatex`; published updated PDF:
+      - `/home/submit/lavezzo/public_html/alphaS/260214_study_slides/z_b_mass_uncertainty_study.pdf`
+    - Validation:
+      - compile succeeded twice (`compile1=0`, `compile2=0`), PDF has 10 pages.
+  - Status after run: `answered`.
+- User-requested formatting update (2026-02-14):
+  - Request: render object-selection notes as regular bullet points above plots (not subtitle text), and ensure inequalities/symbols are in LaTeX math mode.
+  - Status before run: `open`.
+  - Outcome update:
+    - Changed selection-note rendering from subtitle-style text to normal bullet-point text above plot panels.
+    - Added `selection_note_latex` support in `scripts/study_slides.py` so slide notes can include math-mode symbols/inequalities (for example `$|\eta|<2.5$`, `$p_T>20\,\mathrm{GeV}$`, `$nBhad\_pt5\geq2$`).
+    - Updated object-slide notes in `slides/outline.json` to use LaTeX math mode for inequalities and symbols.
+    - Regenerated and compiled with `pdflatex`; published updated PDF:
+      - `/home/submit/lavezzo/public_html/alphaS/260214_study_slides/z_b_mass_uncertainty_study.pdf`
+    - Validation:
+      - compile succeeded (`compile1=0`, `compile2=0`), PDF has 10 pages.
+  - Status after run: `answered`.
+- User-requested formatting update (2026-02-14):
+  - Request: remove per-plot subtitles in slides; regenerate plot labels so B-hadron x-axis text is shorter and collaborator-facing (no internal code variable names like `nBhad_pt5`).
+  - Status before run: `open`.
+  - Outcome update:
+    - Updated B-hadron plot x-axis labels in `studies/z_bb/plot_narf.py` to be collaborator-facing and less wordy (removed explicit code-variable-style wording and extra selection text from axis labels).
+    - Regenerated comparison plot set from existing tagged HDF5 inputs in a new output folder:
+      - `/home/submit/lavezzo/public_html/alphaS/260214_z_bb/hadrons/bhad_allvars_260214_labels/`
+    - Removed per-plot subtitles/captions from the slide outline for object plots and repointed slide image paths to the regenerated plot directory.
+    - Regenerated and compiled slides with `pdflatex`; published updated PDF:
+      - `/home/submit/lavezzo/public_html/alphaS/260214_study_slides/z_b_mass_uncertainty_study.pdf`
+    - Validation:
+      - compile succeeded (`compile1=0`, `compile2=0`), PDF has 10 pages.
+  - Status after run: `answered`.
+- User-requested check (2026-02-14): add explicit display of LHE b-quark $p_T$ spectra in the slide deck.
+  - Status before run: `open`.
+  - Outcome update:
+    - Added dedicated slide "LHE b-Quark pT Spectra" to `slides/outline.json`, using:
+      - `samples_comparison_lhe_bbbar_fin_min_pt.png`
+      - `samples_comparison_lhe_bbbar_fin_max_pt.png`
+    - Regenerated and compiled with `pdflatex`; published updated PDF:
+      - `/home/submit/lavezzo/public_html/alphaS/260214_study_slides/z_b_mass_uncertainty_study.pdf`
+    - Validation:
+      - compile succeeded (`compile1=0`, `compile2=0`), PDF now has 11 pages.
+  - Status after run: `answered`.
+- User-requested check (2026-02-14): produce jet-comparison plots using parton flavour tagging (in addition to hadron flavour) to assess whether they are suitable for slide inclusion.
+  - Status before run: `open`.
+  - Outcome update:
+    - Added under-plot conclusion bullets for requested slides via new `conclusion_note_latex` support in `scripts/study_slides.py`.
+    - Updated slide content in `slides/outline.json`:
+      - LHE kinematics: explicit statement that LHE-level swapping is unphysical due to 5FS/4FS scheme difference.
+      - Jet composition slide: fixed selection wording to distinguish `n_bjets` cut (`p_T>20`, `|eta|<2.5`) vs leading-jet panel from loose stored list (`p_T>0`, `|eta|<10`), plus requested interpretation note.
+      - Jet-pair slide: added requested "ratios are flat" conclusion.
+      - B-hadron multiplicity slide: added requested note on flat-shape + normalization offset and normalized-swap motivation.
+    - Recompiled deck and published updated PDF:
+      - `/home/submit/lavezzo/public_html/alphaS/260214_study_slides/z_b_mass_uncertainty_study.pdf`
+    - Validation:
+      - `pdflatex` compile succeeded twice (`compile1=0`, `compile2=0`), PDF has 11 pages.
+  - Status after run: `answered`.
+
+  - Outcome update (parton-flavour jet study):
+    - Extended canonical histmaker (`$WREM_BASE/scripts/histmakers/w_z_gen_dists.py`) with parton-flavour b-jet diagnostics:
+      - `n_bjets_parton`, `lead/sublead_bjet_{pt,eta}_parton`, `m_bb_jet_parton`, `dR_bb_jet_parton`.
+    - Updated `studies/z_bb/plot_narf.py` to include corresponding parton-flavour plot specs.
+    - Ran fresh tagged hist production with requested 50 threads:
+      - `python studies/z_bb/make_hists.py --tag partonjets_260214_50thr --max-files-massive 20 --max-files-massless 200 --nthreads 50`
+      - produced:
+        - `/scratch/submit/cms/alphaS/260214_gen_massiveBottom/w_z_gen_dists_maxFiles_20_hadronsSel_massive_partonjets_260214_50thr.hdf5`
+        - `/scratch/submit/cms/alphaS/260214_gen_massiveBottom/w_z_gen_dists_maxFiles_200_nnpdf31_hadronsSel_massless_partonjets_260214_50thr.hdf5`
+    - Generated comparison plots:
+      - `python studies/z_bb/plot_narf.py --massive-file <...massive...> --massless-file <...massless...> --tag bhad_allvars_parton_260214_50thr`
+      - output directory:
+        - `/home/submit/lavezzo/public_html/alphaS/260214_z_bb/hadrons/bhad_allvars_parton_260214_50thr/`
+      - parton-flavour jet plots include:
+        - `samples_comparison_n_bjets_parton.png`
+        - `samples_comparison_lead_bjet_pt_parton.png`
+        - `samples_comparison_sublead_bjet_pt_parton.png`
+        - `samples_comparison_lead_bjet_eta_parton.png`
+        - `samples_comparison_sublead_bjet_eta_parton.png`
+        - `samples_comparison_m_bb_jet_parton.png`
+        - `samples_comparison_dR_bb_jet_parton.png`
+  - Status after run: `answered`.
+- User-requested update (2026-02-14):
+  - add backup slides with parton-flavour jet plots;
+  - add two slides for swapped-sample $p_{T}^{V,\mathrm{gen}}$ (B-hadron-based `bottom_sel`): unnormalized swap and normalized swap, with procedure notes.
+  - Status before run: `open`.
+- Outcome update (requested backup + swap slides):
+  - Added slides to `slides/outline.json` for swapped-sample $p_{T}^{V,\mathrm{gen}}$ using B-hadron-based `bottom_sel`:
+    - unnormalized swap: `inclusive_ptVgen.png`
+    - normalized swap: `inclusive_ptVgen_normalized.png`
+  - Added procedure notes and interpretation bullets on both slides.
+  - Added backup parton-flavour jet slides:
+    - multiplicity/leading-$p_T$ (`n_bjets_parton`, `lead_bjet_pt_parton`)
+    - pair kinematics (`m_bb_jet_parton`, `dR_bb_jet_parton`)
+  - Source plot directories:
+    - `/home/submit/lavezzo/public_html/alphaS/260214_z_bb/hadrons/bhad_allvars_parton_260214_50thr/`
+    - `/home/submit/lavezzo/public_html/alphaS/260214_z_bb/hadrons/bhad_allvars_parton_260214_50thr_norm/`
+  - Recompiled with `pdflatex` and published updated PDF:
+    - `/home/submit/lavezzo/public_html/alphaS/260214_study_slides/z_b_mass_uncertainty_study.pdf`
+  - Validation:
+    - compile succeeded (`compile1=0`, `compile2=0`), PDF has 15 pages.
+  - Status after run: `answered`.
+- User-requested slide formatting/content fix (2026-02-14):
+  - remove literal labels "Selection/definition" and "Conclusion" while keeping bullet points;
+  - fix oversized figures on slides 12 and 13;
+  - replace code-style wording (`bottom_sel`) with plain physics selection description.
+  - Status before run: `open`.
+  - Outcome update:
+    - Removed literal prefixes "Selection/definition" and "Conclusion" from slide bullets while keeping the bullet entries.
+    - Reworded swap-procedure slides to plain-language physics selection (no `bottom_sel` code reference):
+      - "at least two B hadrons above 5 GeV and subleading B-hadron $p_T>10$ GeV".
+    - Reduced swap-slide figure sizes to improve fit (`0.72\textwidth` for both unnormalized and normalized $p_T^{V,\mathrm{gen}}$ slides).
+    - Recompiled and published updated deck:
+      - `/home/submit/lavezzo/public_html/alphaS/260214_study_slides/z_b_mass_uncertainty_study.pdf`
+    - Validation:
+      - compile succeeded (`compile1=0`, `compile2=0`), PDF has 15 pages.
+  - Status after run: `answered`.
+- User-requested formatting fix (2026-02-14):
+  - Request: math mode in slide titles was not rendering correctly.
+  - Implemented in `scripts/study_slides.py`:
+    - added `tex_escape_allow_math()` that escapes normal text but preserves `$...$` inline math blocks in titles.
+    - applied to all slide title rendering paths (`bullets`, `figure`, `two_figures`, `text`).
+  - Recompiled and published updated deck:
+    - `/home/submit/lavezzo/public_html/alphaS/260214_study_slides/z_b_mass_uncertainty_study.pdf`
+  - Validation:
+    - generated `.tex` now contains math-mode titles (for example `$p_{T}^{V,\mathrm{gen}}$`, `$p_T$`).
+    - compile succeeded (`compile1=0`, `compile2=0`).
+  - Status after run: `answered`.
+- User-requested fit/content fix (2026-02-14):
+  - Slides 12/13 figures still overflowing page; slide 12 needed explicit "too large systematic" conclusion.
+  - Implemented:
+    - `scripts/study_slides.py`: `figure` slides now support optional `height` with `keepaspectratio`.
+    - `slides/outline.json`:
+      - set swap slides to `width=0.62\\textwidth`, `height=0.42\\textheight`.
+      - updated unnormalized-swap conclusion to explicit wording: "too-large systematic".
+  - Recompiled and published updated PDF:
+    - `/home/submit/lavezzo/public_html/alphaS/260214_study_slides/z_b_mass_uncertainty_study.pdf`
+  - Validation:
+    - compile succeeded (`compile1=0`, `compile2=0`).
+  - Status after run: `answered`.
+- Documentation sync pass (2026-02-14, no slide edits):
+  - Updated `agents/studies/z_bmass_uncertainty/README.md` to align with current slide-era conclusions and latest code state.
+  - Key sync updates:
+    - corrected current `bottom_sel` description to `subB_pt5 > 10`.
+    - removed outdated "keep unchanged at subB_pt>5" decision text.
+    - added consolidated 2026-02-14 conclusion block (LHE, jet, B-hadron, swap-on-ptVgen).
+    - updated knowledge/question tracker statuses and next-step priorities.
+  - Cross-check status:
+    - README now includes major conclusions currently presented in slides.
+  - Status after run: `answered`.

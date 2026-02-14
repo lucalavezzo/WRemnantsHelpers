@@ -143,18 +143,39 @@ def print_nB_table(h, label):
 
 
 plot_specs = [
-    ("nBhad_pt5", "Number of B hadrons (pT > 5 GeV)", True),
-    ("leadB_pt5", "Leading B hadron pT (pT > 5 GeV)", True),
-    ("subB_pt5", "Subleading B hadron pT (pT > 5 GeV)", True),
-    ("softB_pt5", "Softest B hadron pT (pT > 5 GeV)", True),
-    ("leadB_pt5_b2", "Leading B hadron pT (nB>=2, pT > 5 GeV)", True),
-    ("subB_pt5_b2", "Subleading B hadron pT (nB>=2, pT > 5 GeV)", True),
-    ("m_bb_had", "m_bb from leading/subleading B hadrons (nB>=2, pT > 5 GeV)", True),
+    ("nBhad_pt5", "Number of B hadrons", True),
+    ("leadB_pt5", "Leading B-hadron $p_T$ [GeV]", True),
+    ("subB_pt5", "Subleading B-hadron $p_T$ [GeV]", True),
+    ("softB_pt5", "Softest B-hadron $p_T$ [GeV]", True),
+    ("leadB_pt5_b2", "Leading B-hadron $p_T$ [GeV]", True),
+    ("subB_pt5_b2", "Subleading B-hadron $p_T$ [GeV]", True),
+    ("m_bb_had", "$m_{bb}$ from B hadrons [GeV]", True),
+    ("dR_bb_had", "$\\Delta R_{bb}$ from B hadrons", True),
+    ("n_bjets", "Number of gen b-jets", True),
+    ("lead_bjet_pt", "Leading gen b-jet pT", True),
+    ("sublead_bjet_pt", "Subleading gen b-jet pT", True),
+    ("lead_bjet_eta", "Leading gen b-jet eta", False),
+    ("sublead_bjet_eta", "Subleading gen b-jet eta", False),
+    ("m_bb_jet", "m_bb from gen b-jets", True),
+    ("dR_bb_jet", "DeltaR_bb from gen b-jets", True),
+    ("n_bjets_parton", "Number of gen b-jets (parton flavour)", True),
+    ("lead_bjet_pt_parton", "Leading gen b-jet $p_T$ [GeV] (parton flavour)", True),
     (
-        "dR_bb_had",
-        "DeltaR_bb from leading/subleading B hadrons (nB>=2, pT > 5 GeV)",
+        "sublead_bjet_pt_parton",
+        "Subleading gen b-jet $p_T$ [GeV] (parton flavour)",
         True,
     ),
+    ("lead_bjet_eta_parton", "Leading gen b-jet $\\eta$ (parton flavour)", False),
+    ("sublead_bjet_eta_parton", "Subleading gen b-jet $\\eta$ (parton flavour)", False),
+    ("m_bb_jet_parton", "$m_{bb}$ from gen b-jets [GeV] (parton flavour)", True),
+    ("dR_bb_jet_parton", "$\\Delta R_{bb}$ from gen b-jets (parton flavour)", True),
+    ("n_lhe_init_bbbar", "LHE initial-state bb multiplicity", True),
+    ("n_lhe_fin_bbbar", "LHE final-state bb multiplicity", True),
+    ("n_lhe_bbbar", "LHE total bb multiplicity", True),
+    ("lhe_bbbar_fin_min_pt", "LHE final-state min b pT", True),
+    ("lhe_bbbar_fin_max_pt", "LHE final-state max b pT", True),
+    ("m_bb_lhe", "m_bb from LHE b quarks", True),
+    ("dR_bb_lhe", "DeltaR_bb from LHE b quarks", True),
 ]
 
 
@@ -179,8 +200,6 @@ for var, xlabel, logy in plot_specs:
         f"Zmumu_MiNNLO",
         res_massless[f"Zmumu_MiNNLO"]["output"][f"{var}"].get(),
     )
-
-    print(h_massless)
 
     fig = plot_tools.makePlotWithRatioToRef(
         [h_massless, h_massive],
@@ -276,7 +295,11 @@ for vars in [["ptVgen"], ["absYVgen"]]:
         [nominal_bottom, massive],
         labels=[
             "Nominal MiNNLO (1b, 1bbar)",
-            "Massive b's MiNNLO (1b, 1bbar)",
+            (
+                "Massive b's MiNNLO (1b, 1bbar, normalized)"
+                if normalize
+                else "Massive b's MiNNLO (1b, 1bbar)"
+            ),
         ],
         rrange=[[0.5, 1.5]] if vars[0] == "ptVgen" else [[0.95, 1.05]],
         ratio_legend=False,
@@ -312,7 +335,11 @@ for vars in [["ptVgen"], ["absYVgen"]]:
         labels=[
             "Nominal MiNNLO (inclusive)",
             "Nominal MiNNLO (b's subtracted)",
-            "Corrected MiNNLO (inclusive)",
+            (
+                "Corrected MiNNLO (inclusive, normalized swap)"
+                if normalize
+                else "Corrected MiNNLO (inclusive)"
+            ),
         ],
         rrange=[[0.95, 1.05]],
         ratio_legend=False,
