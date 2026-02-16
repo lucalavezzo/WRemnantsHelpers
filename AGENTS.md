@@ -31,19 +31,16 @@ bin/run --help
 ```
 
 ## Codex Session Handoff
-- At the start of a session, ask Codex to read `AGENTS.md` and `agents/session_bootstrap.md`.
-- For physics context, also ask Codex to read `agents/an25_085_summary.md` and use `/home/submit/lavezzo/alphaS/AN-25-085` as source of truth.
-- For workflow context, ask Codex to read `agents/workflow_nominal.md`.
-- For frozen commands and expected behavior, ask Codex to read `agents/nominal_config.md`.
-- For step-by-step pass/fail criteria, ask Codex to read `agents/validation.md`.
-- For study slide generation, ask Codex to read `agents/study_slides.md`.
-- Keep workflow-critical commands and conventions in those files, not only in chat.
+- At the start of a session, ask Codex to read `AGENTS.md` and `agents/knowledge/00_index.md`.
+- Use `agents/knowledge/` as the canonical long-lived knowledge base by topic.
+- Keep `agents/studies/<topic>/` as run-by-run lab notebooks and promote stable lessons into `agents/knowledge/`.
+- For physics source of truth, keep using `/home/submit/lavezzo/alphaS/AN-25-085`.
 - When canonical paths change (for example WRemnants location), update `setup.sh` first, then update docs.
 
 ## Development Guidelines
 - Keep workflows reproducible: prefer scriptable commands over ad hoc shell history.
 - Keep logs in `logs/` with timestamps; `bin/run` is the default launcher for detached jobs.
-- Treat documentation as a living artifact: when Codex learns new workflow, physics-context, environment, or failure-mode details, update the relevant files in `agents/` and `AGENTS.md` in the same working session.
+- Treat documentation as a living artifact: when Codex learns new workflow, physics-context, environment, or failure-mode details, update the relevant files in `agents/knowledge/` and `AGENTS.md` in the same working session.
 - Prefer small, incremental doc updates over delayed large rewrites, so future sessions start from current reality.
 
 ## Study Recording Convention
@@ -82,4 +79,5 @@ bin/run --help
 - **2026-02-13:** Added container-first setup order, canonical path policy, and Codex session handoff notes.
 - **2026-02-13:** Added live-update policy for `agents/studies/<topic>/` documentation during active studies.
 - **2026-02-13:** Documented that `$WREM_BASE` is inside the editable workspace for Codex sessions.
-- **2026-02-13:** Added study-to-slides workflow (`agents/study_slides.md`) and `slides/outline.json` convention.
+- **2026-02-13:** Added study-to-slides workflow (`agents/knowledge/70_slides/study_slides_workflow.md`) and `slides/outline.json` convention.
+- **2026-02-16:** Migrated reusable documentation into `agents/knowledge/` and made it the canonical long-lived knowledge base.

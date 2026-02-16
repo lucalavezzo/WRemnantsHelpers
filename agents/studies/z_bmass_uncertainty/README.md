@@ -19,8 +19,7 @@ Define and implement an additional uncertainty on Z data to cover b-quark mass e
 - Current `bottom_sel` implementation in `w_z_gen_dists.py`:
   - Identify B hadrons using PDG-digit logic in `wremnants/include/theoryTools.hpp` (`isBHadron` + `finalStateBHadronIdx`).
   - Keep particles with `GenPart_status` in `{1,2}`.
-  - Build leading/subleading B-hadron pT from those particles above `5 GeV`.
-  - Define `bottom_sel = (subB_pt5 > 10)` (at least two B hadrons above `5 GeV`, with subleading B hadron above `10 GeV`).
+  - Define `bottom_sel = (bHad_pt.size() >= 1)` (at least one final-state B hadron, with no additional B-hadron kinematic cuts).
 
 ## Decisions taken so far
 - Create a dedicated study folder under `agents/studies/z_bmass_uncertainty/`.
@@ -28,7 +27,8 @@ Define and implement an additional uncertainty on Z data to cover b-quark mass e
 - Next technical step is to define a concrete template-based nuisance prescription (central/up/down) and normalization strategy.
 - Revised approach (per discussion): do not introduce a separate histmaker path; instead extend the canonical `w_z_gen_dists.py` outputs and inspect distributions before changing any swap selection.
 - Use B-hadron-based swap-region definition:
-  - `bottom_sel = (subB_pt5 > 10)`.
+  - current: `bottom_sel = (bHad_pt.size() >= 1)`;
+  - previous reference point: `bottom_sel = (subB_pt5 > 10)`.
 - Keep using a fresh unique tag for every hist/plot iteration (for example `bhad_diag_<YYMMDD_HHMMSS>`).
 
 ## Latest iteration (2026-02-13, tag `bhad_diag_260213_143453`)
@@ -126,6 +126,139 @@ Define and implement an additional uncertainty on Z data to cover b-quark mass e
 - Swap-on-`ptVgen` conclusion:
   - Unnormalized swap induces a too-large systematic shift.
   - Normalized swap yields a much flatter, mostly shape-like effect and is currently the more viable nuisance candidate, with the caveat that physical interpretation still needs agreement.
+
+## Requested check (2026-02-16)
+- Request: test a different swap-region definition that only requires one B hadron and does not apply additional B-hadron cuts.
+- Implementation status:
+  - Updated canonical histmaker selection to `bottom_sel = (bHad_pt.size() >= 1)`.
+  - Completed with tagged run `bhad_ge1_260216_50thr` (including normalized and unnormalized comparisons).
+
+## Latest iteration (2026-02-16, tag `bhad_ge1_260216_50thr`)
+- Executed with requested thread count (`50`) and reduced-stat sample sizes (`20` massive, `200` massless):
+  - hist files:
+    - `/scratch/submit/cms/alphaS/260216_gen_massiveBottom/w_z_gen_dists_maxFiles_20_hadronsSel_massive_bhad_ge1_260216_50thr.hdf5`
+    - `/scratch/submit/cms/alphaS/260216_gen_massiveBottom/w_z_gen_dists_maxFiles_200_nnpdf31_hadronsSel_massless_bhad_ge1_260216_50thr.hdf5`
+  - plot outputs:
+    - unnormalized: `/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_ge1_260216_50thr/`
+    - normalized: `/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_ge1_260216_50thr_norm/`
+- Selection-fraction diagnostics from `nominal_gen`:
+  - `% selected for swap` (4FS massive): `1.0000`
+  - `% selected for swap` (5FS nominal): `0.0574`
+  - selected-yield ratio (`5FS/4FS`, selected region): `4.4254`
+- Inclusive corrected/nominal ratios:
+  - unnormalized swap:
+    - `ptVgen`: min/max/mean = `0.9210 / 0.9786 / 0.9559`
+    - `absYVgen`: min/max/mean = `0.9478 / 0.9738 / 0.9569`
+  - normalized swap:
+    - `ptVgen`: min/max/mean = `0.9850 / 1.0544 / 0.9995`
+    - `absYVgen`: min/max/mean = `0.9763 / 1.0183 / 0.9980`
+- Interpretation:
+  - This `>=1` B-hadron selection is broader than the prior `subB_pt5 > 10` region and selects all events in the 4FS sample while still selecting only a small fraction of the 5FS sample.
+  - As before, unnormalized swap is too rate-dominant; normalized swap remains the more viable nuisance-shape construction.
+
+## Latest iteration (2026-02-16, tags `lepcheck_260216_50thr` and `lepcheck_aux_260216_50thr`)
+- Request: compare dilepton mass and lepton kinematics for bare/postFSR leptons vs dressed leptons, and inspect boson variables (`mass`, `pT`, `|y|`).
+- Technical updates in canonical histmaker (`$WREM_BASE/scripts/histmakers/w_z_gen_dists.py`):
+  - fixed `--singleLeptonHists` + `--addBottomAxis` bug in `prefsr/postfsr` lepton hist booking (`bottom` -> `bottom_sel`);
+  - added dressed single-lepton histograms in the `--singleLeptonHists` branch:
+    - `nominal_dressedLepPt1/2`, `nominal_dressedLepEta1/2`.
+- Produced fresh tagged files:
+  - `/scratch/submit/cms/alphaS/260216_gen_massiveBottom/w_z_gen_dists_maxFiles_20_hadronsSel_massive_lepcheck_260216_50thr.hdf5`
+  - `/scratch/submit/cms/alphaS/260216_gen_massiveBottom/w_z_gen_dists_maxFiles_200_nnpdf31_hadronsSel_massless_lepcheck_260216_50thr.hdf5`
+  - `/scratch/submit/cms/alphaS/260216_gen_massiveBottom/w_z_gen_dists_maxFiles_10_hadronsSel_massive_lepcheck_aux_260216_50thr.hdf5`
+  - `/scratch/submit/cms/alphaS/260216_gen_massiveBottom/w_z_gen_dists_maxFiles_100_nnpdf31_hadronsSel_massless_lepcheck_aux_260216_50thr.hdf5`
+- Output plots:
+  - `/home/submit/lavezzo/public_html/alphaS/260216_z_bb/leptons/lepcheck_aux_260216_50thr/`
+- Key observations:
+  - Bare/postFSR dilepton mass is very similar between samples (`mean_4FS/mean_5FS ~ 0.997` for `ew_mll`).
+  - Bare/postFSR single-lepton kinematics are available and comparable (`nominal_ewLepPt{1,2}`, `nominal_ewLepEta{1,2}`).
+  - Dressed-lepton observables are not physically comparable in current sample setup:
+    - massive sample (`Zbb_MiNNLO`) is `Z->ee`-only in tested files;
+    - dressed variable definition is muon-flavor based in this workflow;
+    - this leads to strong artificial suppression/shape distortion in 4FS dressed quantities.
+  - Boson-level checks (preFSR / EW-postFSR / dressed):
+    - preFSR and EW-postFSR comparisons are usable for shape/scale diagnostics;
+    - dressed boson observables inherit the same flavor-mismatch caveat as dressed lepton observables.
+
+## Requested check (2026-02-16): use `ThePEG::PDT` for B-hadron classification
+- Request:
+  - Consider replacing the local `isBHadron` helper with an external classifier based on `ThePEG::PDT`.
+- Quick implementation audit:
+  - Current logic is in `$WREM_BASE/wremnants/include/theoryTools.hpp` (`isBHadron`, `finalStateBHadronIdx`) and is used by canonical histmaker path in `$WREM_BASE/scripts/histmakers/w_z_gen_dists.py`.
+  - A similar `isBHadron` implementation also exists in `../WRemnants/wremnants/include/utils.hpp`.
+  - No active `ThePEG::PDT` (or equivalent HepPID helper) usage was found in this analysis path.
+- Decision for current study loop:
+  - Keep the existing lightweight PDG-digit `isBHadron` logic for now (no external dependency change in this iteration).
+  - Prefer a future cleanup that unifies duplicated B-hadron classification in one WRemnants helper before considering any heavier external dependency.
+
+## Requested check (2026-02-16, follow-up): run with `PDT`-style B-hadron identifier
+- Request:
+  - Replace the current `isBHadron` behavior with a `ThePEG::PDT`-style B-content classification and rerun hist+plots for direct comparison against prior baseline.
+- Planned implementation (this iteration):
+  - Patch active helper in `$WREM_BASE/wremnants/include/theoryTools.hpp`.
+  - Keep selection definition unchanged (`bottom_sel = (bHad_pt.size() >= 1)`) so only classifier behavior is varied.
+  - Produce a new tagged run in reduced-stat mode (`20` massive, `200` massless) matching prior quick-comparison scale.
+
+## Latest iteration (2026-02-16, tag `bhad_pdtstyle_260216_50thr`)
+- Classifier implementation:
+  - In `$WREM_BASE/wremnants/include/theoryTools.hpp`, split B-hadron logic into:
+    - `isBHadronLegacy(...)` (previous implementation),
+    - `isBHadronPDTStyle(...)` (digit-scan `PDT`-style flavor-content check),
+    - selector switch `kBHadronIdMode` for easy toggling.
+  - Active mode for this run: `BHadronIdMode::PDTStyleDigits`.
+- Produced files:
+  - hist files:
+    - `/scratch/submit/cms/alphaS/260216_gen_massiveBottom/w_z_gen_dists_maxFiles_20_hadronsSel_massive_bhad_pdtstyle_260216_50thr.hdf5`
+    - `/scratch/submit/cms/alphaS/260216_gen_massiveBottom/w_z_gen_dists_maxFiles_200_nnpdf31_hadronsSel_massless_bhad_pdtstyle_260216_50thr.hdf5`
+  - plot outputs:
+    - unnormalized: `/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_pdtstyle_260216_50thr/`
+    - normalized: `/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_pdtstyle_260216_50thr_norm/`
+- Key diagnostics (compare to baseline `bhad_ge1_260216_50thr`):
+  - `% selected for swap` (4FS massive): `1.0000` (baseline `1.0000`)
+  - `% selected for swap` (5FS nominal): `0.0599` (baseline `0.0574`)
+  - selected-yield ratio (`5FS/4FS`, selected region): `4.6181` (baseline `4.4254`)
+  - `nBhad_pt5` fractions:
+    - Nominal MiNNLO: `f(nB>=1)=0.0487`, `f(nB>=2)=0.0405` (baseline about `0.048x/0.040x`)
+    - Massive MiNNLO: `f(nB>=1)=0.9334`, `f(nB>=2)=0.8155` (baseline `0.9333/0.8137`)
+- Interpretation:
+  - Under this trial `PDT`-style identifier, the broad `>=1`-B-hadron selection behavior is very similar to baseline.
+  - The largest visible change in quick diagnostics is a small upward shift in selected 5FS fraction and selected-yield ratio.
+
+## Latest iteration (2026-02-16, tag `bhad_bothcmp_260216_50thr`): legacy vs PDT-style event disagreement
+- Goal:
+  - Evaluate both B-hadron classifiers in the same run and measure whether they disagree on event content.
+- Instrumentation:
+  - Added per-event dual outputs in canonical histmaker path:
+    - `bHadIdx_legacy`, `bHadIdx_pdt`,
+    - `nBhad_idx_symdiff`,
+    - `bHad_any_disagree` (any index disagreement),
+    - `bottom_sel_disagree` (`(nBhad>=1)` disagreement).
+- Produced files:
+  - `/scratch/submit/cms/alphaS/260216_gen_massiveBottom/w_z_gen_dists_maxFiles_20_hadronsSel_massive_bhad_bothcmp_260216_50thr.hdf5`
+  - `/scratch/submit/cms/alphaS/260216_gen_massiveBottom/w_z_gen_dists_maxFiles_200_nnpdf31_hadronsSel_massless_bhad_bothcmp_260216_50thr.hdf5`
+- Disagreement summary (weighted event fractions):
+  - Massive sample (`Zbb_MiNNLO`):
+    - `frac(event any index disagreement)` = `0.05666558`
+    - `frac(event bottom_sel disagreement)` = `0.00000000`
+    - `mean symmetric-diff count` = `0.05806189`
+  - Nominal sample (`Zmumu_MiNNLO`):
+    - `frac(event any index disagreement)` = `0.00488513`
+    - `frac(event bottom_sel disagreement)` = `0.00250351`
+    - `mean symmetric-diff count` = `0.00492208`
+- Interpretation:
+  - Yes, the two classifiers do disagree at event level.
+  - For this broad selection (`bottom_sel = nBhad>=1`), disagreement in the selected/not-selected event flag is:
+    - negligible in massive sample (`0`),
+    - small but nonzero in nominal sample (`~0.25%` weighted).
+
+## Slide update (2026-02-16): source-of-truth wording and `$b$` formatting cleanup
+- Updated backup code slide wording to cite the library helper as source of truth:
+  - `wremnants/include/theoryTools.hpp` is now explicitly referenced in slide-8 code header text.
+- Fixed LaTeX title math escaping in slide generator:
+  - in `scripts/study_slides.py`, title/subtitle now preserve inline math (`$...$`) instead of escaping `$`.
+- Regenerated and compiled updated deck:
+  - `agents/studies/z_bmass_uncertainty/slides/b_quark_mass.pdf`
+  - copied to: `/home/submit/lavezzo/public_html/alphaS/260216_study_slides/b_quark_mass.pdf`
 
 ## Open points
 - Exact observable basis for the nuisance (inclusive vs category-based vs differential in analysis bins).

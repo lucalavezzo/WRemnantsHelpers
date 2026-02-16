@@ -73,6 +73,57 @@ def print_nB_table(h, label):
         print(f"  nB={int(round(c))}: yield={v:.6e}, frac={frac:.6f}")
 
 
+def auto_rrange_from_ratio(
+    ref_hist, var_hist, qlow=0.02, qhigh=0.98, x_range=None, min_ref_rel=1e-4
+):
+    ref = ref_hist.values()
+    var = var_hist.values()
+    mask = np.isfinite(ref) & np.isfinite(var) & (ref > 0)
+
+    if x_range is not None and ref_hist.ndim == 1:
+        x_lo, x_hi = x_range
+        x_centers = ref_hist.axes[0].centers
+        mask = mask & (x_centers >= x_lo) & (x_centers <= x_hi)
+
+    # Suppress bins with tiny reference content that can blow up ratios.
+    ref_max = float(np.max(ref[mask])) if np.any(mask) else 0.0
+    if ref_max > 0:
+        mask = mask & (ref >= min_ref_rel * ref_max)
+
+    if not np.any(mask):
+        return [[0.5, 1.5]]
+
+    ratio = var[mask] / ref[mask]
+    ratio = ratio[np.isfinite(ratio)]
+    if ratio.size == 0:
+        return [[0.5, 1.5]]
+
+    lo = float(np.quantile(ratio, qlow))
+    hi = float(np.quantile(ratio, qhigh))
+
+    if not np.isfinite(lo) or not np.isfinite(hi):
+        return [[0.5, 1.5]]
+
+    if hi <= lo:
+        lo = min(lo, 1.0) - 0.1
+        hi = max(hi, 1.0) + 0.1
+    else:
+        pad = 0.2 * (hi - lo)
+        lo -= pad
+        hi += pad
+
+    lo = min(lo, 1.0)
+    hi = max(hi, 1.0)
+    lo = max(0.0, lo)
+
+    if hi - lo < 0.1:
+        mid = 0.5 * (hi + lo)
+        lo = max(0.0, mid - 0.1)
+        hi = mid + 0.1
+
+    return [[lo, hi]]
+
+
 # 2d
 # for var in [
 #     "n_lhe_init_bbbar_vs_n_lhe_fin_bbbar"
@@ -143,7 +194,12 @@ def print_nB_table(h, label):
 
 
 plot_specs = [
+    ("nBhad", "Number of B hadrons (no $p_T$ cut)", True),
+    ("nBhad_legacy", "Number of B hadrons (legacy ID)", True),
     ("nBhad_pt5", "Number of B hadrons", True),
+    ("leadB_pt", "Leading B-hadron $p_T$ [GeV] (no $p_T$ cut)", True),
+    ("leadB_pt_legacy", "Leading B-hadron $p_T$ [GeV] (legacy ID)", True),
+    ("subB_pt", "Subleading B-hadron $p_T$ [GeV] (no $p_T$ cut)", True),
     ("leadB_pt5", "Leading B-hadron $p_T$ [GeV]", True),
     ("subB_pt5", "Subleading B-hadron $p_T$ [GeV]", True),
     ("softB_pt5", "Softest B-hadron $p_T$ [GeV]", True),
@@ -209,7 +265,7 @@ for var, xlabel, logy in plot_specs:
         legtext_size=16,
         binwnorm=1,
         logy=logy,
-        rrange=[[0.2, 1.5]],
+        rrange=auto_rrange_from_ratio(h_massless, h_massive),
         xlabel=xlabel,
     )
     rel_oname = f"samples_comparison_{var}"
@@ -221,6 +277,85 @@ for var, xlabel, logy in plot_specs:
     fig.savefig(oname + ".png", bbox_inches="tight", dpi=300)
     plt.close(fig)
     output_tools.write_index_and_log(outdir, rel_oname)
+
+
+def plot_bhad_id_compare(var_pdt, var_legacy, xlabel, sample_key, sample_label, logy):
+    if var_pdt not in sample_key["output"] or var_legacy not in sample_key["output"]:
+        print(f"Skipping {sample_label} {var_pdt}/{var_legacy}: missing histogram")
+        return
+
+    h_pdt = read_h(
+        {"tmp": sample_key},
+        "tmp",
+        sample_key["output"][var_pdt].get(),
+    )
+    h_legacy = read_h(
+        {"tmp": sample_key},
+        "tmp",
+        sample_key["output"][var_legacy].get(),
+    )
+
+    fig = plot_tools.makePlotWithRatioToRef(
+        [h_pdt, h_legacy],
+        labels=["PDT helper", "Legacy helper"],
+        ratio_legend=False,
+        nlegcols=1,
+        legtext_size=16,
+        binwnorm=1,
+        logy=logy,
+        rrange=auto_rrange_from_ratio(h_pdt, h_legacy),
+        xlabel=xlabel,
+    )
+    rel_oname = f"bhad_id_compare_{sample_label}_{var_pdt}"
+    oname = os.path.join(outdir, rel_oname)
+    fig.savefig(oname + ".pdf", bbox_inches="tight")
+    fig.savefig(oname + ".png", bbox_inches="tight", dpi=300)
+    plt.close(fig)
+    output_tools.write_index_and_log(outdir, rel_oname)
+
+    if var_pdt == "nBhad":
+        vals_pdt = h_pdt.values()
+        vals_legacy = h_legacy.values()
+        ge1_pdt = np.sum(vals_pdt[h_pdt.axes[0].centers >= 1])
+        ge1_legacy = np.sum(vals_legacy[h_legacy.axes[0].centers >= 1])
+        print(
+            f"{sample_label} nBhad>=1 yield: PDT={ge1_pdt:.6e}, Legacy={ge1_legacy:.6e}, "
+            f"ratio(Leg/PDT)={(ge1_legacy/ge1_pdt if ge1_pdt else np.nan):.6f}"
+        )
+
+
+plot_bhad_id_compare(
+    "leadB_pt",
+    "leadB_pt_legacy",
+    "Leading B-hadron $p_T$ [GeV] (events with >=1 B hadron)",
+    res_massive["Zbb_MiNNLO"],
+    "massive",
+    True,
+)
+plot_bhad_id_compare(
+    "leadB_pt",
+    "leadB_pt_legacy",
+    "Leading B-hadron $p_T$ [GeV] (events with >=1 B hadron)",
+    res_massless["Zmumu_MiNNLO"],
+    "massless",
+    True,
+)
+plot_bhad_id_compare(
+    "nBhad",
+    "nBhad_legacy",
+    "Number of B hadrons (all events)",
+    res_massive["Zbb_MiNNLO"],
+    "massive",
+    True,
+)
+plot_bhad_id_compare(
+    "nBhad",
+    "nBhad_legacy",
+    "Number of B hadrons (all events)",
+    res_massless["Zmumu_MiNNLO"],
+    "massless",
+    True,
+)
 
 
 if (
@@ -272,7 +407,7 @@ h_massless = read_h(
     res_massless[f"Zmumu_MiNNLO"]["output"]["nominal_gen"].get(),
 )
 
-print("Ratio of events with at least 1 b or bbar: ")
+print("Ratio of selected events (bottom_sel==1): ")
 print(
     h_massless[{"bottom_sel": 1}].sum().value / h_massive[{"bottom_sel": 1}].sum().value
 )
@@ -281,7 +416,7 @@ print(h_massive[{"bottom_sel": 1}].sum().value / h_massive.sum().value)
 print("% of massless MiNNLO sample being selected for swap:")
 print(h_massless[{"bottom_sel": 1}].sum().value / h_massless.sum().value)
 
-# comparison of 1b,1bbar events
+# comparison of selected bottom_sel events
 for vars in [["ptVgen"], ["absYVgen"]]:
 
     nominal_bottom = h_massless[{"bottom_sel": 1}].project(*vars)
@@ -294,14 +429,18 @@ for vars in [["ptVgen"], ["absYVgen"]]:
     fig = plot_tools.makePlotWithRatioToRef(
         [nominal_bottom, massive],
         labels=[
-            "Nominal MiNNLO (1b, 1bbar)",
+            "Nominal MiNNLO (selected)",
             (
-                "Massive b's MiNNLO (1b, 1bbar, normalized)"
+                "Massive b's MiNNLO (selected, normalized)"
                 if normalize
-                else "Massive b's MiNNLO (1b, 1bbar)"
+                else "Massive b's MiNNLO (selected)"
             ),
         ],
-        rrange=[[0.5, 1.5]] if vars[0] == "ptVgen" else [[0.95, 1.05]],
+        rrange=auto_rrange_from_ratio(
+            nominal_bottom,
+            massive,
+            x_range=(0, 100) if vars[0] == "ptVgen" else None,
+        ),
         ratio_legend=False,
         nlegcols=1,
         legtext_size=16,
@@ -341,7 +480,11 @@ for vars in [["ptVgen"], ["absYVgen"]]:
                 else "Corrected MiNNLO (inclusive)"
             ),
         ],
-        rrange=[[0.95, 1.05]],
+        rrange=auto_rrange_from_ratio(
+            nominal,
+            corrected,
+            x_range=(0, 100) if vars[0] == "ptVgen" else None,
+        ),
         ratio_legend=False,
         nlegcols=1,
         legtext_size=16,

@@ -6,182 +6,104 @@
 
 \usepackage{booktabs}
 
-\title{Z b-mass Uncertainty Study}
+\title{Z $b$-mass Uncertainty Study}
 
-\subtitle{AlphaS Group Meeting}
+\subtitle{3-Slide Status Summary + Backups}
 
 \author{Luca}
 
-\date{February 14, 2026}
+\date{February 16, 2026}
 
 \begin{document}
 
 \frame{\titlepage}
 
-\begin{frame}{Goal and Strategy}
+\begin{frame}{Overview: Samples, Goal, Methodology}
 \begin{itemize}
-  \item Goal: derive a nuisance for MiNNLO Z (5FS, massless b quarks) using a comparison to Zbb MiNNLO (4FS, massive b quarks).
-  \item Core method: compare distributions between the two samples and interpret differences as candidate nuisance content.
-  \item Important context: 5FS vs 4FS scheme differences are part of the physical effect entering this nuisance.
+  \item Samples: 5FS nominal = Zmumu MiNNLO (massless $b$), 4FS alternate = Zbb MiNNLO (massive $b$).
+  \item Goal: build a $b$-mass uncertainty nuisance by replacing a selected 5FS heavy-flavor component with the 4FS component.
+  \item Method: define a swap region using B hadrons from GenPart (status 1 or 2), compare object-level and inclusive-shape impacts, and assess unnormalized swap behavior first.
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Samples and Object Definitions}
+\begin{frame}{B-Hadron Diagnostics (No B-hadron $p_T$ Cut)}
 \begin{itemize}
-  \item Nominal sample: inclusive Zmumu MiNNLO (5FS, massless b).
-  \item Alternate sample: Zbb MiNNLO (4FS, massive b). (Note: it seems this sample is actually $Z \to ee$.)
-  \item Objects shown in this draft: LHE bb observables, gen b-jet observables, and B-hadron observables from GenPart-based definitions in the histmaker.
-\end{itemize}
-\end{frame}
-
-\begin{frame}{LHE Composition}
-\begin{itemize}
-  \item \small Counts are built from LHEPart with b quarks identified by $|\mathrm{pdgId}|=5$ and split by status: initial-state has status $=-1$, final-state has status $=1$.
+  \item \small B hadrons are identified from GenPart using PDG-ID hadron-content logic (contains bottom flavor) and requiring GenPart status 1 or 2; no additional B-hadron $p_T$ threshold is applied for these two observables. Exact implementation is shown in backup slide `Backup: Exact B-hadron Selection Code`.
 \end{itemize}
 \begin{columns}[T,onlytextwidth]
 \column{0.5\textwidth}
-\includegraphics[width=0.95\linewidth]{\detokenize{/home/submit/lavezzo/public_html/alphaS/260214_z_bb/hadrons/bhad_allvars_260214_labels/samples_comparison_n_lhe_init_bbbar.png}}
+\includegraphics[width=0.95\linewidth]{\detokenize{/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_ge1_260216_50thr/samples_comparison_leadB_pt_focus.png}}
 \column{0.5\textwidth}
-\includegraphics[width=0.95\linewidth]{\detokenize{/home/submit/lavezzo/public_html/alphaS/260214_z_bb/hadrons/bhad_allvars_260214_labels/samples_comparison_n_lhe_fin_bbbar.png}}
+\includegraphics[width=0.95\linewidth]{\detokenize{/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_ge1_260216_50thr/samples_comparison_nBhad_focus.png}}
 \end{columns}
 \end{frame}
 
-\begin{frame}{LHE Kinematics}
+\begin{frame}{Unnormalized Swap Result and Definition}
 \begin{itemize}
-  \item \small $m_{bb}^{\mathrm{LHE}}$ and $\Delta R_{bb}^{\mathrm{LHE}}$ are computed from LHE $b$ and $\bar b$ quarks with $|\mathrm{pdgId}|=5$; $p_{T}$ observables use final-state LHE $b$ quarks with status $=1$.
-\end{itemize}
-\begin{columns}[T,onlytextwidth]
-\column{0.5\textwidth}
-\includegraphics[width=0.95\linewidth]{\detokenize{/home/submit/lavezzo/public_html/alphaS/260214_z_bb/hadrons/bhad_allvars_260214_labels/samples_comparison_m_bb_lhe.png}}
-\column{0.5\textwidth}
-\includegraphics[width=0.95\linewidth]{\detokenize{/home/submit/lavezzo/public_html/alphaS/260214_z_bb/hadrons/bhad_allvars_260214_labels/samples_comparison_dR_bb_lhe.png}}
-\end{columns}
-\begin{itemize}
-  \item \small Swapping at LHE-quark level is unphysical here because the two samples differ by flavor scheme (5FS vs 4FS), not just by a small kinematic perturbation.
-\end{itemize}
-\end{frame}
-
-\begin{frame}{LHE b-Quark pT Spectra}
-\begin{itemize}
-  \item \small Final-state LHE $b$ quarks are selected with status $=1$ and $|\mathrm{pdgId}|=5$; shown are event-wise minimum and maximum $p_{T}$ across final-state $b/\bar b$ quarks.
-\end{itemize}
-\begin{columns}[T,onlytextwidth]
-\column{0.5\textwidth}
-\includegraphics[width=0.95\linewidth]{\detokenize{/home/submit/lavezzo/public_html/alphaS/260214_z_bb/hadrons/bhad_allvars_260214_labels/samples_comparison_lhe_bbbar_fin_min_pt.png}}
-\column{0.5\textwidth}
-\includegraphics[width=0.95\linewidth]{\detokenize{/home/submit/lavezzo/public_html/alphaS/260214_z_bb/hadrons/bhad_allvars_260214_labels/samples_comparison_lhe_bbbar_fin_max_pt.png}}
-\end{columns}
-\end{frame}
-
-\begin{frame}{Jet-Level Composition and pT}
-\begin{itemize}
-  \item \small A gen $b$-jet is defined by $\mathrm{hadronFlavour}=5$; $n_{\mathrm{bjets}}$ uses $p_{T}>20\,\mathrm{GeV}$ and $|\eta|<2.5$, while the leading-jet $p_{T}$ panel uses the loose ordered list with $p_{T}>0$ and $|\eta|<10$ (as stored in NanoAOD).
-\end{itemize}
-\begin{columns}[T,onlytextwidth]
-\column{0.5\textwidth}
-\includegraphics[width=0.95\linewidth]{\detokenize{/home/submit/lavezzo/public_html/alphaS/260214_z_bb/hadrons/bhad_allvars_260214_labels/samples_comparison_n_bjets.png}}
-\column{0.5\textwidth}
-\includegraphics[width=0.95\linewidth]{\detokenize{/home/submit/lavezzo/public_html/alphaS/260214_z_bb/hadrons/bhad_allvars_260214_labels/samples_comparison_lead_bjet_pt.png}}
-\end{columns}
-\begin{itemize}
-  \item \small Because gen jets in NanoAOD effectively have a threshold near $20\,\mathrm{GeV}$, many events in the Zbb sample still have no tagged $b$-jets, so this is not a robust swap handle.
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Jet-Level bb Pair Kinematics}
-\begin{itemize}
-  \item \small $m_{bb}^{\mathrm{jet}}$ and $\Delta R_{bb}^{\mathrm{jet}}$ are computed from the leading two gen $b$-jets after requiring $p_{T}>20\,\mathrm{GeV}$ and $|\eta|<2.5$.
-\end{itemize}
-\begin{columns}[T,onlytextwidth]
-\column{0.5\textwidth}
-\includegraphics[width=0.95\linewidth]{\detokenize{/home/submit/lavezzo/public_html/alphaS/260214_z_bb/hadrons/bhad_allvars_260214_labels/samples_comparison_m_bb_jet.png}}
-\column{0.5\textwidth}
-\includegraphics[width=0.95\linewidth]{\detokenize{/home/submit/lavezzo/public_html/alphaS/260214_z_bb/hadrons/bhad_allvars_260214_labels/samples_comparison_dR_bb_jet.png}}
-\end{columns}
-\begin{itemize}
-  \item \small The ratios are relatively flat between the two samples in these jet-pair observables.
-\end{itemize}
-\end{frame}
-
-\begin{frame}{B-hadron Multiplicity and pT}
-\begin{itemize}
-  \item \small $B$ hadrons are selected from final-state GenPart objects using the $B$-hadron identifier; multiplicity and $p_{T}$ observables on this slide require hadron $p_{T}>5\,\mathrm{GeV}$.
-\end{itemize}
-\begin{columns}[T,onlytextwidth]
-\column{0.5\textwidth}
-\includegraphics[width=0.95\linewidth]{\detokenize{/home/submit/lavezzo/public_html/alphaS/260214_z_bb/hadrons/bhad_allvars_260214_labels/samples_comparison_nBhad_pt5.png}}
-\column{0.5\textwidth}
-\includegraphics[width=0.95\linewidth]{\detokenize{/home/submit/lavezzo/public_html/alphaS/260214_z_bb/hadrons/bhad_allvars_260214_labels/samples_comparison_subB_pt5.png}}
-\end{columns}
-\begin{itemize}
-  \item \small Ratios are fairly flat in shape, but there is a sizeable normalization difference; unnormalized swapping would induce an overly large systematic, so a normalized-swap option is motivated.
-\end{itemize}
-\end{frame}
-
-\begin{frame}{B-hadron Pair Kinematics}
-\begin{itemize}
-  \item \small This slide is restricted to events with at least two $B$ hadrons above $5\,\mathrm{GeV}$; pair observables use the leading two selected $B$ hadrons.
-\end{itemize}
-\begin{columns}[T,onlytextwidth]
-\column{0.5\textwidth}
-\includegraphics[width=0.95\linewidth]{\detokenize{/home/submit/lavezzo/public_html/alphaS/260214_z_bb/hadrons/bhad_allvars_260214_labels/samples_comparison_m_bb_had.png}}
-\column{0.5\textwidth}
-\includegraphics[width=0.95\linewidth]{\detokenize{/home/submit/lavezzo/public_html/alphaS/260214_z_bb/hadrons/bhad_allvars_260214_labels/samples_comparison_dR_bb_had.png}}
-\end{columns}
-\end{frame}
-
-\begin{frame}{Swap Procedure on $p_{T}^{V,\mathrm{gen}}$ (Unnormalized)}
-\begin{itemize}
-  \item \small Procedure: select events with at least two $B$ hadrons above $5\,\mathrm{GeV}$ and subleading $B$-hadron $p_T>10\,\mathrm{GeV}$ in both samples; replace the selected 5FS component with the selected 4FS component without extra scaling.
+  \item \small B-hadron definition: GenPart object passing the same bottom-hadron PDG-ID logic with status 1 or 2. Swap definition: select events with at least one such $B$ hadron ($nBhad \geq 1$); corrected distribution is built as 5FS (unselected) + 4FS (selected), with no normalization factor.
 \end{itemize}
 \begin{center}
-\includegraphics[width=0.62\textwidth,height=0.42\textheight,keepaspectratio]{\detokenize{/home/submit/lavezzo/public_html/alphaS/260214_z_bb/hadrons/bhad_allvars_parton_260214_50thr/inclusive_ptVgen.png}}
+\includegraphics[width=0.62\textwidth,height=0.42\textheight,keepaspectratio]{\detokenize{/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_ge1_260216_50thr/inclusive_ptVgen_unnorm_focus.png}}
 \end{center}
 \begin{itemize}
-  \item \small Conclusion: this direct swap induces a too-large systematic because of the normalization difference.
+  \item \small Result: unnormalized swapping gives a sizable normalization shift (not shape-only), so it is too aggressive as-is.
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Swap Procedure on $p_{T}^{V,\mathrm{gen}}$ (Normalized)}
+\begin{frame}{Backup}
+
+\end{frame}
+
+\begin{frame}{Backup: LHE $b\bar{b}$ Kinematics}
 \begin{itemize}
-  \item \small Procedure: same event selection as previous slide, but normalize the selected 4FS component to the selected 5FS yield before replacement.
+  \item \small LHE $b$-quark observables built with $|\mathrm{pdgId}|=5$ and final-state status criteria in the histmaker.
+\end{itemize}
+\begin{columns}[T,onlytextwidth]
+\column{0.5\textwidth}
+\includegraphics[width=0.95\linewidth]{\detokenize{/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_ge1_260216_50thr/samples_comparison_m_bb_lhe_focus.png}}
+\column{0.5\textwidth}
+\includegraphics[width=0.95\linewidth]{\detokenize{/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_ge1_260216_50thr/samples_comparison_dR_bb_lhe_focus.png}}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Backup: GenJet $b$-jet Observables}
+\begin{itemize}
+  \item \small Gen $b$-jets are defined with hadronFlavour = 5; multiplicity uses the standard jet-threshold selection in this study setup.
+\end{itemize}
+\begin{columns}[T,onlytextwidth]
+\column{0.5\textwidth}
+\includegraphics[width=0.95\linewidth]{\detokenize{/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_ge1_260216_50thr/samples_comparison_n_bjets_focus.png}}
+\column{0.5\textwidth}
+\includegraphics[width=0.95\linewidth]{\detokenize{/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_ge1_260216_50thr/samples_comparison_lead_bjet_pt_focus.png}}
+\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{Backup: Exact B-hadron Selection Code}
+\begin{block}{Cleaned Implementation}
+\begin{verbatim}
+// Source of truth: wremnants/include/theoryTools.hpp
+// Use the library helper as authoritative (ignore local implementation differences)
+if (status[i] != 1 && status[i] != 2) continue;
+const int apdg = std::abs(pdgId[i]);
+if (!isBHadron(apdg)) continue;
+idx.push_back((int)i);
+
+// Histmaker usage (w_z_gen_dists.py)
+df = df.Define("bHadIdx", "wrem::finalStateBHadronIdx(GenPart_pdgId, GenPart_status)")
+df = df.Define("bHad_pt", "Take(GenPart_pt, bHadIdx)")
+df = df.Define("nBhad", "static_cast<int>(bHad_pt.size())")
+df = df.Define("bottom_sel", "(bHad_pt.size() >= 1)")
+\end{verbatim}
+\end{block}
+\end{frame}
+
+\begin{frame}{Backup: Unnormalized Swap with 4FS Scaled by 2}
+\begin{itemize}
+  \item \small Same unnormalized swap definition as main slide, but with an extra factor-2 scaling applied to the selected 4FS component before replacement.
 \end{itemize}
 \begin{center}
-\includegraphics[width=0.62\textwidth,height=0.42\textheight,keepaspectratio]{\detokenize{/home/submit/lavezzo/public_html/alphaS/260214_z_bb/hadrons/bhad_allvars_parton_260214_50thr_norm/inclusive_ptVgen_normalized.png}}
+\includegraphics[width=0.62\textwidth,height=0.42\textheight,keepaspectratio]{\detokenize{/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_ge1_260216_50thr/inclusive_ptVgen_unnorm_massiveX2_focus.png}}
 \end{center}
-\begin{itemize}
-  \item \small With normalization, the ratio is much flatter and the effect is more shape-like, making this prescription more suitable as a nuisance candidate, though it may be unphysical.
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Backup: Parton-Flavour Jet Multiplicity and Leading $p_T$}
-\begin{itemize}
-  \item \small Backup check: define jet tags with parton flavour ($|\mathrm{partonFlavour}|=5$) and use the same jet kinematic cuts as in the hadron-flavour study.
-\end{itemize}
-\begin{columns}[T,onlytextwidth]
-\column{0.5\textwidth}
-\includegraphics[width=0.95\linewidth]{\detokenize{/home/submit/lavezzo/public_html/alphaS/260214_z_bb/hadrons/bhad_allvars_parton_260214_50thr/samples_comparison_n_bjets_parton.png}}
-\column{0.5\textwidth}
-\includegraphics[width=0.95\linewidth]{\detokenize{/home/submit/lavezzo/public_html/alphaS/260214_z_bb/hadrons/bhad_allvars_parton_260214_50thr/samples_comparison_lead_bjet_pt_parton.png}}
-\end{columns}
-\begin{itemize}
-  \item \small These parton-flavour-tagged shapes are qualitatively very similar to the hadron-flavour-tagged ones.
-\end{itemize}
-\end{frame}
-
-\begin{frame}{Backup: Parton-Flavour Jet Pair Kinematics}
-\begin{itemize}
-  \item \small Backup check: compare $m_{bb}^{\mathrm{jet}}$ and $\Delta R_{bb}^{\mathrm{jet}}$ built from parton-flavour-tagged jets.
-\end{itemize}
-\begin{columns}[T,onlytextwidth]
-\column{0.5\textwidth}
-\includegraphics[width=0.95\linewidth]{\detokenize{/home/submit/lavezzo/public_html/alphaS/260214_z_bb/hadrons/bhad_allvars_parton_260214_50thr/samples_comparison_m_bb_jet_parton.png}}
-\column{0.5\textwidth}
-\includegraphics[width=0.95\linewidth]{\detokenize{/home/submit/lavezzo/public_html/alphaS/260214_z_bb/hadrons/bhad_allvars_parton_260214_50thr/samples_comparison_dR_bb_jet_parton.png}}
-\end{columns}
-\begin{itemize}
-  \item \small Again, behavior is close to the hadron-flavour case, so this does not materially change the swap-handle conclusion.
-\end{itemize}
 \end{frame}
 
 \end{document}

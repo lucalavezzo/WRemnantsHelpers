@@ -1,0 +1,16 @@
+\frametitle{Backup: Exact B-hadron Selection Code}
+\begin{block}{Cleaned Implementation}
+\begin{verbatim}
+// C++ helper (theoryTools.hpp)
+if (status[i] != 1 && status[i] != 2) continue;
+const int apdg = std::abs(pdgId[i]);
+if (!isBHadron(apdg)) continue;
+idx.push_back((int)i);
+
+// Histmaker usage (w_z_gen_dists.py)
+df = df.Define("bHadIdx", "wrem::finalStateBHadronIdx(GenPart_pdgId, GenPart_status)")
+df = df.Define("bHad_pt", "Take(GenPart_pt, bHadIdx)")
+df = df.Define("nBhad", "static_cast<int>(bHad_pt.size())")
+df = df.Define("bottom_sel", "(bHad_pt.size() >= 1)")
+\end{verbatim}
+\end{block}

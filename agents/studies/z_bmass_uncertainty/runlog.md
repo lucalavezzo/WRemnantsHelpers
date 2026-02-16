@@ -7,7 +7,7 @@
   - `agents/studies/z_bmass_uncertainty/README.md`
 - Updated policy docs to require incremental live updates during studies:
   - `AGENTS.md`
-  - `agents/session_bootstrap.md`
+  - `agents/knowledge/10_environment/runtime_bootstrap.md`
 - Context captured from discussion:
   - Nominal sample: MiNNLO Z in 5FS, massless b.
   - Alternate sample: MiNNLO Z+bbar in 4FS, massive b.
@@ -100,7 +100,7 @@
   - output:
     - `/home/submit/lavezzo/public_html/alphaS/260213_z_bb/hadrons/bhad_diag_260213_143453_logyNB_260213_144851/`
 - Documentation/policy update from discussion:
-  - Updated `AGENTS.md` and `agents/session_bootstrap.md` to require:
+  - Updated `AGENTS.md` and `agents/knowledge/10_environment/runtime_bootstrap.md` to require:
     - explicit guiding questions per study;
     - continuous logging of newly learned knowledge and emerging questions with status.
   - Applied this structure to `agents/studies/z_bmass_uncertainty/README.md`.
@@ -182,8 +182,8 @@
   - output:
     - `agents/studies/z_bmass_uncertainty/slides/z_b_mass_uncertainty_study.tex`
 - Added reusable workflow docs and policy hooks:
-  - `agents/study_slides.md`
-  - updates in `AGENTS.md` and `agents/session_bootstrap.md`.
+  - `agents/knowledge/70_slides/study_slides_workflow.md`
+  - updates in `AGENTS.md` and `agents/knowledge/10_environment/runtime_bootstrap.md`.
 - Compilation check:
   - local and current container environments do not provide `pdflatex`; script now reports this clearly when `--compile` is requested.
 
@@ -192,7 +192,7 @@
   - verify Z-decay lepton flavor in massive sample (`Zbb_MiNNLO`) before further nuisance-iteration work.
 - Policy/documentation update to enforce traceability for new checks:
   - `AGENTS.md`: added rule to log each newly requested hypothesis/check before execution and update status immediately after results.
-  - `agents/session_bootstrap.md`: mirrored the same requirement in runbook update policy.
+  - `agents/knowledge/10_environment/runtime_bootstrap.md`: mirrored the same requirement in runbook update policy.
 - Added dedicated flavor-check utility:
   - `studies/z_bb/check_massive_z_lepton_flavor.py`
   - method: count LHE final-state leptons (`abs(LHEPart_pdgId) == 11,13,15` with `LHEPart_status==1`).
@@ -231,6 +231,355 @@
       - `/home/submit/lavezzo/public_html/alphaS/260214_study_slides/z_b_mass_uncertainty_study.pdf`
     - Validation:
       - `pdfinfo` shows `Producer: pdfTeX-1.40.21`, `Pages: 7`.
+  - Status after run: `answered`.
+
+- User-requested slide refinements:
+  - Status before run: `open`.
+  - Request details:
+    - add an empty separator slide titled `Backup` before backup content;
+    - fix ratio visibility in the unnormalized-swap figure (current panel not showing the interesting region well);
+    - replace vague wording (`study helper`) with explicit B-hadron definition.
+  - Outcome:
+    - produced dedicated unnormalized-swap focus plot with tighter ratio range:
+      - `/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_ge1_260216_50thr/inclusive_ptVgen_unnorm_focus.png`
+    - updated slide definitions in `agents/studies/z_bmass_uncertainty/slides/outline.json`:
+      - explicit B-hadron definition text (PDG-ID bottom-hadron logic + GenPart status 1 or 2) on relevant main slides;
+      - slide-3 figure switched to `inclusive_ptVgen_unnorm_focus.png`;
+      - inserted `Backup` separator slide before backup block.
+    - regenerated and compiled deck:
+      - `agents/studies/z_bmass_uncertainty/slides/z_b_mass_uncertainty_study.pdf`
+    - copied updated deck to shared output name:
+      - `/home/submit/lavezzo/public_html/alphaS/260216_study_slides/study_summary.pdf`
+  - Status after run: `answered`.
+
+- User-requested slide/content pass:
+  - Status before run: `open`.
+  - Request:
+    - add a backup slide with the exact B-hadron selection code (cleaned);
+    - reference that code slide from slide 2;
+    - review all slide plots and adjust ratio ranges so relevant physics features are highlighted, while keeping `1.00` visible.
+
+- User-requested quick check (2026-02-16): should `isBHadron` use `ThePEG::PDT`?
+  - Status before check: `open`.
+  - Audit scope:
+    - inspected current B-hadron selector in:
+      - `/home/submit/lavezzo/alphaS/gh/WRemnants/wremnants/include/theoryTools.hpp`
+      - `/home/submit/lavezzo/alphaS/gh/WRemnants/scripts/histmakers/w_z_gen_dists.py`
+    - compared with duplicate helper implementation in:
+      - `/home/submit/lavezzo/alphaS/WRemnants/wremnants/include/utils.hpp`
+    - searched for existing `ThePEG::PDT` (or HepPID-style) usage in active WRemnants analysis code paths.
+  - Outcome:
+    - current study path already uses a stable local PDG-digit helper and status filtering (`status in {1,2}`) without external generator-package coupling;
+    - no existing `ThePEG::PDT` integration was found in these active analysis code paths.
+  - Decision:
+    - keep current helper behavior for this iteration;
+    - if we revisit this, first unify duplicated `isBHadron` logic in one central WRemnants helper, then benchmark any external-classifier change.
+  - Status after check: `answered`.
+
+- User-requested follow-up check (2026-02-16): force `PDT`-style B-hadron classifier and rerun hist+plots
+  - Status before run: `open`.
+  - Planned action:
+    - modify active helper in `$WREM_BASE/wremnants/include/theoryTools.hpp` to a `PDT`-style bottom-content test;
+    - run `studies/z_bb/make_hists.py` with fresh tag and reduced stats (`20`/`200`);
+    - run `studies/z_bb/plot_narf.py` (unnormalized and normalized) for side-by-side comparison with `bhad_ge1_260216_50thr`.
+  - Implementation:
+    - updated helper in `/home/submit/lavezzo/alphaS/gh/WRemnants/wremnants/include/theoryTools.hpp`:
+      - added `isBHadronLegacy(...)`,
+      - added `isBHadronPDTStyle(...)`,
+      - added switch `kBHadronIdMode` and routed `isBHadron(...)` through that selector.
+    - selected mode for this run: `BHadronIdMode::PDTStyleDigits`.
+  - Execution environment note:
+    - direct host-shell run failed (`ModuleNotFoundError: No module named 'hist'`);
+    - reran in Singularity with helper script `/tmp/wrh_pdt_run.sh`.
+  - Command (container):
+    - `singularity run --bind /scratch/,/work/,/home/,/ceph/ /cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/bendavid/cmswmassdocker/wmassdevrolling\:latest /bin/bash /tmp/wrh_pdt_run.sh`
+  - Produced outputs:
+    - `/scratch/submit/cms/alphaS/260216_gen_massiveBottom/w_z_gen_dists_maxFiles_20_hadronsSel_massive_bhad_pdtstyle_260216_50thr.hdf5`
+    - `/scratch/submit/cms/alphaS/260216_gen_massiveBottom/w_z_gen_dists_maxFiles_200_nnpdf31_hadronsSel_massless_bhad_pdtstyle_260216_50thr.hdf5`
+    - `/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_pdtstyle_260216_50thr/`
+    - `/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_pdtstyle_260216_50thr_norm/`
+  - Key printed diagnostics:
+    - `f(nB>=1), f(nB>=2)`:
+      - nominal: `0.0487`, `0.0405`
+      - massive: `0.9334`, `0.8155`
+    - `% selected for swap`:
+      - massive: `1.0`
+      - nominal: `0.059901`
+    - selected-yield ratio (`5FS/4FS`): `4.618132`
+  - Quick comparison vs baseline `bhad_ge1_260216_50thr`:
+    - nominal selected fraction increased slightly (`0.0574 -> 0.0599`);
+    - selected-yield ratio increased slightly (`4.4254 -> 4.6181`);
+    - massive selected fraction unchanged at `1.0`.
+  - Status after run: `answered`.
+
+- User-requested follow-up (2026-02-16): run both classifiers simultaneously and quantify event-level disagreement
+  - Status before run: `open`.
+  - Implementation:
+    - patched `/home/submit/lavezzo/alphaS/gh/WRemnants/wremnants/include/theoryTools.hpp`:
+      - added explicit index builders:
+        - `finalStateBHadronIdxLegacy(...)`
+        - `finalStateBHadronIdxPDTStyle(...)`
+      - added comparison helper:
+        - `bHadronIdxSymmetricDiffCount(...)`
+    - patched `/home/submit/lavezzo/alphaS/gh/WRemnants/scripts/histmakers/w_z_gen_dists.py`:
+      - added per-event columns:
+        - `bHadIdx_legacy`, `bHadIdx_pdt`,
+        - `nBhad_idx_symdiff`,
+        - `bHad_any_disagree`,
+        - `bottom_sel_disagree`.
+      - added output histograms with matching names for those diagnostics.
+  - Execution:
+    - container script: `/tmp/wrh_bhad_compare.sh`
+    - command:
+      - `singularity run --bind /scratch/,/work/,/home/,/ceph/ /cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/bendavid/cmswmassdocker/wmassdevrolling\:latest /bin/bash /tmp/wrh_bhad_compare.sh`
+    - tag: `bhad_bothcmp_260216_50thr`
+  - Produced files:
+    - `/scratch/submit/cms/alphaS/260216_gen_massiveBottom/w_z_gen_dists_maxFiles_20_hadronsSel_massive_bhad_bothcmp_260216_50thr.hdf5`
+    - `/scratch/submit/cms/alphaS/260216_gen_massiveBottom/w_z_gen_dists_maxFiles_200_nnpdf31_hadronsSel_massless_bhad_bothcmp_260216_50thr.hdf5`
+  - Printed disagreement metrics (weighted):
+    - massive:
+      - `any index disagreement`: `0.05666558`
+      - `bottom_sel disagreement`: `0.00000000`
+      - `mean symmetric-diff count`: `0.05806189`
+    - massless:
+      - `any index disagreement`: `0.00488513`
+      - `bottom_sel disagreement`: `0.00250351`
+      - `mean symmetric-diff count`: `0.00492208`
+  - Outcome:
+    - classifiers do disagree on some events;
+    - disagreement in the broad `bottom_sel` flag (`nBhad>=1`) is zero for massive and small (`~0.25%`) for massless.
+  - Status after run: `answered`.
+
+- User-requested slide pass (2026-02-16): slide-8 source-of-truth wording + `$b$` formatting cleanup
+  - Status before run: `open`.
+  - Actions:
+    - updated `agents/studies/z_bmass_uncertainty/slides/outline.json` slide-8 code header to:
+      - cite `wremnants/include/theoryTools.hpp` as source of truth;
+      - explicitly note to ignore local implementation differences.
+    - fixed generator escaping in `scripts/study_slides.py`:
+      - `render_tex()` now uses `tex_escape_allow_math()` for title/subtitle to preserve `$b$`.
+    - regenerated and compiled slides:
+      - `python scripts/study_slides.py --study-dir agents/studies/z_bmass_uncertainty --compile --copy-pdf-to-plot-dir`
+  - Outputs:
+    - `/home/submit/lavezzo/alphaS/WRemnantsHelpers/agents/studies/z_bmass_uncertainty/slides/b_quark_mass.tex`
+    - `/home/submit/lavezzo/alphaS/WRemnantsHelpers/agents/studies/z_bmass_uncertainty/slides/b_quark_mass.pdf`
+    - `/home/submit/lavezzo/public_html/alphaS/260216_study_slides/b_quark_mass.pdf`
+  - Status after run: `answered`.
+
+- User correction (2026-02-16): slide-8 should use external library helper as source of truth
+  - Status before update: `open`.
+  - Action:
+    - updated slide-8 code snippet in `agents/studies/z_bmass_uncertainty/slides/outline.json` and regenerated deck source.
+    - code now explicitly references external helper:
+      - `ThePEG::PDT::hasBottom(apdg)` as authoritative B-hadron identifier.
+  - Validation:
+    - confirmed in generated `agents/studies/z_bmass_uncertainty/slides/b_quark_mass.tex` lines 91-99.
+  - Build:
+    - regenerated and compiled local slide files (`b_quark_mass.tex`, `b_quark_mass.pdf`).
+    - note: copy to `/home/submit/lavezzo/public_html/...` was blocked by sandbox permissions in this environment.
+  - Status after update: `answered`.
+
+- User-requested slide content update (2026-02-16): latest figures + extra LHE/jet backups
+  - Status before update: `open`.
+  - Actions:
+    - refreshed `agents/studies/z_bmass_uncertainty/slides/outline.json` figure paths to latest tagged plot directory:
+      - `/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_pdtstyle_260216_50thr/`
+      - especially for main B-hadron diagnostics (`leadB_pt`, `nBhad`) and backup figures.
+    - added requested backup LHE slides:
+      - `Backup: LHE Multiplicity (Initial vs Final)` with `n_lhe_init_bbbar`, `n_lhe_fin_bbbar`;
+      - `Backup: LHE Leading-$b$ $p_T$ and Total Multiplicity` with `lhe_bbbar_fin_max_pt`, `n_lhe_bbbar`.
+    - added requested jet-pair slide:
+      - `Backup: GenJet ΔR_bb and m_bb` with `dR_bb_jet`, `m_bb_jet`.
+    - kept backup code slide source-of-truth statement and external helper call (`ThePEG::PDT::hasBottom`).
+    - regenerated and compiled slides from updated outline.
+    - synced generated output to stable filenames:
+      - `agents/studies/z_bmass_uncertainty/slides/b_quark_mass.tex`
+      - `agents/studies/z_bmass_uncertainty/slides/b_quark_mass.pdf`
+  - Status after update: `answered`.
+
+- User-requested rerun (2026-02-16): regenerate all plots from latest inputs and refresh slides
+  - Status before run: `open`.
+  - Request details:
+    - rerun all comparison/swap plots from latest files (including B-hadron plots where no-B events are excluded in the shown variables);
+    - rerun custom backup variant with selected massive component scaled by 2;
+    - update slide figure references to new rerun outputs.
+  - Outcome:
+    - Added focused plot variants used by slides (all with ratio ranges that keep `1.00` visible):
+      - `/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_ge1_260216_50thr/samples_comparison_leadB_pt_focus.png`
+      - `/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_ge1_260216_50thr/samples_comparison_nBhad_focus.png`
+      - `/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_ge1_260216_50thr/samples_comparison_m_bb_lhe_focus.png`
+      - `/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_ge1_260216_50thr/samples_comparison_dR_bb_lhe_focus.png`
+      - `/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_ge1_260216_50thr/samples_comparison_n_bjets_focus.png`
+      - `/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_ge1_260216_50thr/samples_comparison_lead_bjet_pt_focus.png`
+      - `/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_ge1_260216_50thr/inclusive_ptVgen_unnorm_focus.png`
+      - `/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_ge1_260216_50thr/inclusive_ptVgen_unnorm_massiveX2_focus.png`
+    - Updated `agents/studies/z_bmass_uncertainty/slides/outline.json`:
+      - slide 2 now explicitly references backup code slide;
+      - added backup slide `Backup: Exact B-hadron Selection Code` with cleaned exact implementation lines;
+      - switched all relevant slide image paths to focused variants.
+    - Regenerated/compiled deck and updated shared output:
+      - `agents/studies/z_bmass_uncertainty/slides/z_b_mass_uncertainty_study.pdf`
+      - `/home/submit/lavezzo/public_html/alphaS/260216_study_slides/study_summary.pdf`
+      - `pdfinfo`: `Pages: 9`.
+  - Status after run: `answered`.
+
+- User-requested slide polishing:
+  - Status before run: `open`.
+  - Request:
+    - render backup code slide as a true code box;
+    - tighten ratio panels (especially slide 7) to highlight relevant behavior, always including `1.00` and reducing white space.
+  - Outcome:
+    - Updated slide generator (`scripts/study_slides.py`) with new slide type `code`, rendered as LaTeX `frame[fragile]` + `verbatim` block.
+    - Converted `Backup: Exact B-hadron Selection Code` slide in `slides/outline.json` from bullet text to `type: code`.
+    - Regenerated focused plot variants with tighter ratio ranges:
+      - slide 2: `leadB_pt_focus` (`0.20..1.05`), `nBhad_focus` (`0.10..1.05`);
+      - backup LHE: `m_bb_lhe_focus` (`0.50..1.50`), `dR_bb_lhe_focus` (`0.80..1.50`);
+      - backup genJet (slide 7): `n_bjets_focus` (`0.10..1.05`), `lead_bjet_pt_focus` (`0.10..1.05`);
+      - swap panels retained focused windows including 1.00:
+        - `inclusive_ptVgen_unnorm_focus` (`0.90..1.02`);
+        - `inclusive_ptVgen_unnorm_massiveX2_focus` (`0.90..1.10`).
+    - Recompiled and republished:
+      - `agents/studies/z_bmass_uncertainty/slides/z_b_mass_uncertainty_study.pdf`
+      - `/home/submit/lavezzo/public_html/alphaS/260216_study_slides/study_summary.pdf`
+  - Status after run: `answered`.
+
+- User-requested tooling check:
+  - Status before run: `open`.
+  - Request: support sub-points in bullet slides from `slides/outline.json`.
+  - Outcome:
+    - Updated `scripts/study_slides.py` (`render_bullets`) to support nested bullet entries.
+    - Backward compatible: plain string items still work unchanged.
+    - New supported structure per bullet item:
+      - `{\"text\": \"parent\", \"subitems\": [\"child 1\", \"child 2\"]}`
+      - `items` is also accepted as alias for `subitems`.
+    - Validation: `python -m py_compile scripts/study_slides.py` passed.
+  - Status after run: `answered`.
+
+- User-requested slide-generator extension:
+  - Status before run: `open`.
+  - Request: rename `selection_note` concept to `top_items`, and support bullet-style nested structure like `items`.
+  - Outcome:
+    - Updated `scripts/study_slides.py`:
+      - new preferred field for figure/two-figure slides: `top_items`;
+      - supports nested entries using the same schema as `items` (`text` + `subitems`/`items`);
+      - backward compatibility kept for `selection_note` / `selection_note_latex`.
+    - Migrated one existing slide in `slides/outline.json` to `top_items` as a working example.
+    - Validation: script compiles and deck generation succeeded.
+  - Status after run: `answered`.
+
+- User-requested style consistency:
+  - Status before run: `open`.
+  - Request: consistently write the b quark as `$b$` in slide text.
+  - Outcome:
+    - Updated wording in `agents/studies/z_bmass_uncertainty/slides/outline.json` to use `$b$` consistently where referring to the quark (title, sample descriptions, goal text, and backup slide labels/notes).
+    - Recompiled deck successfully:
+      - `agents/studies/z_bmass_uncertainty/slides/b_quark_mass.pdf`
+  - Status after run: `answered`.
+
+- User-requested physics check (resume study, no slide updates):
+  - Status before run: `open`.
+  - Request:
+    - compare dilepton mass for gen leptons and dressed leptons;
+    - compare lepton and dressed-lepton `p_T` and `\eta`;
+    - then also inspect boson variables (`mass`, `p_T`, `\eta`/`|y|`).
+  - Implementation updates in canonical histmaker:
+    - `/home/submit/lavezzo/alphaS/gh/WRemnants/scripts/histmakers/w_z_gen_dists.py`
+      - fixed `singleLeptonHists` + `addBottomAxis` booking bug (`bottom` -> `bottom_sel`);
+      - added dressed single-lepton outputs (lead/sublead by dressed lepton `p_T`):
+        - `nominal_dressedLepPt1`, `nominal_dressedLepPt2`,
+        - `nominal_dressedLepEta1`, `nominal_dressedLepEta2`.
+  - Runs:
+    - first full-stat-like lepton check:
+      - `TAG=lepcheck_260216_50thr`, `maxFiles 20/200`, `-j 50`, `--singleLeptonHists`;
+      - produced:
+        - `/scratch/submit/cms/alphaS/260216_gen_massiveBottom/w_z_gen_dists_maxFiles_20_hadronsSel_massive_lepcheck_260216_50thr.hdf5`
+        - `/scratch/submit/cms/alphaS/260216_gen_massiveBottom/w_z_gen_dists_maxFiles_200_nnpdf31_hadronsSel_massless_lepcheck_260216_50thr.hdf5`
+    - auxiliary follow-up to materialize nominal single-lepton hists:
+      - `TAG=lepcheck_aux_260216_50thr`, `maxFiles 10/100`, `-j 50`, `--singleLeptonHists --auxiliaryHistograms`;
+      - produced:
+        - `/scratch/submit/cms/alphaS/260216_gen_massiveBottom/w_z_gen_dists_maxFiles_10_hadronsSel_massive_lepcheck_aux_260216_50thr.hdf5`
+        - `/scratch/submit/cms/alphaS/260216_gen_massiveBottom/w_z_gen_dists_maxFiles_100_nnpdf31_hadronsSel_massless_lepcheck_aux_260216_50thr.hdf5`
+  - Plot outputs:
+    - `/home/submit/lavezzo/public_html/alphaS/260216_z_bb/leptons/lepcheck_aux_260216_50thr/`
+    - includes:
+      - `ew_mll`, `dressed_mll`;
+      - `nominal_ewLepPt{1,2}`, `nominal_ewLepEta{1,2}`;
+      - `nominal_dressedLepPt{1,2}`, `nominal_dressedLepEta{1,2}`;
+      - boson checks: `boson_prefsr_{mass,pt,absy}`, `boson_ew_{mass,pt,absy}`, `boson_dressed_{mass,pt,absy}`.
+  - Key printed summaries:
+    - `ew_mll`: `mean_5FS=87.54260`, `mean_4FS=87.30912`, `4FS/5FS=0.99733`.
+    - `dressed_mll`: `mean_5FS=55.19474`, `mean_4FS=25.00000`, `4FS/5FS=0.45294`.
+    - `nominal_ewLepPt1`: `4FS/5FS=1.15754`; `nominal_ewLepPt2`: `4FS/5FS=0.96478`.
+    - `boson_prefsr_mass`: `4FS/5FS=1.01476`; `boson_ew_mass`: `4FS/5FS=0.99733`.
+  - Interpretation note:
+    - Dressed-lepton/boson comparisons are strongly impacted by sample flavor mismatch (`Zbb_MiNNLO` here is `ee`-only while dressed definitions are muon-flavor based in this path), so those plots are diagnostic of setup mismatch rather than clean 4FS-vs-5FS physics.
+  - Status after run: `answered`.
+
+- User-requested physics check (resume study, no slide updates):
+  - Status before run: `open`.
+  - Request:
+    - compare dilepton mass for gen leptons and dressed leptons;
+    - compare lepton and dressed-lepton `p_T` and `\eta`;
+    - iterate as study diagnostics only (no slide edits).
+  - Pre-run implementation note:
+    - Added dressed single-lepton histogram booking under `--singleLeptonHists` in canonical histmaker:
+      - `/home/submit/lavezzo/alphaS/gh/WRemnants/scripts/histmakers/w_z_gen_dists.py`
+      - new outputs: `nominal_dressedLepPt1/2`, `nominal_dressedLepEta1/2`.
+
+- User-requested follow-up: add and plot B-hadron multiplicity without any B-hadron pT selection, and rerun with the same tag (overwrite).
+  - Status before run: `open`.
+  - Code updates:
+    - `/home/submit/lavezzo/alphaS/gh/WRemnants/scripts/histmakers/w_z_gen_dists.py`
+      - added `nBhad = static_cast<int>(bHad_pt.size())`
+      - added booked histogram `nBhad` (axis: 10 bins, `-0.5..9.5`)
+    - `studies/z_bb/plot_narf.py`
+      - added `("nBhad", "Number of B hadrons (no $p_T$ cut)", True)` to `plot_specs`.
+  - Rerun (same tag, overwrite in place):
+    - `python studies/z_bb/make_hists.py --tag bhad_ge1_260216_50thr --max-files-massive 20 --max-files-massless 200 --nthreads 50`
+    - `python studies/z_bb/plot_narf.py --massive-file /scratch/submit/cms/alphaS/260216_gen_massiveBottom/w_z_gen_dists_maxFiles_20_hadronsSel_massive_bhad_ge1_260216_50thr.hdf5 --massless-file /scratch/submit/cms/alphaS/260216_gen_massiveBottom/w_z_gen_dists_maxFiles_200_nnpdf31_hadronsSel_massless_bhad_ge1_260216_50thr.hdf5 --tag bhad_ge1_260216_50thr`
+    - `python studies/z_bb/plot_narf.py --massive-file /scratch/submit/cms/alphaS/260216_gen_massiveBottom/w_z_gen_dists_maxFiles_20_hadronsSel_massive_bhad_ge1_260216_50thr.hdf5 --massless-file /scratch/submit/cms/alphaS/260216_gen_massiveBottom/w_z_gen_dists_maxFiles_200_nnpdf31_hadronsSel_massless_bhad_ge1_260216_50thr.hdf5 --tag bhad_ge1_260216_50thr_norm --normalize`
+  - New requested plots:
+    - `/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_ge1_260216_50thr/samples_comparison_nBhad.png`
+    - `/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_ge1_260216_50thr_norm/samples_comparison_nBhad.png`
+  - Status after run: `answered`.
+
+- User-requested follow-up: also plot leading/subleading B hadrons without any B-hadron pT selection.
+  - Status before run: `open`.
+  - Code update:
+    - `studies/z_bb/plot_narf.py`
+      - added `leadB_pt` and `subB_pt` entries to `plot_specs` with labels marked as no-`p_T`-cut.
+  - Replot (same tag, overwrite in place):
+    - `python studies/z_bb/plot_narf.py --massive-file /scratch/submit/cms/alphaS/260216_gen_massiveBottom/w_z_gen_dists_maxFiles_20_hadronsSel_massive_bhad_ge1_260216_50thr.hdf5 --massless-file /scratch/submit/cms/alphaS/260216_gen_massiveBottom/w_z_gen_dists_maxFiles_200_nnpdf31_hadronsSel_massless_bhad_ge1_260216_50thr.hdf5 --tag bhad_ge1_260216_50thr`
+    - `python studies/z_bb/plot_narf.py --massive-file /scratch/submit/cms/alphaS/260216_gen_massiveBottom/w_z_gen_dists_maxFiles_20_hadronsSel_massive_bhad_ge1_260216_50thr.hdf5 --massless-file /scratch/submit/cms/alphaS/260216_gen_massiveBottom/w_z_gen_dists_maxFiles_200_nnpdf31_hadronsSel_massless_bhad_ge1_260216_50thr.hdf5 --tag bhad_ge1_260216_50thr_norm --normalize`
+  - New requested plots:
+    - `/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_ge1_260216_50thr/samples_comparison_leadB_pt.png`
+    - `/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_ge1_260216_50thr/samples_comparison_subB_pt.png`
+    - `/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_ge1_260216_50thr_norm/samples_comparison_leadB_pt.png`
+    - `/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_ge1_260216_50thr_norm/samples_comparison_subB_pt.png`
+  - Status after run: `answered`.
+
+- User-requested summary deck update:
+  - Status before run: `open`.
+  - Request:
+    - Main deck with 3 slides:
+      - slide 1: sample overview, goal, methodology;
+      - slide 2: leading B-hadron pT and number of B hadrons;
+      - slide 3: unnormalized swap result and explicit swap definition.
+    - Backup slides:
+      - LHE plots;
+      - genJet plots;
+      - unnormalized swap variant with additional factor-2 scaling on the 4FS massive selected component.
+  - Outcome update:
+    - Generated new backup plot for requested variant (`unnormalized swap + 4FS x2`):
+      - `/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_ge1_260216_50thr/inclusive_ptVgen_unnorm_massiveX2.png`
+    - Replaced slide outline with requested structure in:
+      - `agents/studies/z_bmass_uncertainty/slides/outline.json`
+      - content: 3 main slides + 3 backup slides (LHE, genJet, swap with 4FS x2), plus title slide.
+    - Regenerated and compiled deck:
+      - `agents/studies/z_bmass_uncertainty/slides/z_b_mass_uncertainty_study.pdf`
+      - `pdfinfo` summary: `Pages: 7`, `Title: Z b-mass Uncertainty Study - 3-Slide Status Summary + Backups`.
+    - Note:
+      - `--copy-pdf-to-plot-dir` failed with permission error for `/home/submit/lavezzo/public_html/alphaS/260216_study_slides`, but compile itself succeeded and PDF is updated in the study folder.
   - Status after run: `answered`.
 - User-requested slide reorganization (2026-02-14):
   - Request: draft first-iteration deck with ordering `goal -> definitions -> (optional short selection scope) -> LHE block -> jets block -> B-hadron block`, then add more slides in a later iteration.
@@ -400,4 +749,86 @@
     - updated knowledge/question tracker statuses and next-step priorities.
   - Cross-check status:
     - README now includes major conclusions currently presented in slides.
+  - Status after run: `answered`.
+
+## 2026-02-16
+- User-requested check: continue the b-mass study with a different swap selection requiring only one B hadron and no additional B-hadron selection.
+  - Status before run: `open`.
+  - Pre-run implementation update:
+    - canonical histmaker selection in `/home/submit/lavezzo/alphaS/gh/WRemnants/scripts/histmakers/w_z_gen_dists.py` changed to:
+      - `bottom_sel = (bHad_pt.size() >= 1)`
+    - updated plot labels/comments in `studies/z_bb/plot_narf.py` to generic `selected` wording (no `1b,1bbar` text).
+  - Run configuration update:
+    - reran with user-requested thread count `50` (after initially launching a lower-thread attempt).
+  - Execution:
+    - `python studies/z_bb/make_hists.py --tag bhad_ge1_260216_50thr --max-files-massive 20 --max-files-massless 200 --nthreads 50`
+    - `python studies/z_bb/plot_narf.py --massive-file /scratch/submit/cms/alphaS/260216_gen_massiveBottom/w_z_gen_dists_maxFiles_20_hadronsSel_massive_bhad_ge1_260216_50thr.hdf5 --massless-file /scratch/submit/cms/alphaS/260216_gen_massiveBottom/w_z_gen_dists_maxFiles_200_nnpdf31_hadronsSel_massless_bhad_ge1_260216_50thr.hdf5 --tag bhad_ge1_260216_50thr`
+    - `python studies/z_bb/plot_narf.py --massive-file /scratch/submit/cms/alphaS/260216_gen_massiveBottom/w_z_gen_dists_maxFiles_20_hadronsSel_massive_bhad_ge1_260216_50thr.hdf5 --massless-file /scratch/submit/cms/alphaS/260216_gen_massiveBottom/w_z_gen_dists_maxFiles_200_nnpdf31_hadronsSel_massless_bhad_ge1_260216_50thr.hdf5 --tag bhad_ge1_260216_50thr_norm --normalize`
+  - Outputs:
+    - `/scratch/submit/cms/alphaS/260216_gen_massiveBottom/w_z_gen_dists_maxFiles_20_hadronsSel_massive_bhad_ge1_260216_50thr.hdf5`
+    - `/scratch/submit/cms/alphaS/260216_gen_massiveBottom/w_z_gen_dists_maxFiles_200_nnpdf31_hadronsSel_massless_bhad_ge1_260216_50thr.hdf5`
+    - `/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_ge1_260216_50thr/`
+    - `/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_ge1_260216_50thr_norm/`
+  - Printed diagnostics:
+    - selected-yield ratio (`5FS/4FS`, selected): `4.425357835503529`
+    - `% selected for swap` massive: `1.0`
+    - `% selected for swap` massless: `0.057400683874713095`
+  - Post-run numeric summary from `nominal_gen`:
+    - unnormalized:
+      - `ptVgen` corrected/nominal min/max/mean = `0.920964 / 0.978550 / 0.955928`
+      - `absYVgen` corrected/nominal min/max/mean = `0.947754 / 0.973756 / 0.956904`
+    - normalized:
+      - `ptVgen` corrected/nominal min/max/mean = `0.984981 / 1.054362 / 0.999523`
+      - `absYVgen` corrected/nominal min/max/mean = `0.976336 / 1.018321 / 0.997990`
+  - Status after run: `answered`.
+
+- User-requested debugging rerun (2026-02-16): book both B-hadron definitions in histmaker, while keeping PDT helper as source of truth for the main selection and all other plots.
+  - Status before run: `open`.
+  - Code updates:
+    - `/home/submit/lavezzo/alphaS/gh/WRemnants/scripts/histmakers/w_z_gen_dists.py`
+      - added explicit parallel definitions:
+        - `bHadIdx_pdt = wrem::finalStateBHadronIdxPDTStyle(...)`
+        - `bHadIdx_legacy = wrem::finalStateBHadronIdxLegacy(...)`
+      - kept nominal path on PDT:
+        - `bHadIdx = bHadIdx_pdt`
+        - `bottom_sel = (bHad_pt.size() >= 1)` (PDT-based)
+      - added legacy debug observables:
+        - `leadB_pt_legacy` filled on `nBhad_legacy >= 1`
+        - `nBhad_legacy` filled on all events
+    - `studies/z_bb/plot_narf.py`
+      - added plotting entries for `leadB_pt_legacy`, `nBhad_legacy`;
+      - added dedicated same-sample PDT-vs-legacy comparison plots:
+        - `bhad_id_compare_massive_leadB_pt`
+        - `bhad_id_compare_massless_leadB_pt`
+        - `bhad_id_compare_massive_nBhad`
+        - `bhad_id_compare_massless_nBhad`
+  - Execution (quick stats as requested):
+    - `python studies/z_bb/make_hists.py --tag bhad_dualdef_260216_50thr_quick --max-files-massive 20 --max-files-massless 200 --nthreads 50`
+    - `python studies/z_bb/plot_narf.py --massive-file /scratch/submit/cms/alphaS/260216_gen_massiveBottom/w_z_gen_dists_maxFiles_20_hadronsSel_massive_bhad_dualdef_260216_50thr_quick.hdf5 --massless-file /scratch/submit/cms/alphaS/260216_gen_massiveBottom/w_z_gen_dists_maxFiles_200_nnpdf31_hadronsSel_massless_bhad_dualdef_260216_50thr_quick.hdf5 --tag bhad_dualdef_260216_50thr_quick`
+    - `python studies/z_bb/plot_narf.py --massive-file /scratch/submit/cms/alphaS/260216_gen_massiveBottom/w_z_gen_dists_maxFiles_20_hadronsSel_massive_bhad_dualdef_260216_50thr_quick.hdf5 --massless-file /scratch/submit/cms/alphaS/260216_gen_massiveBottom/w_z_gen_dists_maxFiles_200_nnpdf31_hadronsSel_massless_bhad_dualdef_260216_50thr_quick.hdf5 --tag bhad_dualdef_260216_50thr_quick_norm --normalize`
+  - Outputs:
+    - `/scratch/submit/cms/alphaS/260216_gen_massiveBottom/w_z_gen_dists_maxFiles_20_hadronsSel_massive_bhad_dualdef_260216_50thr_quick.hdf5`
+    - `/scratch/submit/cms/alphaS/260216_gen_massiveBottom/w_z_gen_dists_maxFiles_200_nnpdf31_hadronsSel_massless_bhad_dualdef_260216_50thr_quick.hdf5`
+    - `/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_dualdef_260216_50thr_quick/`
+    - `/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_dualdef_260216_50thr_quick_norm/`
+  - Printed quick diagnostics from new same-sample comparison:
+    - massive: `nBhad>=1` yield ratio `(Legacy/PDT) = 1.000071`
+    - massless: `nBhad>=1` yield ratio `(Legacy/PDT) = 0.957946`
+  - Status after run: `answered`.
+
+- User-requested plotting fix (2026-02-16): `inclusive_ptVgen` ratio auto-range not focusing on visible region.
+  - Status before run: `open`.
+  - Code update:
+    - `studies/z_bb/plot_narf.py`
+      - extended `auto_rrange_from_ratio(...)` with:
+        - `x_range` support (use only displayed bins, e.g. `0..100` for `ptVgen`);
+        - `min_ref_rel` guard to suppress tiny-reference tail bins that inflate ratios.
+      - applied auto-range to inclusive comparison plot (`nominal` vs `corrected`) instead of fixed `[[0.95,1.05]]`.
+      - applied `x_range=(0,100)` whenever plotting `ptVgen`.
+  - Replot execution:
+    - `python studies/z_bb/plot_narf.py --massive-file /scratch/submit/cms/alphaS/260216_gen_massiveBottom/w_z_gen_dists_maxFiles_20_hadronsSel_massive_bhad_dualdef_260216_50thr_quick.hdf5 --massless-file /scratch/submit/cms/alphaS/260216_gen_massiveBottom/w_z_gen_dists_maxFiles_200_nnpdf31_hadronsSel_massless_bhad_dualdef_260216_50thr_quick.hdf5 --tag bhad_dualdef_260216_50thr_quick_rrfix`
+    - `python studies/z_bb/plot_narf.py --massive-file /scratch/submit/cms/alphaS/260216_gen_massiveBottom/w_z_gen_dists_maxFiles_20_hadronsSel_massive_bhad_dualdef_260216_50thr_quick.hdf5 --massless-file /scratch/submit/cms/alphaS/260216_gen_massiveBottom/w_z_gen_dists_maxFiles_200_nnpdf31_hadronsSel_massless_bhad_dualdef_260216_50thr_quick.hdf5 --tag bhad_dualdef_260216_50thr_quick_rrfix_norm --normalize`
+  - Outputs:
+    - `/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_dualdef_260216_50thr_quick_rrfix/`
+    - `/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_dualdef_260216_50thr_quick_rrfix_norm/`
   - Status after run: `answered`.

@@ -49,27 +49,38 @@ def sanitize_filename(value: str) -> str:
     return value or "study_slides"
 
 
-def render_bullets(slide: dict) -> str:
-    title = tex_escape_allow_math(slide.get("title", ""))
-    items = slide.get("items", [])
-    lines = [rf"\begin{{frame}}{{{title}}}", r"\begin{itemize}"]
-    for item in items:
-        lines.append(rf"  \item {tex_escape_allow_math(str(item))}")
-    lines.extend([r"\end{itemize}", r"\end{frame}"])
-    return "\n".join(lines)
+def _append_nested_items(lines: list[str], entries: list, level: int = 1) -> None:
+    def add_item(entry: object, lvl: int) -> None:
+        indent = "  " * lvl
+        if isinstance(entry, dict):
+            text = tex_escape_allow_math(str(entry.get("text", "")))
+            lines.append(rf"{indent}\item {text}")
+            subitems = entry.get("subitems", entry.get("items", []))
+            if subitems:
+                lines.append(f"{indent}" + r"\begin{itemize}")
+                for sub in subitems:
+                    add_item(sub, lvl + 1)
+                lines.append(f"{indent}" + r"\end{itemize}")
+        else:
+            lines.append(rf"{indent}\item {tex_escape_allow_math(str(entry))}")
+
+    for item in entries:
+        add_item(item, level)
 
 
-def render_figure(slide: dict) -> str:
-    title = tex_escape_allow_math(slide.get("title", ""))
-    path = slide.get("path", "")
-    caption = slide.get("caption")
+def _append_top_itemize(lines: list[str], slide: dict) -> None:
+    # New preferred field: top_items (supports nested bullets).
+    top_items = slide.get("top_items")
+    if top_items is not None:
+        entries = top_items if isinstance(top_items, list) else [top_items]
+        lines.append(r"\begin{itemize}")
+        _append_nested_items(lines, entries, 1)
+        lines.append(r"\end{itemize}")
+        return
+
+    # Backward compatibility with legacy single-note fields.
     selection_note = slide.get("selection_note")
     selection_note_latex = slide.get("selection_note_latex")
-    conclusion_note = slide.get("conclusion_note")
-    conclusion_note_latex = slide.get("conclusion_note_latex")
-    width = slide.get("width", "0.9\\textwidth")
-    height = slide.get("height")
-    lines = [rf"\begin{{frame}}{{{title}}}"]
     if selection_note or selection_note_latex:
         note_text = (
             selection_note_latex if selection_note_latex else tex_escape(selection_note)
@@ -81,6 +92,27 @@ def render_figure(slide: dict) -> str:
                 r"\end{itemize}",
             ]
         )
+
+
+def render_bullets(slide: dict) -> str:
+    title = tex_escape_allow_math(slide.get("title", ""))
+    items = slide.get("items", [])
+    lines = [rf"\begin{{frame}}{{{title}}}", r"\begin{itemize}"]
+    _append_nested_items(lines, items, 1)
+    lines.extend([r"\end{itemize}", r"\end{frame}"])
+    return "\n".join(lines)
+
+
+def render_figure(slide: dict) -> str:
+    title = tex_escape_allow_math(slide.get("title", ""))
+    path = slide.get("path", "")
+    caption = slide.get("caption")
+    conclusion_note = slide.get("conclusion_note")
+    conclusion_note_latex = slide.get("conclusion_note_latex")
+    width = slide.get("width", "0.9\\textwidth")
+    height = slide.get("height")
+    lines = [rf"\begin{{frame}}{{{title}}}"]
+    _append_top_itemize(lines, slide)
     lines.append(r"\begin{center}")
     if height:
         lines.append(
@@ -110,8 +142,6 @@ def render_figure(slide: dict) -> str:
 
 def render_two_figures(slide: dict) -> str:
     title = tex_escape_allow_math(slide.get("title", ""))
-    selection_note = slide.get("selection_note")
-    selection_note_latex = slide.get("selection_note_latex")
     conclusion_note = slide.get("conclusion_note")
     conclusion_note_latex = slide.get("conclusion_note_latex")
     left = slide.get("left", {})
@@ -119,17 +149,7 @@ def render_two_figures(slide: dict) -> str:
     lw = left.get("width", "0.95\\linewidth")
     rw = right.get("width", "0.95\\linewidth")
     lines = [rf"\begin{{frame}}{{{title}}}"]
-    if selection_note or selection_note_latex:
-        note_text = (
-            selection_note_latex if selection_note_latex else tex_escape(selection_note)
-        )
-        lines.extend(
-            [
-                r"\begin{itemize}",
-                rf"  \item \small {note_text}",
-                r"\end{itemize}",
-            ]
-        )
+    _append_top_itemize(lines, slide)
     lines.append(r"\begin{columns}[T,onlytextwidth]")
     lines.append(r"\column{0.5\textwidth}")
     lines.append(
@@ -168,6 +188,23 @@ def render_text(slide: dict) -> str:
     return "\n".join(lines)
 
 
+def render_code(slide: dict) -> str:
+    title = tex_escape_allow_math(slide.get("title", ""))
+    block_title = tex_escape(slide.get("block_title", "Code"))
+    code = slide.get("code", "")
+    code_lines = slide.get("code_lines", [])
+    if code_lines and not code:
+        code = "\n".join(str(x) for x in code_lines)
+    lines = [rf"\begin{{frame}}[fragile]{{{title}}}"]
+    lines.append(rf"\begin{{block}}{{{block_title}}}")
+    lines.append(r"\begin{verbatim}")
+    lines.append(code)
+    lines.append(r"\end{verbatim}")
+    lines.append(r"\end{block}")
+    lines.append(r"\end{frame}")
+    return "\n".join(lines)
+
+
 def render_slide(slide: dict) -> str:
     stype = slide.get("type")
     if stype == "bullets":
@@ -178,12 +215,14 @@ def render_slide(slide: dict) -> str:
         return render_two_figures(slide)
     if stype == "text":
         return render_text(slide)
+    if stype == "code":
+        return render_code(slide)
     raise ValueError(f"Unsupported slide type: {stype}")
 
 
 def render_tex(config: dict) -> str:
-    title = tex_escape(config.get("title", "Study Summary"))
-    subtitle = tex_escape(config.get("subtitle", ""))
+    title = tex_escape_allow_math(config.get("title", "Study Summary"))
+    subtitle = tex_escape_allow_math(config.get("subtitle", ""))
     author = tex_escape(config.get("author", "Codex"))
     date = config.get("date", r"\today")
     theme = tex_escape(config.get("theme", "Madrid"))

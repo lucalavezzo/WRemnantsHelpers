@@ -1,0 +1,152 @@
+\documentclass[10pt]{beamer}
+
+\usetheme{Madrid}
+
+\usepackage{graphicx}
+
+\usepackage{booktabs}
+
+\title{Uncertainty from $b$ quark masses in Z pT spectrum}
+
+\subtitle{Status summary}
+
+\author{AlphaS from Z pT analysis team, CMS}
+
+\date{February 16, 2026}
+
+\begin{document}
+
+\frame{\titlepage}
+
+\begin{frame}{Overview: Samples, Goal, Methodology}
+\begin{itemize}
+  \item Samples:
+  \begin{itemize}
+    \item nominal MiNNLO: massless $b$, 5FS
+    \item dedicated heavy $b$ quark Z$b\bar{b}$ MiNNLO: massive $b$, 4FS. (From arXiv2404.08598.)
+  \end{itemize}
+  \item Using $\sigma=25.28$pb from Table 1 in arXiv2404.08598, but unclear if that is inclusive $\ell=e,\mu$ or for each lepton flavor.
+  \item Goal: build a $b$-mass uncertainty by replacing selected nominal MiNNLO events with an equivalent massive-$b$-quark MiNNLO component.
+  \item Method: select events with at least one gen-level $B$ hadron and build the corrected distribution as nominal MiNNLO (unselected) + massive-$b$ MiNNLO (selected).
+\end{itemize}
+\end{frame}
+
+\begin{frame}{B-Hadron Diagnostics}
+\begin{itemize}
+  \item B hadrons are identified from GenPart using PDG-ID hadron-content logic (contains bottom flavor) with GenPart status 1 or 2.
+  \item These plots use the $p_T>5$ B-hadron observables to exclude events with no reconstructed B hadrons in the shown distributions.
+  \item Exact implementation is shown in backup.
+\end{itemize}
+\begin{columns}[T,onlytextwidth]
+\column{0.5\textwidth}
+\includegraphics[width=0.95\linewidth]{\detokenize{/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_ge1_1730_rerun_260216_1745/samples_comparison_leadB_pt5.png}}
+\column{0.5\textwidth}
+\includegraphics[width=0.95\linewidth]{\detokenize{/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_ge1_1730_rerun_260216_1745/samples_comparison_subB_pt5.png}}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Swap Result and Definition}
+\begin{itemize}
+  \item Swap definition: select events with at least one such $B$ hadron; corrected distribution is built as nominal MiNNLO (unselected) + massive-$b$ MiNNLO (selected).
+\end{itemize}
+\begin{center}
+\includegraphics[width=0.62\textwidth,height=0.42\textheight,keepaspectratio]{\detokenize{/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_ge1_1730_rerun_260216_1745/inclusive_ptVgen.png}}
+\end{center}
+\begin{itemize}
+  \item \small Result: swapping gives a sizable normalization shift (not shape-only), so it is too aggressive as-is.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Backup}
+
+\end{frame}
+
+\begin{frame}{Backup: LHE $b\bar{b}$ Kinematics}
+\begin{itemize}
+  \item \small LHE $b$-quark observables built with $|\mathrm{pdgId}|=5$ and final-state status criteria in the histmaker.
+\end{itemize}
+\begin{columns}[T,onlytextwidth]
+\column{0.5\textwidth}
+\includegraphics[width=0.95\linewidth]{\detokenize{/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_ge1_1730_rerun_260216_1745/samples_comparison_m_bb_lhe.png}}
+\column{0.5\textwidth}
+\includegraphics[width=0.95\linewidth]{\detokenize{/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_ge1_1730_rerun_260216_1745/samples_comparison_dR_bb_lhe.png}}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Backup: LHE Multiplicity (Initial vs Final)}
+\begin{itemize}
+  \item \small Requested LHE multiplicities: number of $b$ quarks in initial and final state.
+\end{itemize}
+\begin{columns}[T,onlytextwidth]
+\column{0.5\textwidth}
+\includegraphics[width=0.95\linewidth]{\detokenize{/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_ge1_1730_rerun_260216_1745/samples_comparison_n_lhe_init_bbbar.png}}
+\column{0.5\textwidth}
+\includegraphics[width=0.95\linewidth]{\detokenize{/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_ge1_1730_rerun_260216_1745/samples_comparison_n_lhe_fin_bbbar.png}}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Backup: LHE Leading-$b$ $p_T$ and Total Multiplicity}
+\begin{itemize}
+  \item \small Requested LHE leading-$b$ observable: final-state maximum $b$-quark $p_T$.
+\end{itemize}
+\begin{columns}[T,onlytextwidth]
+\column{0.5\textwidth}
+\includegraphics[width=0.95\linewidth]{\detokenize{/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_ge1_1730_rerun_260216_1745/samples_comparison_lhe_bbbar_fin_max_pt.png}}
+\column{0.5\textwidth}
+\includegraphics[width=0.95\linewidth]{\detokenize{/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_ge1_1730_rerun_260216_1745/samples_comparison_n_lhe_bbbar.png}}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Backup: GenJet $b$-jet Observables}
+\begin{itemize}
+  \item \small Gen $b$-jets are defined with hadronFlavour = 5; multiplicity uses the standard jet-threshold selection in this study setup.
+\end{itemize}
+\begin{columns}[T,onlytextwidth]
+\column{0.5\textwidth}
+\includegraphics[width=0.95\linewidth]{\detokenize{/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_ge1_1730_rerun_260216_1745/samples_comparison_n_bjets.png}}
+\column{0.5\textwidth}
+\includegraphics[width=0.95\linewidth]{\detokenize{/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_ge1_1730_rerun_260216_1745/samples_comparison_lead_bjet_pt.png}}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Backup: GenJet $\Delta R_{bb}$ and $m_{bb}$}
+\begin{itemize}
+  \item \small Requested jet-level pair observables from gen $b$-jets.
+\end{itemize}
+\begin{columns}[T,onlytextwidth]
+\column{0.5\textwidth}
+\includegraphics[width=0.95\linewidth]{\detokenize{/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_ge1_1730_rerun_260216_1745/samples_comparison_dR_bb_jet.png}}
+\column{0.5\textwidth}
+\includegraphics[width=0.95\linewidth]{\detokenize{/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_ge1_1730_rerun_260216_1745/samples_comparison_m_bb_jet.png}}
+\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{Backup: Exact B-hadron Selection Code}
+\begin{block}{Implementation}
+\begin{verbatim}
+// Source of truth: external library helper (ThePEG::PDT, from its .hpp)
+// Treat this external helper as authoritative for B-hadron ID
+if (status[i] != 1 && status[i] != 2) continue;
+const int apdg = std::abs(pdgId[i]);
+if (!ThePEG::PDT::hasBottom(apdg)) continue;
+idx.push_back((int)i);
+
+// Histmaker usage
+df = df.Define("bHadIdx", "wrem::finalStateBHadronIdx(GenPart_pdgId, GenPart_status)")
+df = df.Define("bHad_pt", "Take(GenPart_pt, bHadIdx)")
+df = df.Define("nBhad", "static_cast<int>(bHad_pt.size())")
+df = df.Define("bottom_sel", "(bHad_pt.size() >= 1)")
+\end{verbatim}
+\end{block}
+\end{frame}
+
+\begin{frame}{Backup: Unnormalized Swap with 4FS Scaled by 2}
+\begin{itemize}
+  \item \small Same unnormalized swap definition as main slide, but with an extra factor-2 scaling applied to the selected 4FS component before replacement.
+\end{itemize}
+\begin{center}
+\includegraphics[width=0.62\textwidth,height=0.42\textheight,keepaspectratio]{\detokenize{/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_ge1_1730_rerun_260216_1745/inclusive_ptVgen_unnorm_massiveX2_focus.png}}
+\end{center}
+\end{frame}
+
+\end{document}
