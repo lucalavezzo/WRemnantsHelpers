@@ -187,6 +187,9 @@ if should_run 4; then
   #   --varLabel "CT18Z 22 (Avg.)" "CT18Z 4 (Diff.)" "CT18Z 26 (Diff.)" \
   #   --yscale 1.25 --noExtraText --subtitle ${SUBTITLE} --lowerLegPos "upper right" \
   #   --noData --postfix pdfs --showVariations both
+
+  # b quark mass
+  python scripts/plot_corr_hists.py $WREM_BASE/wremnants-data/data/TheoryCorrections/MiNNLO_Zbb_CorrZ.pkl.lz4 --corr Z --corrName 'MiNNLO_Zbb' --axis ptVgen --varAxis vars --vars 'mb_up' --xlim 0 200 --binwnorm 1 -o $MY_AN_DIR/Figures/uncertainties/
 fi
 
 # -------------------------- #
