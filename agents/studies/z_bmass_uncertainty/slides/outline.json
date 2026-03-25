@@ -2,7 +2,7 @@
   "title": "Uncertainty from $b$ quark masses in Z pT spectrum",
   "subtitle": "Status summary",
   "author": "AlphaS from Z pT analysis team, CMS",
-  "date": "February 16, 2026",
+  "date": "February 18, 2026",
   "theme": "Madrid",
   "slides": [
     {
@@ -10,48 +10,59 @@
       "title": "Overview: Samples, Goal, Methodology",
       "items": [
         {
+          "text": "Goal: build a $b$-mass uncertainty to apply to our simulation, since our nominal MiNNLO treats $b$'s as massless.",
+          "subitems": ["N.B.: we are already accounting for heavy quark mass effects in PDFs."]
+        },
+        {
+          "text": "Method:",
+          "subitems": [
+            "select events affected by heavy $b$ quark mass.",
+            "Build a corrected distribution as massless-$b$ MiNNLO (unselected) + massive-$b$ MiNNLO (selected).",
+            "The difference between the corrected distribution and the nominal MiNNLO is taken as an uncertainty."
+          ]
+        },
+        "We attempted to use the B hadrons to define the set of events that should be swapped, but it doesn't seem to work nicely. We looked at jets and LHE quarks as well, see backup.",
+        {
           "text": "Samples:",
           "subitems": [
             "nominal MiNNLO: massless $b$, 5FS",
-            "dedicated heavy $b$ quark Z$b\\bar{b}$ MiNNLO: massive $b$, 4FS. (From arXiv2404.08598.)"
+            "dedicated heavy $b$ quark Z$b\\bar{b}$ MiNNLO: massive $b$, 4FS. (From arXiv2404.08598: $\\sigma=25.28$pb from Table 1, but unclear if that is inclusive $\\ell=e,\\mu$ or for each lepton flavor.)"
           ]
-        },
-        "Using $\\sigma=25.28$pb from Table 1 in arXiv2404.08598, but unclear if that is inclusive $\\ell=e,\\mu$ or for each lepton flavor.",
-        "Goal: build a $b$-mass uncertainty by replacing selected nominal MiNNLO events with an equivalent massive-$b$-quark MiNNLO component.",
-        "Method: select events with at least one gen-level $B$ hadron and build the corrected distribution as nominal MiNNLO (unselected) + massive-$b$ MiNNLO (selected)."
+        }
       ]
     },
     {
       "type": "two_figures",
-      "title": "B-Hadron Diagnostics (No B-hadron $p_T$ Cut)",
+      "title": "B-Hadron Diagnostics",
       "top_items": [
         {
-          "text": "B hadrons are identified from GenPart using PDG-ID hadron-content logic (contains bottom flavor) with GenPart status 1 or 2."
-        },
-        {
-          "text": "Shown without B-hadron $p_T$ cuts: leading B-hadron $p_T$ and B-hadron multiplicity."
-        },
-        {
-          "text": "Exact implementation is shown in backup."
+          "text": "B hadrons are identified from GenPart using PDG-ID hadron-content logic (contains bottom flavor) with GenPart status 1 or 2.",
+          "subitems": ["Exact implementation is shown in backup."]
         }
       ],
       "left": {
-        "path": "/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_dualdef_260216_50thr_quick_rrfix/samples_comparison_leadB_pt.png"
+        "path": "/home/submit/lavezzo/public_html/alphaS/260218_z_bb/hadrons/bhad_hiStat_260218_200thr_genmother_iter2_m91w30_refresh/samples_comparison_leadB_pt.png"
       },
       "right": {
-        "path": "/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_dualdef_260216_50thr_quick_rrfix/samples_comparison_nBhad.png"
-      }
+        "path": "/home/submit/lavezzo/public_html/alphaS/260218_z_bb/hadrons/bhad_hiStat_260218_200thr_genmother_iter2_m91w30_refresh/samples_comparison_nBhad.png"
+      },
+      "conclusion_items_latex": [
+        "Large, unexplained normalization difference, on top of what may be a reasonable shape difference at low $p_T$."
+      ]
     },
     {
       "type": "figure",
       "title": "Swap Result and Definition",
       "top_items": [
         {
-          "text": "Swap definition: select events with at least one such $B$ hadron; corrected distribution is built as nominal MiNNLO (unselected) + massive-$b$ MiNNLO (selected)."
+          "text": "Swap definition: select events with at least one such $B$ hadron (no $p_T$ selection); corrected distribution is built as nominal MiNNLO (unselected) + massive-$b$ MiNNLO (selected)."
         }
       ],
-      "conclusion_note_latex": "Result: swapping gives a sizable normalization shift (not shape-only), so it is too aggressive as-is.",
-      "path": "/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_dualdef_260216_50thr_quick_rrfix/inclusive_ptVgen.png",
+      "conclusion_items_latex": [
+        "Result: swapping gives a sizable normalization shift (not shape-only), so it is too aggressive as-is.",
+        "Questions: is this due to correct normalization difference between samples? Are we selecting more events from the nominal MiNNLO than the ones we are putting back in from the massive-$b$ MiNNLO? Or is it something else?"
+      ],
+      "path": "/home/submit/lavezzo/public_html/alphaS/260218_z_bb/hadrons/bhad_hiStat_260218_200thr_genmother_iter2_m91w30_refresh/inclusive_ptVgen.png",
       "width": "0.62\\textwidth",
       "height": "0.42\\textheight"
     },
@@ -62,8 +73,30 @@
     },
     {
       "type": "two_figures",
+      "title": "Backup: LHE Multiplicity",
+      "selection_note_latex": "LHE $b$-quark observables built with $|\\mathrm{pdgId}|=5$ and final-state status.",
+      "left": {
+        "path": "/home/submit/lavezzo/public_html/alphaS/260218_z_bb/hadrons/bhad_hiStat_260218_200thr_genmother_iter2_m91w30_refresh/samples_comparison_n_lhe_init_bbbar.png"
+      },
+      "right": {
+        "path": "/home/submit/lavezzo/public_html/alphaS/260218_z_bb/hadrons/bhad_hiStat_260218_200thr_genmother_iter2_m91w30_refresh/samples_comparison_n_lhe_fin_bbbar.png"
+      }
+    },
+    {
+      "type": "two_figures",
+      "title": "Backup: LHE Leading-$b$ $p_T$ and Total Multiplicity",
+      "selection_note_latex": "LHE $b$-quark observables built with $|\\mathrm{pdgId}|=5$ and final-state status.",
+      "left": {
+        "path": "/home/submit/lavezzo/public_html/alphaS/260218_z_bb/hadrons/bhad_hiStat_260218_200thr_genmother_iter2_m91w30_refresh/samples_comparison_lhe_bbbar_fin_max_pt.png"
+      },
+      "right": {
+        "path": "/home/submit/lavezzo/public_html/alphaS/260218_z_bb/hadrons/bhad_hiStat_260218_200thr_genmother_iter2_m91w30_refresh/samples_comparison_n_lhe_bbbar.png"
+      }
+    },
+    {
+      "type": "two_figures",
       "title": "Backup: LHE $b\\bar{b}$ Kinematics",
-      "selection_note_latex": "LHE $b$-quark observables built with $|\\mathrm{pdgId}|=5$ and final-state status criteria in the histmaker.",
+      "selection_note_latex": "LHE $b$-quark observables built with $|\\mathrm{pdgId}|=5$ and final-state status.",
       "left": {
         "path": "/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_dualdef_260216_50thr_quick_rrfix/samples_comparison_m_bb_lhe.png"
       },
@@ -73,46 +106,24 @@
     },
     {
       "type": "two_figures",
-      "title": "Backup: LHE Multiplicity (Initial vs Final)",
-      "selection_note_latex": "LHE multiplicities: number of $b$ quarks in initial and final state.",
-      "left": {
-        "path": "/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_dualdef_260216_50thr_quick_rrfix/samples_comparison_n_lhe_init_bbbar.png"
-      },
-      "right": {
-        "path": "/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_dualdef_260216_50thr_quick_rrfix/samples_comparison_n_lhe_fin_bbbar.png"
-      }
-    },
-    {
-      "type": "two_figures",
-      "title": "Backup: LHE Leading-$b$ $p_T$ and Total Multiplicity",
-      "selection_note_latex": "LHE leading-$b$ observable: final-state maximum $b$-quark $p_T$.",
-      "left": {
-        "path": "/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_dualdef_260216_50thr_quick_rrfix/samples_comparison_lhe_bbbar_fin_max_pt.png"
-      },
-      "right": {
-        "path": "/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_dualdef_260216_50thr_quick_rrfix/samples_comparison_n_lhe_bbbar.png"
-      }
-    },
-    {
-      "type": "two_figures",
       "title": "Backup: GenJet $b$-jet Observables",
-      "selection_note_latex": "Gen $b$-jet multiplicity is defined exactly as: count jets with hadronFlavour = 5, $p_T > 20\\,\\mathrm{GeV}$, and $|\\eta| < 2.5$.",
+      "selection_note_latex": "Gen $b$-jet observables here use hadronFlavour = 5 with no kinematic requirement ($p_T > 0$, $|\\eta| < 10$).",
       "left": {
-        "path": "/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_dualdef_260216_50thr_quick_rrfix/samples_comparison_n_bjets.png"
+        "path": "/home/submit/lavezzo/public_html/alphaS/260218_z_bb/hadrons/bhad_hiStat_260218_200thr_genmother_iter2_m91w30_refresh/samples_comparison_n_bjets.png"
       },
       "right": {
-        "path": "/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_dualdef_260216_50thr_quick_rrfix/samples_comparison_lead_bjet_pt.png"
+        "path": "/home/submit/lavezzo/public_html/alphaS/260218_z_bb/hadrons/bhad_hiStat_260218_200thr_genmother_iter2_m91w30_refresh/samples_comparison_lead_bjet_pt.png"
       }
     },
     {
       "type": "two_figures",
       "title": "Backup: GenJet $\\Delta R_{bb}$ and $m_{bb}$",
-      "selection_note_latex": "Jet-level pair observables from gen $b$-jets (same jet definition: hadronFlavour = 5, $p_T > 20\\,\\mathrm{GeV}$, $|\\eta| < 2.5$).",
+      "selection_note_latex": "Jet-level pair observables from gen $b$-jets, with the same no-cut jet definition (hadronFlavour = 5, $p_T > 0$, $|\\eta| < 10$).",
       "left": {
-        "path": "/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_dualdef_260216_50thr_quick_rrfix/samples_comparison_dR_bb_jet.png"
+        "path": "/home/submit/lavezzo/public_html/alphaS/260218_z_bb/hadrons/bhad_hiStat_260218_200thr_genmother_iter2_m91w30_refresh/samples_comparison_dR_bb_jet.png"
       },
       "right": {
-        "path": "/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_dualdef_260216_50thr_quick_rrfix/samples_comparison_m_bb_jet.png"
+        "path": "/home/submit/lavezzo/public_html/alphaS/260218_z_bb/hadrons/bhad_hiStat_260218_200thr_genmother_iter2_m91w30_refresh/samples_comparison_m_bb_jet.png"
       }
     },
     {
@@ -120,25 +131,32 @@
       "title": "Backup: Exact B-hadron Selection Code",
       "block_title": "Implementation",
       "code_lines": [
-        "// Source of truth: external library helper (ThePEG::PDT, from its .hpp)",
-        "// Treat this external helper as authoritative for B-hadron ID",
-        "if (status[i] != 1 && status[i] != 2) continue;",
-        "const int apdg = std::abs(pdgId[i]);",
-        "if (!ThePEG::PDT::hasBottom(apdg)) continue;",
-        "idx.push_back((int)i);",
-        "",
-        "// Histmaker usage",
-        "df = df.Define(\"bHadIdx\", \"wrem::finalStateBHadronIdx(GenPart_pdgId, GenPart_status)\")",
-        "df = df.Define(\"bHad_pt\", \"Take(GenPart_pt, bHadIdx)\")",
-        "df = df.Define(\"nBhad\", \"static_cast<int>(bHad_pt.size())\")",
-        "df = df.Define(\"bottom_sel\", \"(bHad_pt.size() >= 1)\")"
+        "inline bool isBHadron(int pdgId)",
+        "{",
+        "    int64_t id = std::llabs(static_cast<int64_t>(pdgId));",
+
+        "    // Non-hadrons / fundamentals",
+        "    if (id < 100) return false;",
+
+        "    // Reject nuclei/ions.",
+        "    if (id >= 1000000000LL) return false;",
+
+        "    int nq1 = static_cast<int>((id / 1000) % 10);",
+        "    int nq2 = static_cast<int>((id / 100)  % 10);",
+        "    int nq3 = static_cast<int>((id / 10)   % 10);",
+
+        "    // Exclude diquarks.",
+        "    if (nq3 == 0) return false;",
+
+        "    return (nq1 == 5) || (nq2 == 5) || (nq3 == 5);",
+        "}"
       ]
     },
     {
       "type": "figure",
       "title": "Backup: Unnormalized Swap with 4FS Scaled by 2",
       "selection_note_latex": "Same unnormalized swap definition as main slide, but with an extra factor-2 scaling applied to the selected 4FS component before replacement.",
-      "path": "/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_dualdef_260216_50thr_quick_rrfix/inclusive_ptVgen_unnorm_massiveX2_focus.png",
+      "path": "/home/submit/lavezzo/public_html/alphaS/260218_z_bb/hadrons/bhad_hiStat_260218_200thr_genmother_iter2_m91w30_x2/inclusive_ptVgen_x2.png",
       "width": "0.62\\textwidth",
       "height": "0.42\\textheight"
     }

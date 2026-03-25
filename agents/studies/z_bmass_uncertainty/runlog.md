@@ -832,3 +832,1082 @@
     - `/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_dualdef_260216_50thr_quick_rrfix/`
     - `/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_dualdef_260216_50thr_quick_rrfix_norm/`
   - Status after run: `answered`.
+
+- User-requested slide refresh (2026-02-16): update slides to latest plots after ratio-range fix.
+  - Status before run: `open`.
+  - Slide input update:
+    - `agents/studies/z_bmass_uncertainty/slides/outline.json`
+      - repointed plot paths from:
+        - `.../bhad_pdtstyle_rfix_260216_1805/...`
+      - to latest:
+        - `.../bhad_dualdef_260216_50thr_quick_rrfix/...`
+    - all referenced plots resolved; copied missing backup figure:
+      - `inclusive_ptVgen_unnorm_massiveX2_focus.png`
+      - from old directory into new `...quick_rrfix/` directory.
+  - Compile/copy:
+    - `python scripts/study_slides.py --study-dir agents/studies/z_bmass_uncertainty --compile --copy-pdf-to-plot-dir`
+    - generated:
+      - `agents/studies/z_bmass_uncertainty/slides/uncertainty_from_b_quark_masses_in_z_pt_spectrum.pdf`
+    - copied to:
+      - `/home/submit/lavezzo/public_html/alphaS/260216_study_slides/uncertainty_from_b_quark_masses_in_z_pt_spectrum.pdf`
+    - synced standard deck naming for convenience:
+      - `agents/studies/z_bmass_uncertainty/slides/b_quark_mass.pdf`
+      - `/home/submit/lavezzo/public_html/alphaS/260216_study_slides/b_quark_mass.pdf`
+      - and corresponding `.tex`.
+  - Status after run: `answered`.
+
+- User-requested update (2026-02-16): remove gen-level kinematic cuts on gen b-jet observables, remake jet plots, and refresh slides without changing text/order.
+  - Status before run: `open`.
+  - Histmaker change:
+    - `/home/submit/lavezzo/alphaS/gh/WRemnants/scripts/histmakers/w_z_gen_dists.py`
+      - changed hadron-flavour and parton-flavour jet selections from `(p_T>20, |eta|<2.5)` to `(p_T>0, |eta|<10)` for:
+        - `n_bjets`, `bb_kin` (`m_bb_jet`, `dR_bb_jet`)
+        - `n_bjets_parton`, `bb_kin_parton` (`m_bb_jet_parton`, `dR_bb_jet_parton`)
+  - Rerun:
+    - `python studies/z_bb/make_hists.py --tag bhad_jetnocut_260216_50thr --max-files-massive 20 --max-files-massless 200 --nthreads 50`
+    - `python studies/z_bb/plot_narf.py --massive-file /scratch/submit/cms/alphaS/260216_gen_massiveBottom/w_z_gen_dists_maxFiles_20_hadronsSel_massive_bhad_jetnocut_260216_50thr.hdf5 --massless-file /scratch/submit/cms/alphaS/260216_gen_massiveBottom/w_z_gen_dists_maxFiles_200_nnpdf31_hadronsSel_massless_bhad_jetnocut_260216_50thr.hdf5 --tag bhad_jetnocut_260216_50thr_plots`
+  - Slide-asset update (no outline/text reordering edits):
+    - replaced only the four jet figures referenced by current outline, in-place under:
+      - `/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_dualdef_260216_50thr_quick_rrfix/`
+      - files replaced:
+        - `samples_comparison_n_bjets.*`
+        - `samples_comparison_lead_bjet_pt.*`
+        - `samples_comparison_dR_bb_jet.*`
+        - `samples_comparison_m_bb_jet.*`
+  - Slides recompiled/synced:
+    - `agents/studies/z_bmass_uncertainty/slides/b_quark_mass.pdf`
+    - `/home/submit/lavezzo/public_html/alphaS/260216_study_slides/b_quark_mass.pdf`
+    - `pdfinfo` check passed (12 pages).
+  - Status after run: `answered`.
+
+- User-requested slide fixes (2026-02-16): update jet-slide captions and ensure last backup slide uses 3-component swap plot.
+  - Status before run: `open`.
+  - Outline updates (no reordering/content restructure):
+    - `agents/studies/z_bmass_uncertainty/slides/outline.json`
+      - jet slide captions updated to no-cut definition:
+        - hadronFlavour = 5, with $p_T > 0$ and $|\\eta| < 10$.
+  - Last-slide figure update:
+    - regenerated:
+      - `/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_dualdef_260216_50thr_quick_rrfix/inclusive_ptVgen_unnorm_massiveX2_focus.png`
+    - plotting content now explicitly:
+      - `Nominal MiNNLO (inclusive)`,
+      - `Nominal MiNNLO (b's subtracted)`,
+      - `Corrected MiNNLO (inclusive, 4FS x2)`.
+  - Recompiled and copied slides:
+    - `agents/studies/z_bmass_uncertainty/slides/b_quark_mass.pdf`
+    - `/home/submit/lavezzo/public_html/alphaS/260216_study_slides/b_quark_mass.pdf`
+    - Verified final shared PDF with `pdfinfo` (valid, 12 pages).
+  - Status after run: `answered`.
+
+- User-requested follow-up (2026-02-16): fix ratio panel on last backup slide.
+  - Status before run: `open`.
+  - Action:
+    - Regenerated
+      - `/home/submit/lavezzo/public_html/alphaS/260216_z_bb/hadrons/bhad_dualdef_260216_50thr_quick_rrfix/inclusive_ptVgen_unnorm_massiveX2_focus.png`
+    - Ratio-range now computed from both non-reference curves (`subtracted`, `corrected x2`) in visible `ptVgen` range (`0..100`) with low-stat tail suppression.
+  - Slides:
+    - Recompiled and recopied:
+      - `agents/studies/z_bmass_uncertainty/slides/b_quark_mass.pdf`
+      - `/home/submit/lavezzo/public_html/alphaS/260216_study_slides/b_quark_mass.pdf`
+    - `pdfinfo` check passed (creation time `2026-02-16 18:54:13 EST`).
+  - Status after run: `answered`.
+
+## 2026-02-18
+- User-requested check: resume the b-quark-mass study and read paper `https://arxiv.org/pdf/1803.04336`.
+  - Status before run: `open`.
+  - Network/download path:
+    - direct web-tool fetch of the PDF was unavailable in this environment;
+    - downloaded with:
+      - `curl -L https://arxiv.org/pdf/1803.04336 -o /tmp/bmass_paper/1803.04336.pdf`
+    - extracted text with:
+      - `pdftotext /tmp/bmass_paper/1803.04336.pdf /tmp/bmass_paper/1803.04336.txt`
+    - mined key sections via:
+      - `rg -n "4FS|5FS|B hadron|merge|R\\(p|mW"` and targeted `sed` ranges.
+  - Key extracted technical points:
+    - proposed combination (Eq. 4.1):
+      - `dσ_mass = dσ_(5FS-Bveto) + dσ_(4FS)` with orthogonal event classes defined using B hadrons;
+    - shape ratio (Eq. 4.2):
+      - `R(pT) = normalized(dσ_mass/dpT) / normalized(dσ_5FS/dpT)`;
+    - observed NC-DY impact near Z peak:
+      - typically within about `+-1%` in `pT(ll)` shape;
+    - reported CC transfer effect:
+      - resulting `mW` shift generally below `5 MeV`.
+  - Study implication recorded:
+    - Our current normalized swap is qualitatively consistent with a small shape effect, but the implementation should be reframed toward explicit `5FS_Bveto + 4FS_Binclusive` bookkeeping to avoid normalization artefacts from direct replacement.
+  - Documentation updates:
+    - `agents/studies/z_bmass_uncertainty/README.md`
+      - added a new guiding question referencing arXiv:1803.04336 mapping;
+      - added a dated paper-synthesis section with concrete next implementation step.
+  - Status after run: `answered`.
+
+- User-requested rigor follow-up: read full paper carefully (not snippets) and identify missing pieces in our implementation.
+  - Status before run: `open`.
+  - Action:
+    - completed full section pass over text extract (`Sections 1-6`, `Appendix A`) using sequential `sed` windows and appendix-focused scans.
+  - Key added findings:
+    - Eq. (4.2) in paper is based on fiducial-normalized shapes; our current plotting/correction path (`studies/z_bb/plot_narf.py`, `studies/z_bb/make_zbb_corr.py`) does not normalize the final inclusive spectra to unit fiducial integral by default.
+    - Paper assumes consistent leptonic content between compared samples; our known `Zbb_MiNNLO` `ee`-only mismatch remains a major caveat.
+    - Paper uncertainty treatment includes matching/PS variations (`mu_sh`, POWHEG `h`, PS model choice), while our current nuisance scan does not yet propagate this envelope.
+    - Paper reports nontrivial invariant-mass-bin dependence of the correction; our current checks are mostly inclusive.
+    - Paper CC propagation uses transfer-function logic (`R`, then `1/R` reweighting for CC proxy); not yet implemented in this branch.
+  - Documentation updates:
+    - appended gap audit to `agents/studies/z_bmass_uncertainty/README.md`.
+  - Status after run: `answered`.
+
+- User-requested follow-up: review cleaned histmaker changes, rerun with higher stats (`massive=-1`, `massless=1000`, `nthreads=200`), and regenerate plots.
+  - Status before run: `open`.
+  - Review findings and fixes applied before production:
+    - `scripts/histmakers/w_z_gen_dists.py`:
+      - fixed new `--addBottomAxis` fiducial filter to use defined preFSR columns by first defining preFSR gen level (`define_gen_level(..., ['prefsr'])`) and then filtering on `prefsr{,Other}Lep_{pt,absEta}`;
+      - fixed LHE bb histogram column mapping:
+        - `presel_m_bb`/`postsel_m_bb`: `m_bb` -> `m_bb_lhe`;
+        - `presel_dR_bb`/`postsel_dR_bb`: `dR_bb` -> `dR_bb_lhe`.
+    - `wremnants/include/theoryTools.hpp`:
+      - fixed compile blocker in `finalStateBHadronIdx`: `isBHadronLegacy` -> `isBHadron`.
+    - `studies/z_bb/plot_narf.py`:
+      - added histogram-key resolver to support both legacy names and new `presel_*` names.
+  - Validation:
+    - container smoke run (`1` massive + `1` massless file) passed end-to-end after fixes.
+  - High-stat run command (in Singularity):
+    - `python studies/z_bb/make_hists.py --tag bhad_hiStat_260218_200thr --max-files-massive -1 --max-files-massless 1000 --nthreads 200`
+    - followed by:
+      - `python studies/z_bb/plot_narf.py ... --tag bhad_hiStat_260218_200thr`
+      - `python studies/z_bb/plot_narf.py ... --tag bhad_hiStat_260218_200thr_norm --normalize`
+  - Produced files:
+    - `/scratch/submit/cms/alphaS/260218_gen_massiveBottom/w_z_gen_dists_maxFiles_m1_hadronsSel_massive_bhad_hiStat_260218_200thr.hdf5`
+    - `/scratch/submit/cms/alphaS/260218_gen_massiveBottom/w_z_gen_dists_maxFiles_1000_nnpdf31_hadronsSel_massless_bhad_hiStat_260218_200thr.hdf5`
+  - Plot outputs:
+    - unnormalized: `/home/submit/lavezzo/public_html/alphaS/260218_z_bb/hadrons/bhad_hiStat_260218_200thr/`
+    - normalized: `/home/submit/lavezzo/public_html/alphaS/260218_z_bb/hadrons/bhad_hiStat_260218_200thr_norm/`
+  - Key diagnostics:
+    - `% selected for swap` (4FS massive): `1.0`
+    - `% selected for swap` (5FS nominal): `0.066702254213194`
+    - selected-yield ratio (`5FS/4FS`, selected): `3.814260032626388`
+  - Status after run: `answered`.
+
+- User-requested check: add a Table-1-like initial-state flavor contribution histogram (LHE-level), preselection only.
+  - Status before run: `open`.
+  - Implemented in `/home/submit/lavezzo/alphaS/gh/WRemnants/scripts/histmakers/w_z_gen_dists.py`:
+    - event-level incoming-flavor code from `LHEPart_status==-1`:
+      - `lhe_init_flavor_bin = 0..5` with mapping
+        - `0=other/mixed`, `1=ddbar`, `2=uubar`, `3=ssbar`, `4=ccbar`, `5=bbbar`.
+    - new preselection histogram:
+      - `presel_lhe_init_flavor`.
+    - no post-selection flavor histogram added (as requested).
+  - Plotting updates in `studies/z_bb/plot_narf.py`:
+    - added `lhe_init_flavor` to `plot_specs`;
+    - added printed table-like fractions from resolved histogram key (`lhe_init_flavor` / `presel_lhe_init_flavor`).
+  - Validation run (container smoke):
+    - `python studies/z_bb/make_hists.py --tag smoke_initflavor_260218 --max-files-massive 1 --max-files-massless 1 --nthreads 20`
+    - `python studies/z_bb/plot_narf.py --massive-file ... --massless-file ... --tag smoke_initflavor_260218`
+    - output:
+      - `/home/submit/lavezzo/public_html/alphaS/260218_z_bb/hadrons/smoke_initflavor_260218/`
+  - Example printed fractions from smoke:
+    - Nominal MiNNLO: `other~0.633`, `dd~0.146`, `uu~0.175`, `ss~0.039`, `cc~0.006`, `bb~0.0007`.
+    - Massive Zbb MiNNLO: `other~0.939`, `dd~0.024`, `uu~0.029`, `ss~0.0056`, `cc~0.0015`, `bb~0.0`.
+  - Status after run: `answered`.
+
+- User-requested rerun: full-stat production including new preselection initial-flavor histogram.
+  - Status before run: `open`.
+  - Command (Singularity):
+    - `/tmp/zbb_full_run.sh bhad_hiStat_260218_200thr_flavor`
+    - settings: `max-files-massive=-1`, `max-files-massless=1000`, `nthreads=200`
+  - Produced files:
+    - `/scratch/submit/cms/alphaS/260218_gen_massiveBottom/w_z_gen_dists_maxFiles_m1_hadronsSel_massive_bhad_hiStat_260218_200thr_flavor.hdf5`
+    - `/scratch/submit/cms/alphaS/260218_gen_massiveBottom/w_z_gen_dists_maxFiles_1000_nnpdf31_hadronsSel_massless_bhad_hiStat_260218_200thr_flavor.hdf5`
+  - Plot outputs:
+    - unnormalized: `/home/submit/lavezzo/public_html/alphaS/260218_z_bb/hadrons/bhad_hiStat_260218_200thr_flavor/`
+    - normalized: `/home/submit/lavezzo/public_html/alphaS/260218_z_bb/hadrons/bhad_hiStat_260218_200thr_flavor_norm/`
+  - Key printed initial-flavor fractions (preselection, LHE):
+    - Nominal MiNNLO:
+      - `other/mixed=0.633100`, `ddbar=0.146290`, `uubar=0.174739`,
+      - `ssbar=0.039095`, `ccbar=0.005993`, `bbbar=0.000783`.
+    - Massive Zbb MiNNLO:
+      - `other/mixed=0.940246`, `ddbar=0.024312`, `uubar=0.028411`,
+      - `ssbar=0.005881`, `ccbar=0.001151`, `bbbar=0.000000`.
+  - Existing swap diagnostics (same run):
+    - `% selected for swap` (4FS): `1.0`
+    - `% selected for swap` (5FS): `0.066702254213194`
+    - selected-yield ratio (`5FS/4FS`): `3.814260032626388`
+  - Status after run: `answered`.
+
+- User-requested check (2026-02-18): classify quark flavor that directly forms the generated Z (GenPart mother-based), not only LHE initial state.
+  - Status before run: `open`.
+  - Implemented in `/home/submit/lavezzo/alphaS/gh/WRemnants/scripts/histmakers/w_z_gen_dists.py`:
+    - added event-level `z_mother_flavor_bin = 0..5` from GenPart mother tracing of hard-process Z (`23`), with mapping:
+      - `0=other/mixed/unclassified`, `1=ddbar`, `2=uubar`, `3=ssbar`, `4=ccbar`, `5=bbbar`;
+    - added new preselection histogram:
+      - `presel_z_mother_flavor`.
+  - Plotting updates in `studies/z_bb/plot_narf.py`:
+    - added `z_mother_flavor` to `plot_specs`;
+    - added printed table-like fractions for both samples (same bin mapping).
+  - Validation in this Codex session:
+    - syntax verified with AST parse for:
+      - `/home/submit/lavezzo/alphaS/gh/WRemnants/scripts/histmakers/w_z_gen_dists.py`
+      - `studies/z_bb/plot_narf.py`
+    - note: direct `py_compile` in sandbox failed due write permission to `$WREM_BASE/__pycache__`.
+  - Status after run: `answered`.
+
+- User-requested filter tweak (2026-02-18, pre-run): add dilepton mass window to the existing preFSR lepton kinematic filter.
+  - Status before run: `open`.
+  - Updated `/home/submit/lavezzo/alphaS/gh/WRemnants/scripts/histmakers/w_z_gen_dists.py` in the `if args.addBottomAxis and isZ` filter block:
+    - existing cuts kept: `prefsrLep_pt > 20`, `prefsrOtherLep_pt > 20`, `prefsrLep_absEta < 2.5`, `prefsrOtherLep_absEta < 2.5`;
+    - new cut added: `std::fabs(prefsrV_mass - 91.) < 15.`.
+  - Validation in session:
+    - Python AST parse check passed for updated histmaker.
+  - Status after run: `answered`.
+
+- User-requested run start (2026-02-18): full-stat rerun after adding (a) GenPart Z-mother flavor histogram and (b) preFSR mass window `|mll-91|<15` in bottom-axis filter.
+  - Status before run: `open`.
+  - Command (Singularity):
+    - `singularity run --bind /scratch/,/work/,/home/,/ceph/ /cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/bendavid/cmswmassdocker/wmassdevrolling\:latest /bin/bash /tmp/zbb_full_run.sh bhad_hiStat_260218_200thr_genmother_m91w30`
+  - Produced files:
+    - `/scratch/submit/cms/alphaS/260218_gen_massiveBottom/w_z_gen_dists_maxFiles_m1_hadronsSel_massive_bhad_hiStat_260218_200thr_genmother_m91w30.hdf5`
+    - `/scratch/submit/cms/alphaS/260218_gen_massiveBottom/w_z_gen_dists_maxFiles_1000_nnpdf31_hadronsSel_massless_bhad_hiStat_260218_200thr_genmother_m91w30.hdf5`
+  - Plot outputs:
+    - unnormalized: `/home/submit/lavezzo/public_html/alphaS/260218_z_bb/hadrons/bhad_hiStat_260218_200thr_genmother_m91w30/`
+    - normalized: `/home/submit/lavezzo/public_html/alphaS/260218_z_bb/hadrons/bhad_hiStat_260218_200thr_genmother_m91w30_norm/`
+  - Printed checks:
+    - `% selected for swap` (4FS): `1.0`
+    - `% selected for swap` (5FS): `0.06709904773170555`
+    - selected-yield ratio (`5FS/4FS`, selected): `3.727251094067295`
+  - New GenPart mother-flavor output (first implementation):
+    - both nominal and massive show `z_mother_flavor` fully in bin `0` (`other/mixed/unclassified`), with zero entries in `dd/u u/ss/cc/bb` bins.
+    - implies current mother-tracing logic needs adjustment to the generator record representation in these samples.
+  - Status after run: `answered`.
+
+- User-requested iteration (2026-02-18): refine GenPart mother-flavor logic after all-bin-0 result.
+  - Status before run: `open`.
+  - Debug findings from direct GenPart inspection:
+    - in `Zmumu_MiNNLO`, hard-process boson chains are typically single-parent (`V -> V -> quark/gluon`), so sibling `q\bar q` matching fails;
+    - in tested `Zbb_MiNNLO` file(s), `GenPart_pdgId==23` is absent (hard boson appears as `22` in record), so `23`-only lookup also fails.
+  - Code update in `/home/submit/lavezzo/alphaS/gh/WRemnants/scripts/histmakers/w_z_gen_dists.py`:
+    - `z_mother_flavor_bin` now:
+      - selects hard-process last-copy boson preferring `23`, then fallback `22`;
+      - walks mother chain through boson self-copies (`22/23`) to first non-boson ancestor;
+      - assigns bin by ancestor quark flavor (`|pdgId|=1..5`), else bin `0`.
+  - Plot label update in `studies/z_bb/plot_narf.py`:
+    - clarified as `Z/gamma*` ancestor flavor.
+  - Smoke validation run (Singularity):
+    - tag: `smoke_genmother_260218_iter2`
+    - files:
+      - `/scratch/submit/cms/alphaS/260218_gen_massiveBottom/w_z_gen_dists_maxFiles_1_hadronsSel_massive_smoke_genmother_260218_iter2.hdf5`
+      - `/scratch/submit/cms/alphaS/260218_gen_massiveBottom/w_z_gen_dists_maxFiles_1_nnpdf31_hadronsSel_massless_smoke_genmother_260218_iter2.hdf5`
+    - plot output:
+      - `/home/submit/lavezzo/public_html/alphaS/260218_z_bb/hadrons/smoke_genmother_260218_iter2/`
+    - key smoke result:
+      - nominal now has non-zero flavor bins (`dd/u u/ss/cc/bb`);
+      - massive still in bin `0`.
+  - Full-stat rerun (Singularity):
+    - tag: `bhad_hiStat_260218_200thr_genmother_iter2_m91w30`
+    - files:
+      - `/scratch/submit/cms/alphaS/260218_gen_massiveBottom/w_z_gen_dists_maxFiles_m1_hadronsSel_massive_bhad_hiStat_260218_200thr_genmother_iter2_m91w30.hdf5`
+      - `/scratch/submit/cms/alphaS/260218_gen_massiveBottom/w_z_gen_dists_maxFiles_1000_nnpdf31_hadronsSel_massless_bhad_hiStat_260218_200thr_genmother_iter2_m91w30.hdf5`
+    - plot outputs:
+      - unnormalized: `/home/submit/lavezzo/public_html/alphaS/260218_z_bb/hadrons/bhad_hiStat_260218_200thr_genmother_iter2_m91w30/`
+      - normalized: `/home/submit/lavezzo/public_html/alphaS/260218_z_bb/hadrons/bhad_hiStat_260218_200thr_genmother_iter2_m91w30_norm/`
+    - printed `z_mother_flavor` fractions (preselection):
+      - Nominal MiNNLO:
+        - `other=0.305651`, `dd=0.259659`, `uu=0.307303`, `ss=0.090175`, `cc=0.027657`, `bb=0.009554`.
+      - Massive Zbb MiNNLO:
+        - `other=1.000000`, all explicit quark bins `0.0`.
+  - Status after run: `answered`.
+
+- User-requested diagnostic (2026-02-18): test newly added `nBhad_weight` against `nBhad_unity` and `nBhad` to check weight pathologies.
+  - Status before run: `open`.
+  - Smoke run (Singularity):
+    - tag: `smoke_weightdiag_260218`
+    - files:
+      - `/scratch/submit/cms/alphaS/260218_gen_massiveBottom/w_z_gen_dists_maxFiles_1_hadronsSel_massive_smoke_weightdiag_260218.hdf5`
+      - `/scratch/submit/cms/alphaS/260218_gen_massiveBottom/w_z_gen_dists_maxFiles_1_nnpdf31_hadronsSel_massless_smoke_weightdiag_260218.hdf5`
+  - Raw integral checks (`nBhad_*`):
+    - Massive (`Zbb_MiNNLO`):
+      - `sum(nBhad_unity)=2.9547e4`
+      - `sum(nBhad_weight)=1.9715e4`
+      - `sum(nBhad)=1.9715e4`
+      - `weight/unity=0.667242`
+      - `nominal/weight=1.0`
+    - Massless (`Zmumu_MiNNLO`):
+      - `sum(nBhad_unity)=5.3683e4`
+      - `sum(nBhad_weight)=4.8239e4`
+      - `sum(nBhad)=4.8239e4`
+      - `weight/unity=0.898590`
+      - `nominal/weight=1.0`
+  - Interpretation:
+    - For this setup, `nBhad` and `nBhad_weight` are identical, so `nominal_weight` is not introducing an extra normalization factor beyond `weight`.
+    - The residual normalization tension is therefore not from hidden extra per-event factors in `nominal_weight`; it is consistent with sample-level normalization (`xsec/weight_sum`) and genuine sample-content differences.
+  - Status after run: `answered`.
+
+- User-requested replot (2026-02-18): regenerate swapping plots with factor-of-2 applied to swapped massive component.
+  - Status before run: `open`.
+  - Plotter update:
+    - `studies/z_bb/plot_narf.py`
+      - added CLI option `--massive-scale` (default `1.0`);
+      - applied scaling to swapped massive component in selected and inclusive-corrected comparisons before optional `--normalize`.
+  - Replot command (Singularity):
+    - using hist files:
+      - `/scratch/submit/cms/alphaS/260218_gen_massiveBottom/w_z_gen_dists_maxFiles_m1_hadronsSel_massive_bhad_hiStat_260218_200thr_genmother_iter2_m91w30.hdf5`
+      - `/scratch/submit/cms/alphaS/260218_gen_massiveBottom/w_z_gen_dists_maxFiles_1000_nnpdf31_hadronsSel_massless_bhad_hiStat_260218_200thr_genmother_iter2_m91w30.hdf5`
+    - produced tags:
+      - `bhad_hiStat_260218_200thr_genmother_iter2_m91w30_x2`
+      - `bhad_hiStat_260218_200thr_genmother_iter2_m91w30_x2_norm`
+  - Output directories:
+    - `/home/submit/lavezzo/public_html/alphaS/260218_z_bb/hadrons/bhad_hiStat_260218_200thr_genmother_iter2_m91w30_x2/`
+    - `/home/submit/lavezzo/public_html/alphaS/260218_z_bb/hadrons/bhad_hiStat_260218_200thr_genmother_iter2_m91w30_x2_norm/`
+  - Status after run: `answered`.
+
+- User-requested slide update (2026-02-18): replace backup x2 swap plot in slides with latest version.
+  - Status before run: `open`.
+  - Updated slide sources:
+    - `agents/studies/z_bmass_uncertainty/slides/outline.json`
+      - backup x2 figure path ->
+        `/home/submit/lavezzo/public_html/alphaS/260218_z_bb/hadrons/bhad_hiStat_260218_200thr_genmother_iter2_m91w30_x2/inclusive_ptVgen_x2.png`
+    - `agents/studies/z_bmass_uncertainty/slides/b_quark_mass.tex`
+      - same path update for slide "Backup: Unnormalized Swap with 4FS Scaled by 2".
+  - Build/copy:
+    - compiled `agents/studies/z_bmass_uncertainty/slides/b_quark_mass.pdf` successfully;
+    - copied to shared path:
+      - `/home/submit/lavezzo/public_html/alphaS/260216_study_slides/b_quark_mass.pdf`.
+  - Status after run: `answered`.
+
+- User-requested follow-up (2026-02-18): rerun all plots without x2 and update remaining slide plots.
+  - Status before run: `open`.
+  - Replot run (Singularity) using latest `iter2` hist files:
+    - tags:
+      - `bhad_hiStat_260218_200thr_genmother_iter2_m91w30_refresh`
+      - `bhad_hiStat_260218_200thr_genmother_iter2_m91w30_refresh_norm`
+    - output dirs:
+      - `/home/submit/lavezzo/public_html/alphaS/260218_z_bb/hadrons/bhad_hiStat_260218_200thr_genmother_iter2_m91w30_refresh/`
+      - `/home/submit/lavezzo/public_html/alphaS/260218_z_bb/hadrons/bhad_hiStat_260218_200thr_genmother_iter2_m91w30_refresh_norm/`
+  - Slide updates:
+    - updated main + backup non-x2 plot paths to `..._refresh/` in:
+      - `agents/studies/z_bmass_uncertainty/slides/outline.json`
+      - `agents/studies/z_bmass_uncertainty/slides/b_quark_mass.tex`
+    - kept x2 backup slide pointing to latest x2 figure (`..._x2/inclusive_ptVgen_x2.png`).
+    - note: `m_bb_lhe` / `dR_bb_lhe` plots are currently skipped by plotter in this branch, so those backup slide paths remain on prior available files.
+  - Recompiled and synced PDF:
+    - local: `agents/studies/z_bmass_uncertainty/slides/b_quark_mass.pdf`
+    - shared: `/home/submit/lavezzo/public_html/alphaS/260216_study_slides/b_quark_mass.pdf`
+  - Status after run: `answered`.
+
+- User-requested update (2026-02-18): refresh slide date and export to a new output location.
+  - Status before run: `open`.
+  - Date updates:
+    - `agents/studies/z_bmass_uncertainty/slides/outline.json`: `February 18, 2026`
+    - `agents/studies/z_bmass_uncertainty/slides/b_quark_mass.tex`: `\\date{February 18, 2026}`
+    - `agents/studies/z_bmass_uncertainty/slides/uncertainty_from_b_quark_masses_in_z_pt_spectrum.tex`: `\\date{February 18, 2026}`
+  - Recompile:
+    - `agents/studies/z_bmass_uncertainty/slides/b_quark_mass.pdf` built successfully.
+  - New output published:
+    - `/home/submit/lavezzo/public_html/alphaS/260218_study_slides/b_quark_mass.pdf`
+  - Status after run: `answered`.
+
+## 2026-02-22
+- User-requested literature check:
+  - read arXiv paper `2510.18815` and extract how the DY heavy-flavor "swapping" is done.
+- Status before run: `open`.
+- Source read:
+  - https://arxiv.org/pdf/2510.18815
+- Key extracted prescription (Sec. 6.2):
+  - The paper combines DY+bb and DY+jet with a **filter/veto partition**:
+    - `d sigma_tot = d sigma_dy+bb + d sigma_dy+j |_{phi(BB)=0}`.
+  - For their NNLOPS combination, they analogously remove inclusive-sample events with at least one bottom quark (`N_B >= 1`) before adding the dedicated `bb` component.
+  - They also state that if there is no overlap in selected phase space, filtering has no effect.
+- Study interpretation note:
+  - This is not event-by-event "swap this event from 5FS to 4FS"; it is exclusive-region replacement (veto + addback).
+  - The paper points to Ref. `[163]` for detailed Z+b-mass uncertainty context; this paper mainly defines/validates the combination setup.
+- Status after run: `answered`.
+
+- User-requested additional source check:
+  - read INSPIRE file `https://inspirehep.net/files/04f61faf812ad2d2043add38f80a3a08` and verify whether single-b events are also removed in the overlap veto.
+- Status before run: `open`.
+- Source read:
+  - https://inspirehep.net/files/04f61faf812ad2d2043add38f80a3a08
+- Extracted statements:
+  - In the combination section, they apply a bottom-quark filter on the inclusive sample that vetoes events with at least one bottom quark.
+  - The text explicitly states that single-bottom events should also be removed to keep orthogonality with the dedicated heavy-flavor sample.
+  - Appendix B repeats that events with at least one bottom quark are removed for validation of the filter.
+- Interpretation for our study:
+  - Confirms that the overlap-removal logic is an inclusive `>=1 b` veto in the baseline sample, then addback of the dedicated heavy-flavor component.
+  - This supports the same bookkeeping principle we should use in the Z+b-mass nuisance construction.
+- Status after run: `answered`.
+
+- User-requested follow-up:
+  - check Section 4.2 of `https://arxiv.org/pdf/1803.04336` again.
+- Status before run: `open`.
+- Environment note:
+  - direct arXiv fetch is currently unavailable in this runtime, so this check was validated against the previously generated local text extract:
+    - `/tmp/bmass_paper/1803.04336.txt`
+    - (created on 2026-02-18 via `curl` + `pdftotext`, already recorded above).
+- Re-confirmed points from Sec. 4.2 summary:
+  - merged setup is `5FS-Bveto + 4FS` with orthogonal event classes;
+  - correction is taken as a normalized shape ratio (`R(pT)`, Eq. 4.2);
+  - this is compatible with inclusive-veto logic (remove any-bottom events from inclusive part) rather than an exactly-one-b category.
+- Status after run: `answered`.
+
+- User-requested implementation:
+  - add explicit normalization mode where `5FS_Bveto` is scaled to `sigma(5FS)-sigma(4FS)` and addback is scaled to `sigma(4FS)`.
+- Status before run: `open`.
+- Code updates:
+  - `studies/z_bb/plot_narf.py`
+    - added `--norm-mode {default,sigma-difference}`;
+    - implemented target-integral rescaling for inclusive corrected plots in `sigma-difference` mode;
+    - added diagnostics printout and argument conflict checks with `--normalize` and `--massive-scale`.
+  - `studies/z_bb/make_zbb_corr.py`
+    - added `--norm-mode {default,sigma-difference}`;
+    - implemented the same target-integral rescaling before building correction histograms.
+- Validation:
+  - `python -m py_compile studies/z_bb/plot_narf.py studies/z_bb/make_zbb_corr.py` passed.
+- Status after run: `answered`.
+
+- User-requested run:
+  - execute `plot_narf.py` with `--norm-mode sigma-difference` on latest high-stat files and provide output plots.
+- Status before run: `open`.
+- Initial blockers and resolution:
+  - host Python lacked plotting/HDF5 deps (`mplhep`, `h5py`);
+  - initial sandboxed Singularity calls failed with setuid error;
+  - after unsandboxed container permission check (`singularity run ... echo CONTAINER_OK`), full run succeeded as a single-command container execution.
+- Command (Singularity):
+  - `singularity run --bind /scratch/,/work/,/home/,/ceph/ ... /bin/bash -lc 'cd ...; source setup.sh; python studies/z_bb/plot_narf.py --massive-file ...iter2_m91w30.hdf5 --massless-file ...iter2_m91w30.hdf5 --tag bhad_hiStat_260218_200thr_genmother_iter2_m91w30_sigmaDiff --norm-mode sigma-difference'`
+- Output directory:
+  - `/home/submit/lavezzo/public_html/alphaS/260222_z_bb/hadrons/bhad_hiStat_260218_200thr_genmother_iter2_m91w30_sigmaDiff/`
+- Key printed diagnostics:
+  - `% selected for swap` (4FS): `1.0`
+  - `% selected for swap` (5FS): `0.06709904773170555`
+  - `[sigma-difference:ptVgen] target_massive=1.499283e+08, target_5FS_bveto=8.178362e+09, total_5FS=8.328290e+09`
+  - `[sigma-difference:absYVgen] target_massive=1.499283e+08, target_5FS_bveto=8.178364e+09, total_5FS=8.328292e+09`
+- Reproducibility note:
+  - in Codex, this run succeeded when executed as a single unsandboxed command:
+    - `singularity run ... /bin/bash -lc 'cd /home/submit/lavezzo/alphaS/WRemnantsHelpers; source setup.sh; python studies/z_bb/plot_narf.py ... --norm-mode sigma-difference'`
+  - splitting prep/run steps across separate command segments was less reliable in this environment.
+- Status after run: `answered`.
+
+- User-requested follow-up:
+  - compare B-hadron plots using the new sigma-difference normalization targets.
+- Status before run: `open`.
+- Code update:
+  - `studies/z_bb/plot_narf.py` now produces extra B-hadron-only comparison plots in `--norm-mode sigma-difference`:
+    - scales 5FS hist to `sigma_5FS_total - sigma_4FS_total`,
+    - scales 4FS hist to `sigma_4FS_total`.
+- Rerun:
+  - repeated `plot_narf.py` with same inputs/tag and `--norm-mode sigma-difference`.
+- New output files:
+  - `samples_comparison_nBhad_sigma_difference_components.png`
+  - `samples_comparison_leadB_pt_sigma_difference_components.png`
+  - `samples_comparison_subB_pt_sigma_difference_components.png`
+  - `samples_comparison_m_bb_had_sigma_difference_components.png`
+  - `samples_comparison_dR_bb_had_sigma_difference_components.png`
+  - all under:
+    - `/home/submit/lavezzo/public_html/alphaS/260222_z_bb/hadrons/bhad_hiStat_260218_200thr_genmother_iter2_m91w30_sigmaDiff/`
+- Status after run: `answered`.
+
+- User-requested cleanup:
+  - remove the additional B-hadron `*_sigma_difference_components` plotting code.
+- Status before run: `open`.
+- Action:
+  - removed the extra component-comparison block from `studies/z_bb/plot_narf.py`.
+  - kept the core `--norm-mode sigma-difference` behavior for `bb_*` and `inclusive_*` plots unchanged.
+- Validation:
+  - `python -m py_compile studies/z_bb/plot_narf.py` passed.
+- Status after run: `answered`.
+
+- User-requested numeric check:
+  - print clearly the 5FS/4FS total and split cross sections, plus corrected 5FS in sigma-difference method.
+- Status before run: `open`.
+- Command:
+  - ran container helper script `/tmp/zbb_compute_xsecs.py` on latest high-stat files:
+    - massive: `...massive_bhad_hiStat_260218_200thr_genmother_iter2_m91w30.hdf5`
+    - massless: `...massless_bhad_hiStat_260218_200thr_genmother_iter2_m91w30.hdf5`
+- Results (in the same normalization used by `plot_narf.py` scaled histograms):
+  - `x5_total = 8.328290168e+09`
+  - `x5_b1 = 5.588203395e+08`
+  - `x5_b0 = 7.769469829e+09`
+  - `x4_total = 1.499282784e+08`
+  - `x4_b1 = 1.499282784e+08`
+  - `x5_corrected_sigma_difference = 8.328290168e+09`
+  - closure check:
+    - `x5_total - (x5_b0 + x5_b1) = -2.861022949e-06`
+- Status after run: `answered`.
+
+- User-requested follow-up:
+  - identify which cross-section conventions/inputs are used in arXiv:1803.04336.
+- Status before run: `open`.
+- Source used:
+  - local full-text extract from prior run:
+    - `/tmp/bmass_paper/1803.04336.txt`
+    - (created on 2026-02-18 via `curl` + `pdftotext`).
+- Extracted details:
+  - setup:
+    - `sqrt(s)=13 TeV`, `NNPDF3.0 NLO`, `alpha_s(mZ)=0.118`;
+    - `m_b=4.7 GeV` in 4FS only;
+    - central scale `mu = (1/4)*sqrt(M_ll^2 + pT_ll^2)`;
+    - NC fiducial cuts: `pT(l)>20 GeV`, `|eta(l)|<2.5`, `|M_ll-mZ|<15 GeV`, with generation cut `M_ll>30 GeV`.
+  - cross-section treatment:
+    - merged spectrum uses direct addback (Eq. 4.1):
+      - `d sigma_mass = d sigma_(5FS-Bveto) + d sigma_(4FS)`;
+    - comparison is performed with fiducial-normalized ratio (Eq. 4.2):
+      - `R(pT) = [(1/sigma_fid_mass) d sigma_mass/dpT] / [(1/sigma_fid_5FS) d sigma_5FS/dpT]`.
+  - quoted Table-1 benchmark:
+    - total NC-DY fiducial: `743.61 +- 0.22 pb`;
+    - 5FS b-initiated: `28.31 +- 0.05 pb` (`3.8%`).
+- Interpretation:
+  - paper does not introduce an extra free normalization in Eq. 4.1 addback; the key normalization step is in Eq. 4.2 via fiducial shape normalization.
+- Status after run: `answered`.
+
+## 2026-02-23
+- User-requested check: resume b-quark-mass study and print event-fraction tables per initial quark flavor for both samples, for both methods:
+  - LHE initial-state flavor (`lhe_init_flavor`)
+  - GenPart mother/ancestor flavor for generated Z (`z_mother_flavor`)
+- Status before run: `open`.
+- Command (container, latest high-stat files):
+  - `singularity run --bind /scratch/,/work/,/home/,/ceph/ /cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/bendavid/cmswmassdocker/wmassdevrolling\:latest /bin/bash -lc 'cd /home/submit/lavezzo/alphaS/WRemnantsHelpers; source setup.sh >/dev/null 2>&1; MY_PLOT_DIR=/tmp python studies/z_bb/plot_narf.py --massive-file /scratch/submit/cms/alphaS/260218_gen_massiveBottom/w_z_gen_dists_maxFiles_m1_hadronsSel_massive_bhad_hiStat_260218_200thr_genmother_iter2_m91w30.hdf5 --massless-file /scratch/submit/cms/alphaS/260218_gen_massiveBottom/w_z_gen_dists_maxFiles_1000_nnpdf31_hadronsSel_massless_bhad_hiStat_260218_200thr_genmother_iter2_m91w30.hdf5 --tag tmp_fetch_flavor_260223'`
+- Printed fractions (preselection):
+  - LHE initial-state flavor:
+    - Nominal MiNNLO: `other=0.633100`, `dd=0.146290`, `uu=0.174739`, `ss=0.039095`, `cc=0.005993`, `bb=0.000783`.
+    - Massive Zbb MiNNLO: `other=0.940246`, `dd=0.024312`, `uu=0.028411`, `ss=0.005881`, `cc=0.001151`, `bb=0.000000`.
+  - GenPart Z/gamma*-ancestor flavor:
+    - Nominal MiNNLO: `other=0.305651`, `dd=0.259659`, `uu=0.307303`, `ss=0.090175`, `cc=0.027657`, `bb=0.009554`.
+    - Massive Zbb MiNNLO: `other=1.000000`, `dd=0.000000`, `uu=0.000000`, `ss=0.000000`, `cc=0.000000`, `bb=0.000000`.
+- Status after run: `answered`.
+
+- User-requested implementation (2026-02-23): reproduce Appendix-C-like fiducial logic from arXiv:2404.08598 with FastJet reclustering (not GenJet-dependent), reusing existing dressed leptons.
+- Status before run: `open`.
+- Implemented changes:
+  - `/home/submit/lavezzo/alphaS/gh/WRemnants/wremnants/include/theoryTools.hpp`
+    - added `wrem::cmsAppendixCFastjetObs(...)` helper:
+      - anti-kt `R=0.4` FastJet clustering from visible stable `GenPart` (exclude neutrinos),
+      - b-jet tagging via ghost b-hadrons (status 1/2 B hadrons),
+      - SFOS dressed-lepton Z selection with cuts (`pT>25`, `|eta|<2.4`, `71<mll<111`, leading `pT>35`),
+      - lepton-bjet overlap removal (`DeltaR>0.4`),
+      - outputs: pass flags, cleaned b-jet multiplicity, b-jet kinematics.
+  - `/home/submit/lavezzo/alphaS/gh/WRemnants/scripts/histmakers/w_z_gen_dists.py`
+    - new option `--appendixCFastjet`.
+    - when enabled for Z samples with `--addBottomAxis`:
+      - computes and stores preselection diagnostics histograms:
+        - `presel_cms_appc_pass_z`, `presel_cms_appc_n_lep`, `presel_cms_appc_n_bjets_clean`.
+      - replaces jet observables (`n_bjets`, `lead/sublead_bjet_pt`, `lead/sublead_bjet_eta`, `m_bb_jet`, `dR_bb_jet`) with FastJet-based values.
+      - sets `bottom_sel` from Appendix-C-like cleaned b-jet multiplicity (`>=1`).
+      - uses `cms_appc_pass_z==1` as the bottom-axis filter (instead of prior preFSR `pT>20`, `|eta|<2.5`, `|mll-91|<15`).
+  - `studies/z_bb/make_hists.py`
+    - new pass-through flag `--appendixc-fastjet` to forward `--appendixCFastjet` to both massive/massless histmaker calls.
+- Validation:
+  - syntax checks passed for modified python files (`make_hists.py`, AST parse of `w_z_gen_dists.py`).
+  - one-file end-to-end smoke run passed in container with FastJet overlay:
+    - command:
+      - `python /home/submit/lavezzo/alphaS/gh/WRemnants/scripts/histmakers/w_z_gen_dists.py --dataPath /scratch/submit/cms/wmass/NanoAOD/ --maxFiles 1 --addBottomAxis --appendixCFastjet --filterProcs Zmumu_MiNNLO -v 3 -o /tmp/appc_fj_smoke --postfix appc_fj_smoke -j 8`
+    - output:
+      - `/tmp/appc_fj_smoke/w_z_gen_dists_maxFiles_1_appc_fj_smoke.hdf5`
+    - confirmed presence of new hists:
+      - `presel_cms_appc_pass_z`, `presel_cms_appc_n_lep`, `presel_cms_appc_n_bjets_clean`
+      - plus FastJet-backed jet hists (`n_bjets`, `m_bb_jet`, `dR_bb_jet`, `lead_bjet_pt`, `sublead_bjet_pt`).
+- Status after run: `answered`.
+
+- User-requested run (2026-02-23): compare Appendix-C FastJet leading-jet `pT` and `mll` between samples after running histmakers with 100 threads.
+- Status before run: `open`.
+- Prep change:
+  - added dedicated post-selection histogram `cms_appc_mll` in `/home/submit/lavezzo/alphaS/gh/WRemnants/scripts/histmakers/w_z_gen_dists.py` for direct Appendix-C dilepton-mass comparison.
+- Production command (container, FastJet overlay, 100 threads):
+  - `python studies/z_bb/make_hists.py --appendixc-fastjet --nthreads 100 --tag appc_fj_260223_leadjet_mll`
+- Produced files:
+  - massive:
+    - `/ceph/submit/data/group/cms/store/user/lavezzo/alphaS//260223_gen_massiveBottom/w_z_gen_dists_maxFiles_m1_hadronsSel_massive_appc_fj_260223_leadjet_mll.hdf5`
+  - massless:
+    - `/ceph/submit/data/group/cms/store/user/lavezzo/alphaS//260223_gen_massiveBottom/w_z_gen_dists_maxFiles_1000_nnpdf31_hadronsSel_massless_appc_fj_260223_leadjet_mll.hdf5`
+- Comparison results (weighted, from histogram summaries):
+  - `lead_bjet_pt`:
+    - 4FS (`Zbb_MiNNLO`): `yield=451445.0`, `mean=61.79 GeV`, `p50=47.5 GeV`, `p90=107.5 GeV`.
+    - 5FS (`Zmumu_MiNNLO`): `yield=20986.0`, `mean=52.13 GeV`, `p50=42.5 GeV`, `p90=82.5 GeV`.
+    - ratio `5FS/4FS`: `yield=0.0465`, `mean=0.8436`, `p50=0.8947`, `p90=0.7674`.
+  - `cms_appc_mll`:
+    - 4FS: `yield=1,850,363.0`, `mean=90.952 GeV`, `p50=91.25 GeV`, `p90=94.25 GeV`.
+    - 5FS: `yield=29,037,933.29`, `mean=90.847 GeV`, `p50=91.25 GeV`, `p90=94.25 GeV`.
+    - ratio `5FS/4FS`: `yield=15.6931`, `mean=0.99885`, `p50=1.0`, `p90=1.0`.
+- Status after run: `answered`.
+
+- User-requested plotting update (2026-02-23): make plots of Appendix-C variables in `Z + >=1 b-jet` region using existing plotting script.
+- Status before run: `open`.
+- Script edits:
+  - `/home/submit/lavezzo/alphaS/gh/WRemnants/scripts/histmakers/w_z_gen_dists.py`:
+    - added `cms_appc_mll_b1` histogram filled from `df.Filter("cms_appc_n_bjets_clean >= 1")`.
+  - `studies/z_bb/plot_narf.py`:
+    - switched plotted Appendix-C mass variable to `cms_appc_mll_b1`.
+- Production run (100 threads):
+  - `python studies/z_bb/make_hists.py --appendixc-fastjet --nthreads 100 --tag appc_fj_260223_b1plots`
+- Inputs used for plotting:
+  - `/ceph/submit/data/group/cms/store/user/lavezzo/alphaS//260223_gen_massiveBottom/w_z_gen_dists_maxFiles_m1_hadronsSel_massive_appc_fj_260223_b1plots.hdf5`
+  - `/ceph/submit/data/group/cms/store/user/lavezzo/alphaS//260223_gen_massiveBottom/w_z_gen_dists_maxFiles_1000_nnpdf31_hadronsSel_massless_appc_fj_260223_b1plots.hdf5`
+- Plot command:
+  - `python studies/z_bb/plot_narf.py --massive-file <...massive...> --massless-file <...massless...> --tag appc_fj_260223_b1plots`
+- Output directory:
+  - `/home/submit/lavezzo/public_html/alphaS/260223_z_bb/hadrons/appc_fj_260223_b1plots/`
+- Requested plot files created:
+  - `samples_comparison_lead_bjet_pt.png` (and `.pdf`)
+  - `samples_comparison_cms_appc_mll_b1.png` (and `.pdf`)
+- Status after run: `answered`.
+
+## Backend switch check (2026-02-23): Appendix-C mode with GenJet b-tagged jets (no reclustering)
+- User request:
+  - keep the same Appendix-C selection flow and plots, but change backend jet definition from FastJet reclustering to b-tagged `GenJet` inputs.
+- Code changes:
+  - `/home/submit/lavezzo/alphaS/gh/WRemnants/wremnants/include/theoryTools.hpp`
+    - replaced `cmsAppendixCFastjetObs(...)` with `cmsAppendixCGenJetObs(...)`.
+    - removed FastJet usage and now build b-jet candidates directly from:
+      - `GenJet_pt`, `GenJet_eta`, `GenJet_phi`, `GenJet_mass`, `GenJet_hadronFlavour`.
+    - b-jet definition in backend:
+      - `hadronFlavour == 5`, `pT > 30 GeV`, `|eta| < 2.4`, and `DeltaR(l,bjet) > 0.4` cleaning from selected leptons.
+  - `/home/submit/lavezzo/alphaS/gh/WRemnants/scripts/histmakers/w_z_gen_dists.py`
+    - `cms_appc_obs` now calls `wrem::cmsAppendixCGenJetObs(...)` with GenJet inputs.
+    - all downstream Appendix-C histogram definitions unchanged.
+- Production run (100 threads):
+  - `python studies/z_bb/make_hists.py --appendixc-fastjet --nthreads 100 --tag appc_genjet_260223_b1plots`
+- Produced files:
+  - `/ceph/submit/data/group/cms/store/user/lavezzo/alphaS//260223_gen_massiveBottom/w_z_gen_dists_maxFiles_m1_hadronsSel_massive_appc_genjet_260223_b1plots.hdf5`
+  - `/ceph/submit/data/group/cms/store/user/lavezzo/alphaS//260223_gen_massiveBottom/w_z_gen_dists_maxFiles_1000_nnpdf31_hadronsSel_massless_appc_genjet_260223_b1plots.hdf5`
+- Plotting run:
+  - `python studies/z_bb/plot_narf.py --massive-file <...massive...> --massless-file <...massless...> --tag appc_genjet_260223_b1plots`
+- Output directory:
+  - `/home/submit/lavezzo/public_html/alphaS/260223_z_bb/hadrons/appc_genjet_260223_b1plots/`
+- Requested files confirmed:
+  - `samples_comparison_lead_bjet_pt.png` (and `.pdf`)
+  - `samples_comparison_cms_appc_mll_b1.png` (and `.pdf`)
+- Selection diagnostics printed by plot script:
+  - `Ratio of selected events (bottom_sel==1): 2.2794870363111337`
+  - `% massive selected for swap: 0.26752318328890073`
+  - `% massless selected for swap: 0.011311311992799052`
+- Status:
+  - `answered`.
+
+## Config update (2026-02-25): gh-based setup script + weight/dataset wiring
+- User request:
+  - do not modify default `setup.sh`; create `setup_gh.sh` for `gh/WRemnants`.
+  - in GEN histmaker, apply `UnknownWeightAltSet1[0]` event weight factor.
+  - repoint dataset dictionary to new massive sample path in `gh/WRemnants`.
+- Actions:
+  - added `setup_gh.sh` in `WRemnantsHelpers` (same env setup as local `setup.sh`, but sourcing `../gh/WRemnants/setup.sh`).
+  - patched `/home/submit/lavezzo/alphaS/gh/WRemnants/scripts/histmakers/w_z_gen_dists.py`:
+    - multiply event `weight_expr` by `UnknownWeightAltSet1[0]`;
+    - add explicit runtime guard that raises if branch `UnknownWeightAltSet1` is missing.
+  - patched `/home/submit/lavezzo/alphaS/gh/WRemnants/wremnants/datasets/datasetDict_13TeVGen.py`:
+    - `Zbb_MiNNLO` now points to `"{BASE_PATH}/MiNNLO_Zbb_weightsPatch/"`.
+- Verification:
+  - confirmed patched lines via grep/sed on both `gh/WRemnants` files.
+
+## Quick rerun (2026-02-25): new massive sample + UnknownWeightAltSet1
+- User request:
+  - run a small b-mass comparison using new massive samples with the new extra weight and compare against massless sample with usual plots.
+- Initial run attempt:
+  - command used `setup_gh.sh` + `studies/z_bb/make_hists.py` (`10` massive files, `100` massless files) + `studies/z_bb/plot_narf.py` with tag `gh_unknownw_260225_small`.
+  - massive leg succeeded and confirmed source path:
+    - `/scratch/submit/cms/wmass/NanoGen/MiNNLO_Zbb_weightsPatch/`
+  - massless leg failed because `Zmumu_MiNNLO` lacks branch `UnknownWeightAltSet1`.
+- Follow-up patch (same day):
+  - updated `/home/submit/lavezzo/alphaS/gh/WRemnants/scripts/histmakers/w_z_gen_dists.py`:
+    - apply `*UnknownWeightAltSet1[0]` only if branch exists;
+    - otherwise log warning and keep extra factor as `1`.
+- Completed rerun after patch:
+  - massless histmaker command:
+    - `python /home/submit/lavezzo/alphaS/gh/WRemnants/scripts/histmakers/w_z_gen_dists.py --dataPath /scratch/submit/cms/wmass/NanoAOD/ --maxFiles 100 --addBottomAxis -o /scratch/submit/cms/alphaS/260225_gen_massiveBottom --pdf nnpdf31 --filterProcs Zmumu_MiNNLO -v 4 --postfix hadronsSel_massless_gh_unknownw_260225_small -j 50`
+  - plotting command:
+    - `python studies/z_bb/plot_narf.py --massive-file /scratch/submit/cms/alphaS/260225_gen_massiveBottom/w_z_gen_dists_maxFiles_10_hadronsSel_massive_gh_unknownw_260225_small.hdf5 --massless-file /scratch/submit/cms/alphaS/260225_gen_massiveBottom/w_z_gen_dists_maxFiles_100_nnpdf31_hadronsSel_massless_gh_unknownw_260225_small.hdf5 --tag gh_unknownw_260225_small`
+- Produced files:
+  - `/scratch/submit/cms/alphaS/260225_gen_massiveBottom/w_z_gen_dists_maxFiles_10_hadronsSel_massive_gh_unknownw_260225_small.hdf5`
+  - `/scratch/submit/cms/alphaS/260225_gen_massiveBottom/w_z_gen_dists_maxFiles_100_nnpdf31_hadronsSel_massless_gh_unknownw_260225_small.hdf5`
+- Plot output directory:
+  - `/home/submit/lavezzo/public_html/alphaS/260225_z_bb/hadrons/gh_unknownw_260225_small/`
+- Key printed diagnostics:
+  - ratio of selected events (`bottom_sel==1`): `3.725055891003863`
+  - `% massive selected for swap`: `1.0`
+  - `% massless selected for swap`: `0.0669519319155583`
+- Status:
+  - `answered`.
+
+## Branch check request (2026-02-25): look for `LHEPdfWeight*` in new massive sample
+- User request:
+  - inspect one file from new massive sample and check for branches matching `LHEPdfWeight*`.
+- Attempted from Codex:
+  - tried branch inspection via `uproot` and ROOT Python in `wmassdevrolling` container.
+  - container launch in this session failed with:
+    - `ERROR: Installation issue: starter-suid doesn't have setuid bit set`
+  - local fallback unavailable (`ROOT` and `uproot` modules not installed in host Python).
+- Status:
+  - `blocked` in current Codex runtime.
+  - next action: run the provided ROOT-branch listing command in a normal interactive container shell.
+
+## Debug print fix (2026-02-25): `UnknownWeightAltSet1[0]` with ImplicitMT
+- User-reported failure:
+  - `Range(...)` debug probe crashed with ImplicitMT enabled (`Range was called with ImplicitMT enabled`).
+- Fix:
+  - in `/home/submit/lavezzo/alphaS/gh/WRemnants/scripts/histmakers/w_z_gen_dists.py` replaced:
+    - `df.Range(5)...Take[...]`
+  - with MT-safe probe:
+    - `df.Filter("rdfentry_ < 5").Define(...).Take["float"](...).GetValue()`
+- Validation run:
+  - command:
+    - `python /home/submit/lavezzo/alphaS/gh/WRemnants/scripts/histmakers/w_z_gen_dists.py --dataPath /scratch/submit/cms/wmass/NanoAOD/ --maxFiles 1 --filterProcs Zbb_MiNNLO --addBottomAxis -o /tmp/zbb_dbg_weight --postfix dbg_unknownw_mtfix_260225 --pdf nnpdf31 -j 10 -v 4`
+  - printed debug line:
+    - `Debug UnknownWeightAltSet1[0] first entries for Zbb_MiNNLO: [2.3514404296875, 1.069091796875, 0.6351318359375, 0.933563232421875, 1.0]`
+  - output:
+    - `/tmp/zbb_dbg_weight/w_z_gen_dists_maxFiles_1_nnpdf31_dbg_unknownw_mtfix_260225.hdf5`
+- Status:
+  - `answered`.
+
+## Requested update (2026-02-25): histogram for new weight factor
+- User request:
+  - add a histogram for the extra weight factor used to scale `nominal_weight`.
+- Implementation in `/home/submit/lavezzo/alphaS/gh/WRemnants/scripts/histmakers/w_z_gen_dists.py`:
+  - define column:
+    - `unknown_weight0 = UnknownWeightAltSet1[0]` when branch exists;
+    - fallback `unknown_weight0 = 1.0f` otherwise.
+  - use this column in the event-weight expression (`weight_expr *= unknown_weight0`).
+  - add histogram:
+    - name: `unknown_weight0`
+    - axis: regular `120` bins in `[0, 3]`
+    - fill: `["unknown_weight0", "unity"]`.
+- Validation:
+  - quick 1-file run completed:
+    - `/tmp/zbb_dbg_weight/w_z_gen_dists_maxFiles_1_nnpdf31_dbg_unknownw_hist_260225.hdf5`
+  - read-back check:
+    - `has_unknown_weight0_hist=True`
+    - integral reported: `25969.0`.
+- Status:
+  - `answered`.
+
+## Requested run+plot (2026-02-27): include `unknown_weight0` in standard comparison plots
+- User request:
+  - run and plot after adding histogram of the new extra weight factor.
+- Plotter update:
+  - `studies/z_bb/plot_narf.py`: added `("unknown_weight0", "Applied extra weight factor UnknownWeightAltSet1[0]", True, None)` to `plot_specs`.
+- Run:
+  - `python studies/z_bb/make_hists.py --tag gh_unknownw_histplot_260225 --outdir /scratch/submit/cms/alphaS/260225_gen_massiveBottom --max-files-massive 10 --max-files-massless 100 --nthreads 50`
+  - `python studies/z_bb/plot_narf.py --massive-file /scratch/submit/cms/alphaS/260225_gen_massiveBottom/w_z_gen_dists_maxFiles_10_hadronsSel_massive_gh_unknownw_histplot_260225.hdf5 --massless-file /scratch/submit/cms/alphaS/260225_gen_massiveBottom/w_z_gen_dists_maxFiles_100_nnpdf31_hadronsSel_massless_gh_unknownw_histplot_260225.hdf5 --tag gh_unknownw_histplot_260225`
+- Outputs:
+  - hist files:
+    - `/scratch/submit/cms/alphaS/260225_gen_massiveBottom/w_z_gen_dists_maxFiles_10_hadronsSel_massive_gh_unknownw_histplot_260225.hdf5`
+    - `/scratch/submit/cms/alphaS/260225_gen_massiveBottom/w_z_gen_dists_maxFiles_100_nnpdf31_hadronsSel_massless_gh_unknownw_histplot_260225.hdf5`
+  - plot directory:
+    - `/home/submit/lavezzo/public_html/alphaS/260227_z_bb/hadrons/gh_unknownw_histplot_260225/`
+  - new weight plot:
+    - `samples_comparison_unknown_weight0.png` (plus `.pdf` and `.log`).
+- Key printed diagnostics (same run):
+  - selected-yield ratio (`bottom_sel==1`): `3.725055891003863`
+  - `% massive selected for swap`: `1.0`
+  - `% massless selected for swap`: `0.0669519319155583`
+- Status:
+  - `answered`.
+
+## A/B check (2026-02-27): with vs without `UnknownWeightAltSet1[0]`
+- User question:
+  - why `unknown_weight0` mean is > 1 while massive/massless `nBhad` ratio looks almost unchanged; run with/without and compare ratios.
+- Minimal implementation for controlled test:
+  - added CLI switch in `/home/submit/lavezzo/alphaS/gh/WRemnants/scripts/histmakers/w_z_gen_dists.py`:
+    - `--skipUnknownWeightAltSet1` (skip multiplying event weight by `unknown_weight0`).
+- Produced A/B files (same stats, same inputs):
+  - with weight:
+    - `/scratch/submit/cms/alphaS/260227_gen_massiveBottom_ab/w_z_gen_dists_maxFiles_10_hadronsSel_massive_withW_260227_ab.hdf5`
+  - without weight:
+    - `/scratch/submit/cms/alphaS/260227_gen_massiveBottom_ab/w_z_gen_dists_maxFiles_10_hadronsSel_massive_noW_260227_ab.hdf5`
+  - common massless reference:
+    - `/scratch/submit/cms/alphaS/260227_gen_massiveBottom_ab/w_z_gen_dists_maxFiles_100_nnpdf31_hadronsSel_massless_260227_ab.hdf5`
+- Quantitative comparison (scaled as in `plot_narf.py`):
+  - selected ratio `massless/massive` in `bottom_sel==1`:
+    - with weight: `3.725056`
+    - without weight: `3.722445`
+    - relative change: `+0.0701%`
+  - massive selected fraction (`bottom_sel==1`) is unchanged:
+    - with: `1.000000`
+    - without: `1.000000`
+  - `unknown_weight0` mean from histogram:
+    - `1.416303`
+- Interpretation note:
+  - despite mean(`unknown_weight0`) > 1, the key selected-yield ratio is nearly unchanged in this setup (strong cancellation in ratio-level observable); bin-level `nBhad` changes are present and non-uniform.
+- Status:
+  - `answered`.
+
+## Resume request (2026-02-25): fetch newly produced samples from other study
+- User request:
+  - resume b-quark-mass study with newly produced samples from another study and fetch both input files.
+- Located newest paired outputs (same tag, latest mtimes on `/ceph`):
+  - massive:
+    - `/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260223_gen_massiveBottom/w_z_gen_dists_maxFiles_m1_hadronsSel_massive_appc_genjet_260223_b1plots.hdf5`
+  - massless:
+    - `/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260223_gen_massiveBottom/w_z_gen_dists_maxFiles_1000_nnpdf31_hadronsSel_massless_appc_genjet_260223_b1plots.hdf5`
+- Fetched into this study context by staging stable symlinks:
+  - `agents/studies/z_bmass_uncertainty/inputs/latest_from_other_study/massive_appc_genjet_260223_b1plots.hdf5`
+  - `agents/studies/z_bmass_uncertainty/inputs/latest_from_other_study/massless_appc_genjet_260223_b1plots.hdf5`
+- Verification:
+  - massive file size/mtime: `1384981` bytes, `2026-02-23 10:12:29 -0500`
+  - massless file size/mtime: `6429918` bytes, `2026-02-23 10:14:43 -0500`
+- Status:
+  - `answered`.
+
+## Selected-variable plotting expansion (2026-02-23)
+- User request:
+  - plot all variables entering the current Appendix-C-style selection and double-check dressed leptons.
+- Plot-script updates in `studies/z_bb/plot_narf.py`:
+  - added explicit Appendix-C selection variables to the plot list:
+    - `cms_appc_pass_z`, `cms_appc_n_lep`, `cms_appc_n_bjets_clean`, `cms_appc_mll`, `cms_appc_mll_b1`.
+  - added optional `bottom_sel` slicing in generic plotting loop (when axis exists).
+  - added fallback dressed-lepton checks via projections from existing 2D dressed histograms:
+    - `dressed_MllPTll -> ewMll` (with `bottom_sel==1`),
+    - `dressed_MllPTll -> ewPTll` (with `bottom_sel==1`),
+    - `dressed_YllMll -> ewAbsYll` (with `bottom_sel==1`).
+- Attempted to produce direct single-lepton/dressed-lepton 1D histograms with:
+  - `python studies/z_bb/make_hists.py --appendixc-fastjet --single-lepton-hists --nthreads 100 --tag appc_genjet_260223_b1plots_selvars_lep`
+  - and lower-thread/file retries.
+- Outcome of single-lepton retries:
+  - deterministic ROOT abort in massive sample (`free(): invalid size`, exit code 133), reproduced with `--max-files-massive 1` and low thread count.
+  - Therefore `nominal_dressedLepPt{1,2}` / `nominal_dressedLepEta{1,2}` remain unavailable in current output files.
+- Successful plotting command (using existing completed GenJet backend files):
+  - `python studies/z_bb/plot_narf.py --massive-file /ceph/submit/data/group/cms/store/user/lavezzo/alphaS//260223_gen_massiveBottom/w_z_gen_dists_maxFiles_m1_hadronsSel_massive_appc_genjet_260223_b1plots.hdf5 --massless-file /ceph/submit/data/group/cms/store/user/lavezzo/alphaS//260223_gen_massiveBottom/w_z_gen_dists_maxFiles_1000_nnpdf31_hadronsSel_massless_appc_genjet_260223_b1plots.hdf5 --tag appc_genjet_260223_b1plots_selvars2`
+- Output directory:
+  - `/home/submit/lavezzo/public_html/alphaS/260223_z_bb/hadrons/appc_genjet_260223_b1plots_selvars2/`
+- Key new files:
+  - `samples_comparison_cms_appc_pass_z.png`
+
+## Rerun + replot after weight-sum fix (2026-02-27)
+- User request:
+  - rerun histmaking and remake comparison plots after moving `UnknownWeightAltSet1[0]` out of `weight_sum` and into `nominal_weight` (`extra_weight` path).
+- Container command executed:
+  - `/tmp/zbb_rerun_wsumfix_260227.sh` via
+    - `singularity run --bind /scratch/,/work/,/home/,/ceph/ /cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/bendavid/cmswmassdocker/wmassdevrolling\:latest /bin/bash /tmp/zbb_rerun_wsumfix_260227.sh`
+- Produced hist files:
+  - with extra weight:
+    - `/scratch/submit/cms/alphaS/260227_gen_massiveBottom_wsumfix/w_z_gen_dists_maxFiles_10_hadronsSel_massive_withW_wsumfix_260227.hdf5`
+  - without extra weight:
+    - `/scratch/submit/cms/alphaS/260227_gen_massiveBottom_wsumfix/w_z_gen_dists_maxFiles_10_hadronsSel_massive_noW_wsumfix_260227.hdf5`
+  - common massless:
+    - `/scratch/submit/cms/alphaS/260227_gen_massiveBottom_wsumfix/w_z_gen_dists_maxFiles_100_nnpdf31_hadronsSel_massless_wsumfix_260227.hdf5`
+- Plot outputs:
+  - with extra weight:
+    - `/home/submit/lavezzo/public_html/alphaS/260227_z_bb/hadrons/withW_wsumfix_260227/`
+  - without extra weight:
+    - `/home/submit/lavezzo/public_html/alphaS/260227_z_bb/hadrons/noW_wsumfix_260227/`
+- Key printed diagnostics:
+  - selected ratio (`massless/massive`, `bottom_sel==1`):
+    - with extra weight: `1.6834494572675953`
+    - without extra weight: `3.7224453931647616`
+  - selected fractions:
+    - massive: `1.0` (both cases)
+    - massless: `0.0669519319155583`
+
+## Massive-only rerun after adding events (2026-02-27)
+- User request:
+  - rerun the massive sample after adding more events.
+- Command:
+  - `python $WREM_BASE/scripts/histmakers/w_z_gen_dists.py --dataPath /scratch/submit/cms/wmass/NanoAOD/ --maxFiles -1 --addBottomAxis -o /scratch/submit/cms/alphaS/260227_gen_massiveBottom_wsumfix --filterProcs Zbb_MiNNLO -v 4 --postfix hadronsSel_massive_withW_newevents_260227 -j 50`
+- Runtime summary:
+  - input files booked: `116` (was `78` in previous quick A/B run).
+  - processed events: `5,770,000`.
+- Output:
+  - `/scratch/submit/cms/alphaS/260227_gen_massiveBottom_wsumfix/w_z_gen_dists_maxFiles_m1_hadronsSel_massive_withW_newevents_260227.hdf5`
+
+## Full-stat replot with new weighted massive sample (2026-02-27)
+- User request:
+  - remake all study plots with weights and full events for event-selection diagnostics (jets, B hadrons, LHE).
+- Full-stat massless rerun (matching histogram config):
+  - command:
+    - `python $WREM_BASE/scripts/histmakers/w_z_gen_dists.py --dataPath /scratch/submit/cms/wmass/NanoAOD/ --maxFiles 1000 --addBottomAxis -o /scratch/submit/cms/alphaS/260227_gen_massiveBottom_wsumfix --pdf nnpdf31 --filterProcs Zmumu_MiNNLO -v 4 --postfix hadronsSel_massless_full_wsumfix_260227 -j 50`
+  - runtime summary:
+    - files: `1000`
+    - processed events: `106,823,324`
+  - output:
+    - `/scratch/submit/cms/alphaS/260227_gen_massiveBottom_wsumfix/w_z_gen_dists_maxFiles_1000_nnpdf31_hadronsSel_massless_full_wsumfix_260227.hdf5`
+- Plot commands:
+  - `python studies/z_bb/plot_narf.py --massive-file /scratch/submit/cms/alphaS/260227_gen_massiveBottom_wsumfix/w_z_gen_dists_maxFiles_m1_hadronsSel_massive_withW_newevents_260227.hdf5 --massless-file /scratch/submit/cms/alphaS/260227_gen_massiveBottom_wsumfix/w_z_gen_dists_maxFiles_1000_nnpdf31_hadronsSel_massless_full_wsumfix_260227.hdf5 --tag full_withW_newevents_wsumfix_260227`
+  - `python studies/z_bb/plot_narf.py --massive-file /scratch/submit/cms/alphaS/260227_gen_massiveBottom_wsumfix/w_z_gen_dists_maxFiles_m1_hadronsSel_massive_withW_newevents_260227.hdf5 --massless-file /scratch/submit/cms/alphaS/260227_gen_massiveBottom_wsumfix/w_z_gen_dists_maxFiles_1000_nnpdf31_hadronsSel_massless_full_wsumfix_260227.hdf5 --tag full_withW_newevents_wsumfix_260227_norm --normalize`
+- Plot outputs:
+  - unnormalized:
+    - `/home/submit/lavezzo/public_html/alphaS/260227_z_bb/hadrons/full_withW_newevents_wsumfix_260227/`
+  - normalized:
+    - `/home/submit/lavezzo/public_html/alphaS/260227_z_bb/hadrons/full_withW_newevents_wsumfix_260227_norm/`
+- Printed diagnostics:
+  - selected ratio (`massless/massive`, `bottom_sel==1`): `1.660429733186825`
+  - massive selected fraction: `1.0`
+  - massless selected fraction: `0.06709904773170551`
+- Note:
+  - several LHE/Appendix-C/parton-flavor entries were skipped by plotter due to missing histogram keys in one input (same behavior as prior runs with this plot script/hist naming).
+
+## Preselection-plot refresh and new slide deck (2026-02-27)
+- User request:
+  - make a new slide set with: sample definitions, event selection, new weights histogram, preselection object diagnostics (LHE/jets/B hadrons), and corrected sample.
+- Plotter update:
+  - `studies/z_bb/plot_narf.py`:
+    - added alias mapping from legacy LHE names to current hist keys (`presel_*`, `postsel_*`).
+    - added extra B-hadron diagnostics to standard plot loop:
+      - `nBhad_unity`, `nBhad_weight`, `subB_aeta`.
+    - added explicit preselection LHE diagnostics to plot list:
+      - `presel_n_lhe_{init,fin,total}_bbbar`,
+      - `presel_{lhe_init_flavor,z_mother_flavor}`,
+      - `presel_lhe_bbbar_fin_{min,max}_pt`,
+      - `presel_{m_bb,dR_bb}`.
+- Replot commands:
+  - `python studies/z_bb/plot_narf.py --massive-file /scratch/submit/cms/alphaS/260227_gen_massiveBottom_wsumfix/w_z_gen_dists_maxFiles_m1_hadronsSel_massive_withW_newevents_260227.hdf5 --massless-file /scratch/submit/cms/alphaS/260227_gen_massiveBottom_wsumfix/w_z_gen_dists_maxFiles_1000_nnpdf31_hadronsSel_massless_full_wsumfix_260227.hdf5 --tag full_withW_newevents_wsumfix_260227_presel`
+  - `python studies/z_bb/plot_narf.py --massive-file /scratch/submit/cms/alphaS/260227_gen_massiveBottom_wsumfix/w_z_gen_dists_maxFiles_m1_hadronsSel_massive_withW_newevents_260227.hdf5 --massless-file /scratch/submit/cms/alphaS/260227_gen_massiveBottom_wsumfix/w_z_gen_dists_maxFiles_1000_nnpdf31_hadronsSel_massless_full_wsumfix_260227.hdf5 --tag full_withW_newevents_wsumfix_260227_presel_norm --normalize`
+- New plot directories:
+  - `/home/submit/lavezzo/public_html/alphaS/260227_z_bb/hadrons/full_withW_newevents_wsumfix_260227_presel/`
+  - `/home/submit/lavezzo/public_html/alphaS/260227_z_bb/hadrons/full_withW_newevents_wsumfix_260227_presel_norm/`
+- New slide assets:
+  - outline:
+    - `agents/studies/z_bmass_uncertainty/slides/outline_260227_fullweights.json`
+  - compiled deck:
+    - `agents/studies/z_bmass_uncertainty/slides/b_quark_mass_fullweights_260227.tex`
+    - `agents/studies/z_bmass_uncertainty/slides/b_quark_mass_fullweights_260227.pdf`
+  - `samples_comparison_cms_appc_n_lep.png`
+  - `samples_comparison_cms_appc_n_bjets_clean.png`
+  - `samples_comparison_cms_appc_mll.png`
+  - `samples_comparison_cms_appc_mll_b1.png`
+  - `samples_comparison_dressed_MllPTll_proj_ewMll_b1.png`
+  - `samples_comparison_dressed_MllPTll_proj_ewPTll_b1.png`
+  - `samples_comparison_dressed_YllMll_proj_ewAbsYll_b1.png`
+- Status:
+  - `partially answered` for direct single-dressed-lepton pT/eta plots (blocked by reproducible crash),
+  - `answered` for all available selection-variable and dressed-dilepton checks from existing outputs.
+
+## Custom-bin cross-section plots from existing histograms (2026-02-23)
+- User request:
+  - in current plotting script, make leading b-jet plots with custom bins and cross-section units; no histmaker rerun.
+  - bins:
+    - `pT`: `30, 50, 75, 110, 150, 220, 300`
+    - `abs(y)`: `0, 0.4, 0.8, 1.2, 1.6, 2.0, inf`
+  - with `binwnorm=1` and log-y.
+- Script update:
+  - `studies/z_bb/plot_narf.py`
+    - added two custom-bin plot blocks:
+      - `lead_bjet_pt` rebinned to `[30,50,75,110,150,220,300]`
+      - `lead_bjet_eta` converted to `|y|` (`makeAbsHist`) and rebinned to `[0,0.4,0.8,1.2,1.6,2.0,eta_max]` (last bin treated as `2.0 -> inf` within available axis range)
+    - set `binwnorm=1`, `logy=True`, and `ylabel="Cross section / bin width [fb]"` for these custom plots.
+- Plot command:
+  - `python studies/z_bb/plot_narf.py --massive-file /ceph/submit/data/group/cms/store/user/lavezzo/alphaS//260223_gen_massiveBottom/w_z_gen_dists_maxFiles_m1_hadronsSel_massive_appc_genjet_260223_b1plots.hdf5 --massless-file /ceph/submit/data/group/cms/store/user/lavezzo/alphaS//260223_gen_massiveBottom/w_z_gen_dists_maxFiles_1000_nnpdf31_hadronsSel_massless_appc_genjet_260223_b1plots.hdf5 --tag appc_genjet_260223_custombins_xsec`
+- Output directory:
+  - `/home/submit/lavezzo/public_html/alphaS/260223_z_bb/hadrons/appc_genjet_260223_custombins_xsec/`
+- New files:
+  - `samples_comparison_lead_bjet_pt_custombins_30_50_75_110_150_220_300.png`
+  - `samples_comparison_lead_bjet_absy_custombins_0_0p4_0p8_1p2_1p6_2p0_inf.png`
+- Status:
+  - `answered`.
+
+## 2026-02-28 — Literal HepPDT tagging + PDT-axis/hist smoke check
+- User request: use literal PDT function (not hand-rolled digit logic), add nominal axis for PDT bottom selection, and add PDT-labeled B-hadron hist outputs.
+- Code updates:
+  - `/home/submit/lavezzo/alphaS/gh/WRemnants/wremnants/include/theoryTools.hpp`
+    - `isBHadron(int)` now uses literal `HepPDT::ParticleID` API: `isHadron() && hasBottom()`.
+  - `/home/submit/lavezzo/alphaS/gh/WRemnants/scripts/histmakers/w_z_gen_dists.py`
+    - Added nominal axis/column `bottom_sel_pdt` (in addition to existing `bottom_sel`).
+    - Defined `bottom_sel_pdt = (nBhad >= 1)` from PDT-tagged hadron collection.
+    - Added explicit PDT-labeled B-hadron hist aliases:
+      - `nBhad_pdt`, `leadB_pt_pdt`, `subB_pt_pdt`, `m_bb_had_pdt`, `dR_bb_had_pdt`.
+- Smoke run executed in container:
+  - `python studies/z_bb/make_hists.py --tag pdtlit_260227_smoke --max-files-massive 1 --max-files-massless 1 --nthreads 4`
+- Output files:
+  - `/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260227_gen_massiveBottom/w_z_gen_dists_maxFiles_1_hadronsSel_massive_pdtlit_260227_smoke.hdf5`
+  - `/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260227_gen_massiveBottom/w_z_gen_dists_maxFiles_1_nnpdf31_hadronsSel_massless_pdtlit_260227_smoke.hdf5`
+- Validation from produced massive file (`Zbb_MiNNLO`):
+  - `nominal_gen`, `nBhad_pdt`, `leadB_pt_pdt`, `subB_pt_pdt`, `m_bb_had_pdt`, `dR_bb_had_pdt` all present.
+  - `nominal_gen` axes are now:
+    - `['massVgen', 'absYVgen', 'ptVgen', 'chargeVgen', 'bottom_sel', 'bottom_sel_pdt']`.
+
+## 2026-02-28 — Tagging-method diagnostics: 2x2 matrix plots
+- User request: add diagnostics to understand differences between tagging methods, especially a 2x2 event-count matrix between methods.
+- Implemented in `/home/submit/lavezzo/alphaS/WRemnantsHelpers/studies/z_bb/plot_narf.py`:
+  - added `plot_tagging_matrix(...)` to build 2x2 matrices from `nominal_gen` axes:
+    - rows: `bottom_sel` (analysis selection)
+    - columns: `bottom_sel_pdt` (PDT-based selection)
+  - added two outputs per sample:
+    - `*_event_yield_matrix` (absolute weighted yields)
+    - `*_event_fraction_matrix` (fractions of total)
+  - added printed diagnostics:
+    - agreement yield (`00+11`), disagreement yield (`01+10`), disagreement fraction.
+- Smoke validation run:
+  - `python studies/z_bb/plot_narf.py --massive-file /ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260227_gen_massiveBottom/w_z_gen_dists_maxFiles_1_hadronsSel_massive_pdtlit_260227_smoke.hdf5 --massless-file /ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260227_gen_massiveBottom/w_z_gen_dists_maxFiles_1_nnpdf31_hadronsSel_massless_pdtlit_260227_smoke.hdf5 --tag pdt_matrix_smoke_260228`
+- Output directory:
+  - `/home/submit/lavezzo/public_html/alphaS/260228_z_bb/hadrons/pdt_matrix_smoke_260228/`
+- New files produced:
+  - `tagging_matrix_massive_event_yield_matrix.{png,pdf}`
+  - `tagging_matrix_massive_event_fraction_matrix.{png,pdf}`
+  - `tagging_matrix_massless_event_yield_matrix.{png,pdf}`
+  - `tagging_matrix_massless_event_fraction_matrix.{png,pdf}`
+- Printed smoke diagnostics:
+  - Massive: `agreement=3.405621e+01`, `disagreement=0.000000e+00`, `disagreement_frac=0.000000`
+  - Nominal: `agreement=8.358939e+02`, `disagreement=0.000000e+00`, `disagreement_frac=0.000000`
+
+## 2026-02-28 — Full-stat massive rerun with PDT tag
+- User request: run new full-stat massive histmaker with fresh PDT tag.
+- Command:
+  - `python /home/submit/lavezzo/alphaS/gh/WRemnants/scripts/histmakers/w_z_gen_dists.py --dataPath /scratch/submit/cms/wmass/NanoAOD/ --maxFiles -1 --addBottomAxis -o /scratch/submit/cms/alphaS/260227_gen_massiveBottom_wsumfix --filterProcs Zbb_MiNNLO -v 4 --postfix hadronsSel_massive_withW_newevents_260228_pdt -j 200`
+- Runtime summary:
+  - processed files: `116/116`
+  - processed events: `5,770,000`
+- Output:
+  - `/scratch/submit/cms/alphaS/260227_gen_massiveBottom_wsumfix/w_z_gen_dists_maxFiles_m1_hadronsSel_massive_withW_newevents_260228_pdt.hdf5`
+
+## 2026-02-28 — Full rerun with explicit legacy vs PDT split
+- User request: rerun histmaker over both samples after enforcing
+  - `bottom_sel` = legacy B-hadron tag,
+  - `bottom_sel_pdt` = HepPDT tag.
+- Command:
+  - `python studies/z_bb/make_hists.py --tag legacyVsPDT_split_260228 --outdir /scratch/submit/cms/alphaS/260227_gen_massiveBottom_wsumfix --max-files-massive -1 --max-files-massless 1000 --nthreads 200`
+- Outputs:
+  - massive: `/scratch/submit/cms/alphaS/260227_gen_massiveBottom_wsumfix/w_z_gen_dists_maxFiles_m1_hadronsSel_massive_legacyVsPDT_split_260228.hdf5`
+  - massless: `/scratch/submit/cms/alphaS/260227_gen_massiveBottom_wsumfix/w_z_gen_dists_maxFiles_1000_nnpdf31_hadronsSel_massless_legacyVsPDT_split_260228.hdf5`
+
+## 2026-02-28 — Full-stat run with GenPart FastJet reclustered-jet diagnostics
+- Added `--genPartFastjetJets` path in canonical histmaker and ran full-stat production for both samples.
+- Command:
+  - `python studies/z_bb/make_hists.py --tag fastjetrecl_full_260228 --outdir /scratch/submit/cms/alphaS/260227_gen_massiveBottom_wsumfix --max-files-massive -1 --max-files-massless 1000 --nthreads 200 --genpart-fastjet-jets`
+- Outputs:
+  - `/scratch/submit/cms/alphaS/260227_gen_massiveBottom_wsumfix/w_z_gen_dists_maxFiles_m1_hadronsSel_massive_fastjetrecl_full_260228.hdf5`
+  - `/scratch/submit/cms/alphaS/260227_gen_massiveBottom_wsumfix/w_z_gen_dists_maxFiles_1000_nnpdf31_hadronsSel_massless_fastjetrecl_full_260228.hdf5`
+- Ran existing plotting script on the new pair (to `/tmp` due public_html space limit):
+  - `python studies/z_bb/plot_narf.py --massive-file <...massive_fastjetrecl_full_260228.hdf5> --massless-file <...massless_fastjetrecl_full_260228.hdf5> --outdir /tmp/fastjetrecl_full_260228_plots --tag fastjetrecl_full_260228`
+- New Nano-vs-reclustered comparison plots produced in `/tmp/fastjetrecl_full_260228_plots`:
+  - `jet_collection_compare_{massive,massless}_{n_bjets,lead_bjet_pt,sublead_bjet_pt,lead_bjet_eta,sublead_bjet_eta,m_bb_jet,dR_bb_jet}.{png,pdf}`
+
+## 2026-03-02 — Resume request: define bottom selection via `nLHE > 0` and rerun corrected sample
+- User request:
+  - resume b-quark-mass study;
+  - define bottom selection via LHE multiplicity (`nLHE > 0`);
+  - rerun pipeline and inspect corrected sample.
+- Code update (applied):
+  - `/home/submit/lavezzo/alphaS/gh/WRemnants/scripts/histmakers/w_z_gen_dists.py`
+    - changed analysis selection:
+      - from `bottom_sel = (bHad_pt.size() >= 1)`
+      - to `bottom_sel = (n_lhe_bbbar > 0)` (implemented `nLHE > 0` using existing event-level total LHE `bbbar` multiplicity).
+- Runtime/debug notes from this run:
+  - Direct `singularity run ...` from Codex failed with:
+    - `ERROR  : Installation issue: starter-suid doesn't have setuid bit set`
+  - Successful execution path in this session used approved wrapper:
+    - `/home/submit/lavezzo/alphaS/WRemnantsHelpers/agents/run_wmass_with_heppdt.sh`
+  - Pipeline script moved to bound path and fixed setup sourcing:
+    - `/home/submit/lavezzo/alphaS/WRemnantsHelpers/agents/debug/zbb_nlhe_sel_260302.sh`
+    - fix: disable `nounset` around `source /home/submit/lavezzo/alphaS/gh/WRemnants/setup.sh` (`set +u`/`set -u`), otherwise script exits early.
+- Full pipeline command (successful):
+  - `/home/submit/lavezzo/alphaS/WRemnantsHelpers/agents/run_wmass_with_heppdt.sh /bin/bash /home/submit/lavezzo/alphaS/WRemnantsHelpers/agents/debug/zbb_nlhe_sel_260302.sh`
+- Produced hist files:
+  - massive:
+    - `/scratch/submit/cms/alphaS/260302_gen_massiveBottom_nlhe/w_z_gen_dists_maxFiles_m1_hadronsSel_massive_nlheSel_260302.hdf5`
+  - massless:
+    - `/scratch/submit/cms/alphaS/260302_gen_massiveBottom_nlhe/w_z_gen_dists_maxFiles_1000_nnpdf31_hadronsSel_massless_nlheSel_260302.hdf5`
+- Plot outputs (corrected sample shown in both unnormalized and normalized variants):
+  - unnormalized:
+    - `/home/submit/lavezzo/public_html/alphaS/260302_z_bb/hadrons/nlheSel_260302/`
+  - normalized (`--normalize`):
+    - `/home/submit/lavezzo/public_html/alphaS/260302_z_bb/hadrons/nlheSel_260302_norm/`
+  - key corrected-sample figures:
+    - `inclusive_ptVgen{_normalized}.{png,pdf}`
+    - `inclusive_absYVgen{_normalized}.{png,pdf}`
+- Printed swap diagnostics from `plot_narf.py`:
+  - `Ratio of selected events (bottom_sel==1)` = `0.9532019550472046`
+  - `% selected for swap`:
+    - massive = `1.0`
+    - massless = `0.038519512269219965`
+- Additional corrected/nominal ratio summary (from `agents/debug/nlhe_summary_260302.py`):
+  - unnormalized corrected:
+    - `ptVgen` ratio min/max/wmean = `0.997395 / 1.024550 / 1.001891`
+    - `absYVgen` ratio min/max/wmean = `1.001094 / 1.002323 / 1.001891`
+  - normalized corrected:
+    - `ptVgen` ratio min/max/wmean = `0.996286 / 1.020497 / 1.000000`
+    - `absYVgen` ratio min/max/wmean = `0.999649 / 1.000764 / 1.000000`
+- Physics-sense quick check:
+  - With `bottom_sel = (n_lhe_bbbar > 0)`, the selected component in 5FS decreases vs prior broad hadron-based selection (`~3.85%` now vs `~6.71%` in the recent baseline run), and selected-yield ratio `5FS/4FS` drops to `~0.95` (from `~1.66`), making the corrected inclusive shape close to unity with modest high-`ptV` enhancement.
+- Status:
+  - `answered`.

@@ -37,6 +37,6 @@ fi
 mkdir -p $output_dir
 echo "Output directory: $output_dir"
 
-command="python ${WREM_BASE}/scripts/histmakers/mz_dilepton.py --dataPath /scratch/submit/cms/wmass/NanoAOD/ -o $output_dir --maxFiles -1 --axes ptll yll --csVarsHist --unfolding --poiAsNoi --unfoldingAxes ptVGen absYVGen helicitySig --unfoldingInclusive --filterProcs Data Zmumu Ztautau PhotonInduced --forceDefaultName ${extra_args} ${postfix}"
+command="python ${WREM_BASE}/scripts/histmakers/mz_dilepton.py --dataPath /scratch/submit/cms/wmass/NanoAOD/ -o $output_dir --maxFiles -1 --axes ptll yll --csVarsHist --unfolding --poiAsNoi --unfoldingAxes ptVGen absYVGen helicitySig --unfoldingInclusive --forceDefaultName -j 300 --theoryCorr 'scetlib_dyturbo_LatticeNP_CT18Z_N3p0LL_N2LO' 'scetlib_dyturbo_LatticeNP_CT18Z_N3p0LL_N2LO_pdfvars' 'scetlib_dyturbo_LatticeNP_CT18Z_N3p0LL_N2LO_pdfas' ${extra_args} ${postfix}"
 echo "Executing command: $command"
 eval $command

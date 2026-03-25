@@ -28,7 +28,7 @@ def parse_args():
         "--max-files-massless",
         type=int,
         default=1000,
-        help="--maxFiles for Zmumu_MiNNLO (default: 1000).",
+        help="--maxFiles for Zmumu_13TeVGen (default: 1000).",
     )
     parser.add_argument(
         "-j",
@@ -36,6 +36,21 @@ def parse_args():
         type=int,
         default=50,
         help="Number of threads passed to histmaker.",
+    )
+    parser.add_argument(
+        "--appendixc-fastjet",
+        action="store_true",
+        help="Enable Appendix-C-like FastJet fiducial selection in histmaker.",
+    )
+    parser.add_argument(
+        "--single-lepton-hists",
+        action="store_true",
+        help="Also produce single-lepton (including dressed-lepton) histograms.",
+    )
+    parser.add_argument(
+        "--genpart-fastjet-jets",
+        action="store_true",
+        help="Also store GenPart reclustered FastJet+ghost-b observables in histmaker output.",
     )
     return parser.parse_args()
 
@@ -77,6 +92,12 @@ def main():
         "-j",
         str(args.nthreads),
     ]
+    if args.appendixc_fastjet:
+        cmd_massive.append("--appendixCFastjet")
+    if args.genpart_fastjet_jets:
+        cmd_massive.append("--genPartFastjetJets")
+    if args.single_lepton_hists:
+        cmd_massive.append("--singleLeptonHists")
     cmd_massless = [
         "python",
         histmaker,
@@ -90,7 +111,7 @@ def main():
         "--pdf",
         "nnpdf31",
         "--filterProcs",
-        "Zmumu_MiNNLO",
+        "Zmumu_13TeVGen",
         "-v",
         "4",
         "--postfix",
@@ -98,6 +119,12 @@ def main():
         "-j",
         str(args.nthreads),
     ]
+    if args.appendixc_fastjet:
+        cmd_massless.append("--appendixCFastjet")
+    if args.genpart_fastjet_jets:
+        cmd_massless.append("--genPartFastjetJets")
+    if args.single_lepton_hists:
+        cmd_massless.append("--singleLeptonHists")
 
     run_cmd(cmd_massive)
     run_cmd(cmd_massless)

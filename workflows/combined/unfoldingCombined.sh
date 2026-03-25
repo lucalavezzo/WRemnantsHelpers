@@ -29,12 +29,13 @@ while getopts "u:o:e:f:" opt; do
 done
 
 if [ -z "$output_dir" ]; then
-    output_dir=$(dirname $input_file_Z)
+    current_date=$(date +"%y%m%d")
+    output_dir="${MY_OUT_DIR}/${current_date}_WZSimultaneousUnfolding_flipped/"
     echo "Set output directory to: $output_dir"
 fi
 
 # unfolding command
-unfolding_setup_command="python $WREM_BASE/scripts/rabbit/setupRabbit.py -i $input_file_Z $input_file_W -o $output_dir --analysisMode unfolding --unfoldingLevel prefsr --poiAsNoi --poiAsNoi --fitvar 'ptll-yll-cosThetaStarll_quantile-phiStarll_quantile' 'eta-pt-charge' --genAxes 'ptVGen-absYVGen-helicitySig' 'absEtaGen-ptGen-qGen' --scaleNormXsecHistYields '0.05' --allowNegativeExpectation --realData --systematicType normal --unfoldSimultaneousWandZ "
+unfolding_setup_command="python $WREM_BASE/scripts/rabbit/setupRabbit.py -i $input_file_Z $input_file_W -o $output_dir --analysisMode unfolding --unfoldingLevel prefsr --poiAsNoi --fitvar 'ptll-yll-cosThetaStarll_quantile-phiStarll_quantile' 'eta-pt-charge' --genAxes 'ptVGen-absYVGen-helicitySig' 'absEtaGen-ptGen-qGen' --scaleNormXsecHistYields '0.05' --allowNegativeExpectation --realData --systematicType normal --unfoldSimultaneousWandZ --npUnc LatticeEigvars --pdfUncFromCorr ${extra_setup}"
 
 echo "Executing command: $unfolding_setup_command"
 unfolding_setup_command_output=$(eval "$unfolding_setup_command 2>&1" | tee /dev/tty)
@@ -49,7 +50,7 @@ echo "Output: $output"
 echo
 
 
-unfolding_command="rabbit_fit.py ${unfolding_combine_file} -o ${output} --binByBinStatType normal-multiplicative -t -1 --doImpacts --globalImpacts --saveHists --computeHistErrors --computeHistImpacts --computeHistCov --compositeModel -m Select 'ch0_masked' 'helicitySig:slice(0,1)' -m Select 'ch1_masked'  --postfix asimov ${extra_fit}"
+unfolding_command="rabbit_fit.py ${unfolding_combine_file} -o ${output} --binByBinStatType normal-multiplicative -t -1 --doImpacts --globalImpacts --saveHists --computeHistErrors --computeHistImpacts --computeHistCov --compositeMapping -m Select 'ch0_masked' 'helicitySig:0' -m Select 'ch1_masked' --postfix asimov ${extra_fit}"
 echo "Executing command: $unfolding_command"
 unfolding_command_output=$(eval "$unfolding_command 2>&1" | tee /dev/tty)
 echo

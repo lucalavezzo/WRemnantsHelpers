@@ -32,9 +32,12 @@ python /home/submit/lavezzo/alphaS/gh/WRemnants/rabbit/bin/rabbit_print_impacts.
 ## Common Pitfalls
 - `-e "--maxFiles 10"` can parse incorrectly; use `-e "--maxFiles=10"`.
 - Non-TTY sessions can break naive `tee /dev/tty` usage.
+- Grouped nuisance-variation plotting requires fitresult metadata persistence.
+  - Ensure `rabbit_fit.py` writes `systs`, `systgroups`, and `systgroupidxs` into `meta`.
+  - Then `rabbit_plot_hists.py --varGroupNames <group>` can build on-the-fly grouped bands from `hist_<fitType>_inclusive_variations`.
 
 ## Last Updated
-- 2026-02-16
+- 2026-02-28
 
 ## Source
 - Migration from legacy nominal workflow notes (2026-02-16)

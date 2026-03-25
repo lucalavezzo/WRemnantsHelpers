@@ -1,8 +1,7 @@
 \frametitle{Backup: Exact B-hadron Selection Code}
 \begin{block}{Implementation}
 \begin{verbatim}
-// Source of truth: external library helper (ThePEG::PDT, from its .hpp)
-// Treat this external helper as authoritative for B-hadron ID
+// wrem::finalStateBHadronIdx implementation
 if (status[i] != 1 && status[i] != 2) continue;
 const int apdg = std::abs(pdgId[i]);
 if (!ThePEG::PDT::hasBottom(apdg)) continue;

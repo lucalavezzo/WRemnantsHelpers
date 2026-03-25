@@ -1,0 +1,332 @@
+# Run Log: PDF From Correlations Bias Test
+
+## 2026-02-26
+- Initialized study tracking files:
+  - `agents/studies/pdf_from_corrs_bias_test/README.md`
+  - `agents/studies/pdf_from_corrs_bias_test/runlog.md`
+- Inspected script set:
+  - `studies/pdf_from_corrs_bias_test/run_histmakers.py`
+  - `studies/pdf_from_corrs_bias_test/run_fitter.py`
+  - `studies/pdf_from_corrs_bias_test/plot_results.py`
+- Quick findings:
+  - Workflow logic matches intended central-vs-pseudo-data bias test strategy.
+  - Potential PDF-key mismatches detected (`ct18` vs `ct18z`, `msht20an3lo` vs `msht20aN3LO`), flagged for validation before execution.
+- No jobs launched yet in this session.
+- Implemented new plotting utility for histmaker outputs:
+  - `studies/pdf_from_corrs_bias_test/plot_nominal_vs_alternate_pdfs.py`
+  - Purpose: compare nominal histogram to alternate PDF central templates from the same histmaker `.hdf5`.
+  - Key options:
+    - `--axes` to project selected axes before plotting.
+    - automatic unrolling of remaining axes.
+    - `--alt-pdfs` (resolved to hist names) or explicit `--alt-hists`.
+    - `--select` for axis selections prior to projection.
+- Validation:
+  - `python -m py_compile studies/pdf_from_corrs_bias_test/plot_nominal_vs_alternate_pdfs.py` (passed).
+- Example command template:
+  - `python studies/pdf_from_corrs_bias_test/plot_nominal_vs_alternate_pdfs.py /path/to/mz_dilepton_<central>.hdf5 --proc ZmumuPostVFP --axes ptll yll --outdir $MY_PLOT_DIR/$(date +%y%m%d)_pdf_bias_debug`
+- Update: added optional MINNLO PDF-weight overlay in the same script.
+  - New flag: `--include-minnlo-pdfs`.
+  - Behavior: for each `--alt-pdfs` key, the script now tries both:
+    - theory-correction histogram (`nominal_<...>_Corr`)
+    - MINNLO histogram (`nominal_pdf{PDFNAME}`)
+- Test execution on requested input:
+  - Input file: `/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260225_histmaker_dilepton/mz_dilepton_ct18z.hdf5`
+  - Command run (inside `wmassdevrolling`):
+    - `python studies/pdf_from_corrs_bias_test/plot_nominal_vs_alternate_pdfs.py /ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260225_histmaker_dilepton/mz_dilepton_ct18z.hdf5 --proc Zmumu_2016PostVFP --axes ptll yll --include-minnlo-pdfs --outdir /tmp/pdf_from_corrs_bias_test_260226 --postfix test_run`
+  - Output:
+    - `/tmp/pdf_from_corrs_bias_test_260226/nominal_vs_alternate_pdfs_test_run.pdf`
+    - `/tmp/pdf_from_corrs_bias_test_260226/nominal_vs_alternate_pdfs_test_run.png`
+    - `/tmp/pdf_from_corrs_bias_test_260226/nominal_vs_alternate_pdfs_test_run.log`
+- Bug fix applied during test:
+  - `plot_nominal_vs_alternate_pdfs.py` now keeps the HDF5 file open while dereferencing `H5PickleProxy` histogram objects.
+- Re-run in nominal plot output directory:
+  - Command:
+    - `python studies/pdf_from_corrs_bias_test/plot_nominal_vs_alternate_pdfs.py /ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260225_histmaker_dilepton/mz_dilepton_ct18z.hdf5 --proc Zmumu_2016PostVFP --axes ptll yll --include-minnlo-pdfs --outdir /home/submit/lavezzo/public_html/alphaS/260226_pdf_from_corrs_bias_test --postfix nominal_outdir`
+  - Output:
+    - `/home/submit/lavezzo/public_html/alphaS/260226_pdf_from_corrs_bias_test/nominal_vs_alternate_pdfs_nominal_outdir.pdf`
+    - `/home/submit/lavezzo/public_html/alphaS/260226_pdf_from_corrs_bias_test/nominal_vs_alternate_pdfs_nominal_outdir.png`
+    - `/home/submit/lavezzo/public_html/alphaS/260226_pdf_from_corrs_bias_test/nominal_vs_alternate_pdfs_nominal_outdir.log`
+- Auto ratio-range support implemented and validated:
+  - `wums.plot_tools.makePlotWithRatioToRef` now applies `autorrange` to set ratio-panel limits from actual ratio values (including uncertainties), with configurable padding.
+  - Study plot script now uses auto-range by default when `--rrange` is omitted; manual `--rrange` still overrides it.
+  - Validation run:
+    - `python studies/pdf_from_corrs_bias_test/plot_nominal_vs_alternate_pdfs.py /ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260225_histmaker_dilepton/mz_dilepton_ct18z.hdf5 --proc Zmumu_2016PostVFP --axes ptll yll --include-minnlo-pdfs --outdir /home/submit/lavezzo/public_html/alphaS/260226_pdf_from_corrs_bias_test --postfix with_minnlo_autorrange`
+  - Output:
+    - `/home/submit/lavezzo/public_html/alphaS/260226_pdf_from_corrs_bias_test/nominal_vs_alternate_pdfs_with_minnlo_autorrange.pdf`
+    - `/home/submit/lavezzo/public_html/alphaS/260226_pdf_from_corrs_bias_test/nominal_vs_alternate_pdfs_with_minnlo_autorrange.png`
+- Histmaker launcher refactor for one-correction-per-run workaround:
+  - Replaced `studies/pdf_from_corrs_bias_test/run_histmakers.py` with a loop over theory-correction keys.
+  - New implementation calls `mz_dilepton.py` directly and builds `--theoryCorr` per key:
+    - `<corr>`, `<corr>_pdfvars`, `<corr>_pdfas` (configurable).
+  - Adds per-key postfixes (`<prefix>_<key>`) and configurable process/PDF/job options.
+  - Dry-run check executed:
+    - `python studies/pdf_from_corrs_bias_test/run_histmakers.py --dry-run --theory-corr-keys ct18z nnpdf31 msht20 --jobs 100 --outdir /tmp/pdf_from_corrs_bias_hm`
+  - Note: in this Codex shell, default `$MY_OUT_DIR` may expand with numeric UID; for reliability in this environment, pass `--outdir` explicitly when needed.
+- Interface update requested in discussion:
+  - `run_histmakers.py` now takes only PDF names via `--central-pdfs`.
+  - Theory corrections are resolved internally through a fixed `PDF_TO_THEORY_CORR` mapping.
+  - By default, the same `--central-pdfs` list is passed to histmaker `--pdfs`.
+  - Optional override remains available via `--histmaker-pdfs`.
+  - Dry-run check:
+    - `python studies/pdf_from_corrs_bias_test/run_histmakers.py --dry-run --central-pdfs ct18z nnpdf31 msht20 --outdir /tmp/pdf_from_corrs_bias_hm`
+- Added directory-based plotting utility for per-pair histmaker outputs:
+  - `studies/pdf_from_corrs_bias_test/plot_nominal_vs_alternate_pdfs_from_dir.py`
+  - Input model:
+    - directory with files named like `mz_dilepton_<postfix>_<pdf>.hdf5`.
+    - PDF key inferred from filename suffix; theory-corr histogram inferred from internal PDF->theoryCorr mapping.
+  - Smoke test:
+    - `python studies/pdf_from_corrs_bias_test/plot_nominal_vs_alternate_pdfs_from_dir.py --input-dir /ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260226_histmaker_dilepton_pdfFromCorrBiasTest --pdfs msht20 --proc Zmumu_2016PostVFP --axes ptll yll --outdir /tmp/pdf_from_corrs_bias_test_dir_plot --postfix smoke`
+  - Output:
+    - `/tmp/pdf_from_corrs_bias_test_dir_plot/nominal_vs_alternate_pdfs_from_dir_smoke.pdf`
+    - `/tmp/pdf_from_corrs_bias_test_dir_plot/nominal_vs_alternate_pdfs_from_dir_smoke.png`
+- Full run on current per-pair output directory:
+  - Command:
+    - `python studies/pdf_from_corrs_bias_test/plot_nominal_vs_alternate_pdfs_from_dir.py --input-dir /ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260226_histmaker_dilepton_pdfFromCorrBiasTest --proc Zmumu_2016PostVFP --axes ptll yll --include-minnlo-pdfs --outdir /home/submit/lavezzo/public_html/alphaS/260226_pdf_from_corrs_bias_test --postfix from_dir`
+  - Runtime note:
+    - Missing-file warning for PDFs not yet produced in that directory (`herapdf20`, `msht20aN3LO`, `nnpdf40`, `pdf4lhc21`, `nnpdf31`); script proceeded with available file(s).
+  - Output:
+    - `/home/submit/lavezzo/public_html/alphaS/260226_pdf_from_corrs_bias_test/nominal_vs_alternate_pdfs_from_dir_from_dir.pdf`
+    - `/home/submit/lavezzo/public_html/alphaS/260226_pdf_from_corrs_bias_test/nominal_vs_alternate_pdfs_from_dir_from_dir.png`
+- `run_fitter.py` updated for split histmaker files:
+  - Now runs per `(central_pdf, pseudodata_pdf)` pair.
+  - Uses setupRabbit `--pseudoDataFile` so pseudodata can come from a different histfile.
+  - Pseudodata histogram is inferred from mapping: `nominal_<theoryCorr_of_pseudodata_pdf>_Corr`.
+  - Dry-run example:
+    - `python studies/pdf_from_corrs_bias_test/run_fitter.py --input-dir /ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260226_histmaker_dilepton_pdfFromCorrBiasTest --central-pdfs msht20 --pseudodata-pdfs msht20 ct18z --dry-run`
+- Test on current outputs (real run):
+  - Input files present:
+    - `mz_dilepton_pdfFromCorrBias_ct18z.hdf5`
+    - `mz_dilepton_pdfFromCorrBias_msht20.hdf5`
+  - Dry-run pairing check correctly produced only cross-pairs and skipped missing files.
+  - Executed pair:
+    - central=`msht20`, pseudodata=`ct18z`
+    - command:
+      - `python studies/pdf_from_corrs_bias_test/run_fitter.py --input-dir /ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260226_histmaker_dilepton_pdfFromCorrBiasTest --central-pdfs msht20 --pseudodata-pdfs ct18z --postfix splitCheck`
+  - Output fit directory:
+    - `/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260226_histmaker_dilepton_pdfFromCorrBiasTest/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile_pdfBiasTest_Zmumu_splitCheck_msht20_pseudoct18z/`
+  - Output fit file:
+    - `/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260226_histmaker_dilepton_pdfFromCorrBiasTest/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile_pdfBiasTest_Zmumu_splitCheck_msht20_pseudoct18z/fitresults.hdf5`
+
+- 2026-02-27: Naming consistency fix for `msht20an3lo`
+  - Updated study scripts to use lowercase PDF key consistently:
+    - `run_fitter.py`
+    - `plot_results_from_split_fits.py`
+    - `plot_nominal_vs_alternate_pdfs_from_dir.py`
+    - `plot_nominal_vs_alternate_pdfs.py`
+    - `plot_results.py`
+  - Removed/avoided mixed key usage (`msht20aN3LO`) in study-level PDF dictionaries.
+  - Sanity check (`morePdfs` set) showed current available fit outputs are not full-matrix:
+    - fitresults count = 10
+    - central PDFs present = `['ct18z', 'herapdf20', 'msht20']`
+    - pseudodata PDFs present = `['ct18z', 'herapdf20', 'msht20', 'nnpdf31', 'nnpdf40', 'pdf4lhc21']`
+    - effective matrix coverage = `3 x 6` (not `3 x 3` and not full all-pairs)
+  - Attempted full rerun with postfix `morePdfsV3` in Singularity:
+    - command launched successfully in container and produced at least one new fitresult (`ct18z` vs `herapdf20`) before manual stop to avoid a long interactive all-pairs run.
+
+- 2026-02-27: Backfilled missing split-fit combinations and replotted
+  - Added `run_fitter.py` guard to skip already existing `fitresults.hdf5` for a given `(central,pseudo,postfix)` output.
+  - Executed completion runs for postfix `morePdfs` in Singularity.
+  - Final fit-capable coverage now present in output dir:
+    - total valid produced fits: 24
+    - central rows with complete off-diagonal pseudo coverage: `ct18z`, `herapdf20`, `msht20`, `msht20an3lo` (6 each)
+    - pseudo columns seen: `ct18z`, `herapdf20`, `msht20`, `msht20an3lo`, `nnpdf31`, `nnpdf40`, `pdf4lhc21`
+  - Important limitation discovered:
+    - `nnpdf31` as a **central** fit input fails setupRabbit with missing alphaS systematic histogram
+      `scetlib_dyturbo_LatticeNP_NNPDF31_N3p0LL_N2LO_pdfas_CorrByHelicity`,
+      so those central rows are currently not fit-capable in this setup.
+  - Plotting update:
+    - `plot_results_from_split_fits.py` patched to skip unreadable/missing-result fit files (needed because one interrupted `morePdfsV3` file was corrupted).
+  - Re-generated plots:
+    - `/home/submit/lavezzo/public_html/alphaS/260227_pdf_from_corrs_bias_test/alphas_heatmap_split_fits_morePdfs.pdf`
+    - `/home/submit/lavezzo/public_html/alphaS/260227_pdf_from_corrs_bias_test/alphas_heatmap_split_fits_morePdfs.png`
+    - `/home/submit/lavezzo/public_html/alphaS/260227_pdf_from_corrs_bias_test/alphas_scatter_split_fits_morePdfs.pdf`
+    - `/home/submit/lavezzo/public_html/alphaS/260227_pdf_from_corrs_bias_test/alphas_scatter_split_fits_morePdfs.png`
+
+- 2026-02-28: Centralized study color palette utility and switched plotting scripts to import it
+  - New shared module:
+    - `studies/pdf_from_corrs_bias_test/color_utils.py`
+    - Exposes `CMS_DEFAULT_COLORS` and `build_cms_color_cycle(n)`.
+  - Updated scripts:
+    - `studies/pdf_from_corrs_bias_test/plot_nominal_vs_alternate_pdfs_from_dir.py`
+    - `studies/pdf_from_corrs_bias_test/plot_results_from_split_fits.py`
+    - `studies/pdf_from_corrs_bias_test/plot_results.py`
+  - Palette now defaults to CMS sequence:
+    - `#3f90da`, `#ffa90e`, `#bd1f01`, `#94a4a2`, `#832db6`, `#a96b59`, `#e76300`, `#b9ac70`, `#717581`, `#92dadd`
+  - Validation:
+    - `python -m py_compile studies/pdf_from_corrs_bias_test/color_utils.py studies/pdf_from_corrs_bias_test/plot_nominal_vs_alternate_pdfs_from_dir.py studies/pdf_from_corrs_bias_test/plot_results_from_split_fits.py studies/pdf_from_corrs_bias_test/plot_results.py`
+
+- 2026-02-28: Promoted CMS color utility to shared scripts namespace and re-ran split-fit plotting
+  - Centralized helper module:
+    - `scripts/common_plot_style.py`
+  - Updated imports to shared helper:
+    - `studies/pdf_from_corrs_bias_test/plot_nominal_vs_alternate_pdfs_from_dir.py`
+    - `studies/pdf_from_corrs_bias_test/plot_results_from_split_fits.py`
+    - `studies/pdf_from_corrs_bias_test/plot_results.py`
+    - `scripts/compare_fitresults/plot_fitresults.py` (default color assignment now also uses CMS palette)
+  - Backward compatibility:
+    - `studies/pdf_from_corrs_bias_test/color_utils.py` kept as a thin re-export wrapper.
+  - Re-run command (inside `wmassdevrolling` after `source setup.sh`):
+    - `python studies/pdf_from_corrs_bias_test/plot_results_from_split_fits.py --input-dir /ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260226_histmaker_dilepton_pdfFromCorrBiasTest --output-dir /home/submit/lavezzo/public_html/alphaS/260228_pdf_from_corrs_bias_test --postfix centralizedColors`
+  - Output:
+    - `/home/submit/lavezzo/public_html/alphaS/260228_pdf_from_corrs_bias_test/alphas_heatmap_split_fits_centralizedColors.pdf`
+    - `/home/submit/lavezzo/public_html/alphaS/260228_pdf_from_corrs_bias_test/alphas_heatmap_split_fits_centralizedColors.png`
+    - `/home/submit/lavezzo/public_html/alphaS/260228_pdf_from_corrs_bias_test/alphas_scatter_split_fits_centralizedColors.pdf`
+    - `/home/submit/lavezzo/public_html/alphaS/260228_pdf_from_corrs_bias_test/alphas_scatter_split_fits_centralizedColors.png`
+  - Runtime note:
+    - One corrupted/interrupted fit file was skipped (`...morePdfsV3_ct18z_pseudoherapdf20/fitresults.hdf5`, bad object header), consistent with existing skip logic.
+  - Physics-sense quick check (visual):
+    - Heatmap and scatter preserve the previously observed pattern: diagonal/self pairs are absent as expected; several off-diagonal combinations remain near the central band while known tension pairs still show larger shifts.
+    - Color styling changed only presentation; no new anomalous structural behavior introduced by the centralization patch.
+
+- 2026-02-28: Re-ran differential-predictions overlay plot (from split histmaker directory)
+  - Command:
+    - `python studies/pdf_from_corrs_bias_test/plot_nominal_vs_alternate_pdfs_from_dir.py --input-dir /ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260226_histmaker_dilepton_pdfFromCorrBiasTest --proc Zmumu_2016PostVFP --axes ptll yll --outdir /home/submit/lavezzo/public_html/alphaS/260228_pdf_from_corrs_bias_test --postfix diffPredictions`
+  - Output:
+    - `/home/submit/lavezzo/public_html/alphaS/260228_pdf_from_corrs_bias_test/nominal_vs_alternate_pdfs_from_dir_diffPredictions.pdf`
+    - `/home/submit/lavezzo/public_html/alphaS/260228_pdf_from_corrs_bias_test/nominal_vs_alternate_pdfs_from_dir_diffPredictions.png`
+  - Physics-sense quick check (visual):
+    - Unrolled spectra remain smooth and overlapping as expected.
+    - Ratio panel shows coherent few-percent-level offsets with no pathological spikes/discontinuities.
+
+- 2026-02-28: Added one-file prefit plotting wrapper around `rabbit_plot_hists.py` and tested CT18Z/MSHT20 cross-cases
+  - New script:
+    - `studies/pdf_from_corrs_bias_test/plot_prefit_from_fitresult.py`
+  - Purpose:
+    - Plot prefit from a single `fitresults.hdf5` (one central/pseudodata pair),
+      using pseudodata stored in that same file (`--dataHist nobs`),
+      plus total prefit uncertainty band (`--upperPanelUncertaintyBand`).
+    - Optional grouped-PDF overlay via `--varNames`; auto-detection now checks whether the variation key exists and skips cleanly if missing.
+  - Test commands:
+    - `python studies/pdf_from_corrs_bias_test/plot_prefit_from_fitresult.py /ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260226_histmaker_dilepton_pdfFromCorrBiasTest/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile_pdfBiasTest_Zmumu_morePdfs_ct18z_pseudomsht20/fitresults.hdf5 --outdir /tmp/pdf_from_corrs_bias_prefit_wrapper --postfix ct18z_pseudomsht20_v2`
+    - `python studies/pdf_from_corrs_bias_test/plot_prefit_from_fitresult.py /ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260226_histmaker_dilepton_pdfFromCorrBiasTest/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile_pdfBiasTest_Zmumu_morePdfs_msht20_pseudoct18z/fitresults.hdf5 --outdir /tmp/pdf_from_corrs_bias_prefit_wrapper --postfix msht20_pseudoct18z_v2`
+  - Output:
+    - `/tmp/pdf_from_corrs_bias_prefit_wrapper/prefit_ct18z_pseudomsht20_v2_ptll_ch0_Project_ch0_ptll_preliminary.pdf`
+    - `/tmp/pdf_from_corrs_bias_prefit_wrapper/prefit_msht20_pseudoct18z_v2_ptll_ch0_Project_ch0_ptll_preliminary.pdf`
+  - Runtime note:
+    - In these two files, auto-grouped variation keys (`pdfCT18ZNoAlphaS`, `pdfMSHT20NoAlphaS`) are not present in `hist_prefit_inclusive_variations`, so grouped overlay is skipped with an info message.
+  - Physics-sense quick check (visual):
+    - Prefit spectra and pseudodata points are smooth and well-behaved.
+    - Ratio panels are close to unity with broad uncertainty bands; no pathological spikes or binning artifacts seen.
+
+- 2026-02-28: Refit check after enabling histogram impacts in `workflows/fitter.sh`
+  - `fitter.sh` fit command now includes `--computeHistImpacts` in addition to `--computeHistErrors`.
+  - Re-run command (single validation pair):
+    - `python studies/pdf_from_corrs_bias_test/run_fitter.py --input-dir /ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260226_histmaker_dilepton_pdfFromCorrBiasTest --central-pdfs ct18z --pseudodata-pdfs msht20 --postfix histImpactsCheck`
+  - New fit output:
+    - `/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260226_histmaker_dilepton_pdfFromCorrBiasTest/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile_pdfBiasTest_Zmumu_histImpactsCheck_ct18z_pseudomsht20/fitresults.hdf5`
+  - Verified with `scripts/open_fitresult.py` and direct object inspection:
+    - channel now contains `hist_prefit_inclusive_global_impacts_grouped` (and corresponding postfit key).
+    - grouped impact axis includes both `pdfCT18ZNoAlphaS` and `pdfCT18Z`.
+
+- 2026-02-28: Produced requested prefit plots with both total and PDF-only bands for CT18Z/MSHT20 cross pairs
+  - Fit inputs regenerated with `--computeHistImpacts`:
+    - `..._histImpactsCheck_ct18z_pseudomsht20/fitresults.hdf5`
+    - `..._histImpactsCheck_msht20_pseudoct18z/fitresults.hdf5`
+  - Wrapper update:
+    - `studies/pdf_from_corrs_bias_test/plot_prefit_from_fitresult.py` now builds the PDF-only uncertainty band from `hist_prefit_inclusive_global_impacts_grouped` (prefers `<pdf>NoAlphaS`, fallback `<pdf>`), and sets data label to `Pseudodata (<pdf>)`.
+  - Public outputs:
+    - `/home/submit/lavezzo/public_html/alphaS/260228_pdf_from_corrs_bias_test/prefit_ct18z_pseudomsht20_histImpacts_totalBand_ptll_ch0_Project_ch0_ptll_preliminary.pdf`
+    - `/home/submit/lavezzo/public_html/alphaS/260228_pdf_from_corrs_bias_test/prefit_ct18z_pseudomsht20_histImpacts_pdfOnlyBand_ptll_ch0_Project_ch0_ptll_preliminary.pdf`
+    - `/home/submit/lavezzo/public_html/alphaS/260228_pdf_from_corrs_bias_test/prefit_msht20_pseudoct18z_histImpacts_totalBand_ptll_ch0_Project_ch0_ptll_preliminary.pdf`
+    - `/home/submit/lavezzo/public_html/alphaS/260228_pdf_from_corrs_bias_test/prefit_msht20_pseudoct18z_histImpacts_pdfOnlyBand_ptll_ch0_Project_ch0_ptll_preliminary.pdf`
+  - Physics-sense quick check (visual):
+    - Spectra and pseudodata are smooth/consistent; PDF-only band is narrower or comparable to total band as expected.
+
+- 2026-02-28: Enabled grouped-variation overlays at plotting time via rabbit metadata mapping
+  - `rabbit_fit.py` now persists nuisance/group mapping in fitresult meta:
+    - `systs`, `systgroups`, `systgroupidxs`, `systsnoconstraint`
+  - `rabbit_plot_hists.py` supports on-the-fly grouped band construction from
+    `hist_<fitType>_inclusive_variations`:
+    - new options: `--varGroupNames`, `--varGroupLabels`, `--varGroupColors`
+  - Study wrapper updated to forward these options:
+    - `studies/pdf_from_corrs_bias_test/plot_prefit_from_fitresult.py`
+  - Wrapper dry-run validation command:
+    - `python studies/pdf_from_corrs_bias_test/plot_prefit_from_fitresult.py /tmp/rabbit_vargroup_test2/fitresults_vargroup_test2.hdf5 --outdir /tmp/rabbit_vargroup_test2_plots --result nominal_scetlib_dyturbo_LatticeNP_MSHT20_N3p0LL_N2LO_Corr_vars --varGroupNames pdfCT18ZNoAlphaS --varGroupLabels PDF-only-group --varGroupColors black --dry-run`
+- 2026-02-28: Tried `--varGroupNames` through wrapper on existing CT18Z/MSHT20 fitresult
+  - Command succeeded and produced plot, but warning showed group unresolved (`pdfCT18ZNoAlphaS` had no matching nuisances).
+  - Metadata check for that file showed no persisted `systs/systgroups/systgroupidxs`, so on-the-fly grouping is not possible on that legacy fitresult.
+- 2026-02-28: Verified wrapper + `--varGroupNames` on fitresult containing mapping metadata
+  - Input: `/tmp/rabbit_vargroup_test2/fitresults_vargroup_test2.hdf5`
+  - Output: `/tmp/rabbit_vargroup_test2_plots/prefit_wrapper_vargroup_check_ptll_ch0_Project_ch0_ptll_preliminary.pdf`
+  - Result: grouped variation overlay produced successfully.
+
+## 2026-03-01
+- Investigated report: split-fit plot command produced only one visible point for
+  `--central-pdfs ct18z msht20 --pseudodata-pdfs ct18z msht20`.
+- Coverage check in input directory:
+  - `/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260301_pdfFromCorrBiasTest/`
+  - Only one `fitresults.hdf5` existed:
+    - `.../ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile_pdfBiasTest_Zmumu_msht20_pseudoct18z/fitresults.hdf5`
+- Dry-run pairing check:
+  - `python studies/pdf_from_corrs_bias_test/run_fitter.py --dry-run --input-dir /ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260301_pdfFromCorrBiasTest/ --central-pdfs ct18z msht20 --pseudodata-pdfs ct18z msht20`
+  - Outcome: missing pair identified as `ct18z_pseudomsht20`; existing pair `msht20_pseudoct18z` skipped as expected.
+- Executed missing fit production:
+  - `python studies/pdf_from_corrs_bias_test/run_fitter.py --input-dir /ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260301_pdfFromCorrBiasTest/ --central-pdfs ct18z msht20 --pseudodata-pdfs ct18z msht20`
+  - New output produced:
+    - `/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260301_pdfFromCorrBiasTest/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile_pdfBiasTest_Zmumu_ct18z_pseudomsht20/fitresults.hdf5`
+- Re-ran split-fit plotting after backfilling missing pair:
+  - `python studies/pdf_from_corrs_bias_test/plot_results_from_split_fits.py --input-dir /ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260301_pdfFromCorrBiasTest/ --output-dir /tmp/260301_pdf_from_corrs_bias_test_after_fix/ --central-pdfs ct18z msht20 --pseudodata-pdfs ct18z msht20`
+  - Output:
+    - `/tmp/260301_pdf_from_corrs_bias_test_after_fix/alphas_heatmap_split_fits.pdf`
+    - `/tmp/260301_pdf_from_corrs_bias_test_after_fix/alphas_scatter_split_fits.pdf`
+- Physics-sense quick check:
+  - For a 2x2 reduced matrix, only off-diagonal entries are expected (self-pairs are not fit),
+    so seeing two populated points after backfilling is the expected behavior.
+- Applied grouped-nuisance plotting setup for today's cross-pair fitresults (command generation validated):
+  - Requested pairs:
+    - central=`msht20`, pseudodata=`ct18z`
+    - central=`ct18z`, pseudodata=`msht20`
+  - Wrapper commands (validated with `--dry-run`):
+    - `python studies/pdf_from_corrs_bias_test/plot_prefit_from_fitresult.py /ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260301_pdfFromCorrBiasTest/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile_pdfBiasTest_Zmumu_msht20_pseudoct18z/fitresults.hdf5 --outdir /tmp/260301_group_nuisance_plots --postfix msht20_pseudoct18z_groupNuis_pdfCT18Z --varGroupNames pdfCT18ZNoAlphaS --varGroupLabels PDF-only-CT18Z --varGroupColors black`
+    - `python studies/pdf_from_corrs_bias_test/plot_prefit_from_fitresult.py /ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260301_pdfFromCorrBiasTest/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile_pdfBiasTest_Zmumu_ct18z_pseudomsht20/fitresults.hdf5 --outdir /tmp/260301_group_nuisance_plots --postfix ct18z_pseudomsht20_groupNuis_pdfMSHT20 --varGroupNames pdfMSHT20NoAlphaS --varGroupLabels PDF-only-MSHT20 --varGroupColors black`
+  - Runtime blocker in Codex execution environment:
+    - Direct `rabbit_plot_hists.py` execution failed here due missing Python plotting deps (`ModuleNotFoundError: hist`) and intermittent container setuid startup error (`starter-suid doesn't have setuid bit set`).
+  - Metadata sanity probe on both `260301` cross-pair fitresults:
+    - Recursive key scan showed no obvious `syst*`/`group*`/`variation*` datasets (0 matching keys out of 89 each), so if grouped overlay is unresolved at runtime, these files may lack required group-mapping metadata (`systs/systgroups/systgroupidxs`) and may need a rerun with metadata-preserving settings.
+
+## 2026-03-04
+- Updated split-fit result plotting uncertainty source to use per-central Asimov fits.
+  - File changed:
+    - `studies/pdf_from_corrs_bias_test/plot_results_from_split_fits.py`
+  - New uncertainty resolution logic:
+    - Preferred source: `central==pseudo` fit directory for each central PDF, reading result key `nominal_<central_corr>_Corr_vars`.
+    - Secondary fallback: `result="asimov"` fit payload (for fits run with `rabbit_fit -t -1`).
+    - Last-resort fallback (with warning): per-cell split-fit uncertainty, only if no Asimov source is readable.
+  - Quick validation:
+    - `python -m py_compile studies/pdf_from_corrs_bias_test/plot_results_from_split_fits.py`
+- Executed updated plotting script on reduced `ct18z/msht20` matrix in container:
+  - Command:
+    - `singularity run --bind /scratch/,/work/,/home/,/ceph/ /cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/bendavid/cmswmassdocker/wmassdevrolling\:latest /bin/bash -lc 'cd /home/submit/lavezzo/alphaS/WRemnantsHelpers; source setup.sh >/dev/null 2>&1; python studies/pdf_from_corrs_bias_test/plot_results_from_split_fits.py --input-dir /ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260301_pdfFromCorrBiasTest/ --output-dir /tmp/260304_pdf_from_corrs_bias_test_runcheck --central-pdfs ct18z msht20 --pseudodata-pdfs ct18z msht20 --postfix asimovUncCheck'`
+  - Outcome:
+    - Run completed and wrote:
+      - `/tmp/260304_pdf_from_corrs_bias_test_runcheck/alphas_heatmap_split_fits_asimovUncCheck.pdf`
+      - `/tmp/260304_pdf_from_corrs_bias_test_runcheck/alphas_scatter_split_fits_asimovUncCheck.pdf`
+    - Warnings indicated no readable central==pseudo Asimov source for both centrals in this reduced sample, so row uncertainties fell back to split-fit uncertainty as designed.
+- Updated plotting code to disallow split-fit uncertainty fallback for missing Asimov rows.
+  - `studies/pdf_from_corrs_bias_test/plot_results_from_split_fits.py` now raises if Asimov uncertainty is missing for any central present in the matrix.
+- Produced missing self-pseudo fits needed for Asimov row uncertainties (same input campaign):
+  - central=`ct18z`, pseudodata=`ct18z`:
+    - output directory:
+      - `/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260301_pdfFromCorrBiasTest/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile_pdfBiasTest_Zmumu_ct18z_pseudoct18z/`
+    - fitresult:
+      - `/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260301_pdfFromCorrBiasTest/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile_pdfBiasTest_Zmumu_ct18z_pseudoct18z/fitresults.hdf5`
+  - central=`msht20`, pseudodata=`msht20`:
+    - output directory:
+      - `/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260301_pdfFromCorrBiasTest/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile_pdfBiasTest_Zmumu_msht20_pseudomsht20/`
+    - fitresult:
+      - `/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260301_pdfFromCorrBiasTest/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile_pdfBiasTest_Zmumu_msht20_pseudomsht20/fitresults.hdf5`
+- Re-ran split-fit plotting after adding self-pseudo fits:
+  - `python studies/pdf_from_corrs_bias_test/plot_results_from_split_fits.py --input-dir /ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260301_pdfFromCorrBiasTest/ --output-dir /tmp/260304_pdf_from_corrs_bias_test_runcheck --central-pdfs ct18z msht20 --pseudodata-pdfs ct18z msht20 --postfix asimovUncNoFallback`
+  - Asimov row uncertainties printed from self-pseudo fits:
+    - `ct18z: 0.00069`
+    - `msht20: 0.00260`
+  - Output:
+    - `/tmp/260304_pdf_from_corrs_bias_test_runcheck/alphas_heatmap_split_fits_asimovUncNoFallback.pdf`
+    - `/tmp/260304_pdf_from_corrs_bias_test_runcheck/alphas_scatter_split_fits_asimovUncNoFallback.pdf`
+- Ran plotting with all central PDFs except HERA in default output dir:
+  - `python studies/pdf_from_corrs_bias_test/plot_results_from_split_fits.py --input-dir /ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260301_pdfFromCorrBiasTest/ --central-pdfs ct18z msht20 msht20an3lo nnpdf31 nnpdf40 pdf4lhc21 ct18 --postfix asimovNoFallback_allCentralNoHera`
+  - Output:
+    - `/home/submit/lavezzo/public_html/alphaS/260304_pdf_from_corrs_bias_test/alphas_heatmap_split_fits_asimovNoFallback_allCentralNoHera.pdf`
+    - `/home/submit/lavezzo/public_html/alphaS/260304_pdf_from_corrs_bias_test/alphas_scatter_split_fits_asimovNoFallback_allCentralNoHera.pdf`
+  - Note:
+    - In the current `260301` input campaign, only `ct18z` and `msht20` rows are populated with fitresults; other requested central rows are currently empty (`--` in the text matrix).

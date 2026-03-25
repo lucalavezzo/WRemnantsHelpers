@@ -36,8 +36,8 @@ for i in "${!configs[@]}"; do
 
         noi_cfg="${noi_configs[j]}"
         noi_out="${noi_outputs[j]}"
-        echo "python $WREM_BASE/scripts/rabbit/feedRabbitTheory.py $fit_outdir/fitresults_$postfix.hdf5 -o $fit_outdir/fit_$postfix/ $fit_cfg $noi_cfg"
-        python $WREM_BASE/scripts/rabbit/feedRabbitTheory.py $fit_outdir/fitresults_$postfix.hdf5 -o $fit_outdir/fit_$postfix/ $fit_cfg $noi_cfg
+        echo "python $WREM_BASE/scripts/rabbit/feedRabbitSigmaUL.py -i $fit_outdir/fitresults_$postfix.hdf5 -o $fit_outdir/fit_$postfix/ $fit_cfg $noi_cfg"
+        python $WREM_BASE/scripts/rabbit/feedRabbitSigmaUL.py -i $fit_outdir/fitresults_$postfix.hdf5 -o $fit_outdir/fit_$postfix/ $fit_cfg $noi_cfg
 
         echo "rabbit_fit.py ${fit_outdir}/fit_${postfix}//carrot_${noi_out}.hdf5 -o ${fit_outdir}/fit_${postfix}/ --postfix ${noi_out} --externalCovariance --doImpacts --chisqFit --globalImpacts --saveHists --computeVariations --computeHistErrors"
         rabbit_fit.py $fit_outdir/fit_$postfix//carrot_$noi_out.hdf5 -o $fit_outdir/fit_$postfix/ --postfix $noi_out --externalCovariance --doImpacts --chisqFit --globalImpacts --saveHists --computeVariations --computeHistErrors

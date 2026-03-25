@@ -73,7 +73,7 @@ fi
 
 if [ -z "$output_dir" ]; then
     current_date=$(date +"%y%m%d")
-    output_dir="${MY_OUT_DIR}/${current_date}_WZCombinedFit/"
+    output_dir="${MY_OUT_DIR}/${current_date}_WZRecoFit/"
 fi
 
 # check if WREM_BASE is set
@@ -96,7 +96,7 @@ if $do_setup; then
         fitvar_Z='ptll-yll-cosThetaStarll_quantile-phiStarll_quantile'
     fi
 
-    setup_commmand="python ${WREM_BASE}/scripts/rabbit/setupRabbit.py -i $input_file_Z $input_file_W --fitvar $fitvar_Z eta-pt-charge -o $output_dir --noi alphaS $extra_setup"
+    setup_commmand="python ${WREM_BASE}/scripts/rabbit/setupRabbit.py -i $input_file_Z $input_file_W --fitvar $fitvar_Z eta-pt-charge -o $output_dir --noi alphaS wmass --npUnc LatticeEigvars --pdfUncFromCorr $extra_setup"
 
     echo "$setup_commmand"
     setup_output=$($setup_commmand 2>&1 | tee /dev/tty)

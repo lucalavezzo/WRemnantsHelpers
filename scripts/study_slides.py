@@ -94,6 +94,51 @@ def _append_top_itemize(lines: list[str], slide: dict) -> None:
         )
 
 
+def _append_conclusion_itemize(lines: list[str], slide: dict) -> None:
+    # Preferred multi-item fields.
+    conclusion_items = slide.get("conclusion_items")
+    if conclusion_items is not None:
+        entries = (
+            conclusion_items
+            if isinstance(conclusion_items, list)
+            else [conclusion_items]
+        )
+        lines.append(r"\begin{itemize}")
+        _append_nested_items(lines, entries, 1)
+        lines.append(r"\end{itemize}")
+        return
+
+    conclusion_items_latex = slide.get("conclusion_items_latex")
+    if conclusion_items_latex is not None:
+        entries = (
+            conclusion_items_latex
+            if isinstance(conclusion_items_latex, list)
+            else [conclusion_items_latex]
+        )
+        lines.append(r"\begin{itemize}")
+        for entry in entries:
+            lines.append(rf"  \item \small {entry}")
+        lines.append(r"\end{itemize}")
+        return
+
+    # Backward compatibility with legacy single-note fields.
+    conclusion_note = slide.get("conclusion_note")
+    conclusion_note_latex = slide.get("conclusion_note_latex")
+    if conclusion_note or conclusion_note_latex:
+        ctext = (
+            conclusion_note_latex
+            if conclusion_note_latex
+            else tex_escape(conclusion_note)
+        )
+        lines.extend(
+            [
+                r"\begin{itemize}",
+                rf"  \item \small {ctext}",
+                r"\end{itemize}",
+            ]
+        )
+
+
 def render_bullets(slide: dict) -> str:
     title = tex_escape_allow_math(slide.get("title", ""))
     items = slide.get("items", [])
@@ -107,8 +152,6 @@ def render_figure(slide: dict) -> str:
     title = tex_escape_allow_math(slide.get("title", ""))
     path = slide.get("path", "")
     caption = slide.get("caption")
-    conclusion_note = slide.get("conclusion_note")
-    conclusion_note_latex = slide.get("conclusion_note_latex")
     width = slide.get("width", "0.9\\textwidth")
     height = slide.get("height")
     lines = [rf"\begin{{frame}}{{{title}}}"]
@@ -123,27 +166,13 @@ def render_figure(slide: dict) -> str:
     if caption:
         lines.append(rf"\\ {tex_escape(caption)}")
     lines.append(r"\end{center}")
-    if conclusion_note or conclusion_note_latex:
-        ctext = (
-            conclusion_note_latex
-            if conclusion_note_latex
-            else tex_escape(conclusion_note)
-        )
-        lines.extend(
-            [
-                r"\begin{itemize}",
-                rf"  \item \small {ctext}",
-                r"\end{itemize}",
-            ]
-        )
+    _append_conclusion_itemize(lines, slide)
     lines.append(r"\end{frame}")
     return "\n".join(lines)
 
 
 def render_two_figures(slide: dict) -> str:
     title = tex_escape_allow_math(slide.get("title", ""))
-    conclusion_note = slide.get("conclusion_note")
-    conclusion_note_latex = slide.get("conclusion_note_latex")
     left = slide.get("left", {})
     right = slide.get("right", {})
     lw = left.get("width", "0.95\\linewidth")
@@ -164,19 +193,7 @@ def render_two_figures(slide: dict) -> str:
     if right.get("caption"):
         lines.append(rf"\\ {tex_escape(right['caption'])}")
     lines.append(r"\end{columns}")
-    if conclusion_note or conclusion_note_latex:
-        ctext = (
-            conclusion_note_latex
-            if conclusion_note_latex
-            else tex_escape(conclusion_note)
-        )
-        lines.extend(
-            [
-                r"\begin{itemize}",
-                rf"  \item \small {ctext}",
-                r"\end{itemize}",
-            ]
-        )
+    _append_conclusion_itemize(lines, slide)
     lines.append(r"\end{frame}")
     return "\n".join(lines)
 

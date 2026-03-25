@@ -4,12 +4,12 @@ from datetime import datetime
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
+import matplotlib.lines as mlines
 import mplhep as hep
 
 import rabbit
 import rabbit.io_tools
 import wums.output_tools
-from wremnants import theory_tools
 
 hep.style.use("CMS")
 
@@ -18,28 +18,28 @@ ALPHA_S_PDG = 0.118
 ALPHA_S_SCALING = 0.002
 ALPHA_S_TEX = r"$\alpha_{\mathrm{S}}$"
 DEFAULT_CENTRAL_PREDS = [
-    "scetlib_dyturbo",
-    # "scetlib_dyturboMSHT20",
-    "scetlib_dyturboN3p1LL",
-    "scetlib_dyturboN4p0LL",
-    "scetlib_nnlojetN3p1LLN3LO",
-    "scetlib_nnlojetN4p0LLN3LO",
+    "scetlib_dyturbo_LatticeNP_CT18Z_N3p0LL_N2LO",
+    "scetlib_dyturbo_LatticeNP_CT18Z_N2p1LL_N2LO",
+    "scetlib_dyturbo_LatticeNP_CT18Z_N4p0LL_N2LO",
+    "scetlib_dyturbo_LatticeNP_CT18Z_N3p1LL_N2LO",
+    # "scetlib_nnlojetN3p1LLN3LO",
+    # "scetlib_nnlojetN4p0LLN3LO",
 ]
 LABELS = {
-    "scetlib_dyturbo": "SCETlib N$^{3+0}$LL + DYTurbo NNLO",
-    "scetlib_dyturboMSHT20": "SCETlib N$^{3+0}$LL + DYTurbo NNLO, MSHT20",
-    "scetlib_dyturboN3p1LL": "SCETlib N$^{3+1}$LL + DYTurbo NNLO",
-    "scetlib_dyturboN4p0LL": "SCETlib N$^{4+0}$LL + DYTurbo NNLO",
-    "scetlib_nnlojetN3p1LLN3LO": "SCETlib N$^{3+1}$LL + NNLOjet N$^3$LO",
-    "scetlib_nnlojetN4p0LLN3LO": "SCETlib N$^{4+0}$LL + NNLOjet N$^3$LO",
+    "scetlib_dyturbo_LatticeNP_CT18Z_N3p0LL_N2LO": "SCETlib N$^{3+0}$LL + DYTurbo NNLO",
+    "scetlib_dyturbo_LatticeNP_CT18Z_N2p1LL_N2LO": "SCETlib N$^{2+1}$LL + DYTurbo NNLO",
+    "scetlib_dyturbo_LatticeNP_CT18Z_N4p0LL_N2LO": "SCETlib N$^{4+0}$LL + DYTurbo NNLO",
+    "scetlib_dyturbo_LatticeNP_CT18Z_N3p1LL_N2LO": "SCETlib N$^{3+1}$LL + DYTurbo NNLO",
+    # "scetlib_nnlojetN3p1LLN3LO": "SCETlib N$^{3+1}$LL + NNLOjet N$^3$LO",
+    # "scetlib_nnlojetN4p0LLN3LO": "SCETlib N$^{4+0}$LL + NNLOjet N$^3$LO",
 }
 XLABELS = {
-    "scetlib_dyturbo": "N$^{3+0}$LL + NNLO",
-    "scetlib_dyturboMSHT20": "N$^{3+0}$LL + NNLO, MSHT20",
-    "scetlib_dyturboN3p1LL": "N$^{3+1}$LL + NNLO",
-    "scetlib_dyturboN4p0LL": "N$^{4+0}$LL + NNLO",
-    "scetlib_nnlojetN3p1LLN3LO": "N$^{3+1}$LL + N$^3$LO",
-    "scetlib_nnlojetN4p0LLN3LO": "N$^{4+0}$LL + N$^3$LO",
+    "scetlib_dyturbo_LatticeNP_CT18Z_N3p0LL_N2LO": "N$^{3+0}$LL + NNLO",
+    "scetlib_dyturbo_LatticeNP_CT18Z_N2p1LL_N2LO": "N$^{2+1}$LL + NNLO",
+    "scetlib_dyturbo_LatticeNP_CT18Z_N4p0LL_N2LO": "N$^{4+0}$LL + NNLO",
+    "scetlib_dyturbo_LatticeNP_CT18Z_N3p1LL_N2LO": "N$^{3+1}$LL + NNLO",
+    # "scetlib_nnlojetN3p1LLN3LO": "N$^{3+1}$LL + N$^3$LO",
+    # "scetlib_nnlojetN4p0LLN3LO": "N$^{4+0}$LL + N$^3$LO",
 }
 
 
@@ -61,7 +61,7 @@ def parse_args():
     )
     parser.add_argument(
         "--file-base",
-        default="ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile_Zmumu_",
+        default="ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile_",
         dest="file_base",
         help="Label for the pred bias test configuration (reported in log output). (Default: %(default)s)",
     )
@@ -88,7 +88,7 @@ def parse_args():
         "--ylim",
         nargs=2,
         type=float,
-        default=(0.116, 0.120),
+        default=(0.116, 0.1205),
         help="Set y-axis limits for the scatter plot. (Default: %(default)s)",
     )
     parser.add_argument(
@@ -159,9 +159,8 @@ def main():
     for central_pred, value, uncert in zip(
         args.central_preds, results_array, uncerts_array
     ):
-        latex_lines.append(
-            f"{LABELS[central_pred].replace('_', '\\_')} & {format_alphas_value(value, uncert)} \\\\"
-        )
+        label = LABELS[central_pred].replace("_", r"\_")
+        latex_lines.append(f"{label} & {format_alphas_value(value, uncert)} \\\\")
     print("\nLaTeX table:\n" + "\n".join(latex_lines))
 
     # bar plot: bars encode uncertainty, horizontal line marks central value
@@ -196,10 +195,10 @@ def main():
             linewidth=2,
             # label=LABELS[central_pred],
         )
-    ax.axhline(
+    pdg_line = ax.axhline(
         y=ALPHA_S_PDG,
         color="black",
-        label=f"PDG average: " + ALPHA_S_TEX + f"={ALPHA_S_PDG}",
+        label=f"PDG avg.: " + ALPHA_S_TEX + f"={ALPHA_S_PDG}",
         linestyle="--",
         linewidth=1,
     )
@@ -213,9 +212,25 @@ def main():
     ax.set_xlim(-0.5, len(args.central_preds) - 0.5)
     if args.ylim:
         ax.set_ylim(args.ylim)
+    total_handle = matplotlib.patches.Patch(
+        facecolor="gray",
+        edgecolor="black",
+        alpha=0.35,
+        label="Total uncert.",
+    )
+    pdg_handle = mlines.Line2D(
+        [],
+        [],
+        color="black",
+        linestyle="--",
+        linewidth=1,
+        label=pdg_line.get_label(),
+    )
     ax.legend(
-        fontsize="small",
-        loc="upper center",
+        handles=[total_handle, pdg_handle],
+        fontsize="x-small",
+        loc="upper left",
+        ncols=2,
     )
     fname = "ho_alphas_results"
     fname += f"_{args.uncert}Uncert"

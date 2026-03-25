@@ -9,7 +9,7 @@ import mplhep as hep
 import rabbit
 import rabbit.io_tools
 import wums.output_tools
-from wremnants import theory_tools
+from wremnants.utilities import theory_utils
 from scripts.common_plot_style import build_cms_color_cycle
 
 hep.style.use("CMS")
@@ -38,14 +38,14 @@ DEFAULT_PSEUDODATA_PDFS = {
 
 
 def get_pdf_map_name(pdf_key: str) -> str:
-    info = theory_tools.pdfMap.get(pdf_key)
+    info = theory_utils.pdfMap.get(pdf_key)
     if info:
         return info["name"]
     return f"pdf{pdf_key.upper()}"
 
 
 def get_pdf_display_name(pdf_key: str) -> str:
-    info = theory_tools.pdfMap.get(pdf_key)
+    info = theory_utils.pdfMap.get(pdf_key)
     if info:
         return info["name"].strip("pdf")
     return f"pdf{pdf_key.upper()}"

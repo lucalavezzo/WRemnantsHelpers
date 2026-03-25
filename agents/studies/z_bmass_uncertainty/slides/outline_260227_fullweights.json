@@ -1,0 +1,184 @@
+{
+  "title": "Z+$b\\bar{b}$ Study with Updated Samples",
+  "subtitle": "Samples, selection, preselection object diagnostics, and corrected result",
+  "author": "Luca",
+  "date": "February 27, 2026",
+  "theme": "Madrid",
+  "slides": [
+    {
+      "type": "bullets",
+      "title": "Samples",
+      "items": [
+        "Nominal sample (5FS, massless b): Zmumu MiNNLO.",
+        "Alternate sample (4FS, massive b): Zbb MiNNLO.",
+        "We now use the correct event weights from the LHE files: thanks to Marius, Kenneth for setting this up.",
+        "Marco Zaro confirmed that in arXiv1803.04336 they used B hadrons to swap, as we do here."
+      ]
+    },
+    {
+      "type": "bullets",
+      "title": "Event Selection and Swap Definition",
+      "items": [
+        {
+          "text": "Event selection:",
+          "subitems": [
+            "prefsrLep_pt $>$ 20",
+            "prefsrOtherLep_pt $>$ 20",
+            "prefsrLep_absEta $<$ 2.5",
+            "prefsrOtherLep_absEta $<$ 2.5",
+            "abs(prefsrV_mass - 91.) $<$ 15"
+          ]
+        },
+        "Event-level selected region for swap: $bottom\\_sel = (nBhad \\geq 1)$. No requirements on the B hadrons themselves.",
+        "B hadrons are built from final-state GenPart bottom-hadron ID logic, as before.",
+        "Corrected sample construction: nominal unselected + massive selected.",
+        "Slides below show both preselection LHE, b-tagged jet, and B hadron diagnostics."
+      ]
+    },
+    {
+      "type": "figure",
+      "title": "Event Weight Histogram",
+      "top_items": [
+        "Distribution of the updated LHE event weight used in this run."
+      ],
+      "path": "/home/submit/lavezzo/public_html/alphaS/260227_z_bb/hadrons/full_withW_newevents_wsumfix_260227_presel_v2/samples_comparison_unknown_weight0.png",
+      "width": "0.72\\textwidth",
+      "height": "0.56\\textheight"
+    },
+    {
+      "type": "two_figures",
+      "title": "Post-Cut LHE Multiplicity",
+      "top_items": [
+        "After lepton/event selection cuts, inclusive in B-hadrons."
+      ],
+      "left": {
+        "path": "/home/submit/lavezzo/public_html/alphaS/260227_z_bb/hadrons/full_withW_newevents_wsumfix_260227_jetsInclusive/samples_comparison_n_lhe_init_bbbar.png",
+        "width": "0.88\\linewidth"
+      },
+      "right": {
+        "path": "/home/submit/lavezzo/public_html/alphaS/260227_z_bb/hadrons/full_withW_newevents_wsumfix_260227_jetsInclusive/samples_comparison_n_lhe_fin_bbbar.png",
+        "width": "0.88\\linewidth"
+      }
+    },
+    {
+      "type": "two_figures",
+      "title": "Post-Cut LHE Kinematics",
+      "top_items": [
+        "After lepton/event selection cuts, inclusive in B-hadrons."
+      ],
+      "left": {
+        "path": "/home/submit/lavezzo/public_html/alphaS/260227_z_bb/hadrons/full_withW_newevents_wsumfix_260227_jetsInclusive/samples_comparison_m_bb_lhe.png",
+        "width": "0.88\\linewidth"
+      },
+      "right": {
+        "path": "/home/submit/lavezzo/public_html/alphaS/260227_z_bb/hadrons/full_withW_newevents_wsumfix_260227_jetsInclusive/samples_comparison_dR_bb_lhe.png",
+        "width": "0.88\\linewidth"
+      }
+    },
+    {
+      "type": "two_figures",
+      "title": "Selected-Region Gen Jet Overview",
+      "top_items": [
+        "After lepton/event selection cuts, inclusive in B-hadrons."
+      ],
+      "left": {
+        "path": "/home/submit/lavezzo/public_html/alphaS/260227_z_bb/hadrons/full_withW_newevents_wsumfix_260227_jetsInclusive/samples_comparison_n_bjets.png",
+        "width": "0.88\\linewidth"
+      },
+      "right": {
+        "path": "/home/submit/lavezzo/public_html/alphaS/260227_z_bb/hadrons/full_withW_newevents_wsumfix_260227_jetsInclusive/samples_comparison_lead_bjet_pt.png",
+        "width": "0.88\\linewidth"
+      }
+    },
+    {
+      "type": "two_figures",
+      "title": "Selected-Region Gen Jet Pair Kinematics",
+      "top_items": [
+        "Combination of jet-pair observables."
+      ],
+      "left": {
+        "path": "/home/submit/lavezzo/public_html/alphaS/260227_z_bb/hadrons/full_withW_newevents_wsumfix_260227_jetsInclusive/samples_comparison_m_bb_jet.png",
+        "width": "0.88\\linewidth"
+      },
+      "right": {
+        "path": "/home/submit/lavezzo/public_html/alphaS/260227_z_bb/hadrons/full_withW_newevents_wsumfix_260227_jetsInclusive/samples_comparison_dR_bb_jet.png",
+        "width": "0.88\\linewidth"
+      }
+    },
+    {
+      "type": "two_figures",
+      "title": "B-Hadron Multiplicity",
+      "top_items": [
+        {
+        "text": "Both panels use no B-hadron requirements, after basic event selection.",
+        "subitem": [
+            "Left: updated LHE weights.",
+            "Right: old LHE weights."
+          ]
+        },
+        "Factor of ~2 increase in event yields from the updated weights."
+      ],
+      "left": {
+        "path": "/home/submit/lavezzo/public_html/alphaS/260227_z_bb/hadrons/full_withW_newevents_wsumfix_260227_presel_v2/samples_comparison_nBhad.png",
+        "width": "0.88\\linewidth"
+      },
+      "right": {
+        "path": "/home/submit/lavezzo/public_html/alphaS/260227_z_bb/hadrons/full_withW_newevents_wsumfix_260227_presel_v2/samples_comparison_nBhad_weight.png",
+        "width": "0.88\\linewidth"
+      }
+    },
+    {
+      "type": "two_figures",
+      "title": "B-Hadron Single-Object Kinematics",
+      "top_items": [
+        "Improved agreement between samples.",
+        "Clear differences at low $p_T$. Physical?"
+      ],
+      "left": {
+        "path": "/home/submit/lavezzo/public_html/alphaS/260227_z_bb/hadrons/full_withW_newevents_wsumfix_260227_presel_v2/samples_comparison_leadB_pt.png",
+        "width": "0.88\\linewidth"
+      },
+      "right": {
+        "path": "/home/submit/lavezzo/public_html/alphaS/260227_z_bb/hadrons/full_withW_newevents_wsumfix_260227_presel_v2/samples_comparison_subB_pt.png",
+        "width": "0.88\\linewidth"
+      }
+    },
+    {
+      "type": "two_figures",
+      "title": "B-Hadron Pair Kinematics",
+      "left": {
+        "path": "/home/submit/lavezzo/public_html/alphaS/260227_z_bb/hadrons/full_withW_newevents_wsumfix_260227_presel_v2/samples_comparison_m_bb_had.png",
+        "width": "0.88\\linewidth"
+      },
+      "right": {
+        "path": "/home/submit/lavezzo/public_html/alphaS/260227_z_bb/hadrons/full_withW_newevents_wsumfix_260227_presel_v2/samples_comparison_dR_bb_had.png",
+        "width": "0.88\\linewidth"
+      }
+    },
+    {
+      "type": "two_figures",
+      "title": "Corrected Sample: Selected Component",
+      "top_items": [
+        "Selected-component ($nBhad >= 1$) comparison in $p_T^Z$ and $|y_Z|$."
+      ],
+      "left": {
+        "path": "/home/submit/lavezzo/public_html/alphaS/260227_z_bb/hadrons/full_withW_newevents_wsumfix_260227_presel_v2/bb_ptVgen.png",
+        "width": "0.88\\linewidth"
+      },
+      "right": {
+        "path": "/home/submit/lavezzo/public_html/alphaS/260227_z_bb/hadrons/full_withW_newevents_wsumfix_260227_presel_v2/bb_absYVgen.png",
+        "width": "0.88\\linewidth"
+      }
+    },
+    {
+      "type": "figure",
+      "title": "Corrected Sample: Inclusive Z pT",
+      "top_items": [
+        "Inclusive corrected distribution from the current swap recipe."
+      ],
+      "path": "/home/submit/lavezzo/public_html/alphaS/260227_z_bb/hadrons/full_withW_newevents_wsumfix_260227_presel_v2/inclusive_ptVgen.png",
+      "width": "0.72\\textwidth",
+      "height": "0.56\\textheight"
+    }
+  ]
+}

@@ -108,7 +108,7 @@ if $do_setup; then
         postfix_arg="--postfix ${postfix}"
     fi
 
-    setup_command="python ${WREM_BASE}/scripts/rabbit/setupRabbit.py -i $input_file --fitvar $fitvar -o $output_dir --noi alphaS $postfix_arg $extra_setup"
+    setup_command="python ${WREM_BASE}/scripts/rabbit/setupRabbit.py -i $input_file --fitvar $fitvar -o $output_dir --noi alphaS --npUnc LatticeEigvars --pdfUncFromCorr $postfix_arg $extra_setup"
 
     echo "$setup_command"
     if [ -t 1 ]; then
@@ -134,7 +134,7 @@ if $do_fit; then
 
     echo
     echo "Running the fit..."
-    fit_command="rabbit_fit.py $carrot --computeVariations -m Project ch0 ptll --computeHistErrors --doImpacts -o $output --globalImpacts --saveHists --saveHistsPerProcess $extra_fit"
+    fit_command="rabbit_fit.py $carrot --computeVariations -m Project ch0 ptll yll -m Project ch0 ptll -m Project ch0 yll -m Project ch0 cosThetaStarll_quantile -m Project ch0 phiStarll_quantile --computeHistErrors --computeHistImpacts --doImpacts -o $output --globalImpacts --saveHists --saveHistsPerProcess $extra_fit"
     echo "$fit_command"
     if [ -t 1 ]; then
         fit_output=$($fit_command 2>&1 | tee /dev/tty)

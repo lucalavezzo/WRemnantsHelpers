@@ -15,7 +15,7 @@ import mplhep as hep
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 from wums import logging, output_tools, plot_tools  # isort: skip
-from utilities import common, parsing
+from wremnants.utilities import parsing
 import hist
 from hist import Hist
 import datetime
@@ -413,7 +413,7 @@ def main():
                             sel_ax, sel_val = sel
                             sel_lines.append(f"{sel_ax}: {sel_val}")
                     if sel_lines:
-                        per_hist_selections[i] = "\\n".join(sel_lines)
+                        per_hist_selections[i] = "\n".join(sel_lines)
             if args.logy:
                 ax1.set_yscale("log")
             if args.xlabel:

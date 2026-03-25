@@ -56,11 +56,10 @@ def main():
     for pdf_central in args.central_pdfs:
         input_file = f"{args.input_dir}/mz_dilepton_{pdf_central}.hdf5"
 
-        postfix = f"Zmumu"
         if args.postfix:
             postfix += f"_{args.postfix}"
         postfix += f"_{pdf_central}"
-        extra_setup = f"--filterProcGroups Zmumu " f"--postfix {postfix} "
+        extra_setup = f"--postfix {postfix} "
         extra_fit = ""
         if args.asym:
             extra_fit += "--scan pdfAlphaS --contourScan pdfAlphaS -v 4 --scanRange 3.0 --scanPoints 45 "

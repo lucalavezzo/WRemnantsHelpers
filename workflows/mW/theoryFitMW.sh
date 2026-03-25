@@ -55,9 +55,8 @@ echo "Unfolded fit result: $unfolding_fitresult"
 unfolding_output_dir=$(dirname "$unfolding_fitresult")
 echo
 
-theory_setup_command="python ${WREM_BASE}/scripts/rabbit/feedRabbitTheory.py ${unfolding_fitresult} --fitW --predGenerator 'scetlib_dyturbo' -o ${unfolding_output_dir} --systematicType log_normal --fitresultModel CompositeModel --fitresultChannelW Select_ch0_masked --constrainAlphaS  --noFitSigmaUL ${extra_setup}"
-echo "Executing command: $theory_setup_command"
-theory_setup_command_output=$(eval "$theory_setup_command 2>&1" | tee /dev/tty)
+echo "feedRabbitTheory.py was removed. theoryFitMW.sh still depends on the deleted W-only workflow and has no direct replacement yet." >&2
+exit 1
 
 # extract the output file name, and the output directory, where we will put the fit results
 theory_file=$(echo "$theory_setup_command_output" | grep -oP '(?<=Write output file ).*')

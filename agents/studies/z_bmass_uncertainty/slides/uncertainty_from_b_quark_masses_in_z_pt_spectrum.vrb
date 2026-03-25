@@ -1,17 +1,19 @@
 \frametitle{Backup: Exact B-hadron Selection Code}
 \begin{block}{Implementation}
 \begin{verbatim}
-// Source of truth: external library helper (ThePEG::PDT, from its .hpp)
-// Treat this external helper as authoritative for B-hadron ID
-if (status[i] != 1 && status[i] != 2) continue;
-const int apdg = std::abs(pdgId[i]);
-if (!ThePEG::PDT::hasBottom(apdg)) continue;
-idx.push_back((int)i);
-
-// Histmaker usage
-df = df.Define("bHadIdx", "wrem::finalStateBHadronIdx(GenPart_pdgId, GenPart_status)")
-df = df.Define("bHad_pt", "Take(GenPart_pt, bHadIdx)")
-df = df.Define("nBhad", "static_cast<int>(bHad_pt.size())")
-df = df.Define("bottom_sel", "(bHad_pt.size() >= 1)")
+inline bool isBHadron(int pdgId)
+{
+    int64_t id = std::llabs(static_cast<int64_t>(pdgId));
+    // Non-hadrons / fundamentals
+    if (id < 100) return false;
+    // Reject nuclei/ions.
+    if (id >= 1000000000LL) return false;
+    int nq1 = static_cast<int>((id / 1000) % 10);
+    int nq2 = static_cast<int>((id / 100)  % 10);
+    int nq3 = static_cast<int>((id / 10)   % 10);
+    // Exclude diquarks.
+    if (nq3 == 0) return false;
+    return (nq1 == 5) || (nq2 == 5) || (nq3 == 5);
+}
 \end{verbatim}
 \end{block}

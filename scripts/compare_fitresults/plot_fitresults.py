@@ -7,6 +7,7 @@ import argparse
 import yaml
 import datetime
 from wums import output_tools
+from scripts.common_plot_style import build_cms_color_cycle
 
 hep.style.use(hep.style.CMS)
 
@@ -28,18 +29,7 @@ def get_default_markers():
 
 def get_default_colors():
     """Return list of default colors."""
-    return [
-        "blue",
-        "red",
-        "green",
-        "orange",
-        "purple",
-        "brown",
-        "pink",
-        "gray",
-        "olive",
-        "cyan",
-    ]
+    return build_cms_color_cycle(10)
 
 
 def assign_defaults(fit_results):

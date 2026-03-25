@@ -1,6 +1,8 @@
 import argparse
 import os
 from datetime import datetime
+import re
+import warnings
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
@@ -11,7 +13,7 @@ import mplhep as hep
 import rabbit
 import rabbit.io_tools
 import wums.output_tools
-from wremnants import theory_tools
+from wremnants.utilities import theory_utils as theory_tools
 
 hep.style.use("CMS")
 
@@ -37,6 +39,23 @@ XLABELS = {
     "msht20": "MSHT20",
     "herapdf20": "HERAPDF20",
 }
+PDF_TO_THEORY_CORR = {
+    "ct18z": "scetlib_dyturbo_LatticeNP_CT18Z_N3p0LL_N2LO",
+    "herapdf20": "scetlib_dyturbo_LatticeNP_HERAPDF20_N3p0LL_N2LO",
+    "msht20": "scetlib_dyturbo_LatticeNP_MSHT20_N3p0LL_N2LO",
+    "msht20an3lo": "scetlib_dyturbo_LatticeNP_MSHT20aN3LO_N3p0LL_N2LO",
+    "nnpdf40": "scetlib_dyturbo_LatticeNP_NNPDF40_N3p0LL_N2LO",
+    "pdf4lhc21": "scetlib_dyturbo_LatticeNP_PDF4LHC21_N3p0LL_N2LO",
+    "nnpdf31": "scetlib_dyturbo_LatticeNP_NNPDF31_N3p0LL_N2LO",
+    "ct18": "scetlib_dyturbo_LatticeNP_CT18_N3p0LL_N2LO",
+}
+
+
+def _split_dir_pattern(file_base: str) -> re.Pattern:
+    escaped_base = re.escape(file_base)
+    return re.compile(
+        rf"^(?P<file_base>{escaped_base})(?P<separator>_)?(?:(?P<postfix>.+)_)?(?P<central>[a-z0-9]+)_pseudo(?P<pseudo>[a-z0-9]+)$"
+    )
 
 
 def get_pdf_map_name(pdf_key: str) -> str:
@@ -44,6 +63,24 @@ def get_pdf_map_name(pdf_key: str) -> str:
     if info:
         return info["name"]
     return f"pdf{pdf_key.upper()}"
+
+
+def normalize_pdf(pdf):
+    return pdf.lower()
+
+
+def parse_split_dir_name(name, file_base):
+    match = _split_dir_pattern(file_base).match(name)
+    if not match:
+        return None, None
+    central = normalize_pdf(match.group("central"))
+    pseudo = normalize_pdf(match.group("pseudo"))
+    if central != pseudo:
+        return None, None
+    postfix = (match.group("postfix") or "").strip()
+    if central in PDF_TO_THEORY_CORR and pseudo in PDF_TO_THEORY_CORR:
+        return central, postfix
+    return None, None
 
 
 def parse_args():
@@ -57,21 +94,34 @@ def parse_args():
         dest="input_dir",
         help=(
             f"Directory containing the directories of fit results, with the format"
-            "<input-dir>/<file-base>_<central-pdf>/fitresult.hdf5."
+            "<input-dir>/<file-base>_<postfix_><central>_pseudo<central>/fitresults.hdf5."
             "configured via the script arguments"
             "(Default: None)"
         ),
     )
     parser.add_argument(
         "--file-base",
-        default="ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile_Zmumu_",
+        default="ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile_",
         dest="file_base",
-        help="Label for the configuration (reported in log output). (Default: %(default)s)",
+        help=(
+            "Directory prefix before <postfix_><central> in split-fit layout. "
+            "(Default: %(default)s)"
+        ),
+    )
+    parser.add_argument(
+        "--fit-postfix",
+        default="",
+        help=(
+            "Split layout only: require this postfix in "
+            "'..._Zmumu_<postfix>_<central>_pseudo<central>'. "
+            "Use empty string for no-postfix dirs."
+        ),
     )
     parser.add_argument(
         "--output-dir",
         default=os.path.join(
-            os.environ["MY_PLOT_DIR"], datetime.now().strftime("%y%m%d_alternate_pdfs")
+            os.environ.get("MY_PLOT_DIR", "."),
+            datetime.now().strftime("%y%m%d_alternate_pdfs"),
         ),
         help=(f"Directory where plots are written. (Default: %(default)s)"),
     )
@@ -91,7 +141,7 @@ def parse_args():
         "--ylim",
         nargs=2,
         type=float,
-        default=(0.116, 0.120),
+        default=(0.116, 0.1205),
         help="Set y-axis limits for the scatter plot. (Default: %(default)s)",
     )
     parser.add_argument(
@@ -155,6 +205,29 @@ def draw_bar_edges(
     )
 
 
+def collect_split_fitfiles(input_dir, fit_postfix, file_base):
+    fitfiles = {}
+    for entry in sorted(os.listdir(input_dir)):
+        full = os.path.join(input_dir, entry)
+        if not os.path.isdir(full):
+            continue
+        central, postfix = parse_split_dir_name(entry, file_base)
+        if not central:
+            continue
+        if postfix != fit_postfix:
+            continue
+        fitfile = os.path.join(full, "fitresults.hdf5")
+        if not os.path.exists(fitfile):
+            continue
+        if central in fitfiles:
+            warnings.warn(
+                f"Multiple split-fit files found for central={central}; keeping first: {fitfiles[central]}"
+            )
+            continue
+        fitfiles[central] = fitfile
+    return fitfiles
+
+
 def main():
     args = parse_args()
     os.makedirs(args.output_dir, exist_ok=True)
@@ -162,22 +235,49 @@ def main():
     results = []
     tot_uncerts = []
     pdf_uncerts = []
-    for central_pdf in args.central_pdfs:
-        input_file = os.path.join(
-            args.input_dir, args.file_base + central_pdf, "fitresults.hdf5"
+    used_central_pdfs = []
+
+    split_fitfiles = {}
+    split_fitfiles = collect_split_fitfiles(
+        args.input_dir, args.fit_postfix, args.file_base
+    )
+    if not split_fitfiles:
+        raise RuntimeError(
+            "No split-fit outputs found for requested --fit-postfix in input dir."
         )
+    print("Using input layout: split")
+
+    for central_pdf in args.central_pdfs:
+        if central_pdf not in PDF_TO_THEORY_CORR:
+            raise ValueError(
+                f"Unsupported central PDF '{central_pdf}'. Supported: "
+                + ", ".join(sorted(PDF_TO_THEORY_CORR))
+            )
+        input_file = split_fitfiles.get(central_pdf)
+        if not input_file:
+            warnings.warn(
+                f"Missing split Asimov fit for central={central_pdf}; skipping."
+            )
+            continue
+        result_name = f"nominal_{PDF_TO_THEORY_CORR[central_pdf]}_Corr_vars"
+
         central_pdf_name = get_pdf_map_name(central_pdf)
         print(input_file)
 
-        result = f"asimov"
-        fitresult, _ = rabbit.io_tools.get_fitresult(
-            input_file, result=result, meta=True
-        )
+        try:
+            fitresult, _ = rabbit.io_tools.get_fitresult(
+                input_file, result=result_name, meta=True
+            )
+        except Exception:
+            fitresult, _ = rabbit.io_tools.get_fitresult(
+                input_file, result="asimov", meta=True
+            )
         parms = fitresult["parms"].get()
 
         alphas = parms["pdfAlphaS"].value
         alphas *= ALPHA_S_SCALING
         results.append(alphas)
+        used_central_pdfs.append(central_pdf)
 
         alphas_tot_uncert = parms["pdfAlphaS"].variance ** 0.5
         if args.impact_type == "global":
@@ -198,6 +298,11 @@ def main():
         tot_uncerts.append(alphas_tot_uncert)
         pdf_uncerts.append(alphas_pdf_uncert)
 
+    if not results:
+        raise RuntimeError(
+            "No fit results loaded. Check --fit-postfix and --central-pdfs."
+        )
+
     results_array = np.array(results)
     tot_uncerts_array = np.array(tot_uncerts)
     pdf_uncerts_array = np.array(pdf_uncerts)
@@ -214,18 +319,19 @@ def main():
 
     latex_lines = []
     for central_pdf, value, tot_uncert, pdf_uncert in zip(
-        args.central_pdfs, results_array, tot_uncerts_array, pdf_uncerts_array
+        used_central_pdfs, results_array, tot_uncerts_array, pdf_uncerts_array
     ):
+        label = XLABELS.get(central_pdf, central_pdf).replace("_", r"\_")
         latex_lines.append(
-            f"{XLABELS[central_pdf].replace('_', '\\_')} & {format_alphas_value(value, tot_uncert, pdf_uncert)} \\\\"
+            f"{label} & {format_alphas_value(value, tot_uncert, pdf_uncert)} \\\\"
         )
     print("\nLaTeX table:\n" + "\n".join(latex_lines))
 
     # bar plot: bars encode uncertainty, horizontal line marks central value
-    fig, ax = plt.subplots(figsize=(12, 7))
-    bar_positions = np.arange(len(args.central_pdfs))
+    fig, ax = plt.subplots(figsize=(8, 7))
+    bar_positions = np.arange(len(used_central_pdfs))
     bar_width = 1.0  # edges touch when x-limits are set to +/-0.5 from first/last bar
-    for idx, central_pdf in enumerate(args.central_pdfs):
+    for idx, central_pdf in enumerate(used_central_pdfs):
         central = float(np.squeeze(results_array[idx] + ALPHA_S))
         tot_uncert_array = np.atleast_1d(tot_uncerts_array[idx]).astype(float).flatten()
         if tot_uncert_array.size == 1:
@@ -280,18 +386,18 @@ def main():
     pdg_line = ax.axhline(
         y=ALPHA_S_PDG,
         color="black",
-        label=f"PDG average: " + ALPHA_S_TEX + f"={ALPHA_S_PDG}",
+        label=f"PDG avg.: " + ALPHA_S_TEX + f"={ALPHA_S_PDG}",
         linestyle="--",
         linewidth=1,
     )
     ax.set_ylabel(ALPHA_S_TEX, loc="center")
     ax.set_xticks(bar_positions)
     ax.set_xticklabels(
-        [XLABELS.get(p, p) for p in args.central_pdfs],
+        [XLABELS.get(p, p) for p in used_central_pdfs],
         rotation=45,
         ha="right",
     )
-    ax.set_xlim(-0.5, len(args.central_pdfs) - 0.5)
+    ax.set_xlim(-0.5, len(used_central_pdfs) - 0.5)
     if args.ylim:
         ax.set_ylim(args.ylim)
     total_handle = matplotlib.patches.Patch(
@@ -312,14 +418,14 @@ def main():
     ax.legend(
         handles=[total_handle, pdf_handle, pdg_line],
         labels=[
-            "Total uncertainty",
-            "PDF uncertainty",
+            "Total uncert.",
+            "PDF uncert.",
             pdg_line.get_label(),
         ],
         fontsize="x-small",
-        loc="lower left",
-        bbox_to_anchor=(1.01, 0),
+        loc="upper left",
         handler_map={pdf_handle: HandlerPatchWithLine()},
+        ncols=2,
     )
     fname = "alt_pdfs_alphas_results"
     fname += f"_{args.impact_type}Impacts"

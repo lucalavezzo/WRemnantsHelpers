@@ -84,7 +84,7 @@ if $do_setup; then
     
     fitvar='pt-eta-charge'
 
-    setup_command=(python "${WREM_BASE}/scripts/rabbit/setupRabbit.py" -i "$input_file" --fitvar "$fitvar" -o "$output_dir")
+    setup_command=(python "${WREM_BASE}/scripts/rabbit/setupRabbit.py" -i "$input_file" --fitvar "$fitvar" --pdfUncFromCorr --npUnc LatticeEigvars -o "$output_dir")
     if [ -n "$extra_setup" ]; then
         # Use eval to split extra_setup into array elements
         eval "setup_command+=( $extra_setup )"
@@ -105,6 +105,6 @@ fi
 echo "Rabbit file: $carrot"
 output=$(dirname "$carrot")
 echo "Running the fit..."
-fit_command="rabbit_fit.py $carrot -t -1 --computeVariations -m Project ch0 pt eta --computeHistErrors --doImpacts -o $output --globalImpacts --saveHists --saveHistsPerProcess $extra_fit"
+fit_command="rabbit_fit.py $carrot -t -1 --computeVariations -m BaseMapping --computeHistErrors --doImpacts -o $output --globalImpacts --saveHists --saveHistsPerProcess $extra_fit"
 echo "$fit_command"
 fit_output=$($fit_command 2>&1 | tee /dev/tty)

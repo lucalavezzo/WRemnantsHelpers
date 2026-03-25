@@ -45,6 +45,7 @@ def main():
     parser.add_argument(
         "--proc",
         default=None,
+        nargs="+",
         type=str,
         help="Process name to grab from the narf file (default: None).",
     )
@@ -148,23 +149,28 @@ def main():
         args.hist = args.hist * len(args.infiles)
 
     files_hists = {}
-    for infile, hist_name in zip(args.infiles, args.hist):
+    for ifile, (infile, hist_name) in enumerate(zip(args.infiles, args.hist)):
         print(f"Processing file: {infile}")
 
         hists = {}
 
         if args.narf:
 
+            proc = None
             with h5py.File(infile, "r") as h5file:
                 results = load_results_h5py(h5file)
                 try:
                     if args.proc is None:
                         h = results[hist_name]
                     else:
-                        h = results[args.proc]["output"][hist_name].get()
+                        if args.proc is not None and len(args.proc) == 1:
+                            proc = args.proc[0]
+                        else:
+                            proc = args.proc[ifile]
+                        h = results[proc]["output"][hist_name].get()
                 except KeyError:
                     raise KeyError(
-                        f"Histogram '{hist_name}' not found in file '{infile}'. Available histograms: {list(results[args.proc]['output'].keys())}"
+                        f"Histogram '{hist_name}' not found in file '{infile}'. Available histograms: {list(results[proc]['output'].keys())}"
                     )
         else:
 
@@ -328,6 +334,12 @@ def main():
             color="black",
             yerr=not args.norm,
         )
+
+        print(_h_ref)
+        for i in range(6):
+            print(
+                f"Flavor {i}: {_h_ref[{'presel_z_mother_flavor': i*1.j}].value / _h_ref[{'presel_z_mother_flavor': slice(1j, None)}].sum().value}"
+            )
 
         for i, (infile, hists) in enumerate(files_hists.items()):
             if i == 0:

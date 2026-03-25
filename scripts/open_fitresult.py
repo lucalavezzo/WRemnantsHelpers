@@ -37,9 +37,14 @@ parser.add_argument(
 )
 args = parser.parse_args()
 
-fitresult, meta = rabbit.io_tools.get_fitresult(
-    args.infile, result=args.result, meta=True
-)
+try:
+    fitresult, meta = rabbit.io_tools.get_fitresult(
+        args.infile, result=args.result, meta=True
+    )
+except ValueError as e:
+    print(f"Error reading fit result: {e}")
+    print("Try passing another value for --result.")
+    sys.exit(1)
 
 print(f"Fit result keys: {fitresult.keys()}")
 print(f"Meta data keys: {meta.keys()}")

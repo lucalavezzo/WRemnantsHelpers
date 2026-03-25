@@ -40,8 +40,11 @@ bin/run --help
 ## Development Guidelines
 - Keep workflows reproducible: prefer scriptable commands over ad hoc shell history.
 - Keep logs in `logs/` with timestamps; `bin/run` is the default launcher for detached jobs.
+- For plot scripts, prefer `wums` plotting/output utilities (`plot_tools`, `boostHistHelpers`, `output_tools`) over ad hoc matplotlib-only helpers.
 - Treat documentation as a living artifact: when Codex learns new workflow, physics-context, environment, or failure-mode details, update the relevant files in `agents/knowledge/` and `AGENTS.md` in the same working session.
 - Prefer small, incremental doc updates over delayed large rewrites, so future sessions start from current reality.
+- Always perform a physics-sense check for produced plots/results (not only technical script success), and explicitly record the interpretation in the active study notes.
+- Persist reusable lessons to long-lived memory: promote stable, cross-study findings/rules into `agents/knowledge/` during the same session.
 
 ## Study Recording Convention
 - Default for research studies: create a study folder under `agents/studies/<topic>/`.
@@ -62,7 +65,7 @@ bin/run --help
 - Standard iteration loop for studies:
   - Implement requested code/config changes.
   - Run the study workflow end-to-end (hist production and plotting/summary), using a fresh unique run tag/postfix on every run for traceability.
-  - Inspect outputs directly (plots and/or printed histogram values).
+  - Inspect outputs directly (plots and/or printed histogram values), including a physics-sense sanity check.
   - Update study docs with new knowledge and question status.
   - When requested, update `slides/outline.json`, regenerate slides via `scripts/study_slides.py`, and iterate with the user on slide content.
   - Summarize concise physics takeaways and propose concrete suggestions for the next iteration.
@@ -70,7 +73,23 @@ bin/run --help
 
 ## Troubleshooting
 - **Logs & monitoring:** logs should be saved in `logs/` with timestamps.
+- **Optional FastJet overlay (Arch package path):**
+  - Base `wmassdevrolling` image is Arch Linux and can install `fastjet` via `pacman`.
+  - Because `/cvmfs` image is immutable, use a writable overlay once, then mount it read-only for normal runs.
+  - One-time setup:
+    - `agents/install_fastjet_overlay.sh`
+  - FastJet-enabled launch:
+    - `agents/run_wmass_with_fastjet.sh`
 - **Container checks from Codex:** If an inline `singularity run ... bash -lc '...'` command behaves unexpectedly, run a small script file from `/home/submit/lavezzo/alphaS/WRemnantsHelpers/agents/` inside the container instead.
+- **Known Codex runtime limitation:** In some Codex sessions, container startup can fail with
+  - `ERROR: Installation issue: starter-suid doesn't have setuid bit set`, or
+  - user-namespace mapping errors (`Could not write info to setgroups`).
+  In this case, run the study command in your normal interactive container shell and share the printed diagnostics/output path back to Codex for analysis.
+- **Known-good Codex execution pattern (when unsandboxed permission is available):**
+  - First validate container access with a single-command test:
+    `singularity run --bind /scratch/,/work/,/home/,/ceph/ /cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/bendavid/cmswmassdocker/wmassdevrolling\:latest /bin/bash -lc 'echo CONTAINER_OK && python --version'`
+  - Then run the real workload as one `singularity run ... /bin/bash -lc 'cd ...; source setup.sh; python ...'` command.
+  - Avoid splitting into multiple command segments when possible; in Codex this can cause mixed sandbox/escalation handling and re-trigger setuid errors.
 
 ## Roadmap / TODOs
 
@@ -81,3 +100,4 @@ bin/run --help
 - **2026-02-13:** Documented that `$WREM_BASE` is inside the editable workspace for Codex sessions.
 - **2026-02-13:** Added study-to-slides workflow (`agents/knowledge/70_slides/study_slides_workflow.md`) and `slides/outline.json` convention.
 - **2026-02-16:** Migrated reusable documentation into `agents/knowledge/` and made it the canonical long-lived knowledge base.
+- **2026-02-26:** Added explicit policy to always perform and document physics-sense checks on plots/results, and to promote reusable lessons to `agents/knowledge/` in-session.

@@ -81,11 +81,11 @@ def resolve_paths(output_mode: str) -> dict[str, str]:
         ),
         "wz_gen_fit": str(
             Path(my_out_dir)
-            / "260304_WZSimultaneousUnfolding/Combination_ZMassDileptonWMass/Combination_WMassZMassDilepton_noQCDscalesZ_flipped/fitresults.hdf5"
+            / "260304_WZSimultaneousUnfolding/Combination_ZMassDileptonWMass/Combination_WMassZMassDilepton_CombinedTheoryFitViaMC/fitresults.hdf5"
         ),
         "z_gen_fit": str(
             Path(my_out_dir)
-            / "260303_histmaker_dilepton_unfolding/ZMassDilepton_ptVGen_absYVGen_noQCDscales/fitresults.hdf5"
+            / "260303_histmaker_dilepton_unfolding/ZMassDilepton_ptVGen_absYVGen_test/fitresults.hdf5"
         ),
         "higher_orders_input_dir": str(Path(my_out_dir) / "260304_ho"),
         "alternate_pdfs_input_dir": str(
@@ -598,7 +598,7 @@ def build_tasks(paths: dict[str, str]) -> list[Task]:
                 "--showNumbers",
                 "--oneSidedImpacts",
                 "--grouping",
-                "min",
+                "alphaS",
                 "-o",
                 paths["z_reco_results"],
                 "--otherExtensions",
@@ -633,7 +633,7 @@ def build_tasks(paths: dict[str, str]) -> list[Task]:
                 "--showNumbers",
                 "--oneSidedImpacts",
                 "--grouping",
-                "min",
+                "alphaS",
                 "-o",
                 paths["z_reco_results"],
                 "--otherExtensions",
@@ -714,7 +714,7 @@ def build_tasks(paths: dict[str, str]) -> list[Task]:
                 "--showNumbers",
                 "--oneSidedImpacts",
                 "--grouping",
-                "min",
+                "alphaS",
                 "--otherExtensions",
                 "pdf",
                 "png",
@@ -780,7 +780,7 @@ def build_tasks(paths: dict[str, str]) -> list[Task]:
                 "--showNumbers",
                 "--oneSidedImpacts",
                 "--grouping",
-                "min",
+                "alphaS",
                 "--otherExtensions",
                 "pdf",
                 "png",
@@ -848,7 +848,7 @@ def build_tasks(paths: dict[str, str]) -> list[Task]:
                 "--showNumbers",
                 "--oneSidedImpacts",
                 "--grouping",
-                "min",
+                "alphaS",
                 "--otherExtensions",
                 "pdf",
                 "png",
@@ -888,7 +888,7 @@ def build_tasks(paths: dict[str, str]) -> list[Task]:
                 "--showNumbers",
                 "--oneSidedImpacts",
                 "--grouping",
-                "min",
+                "alphaS",
                 "--otherExtensions",
                 "pdf",
                 "png",

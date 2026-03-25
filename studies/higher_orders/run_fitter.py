@@ -1,25 +1,14 @@
 import argparse
 import os
 
-from wremnants import theory_tools
-
 DEFAULT_CENTRAL_PREDS = [
-    "scetlib_dyturbo",
-    "scetlib_dyturboMSHT20",
-    "scetlib_dyturboMSHT20an3lo",
-    "scetlib_dyturboN3p1LL",
-    "scetlib_dyturboN4p0LL",
-    "scetlib_nnlojetN3p1LLN3LO",
-    "scetlib_nnlojetN4p0LLN3LO",
-    "scetlib_dyturboN3p0LL_LatticeNP",
+    "scetlib_dyturbo_LatticeNP_CT18Z_N3p0LL_N2LO",
+    "scetlib_dyturbo_LatticeNP_CT18Z_N2p1LL_N2LO",
+    "scetlib_dyturbo_LatticeNP_CT18Z_N4p0LL_N2LO",
+    "scetlib_dyturbo_LatticeNP_CT18Z_N3p1LL_N2LO",
+    # "scetlib_nnlojetN3p1LLN3LO",
+    # "scetlib_nnlojetN4p0LLN3LO",
 ]
-
-
-def get_pred_map_name(pred_key: str) -> str:
-    info = theory_tools.predMap.get(pred_key)
-    if info:
-        return info["name"]
-    return f"pred{pred_key.upper()}"
 
 
 def parse_args():
@@ -55,15 +44,15 @@ def main():
 
     for pred_central in args.central_preds:
         print(f"Processing {pred_central}")
-        input_file = f"{args.input_dir}/mz_dilepton_{pred_central}.hdf5"
+        input_file = (
+            f"{args.input_dir}/mz_dilepton_{pred_central}_Corr_maxFiles_m1.hdf5"
+        )
 
-        postfix = f"Zmumu"
+        postfix = f""
         if args.postfix:
             postfix += f"_{args.postfix}"
-        postfix += f"_{pred_central}"
-        extra_setup = f"--filterProcGroups Zmumu " f"--postfix {postfix} "
-        if "lattice" in pred_central.lower():
-            extra_setup += "--npUnc LatticeEigvars --pdfUncFromCorr"
+        postfix += f"{pred_central}"
+        extra_setup = f"--postfix {postfix} "
         extra_fit = ""
         if args.asym:
             extra_fit += "--scan pdfAlphaS --contourScan pdfAlphaS -v 4 --scanRange 3.0 --scanPoints 45 "

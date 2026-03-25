@@ -63,7 +63,7 @@ echo "Unfolded fit result: $unfolding_fitresult"
 unfolding_output_dir=$(dirname "$unfolding_fitresult")
 echo
 
-theory_setup_command="python ${WREM_BASE}/scripts/rabbit/feedRabbitTheory.py --infile ${unfolding_fitresult} --predGenerator 'scetlib_dyturbo' -o ${unfolding_output_dir} --systematicType log_normal -m 'Select helicitySig:0' --channelSigmaUL ch0_masked --noi alphaS ${extra_setup}"
+theory_setup_command="python ${WREM_BASE}/scripts/rabbit/feedRabbitSigmaUL.py --infile ${unfolding_fitresult} --predGenerator 'scetlib_dyturbo_CT18Z_N3p0LL_N2LO' -o ${unfolding_output_dir} --systematicType log_normal --fitresultMapping 'Select helicitySig:0' --channelSigmaUL ch0_masked --nois alphaS ${extra_setup}"
 echo "Executing command: $theory_setup_command"
 theory_setup_command_output=$(eval "$theory_setup_command 2>&1" | tee /dev/tty)
 

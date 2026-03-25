@@ -88,6 +88,11 @@ def parse_args():
         help="Index on --pseudodata-axis (default: 0).",
     )
     parser.add_argument(
+        "--scalePdf1p0",
+        action="store_true",
+        help="Scale PDF variations to 1.0, no inflation factors.",
+    )
+    parser.add_argument(
         "--postfix",
         default=None,
         help="Optional extra postfix for output directory names.",
@@ -142,9 +147,6 @@ def main():
             continue
 
         for pseudodata_pdf in pseudodata_pdfs:
-            if pseudodata_pdf == central_pdf:
-                continue
-
             pseudodata_file = os.path.join(
                 args.input_dir, args.file_pattern.format(pdf=pseudodata_pdf)
             )
@@ -177,6 +179,8 @@ def main():
                 f"--filterProcGroups {' '.join(args.filter_proc_groups)}",
                 f"--postfix {out_postfix}",
             ]
+            if args.scalePdf1p0:
+                extra_setup_parts.append("--scalePdf 1.0")
             extra_fit_parts = ["--pseudoData", "-t 0", "--unblind"]
             if args.asym:
                 extra_fit_parts.extend(
