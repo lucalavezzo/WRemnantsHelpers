@@ -55,7 +55,7 @@ Executables added to the `PATH` by `setup.sh`.
     ```
 
 ## For humans using AI assistants
-The setup script creates a `CLAUDE.md` in the parent directory, alongside `WRemnants/`, `WRemnantsHelpers/`, etc.
+The setup script creates `AGENTS.md` and `CLAUDE.md` in the parent directory, alongside `WRemnants/`, `WRemnantsHelpers/`, etc.
 
 ## For AI assistants
 `AGENTS.md` is the guide for agents working in here (Claude, Codex, ...), and `CLAUDE.md` just points at it. If you're an agent, read `AGENTS.md` first.
