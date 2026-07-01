@@ -32,9 +32,8 @@ clone_if_missing() {
 if [ -e WRemnants ]; then
     echo "[skip]  WRemnants already exists"
 else
-    echo "[clone] WRemnants <- fork (origin) + arne + upstream"
+    echo "[clone] WRemnants <- fork (origin) + upstream"
     git clone git@github.com:lucalavezzo/WRemnants.git WRemnants
-    git -C WRemnants remote add arne     git@github.com:reimersa/WRemnants.git 2>/dev/null || true
     git -C WRemnants remote add upstream git@github.com:WMass/WRemnants.git    2>/dev/null || true
     git -C WRemnants fetch --all
 fi

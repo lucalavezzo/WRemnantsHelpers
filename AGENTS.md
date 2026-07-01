@@ -1,115 +1,79 @@
-# alphaS analysis — agent guide
+# Notes for AI assistants
 
-This repo (`WRemnantsHelpers`) is the **hub** for the α_s / W-mass analysis: your
-own scripts, workflows, per-study logbooks, and durable knowledge. The physics
-framework (`WRemnants`) and the analysis documents (`AN-25-085`, `SMP-25-017`)
-are **sibling repos**, referenced but not part of this one — see the map below.
+This repo (`WRemnantsHelpers`) is the hub for the analyses done in the main framework (`WRemnants`), such as $\alpha_S$ and $m_W$: our scripts, workflows, per-study logbooks, and reference notes. The framework (`WRemnants`) and the analysis documents (`AN-25-085`, `SMP-25-017`) are sibling repos that live next to this one, not part of it.
 
-> Claude loads this through `CLAUDE.md` (`@AGENTS.md`), and the workspace root
-> `../CLAUDE.md` points here too, so any session under `alphaS/` finds it. This
-> file is tool-agnostic — keep it readable by any agent (Codex/Copilot included).
+Claude reads this through `CLAUDE.md`, which just does `@AGENTS.md`, and the workspace-root `../CLAUDE.md` points here too, so a session started anywhere under `alphaS/` will find it. Keep it plain enough that any agent (Codex included) can read it. The `README.md` covers the same repo for humans; this file adds the parts an agent needs.
 
-## Workspace map
+## The workspace
 
-Everything lives side-by-side under the workspace root (`alphaS/`, the parent of
-this repo). Reconstruct it with `./clone-siblings.sh`.
+Everything sits side by side under `alphaS/`:
 
-| Path | Repo / remote | Role |
-|---|---|---|
-| `WRemnantsHelpers/` | github `lucalavezzo/WRemnantsHelpers` | **this repo** — the hub (you own it) |
-| `WRemnants/` | github `origin`=lucalavezzo · `arne`=reimersa · `upstream`=WMass | the physics framework — the canonical checkout |
-| `WRemnants-<branch>/` | worktree of `WRemnants` | on-demand 2nd branch — make with `wtree` |
-| `AN-25-085/` | gitlab `tdr/notes` | **physics ground truth** — the analysis note |
-| `SMP-25-017/` | gitlab `tdr/papers` | the public paper |
-
-### Which WRemnants tree / remote
-- **One primary checkout: `WRemnants`**, carrying three remotes — `origin`
-  (your fork), `arne` (reimersa; the shared working branches), `upstream` (WMass).
-- Work Arne's shared branches via `arne/<branch>`; PR to `origin` or `arne` as
-  appropriate; `upstream` is the true WMass repo.
-- **Need a second branch checked out at once?** `wtree <branch>` — a git worktree
-  of the primary checkout. Do **not** clone a second copy.
-
-## Setup / runtime
-
-Run inside the WRemnants singularity, activate the venv, then source `setup.sh`:
-
-```bash
-singularity run --bind /scratch/,/work/,/home/,/ceph/ \
-  /cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/bendavid/cmswmassdocker/wmassdevrolling:latest
-source /opt/venv/bin/activate                 # required for rabbit/tensorflow
-cd WRemnantsHelpers && source setup.sh        # sets WREM_BASE, MY_*, PATH; regenerates ../CLAUDE.md
+```
+WRemnants/          # the framework (remotes: origin=your fork, upstream=WMass)
+WRemnantsHelpers/   # this repo
+AN-25-085/          # the analysis note, the physics reference
+SMP-25-017/         # the paper
 ```
 
-Key packages: `WRemnants`, `rabbit` (fitting), `wums` (HDF5/plot helpers). Their
-sources live under `$WREM_BASE` (resolved by `setup.sh`) — always use that path,
-never hardcode.
+`./clone-siblings.sh` clones whatever is missing.
 
-## Repo layout — where things go
+There is one `WRemnants` checkout with three remotes: `origin` is your fork and `upstream` is WMass. PR to `origin`, and treat `upstream` as the real WMass repo. If you need a second branch checked out at the same time, run `wtree <branch>` instead of cloning again.
 
-The `bin/` / `scripts/` / `workflows/` / `studies/` split is deliberate; respect it.
+## Running things
 
-| Dir | Holds | Put here when… |
-|---|---|---|
-| `bin/` | executables on `PATH` (`run`, `wtree`) | it's a reusable command you'll invoke by name |
-| `scripts/` | general-purpose tools (plot histmaker output, read fitresults…) | it's useful across many studies |
-| `workflows/` | standard recipe chains (histmaker→fit→plot, pulls & impacts…) | it runs the framework end-to-end |
-| `studies/<slug>/` | one folder per investigation: `LOGBOOK.md` + `scripts/` + artifacts | it's specific to a single study |
-| `knowledge/` | durable cross-study facts (the reference layer) | it's a fact true across the whole analysis |
+Work inside the WRemnants singularity, activate the venv, then source `setup.sh`:
 
-**Tooling order — before writing new code:** rabbit `bin/` → this repo's `bin/` +
-`scripts/` + `workflows/` → only then ad hoc. Read `--help` and existing flags
-first. Ad hoc study code belongs in `studies/<slug>/`, not the repo root.
+```
+singularity run --bind /scratch/,/work/,/home/,/ceph/ /cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/bendavid/cmswmassdocker/wmassdevrolling:latest
+source /opt/venv/bin/activate
+cd WRemnantsHelpers && source setup.sh
+```
 
-## Logbooks (soft contract)
+`setup.sh` sets `WREM_BASE`, the `MY_*` paths, and `PATH`, and regenerates `../CLAUDE.md`. The `WRemnants`, `rabbit`, and `wums` sources live under `$WREM_BASE`; use that, don't hardcode paths.
 
-When you do a study — anything beyond a one-shot lookup — keep a logbook at
-`studies/<slug>/LOGBOOK.md` (copy `studies/_TEMPLATE/LOGBOOK.md`; see
-`studies/README.md`):
+## Where things go
 
-1. **Resuming** → read the **START HERE** block first (current state · next action
-   · what's blocking). Don't re-derive what's recorded; don't re-open settled Decisions.
-2. **As you work** → append dated bullets under `## Log`; promote durable
-   conclusions to `## Findings` and choices to `## Decisions`.
-3. **Before ending** → refresh **START HERE** and bump `updated:`. This is the one
-   non-optional step; it's what makes the next session cheap.
+The `bin` / `scripts` / `workflows` / `studies` / `knowledge` split is worth keeping to:
 
-This is a *soft* contract — enforced by the user directing you to keep it, not by
-hooks. Honor it anyway.
+- `bin/`: executables on `PATH` (`run`, `wtree`).
+- `scripts/`: general-purpose tools; overlay and container helpers under `scripts/overlays/`.
+- `workflows/`: the standard recipe chains, like histmaker to fit to plots, or pulls and impacts.
+- `studies/<slug>/`: one folder per investigation, holding its `LOGBOOK.md`, its scripts, and its outputs.
+- `knowledge/`: reference notes that outlive any single study.
 
-## Three durable stores (don't confuse them)
+Before writing new code, look for something that already does the job: rabbit's own `bin/` tools first, then this repo's `bin/`, `scripts/`, and `workflows/`, and only then something new. Read the `--help` and the existing flags first. New study-specific code goes under `studies/<slug>/`, not in the repo root.
 
-Two live in the repo and are the source of truth; one is Claude's private cache.
+## Logbooks
 
-| Store | Holds | One-liner |
-|---|---|---|
-| `studies/<slug>/LOGBOOK.md` | per-study narrative: hypothesis → tried → found → decided | *"what we're doing"* |
-| `knowledge/` | cross-study durable facts, distilled from finished studies | *"what's true"* |
-| Claude memory (`~/.claude/…`) | auto-loaded index + Claude-only quirks | *"where to look"* |
+When you're doing a study, meaning anything past a quick one-off, keep a logbook at `studies/<slug>/LOGBOOK.md` (copy `studies/_TEMPLATE/LOGBOOK.md` to start one). When you come back to a study, read the "START HERE" block first; it holds the current state, the next step, and whatever is blocking. As you work, add dated notes under the log, and move anything settled into Findings and Decisions. Before you stop, update "START HERE" and bump `updated:`. That last step is the one that matters, since it's what lets the next session pick up quickly.
 
-**Rule:** Claude memory never holds an analysis fact that isn't already in the repo
-— it only points to it. **When memory and the repo disagree, the repo wins.**
-A finding that proves durable across studies gets promoted from a logbook into
-`knowledge/`.
+Nothing enforces this. It's on you, or on Luca telling you, to keep it up.
+
+## Logbooks vs. knowledge vs. memory
+
+Three places hold durable information and it's easy to confuse them:
+
+- `studies/<slug>/LOGBOOK.md` is what we're doing, the narrative of one study.
+- `knowledge/` is what's true, the facts that hold across studies.
+- Claude's own memory is just an index that points back into the repo.
+
+When a study turns up something that holds generally, write it into `knowledge/`. Keep Claude's memory pointing at the repo rather than copying facts into it, and if memory and the repo ever disagree, the repo wins.
 
 ## Physics ground truth
 
-The analysis note **`AN-25-085/AN-25-085.tex`** (env `$MY_AN_DIR`) is the physics
-ground truth. Cross-check physics claims against it rather than inferring from
-code. A distilled digest lives in `knowledge/30_physics_global/an25_085_digest.md`.
-Results aren't "done" until a short physics interpretation is recorded in the
-study's logbook — not just "ran successfully".
+The analysis note, `AN-25-085/AN-25-085.tex` (also `$MY_AN_DIR`), is the physics reference. Check claims against it rather than inferring them from the code. There's a shorter digest at `knowledge/30_physics_global/an25_085_digest.md`. A result isn't done until there's a short physics read of it in the study's logbook, not just "it ran".
 
-## More detail (in `knowledge/`)
+## More detail
 
-- Environment / container / bootstrap → `knowledge/10_environment/runtime_bootstrap.md`
-- Nominal workflow + rabbit pitfalls → `knowledge/20_frameworks/nominal_workflow.md`,
-  `knowledge/20_frameworks/profile_likelihood_pitfalls.md`
-- Theory weights & corrections (histmaker weight formulas) → `knowledge/20_frameworks/theory_weights_and_corrections.md`
-- Frozen-nominal / validation → `knowledge/20_frameworks/{frozen_nominal_spec,validation_contract}.md`
-- W/Z gen dists, utilities → `knowledge/20_frameworks/{w_z_gen_dists_summary,utilities}.md`
-- dokan / NNLOJET production → `knowledge/20_frameworks/dokan_nnlojet.md`
-- NP parametrization constraints (CS + TMD tanh) → `knowledge/30_physics_global/np_parametrization_constraints.md`
-- Plotting style / labels → `knowledge/60_plotting_style/plotting_and_labels.md`
-- Slide workflow → `knowledge/70_slides/study_slides_workflow.md`
-- Glossary → `knowledge/90_glossary.md`
+Most of the framework knowledge lives under `knowledge/`:
+
+- Environment, container, and bootstrap: `knowledge/10_environment/runtime_bootstrap.md`
+- Nominal workflow and rabbit pitfalls: `knowledge/20_frameworks/nominal_workflow.md`, `knowledge/20_frameworks/profile_likelihood_pitfalls.md`
+- Theory weights and corrections (the histmaker weight formulas): `knowledge/20_frameworks/theory_weights_and_corrections.md`
+- Frozen-nominal and validation: `knowledge/20_frameworks/frozen_nominal_spec.md`, `knowledge/20_frameworks/validation_contract.md`
+- W/Z gen distributions and utilities: `knowledge/20_frameworks/w_z_gen_dists_summary.md`, `knowledge/20_frameworks/utilities.md`
+- dokan / NNLOJET production: `knowledge/20_frameworks/dokan_nnlojet.md`
+- NP parametrization constraints (CS and TMD tanh): `knowledge/30_physics_global/np_parametrization_constraints.md`
+- Plotting style and labels: `knowledge/60_plotting_style/plotting_and_labels.md`
+- Slide workflow: `knowledge/70_slides/study_slides_workflow.md`
+- Glossary: `knowledge/90_glossary.md`
