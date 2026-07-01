@@ -1,8 +1,8 @@
 import sys
 
-sys.path.insert(0, "/home/submit/lavezzo/alphaS/main/WRemnants/rabbit")
-sys.path.insert(0, "/home/submit/lavezzo/alphaS/main/WRemnants/wums")
-sys.path.insert(0, "/home/submit/lavezzo/alphaS/main/WRemnants")
+sys.path.insert(0, "/home/submit/lavezzo/alphaS/WRemnants/rabbit")
+sys.path.insert(0, "/home/submit/lavezzo/alphaS/WRemnants/wums")
+sys.path.insert(0, "/home/submit/lavezzo/alphaS/WRemnants")
 
 from rabbit import inputdata, debugdata
 

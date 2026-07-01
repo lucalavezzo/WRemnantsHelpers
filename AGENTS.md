@@ -17,13 +17,13 @@ this repo). Reconstruct it with `./clone-siblings.sh`.
 | Path | Repo / remote | Role |
 |---|---|---|
 | `WRemnantsHelpers/` | github `lucalavezzo/WRemnantsHelpers` | **this repo** — the hub (you own it) |
-| `main/WRemnants/` | github `origin`=lucalavezzo · `arne`=reimersa · `upstream`=WMass | the physics framework — the canonical checkout |
-| `WRemnants-<branch>/` | worktree of `main/WRemnants` | on-demand 2nd branch — make with `wtree` |
+| `WRemnants/` | github `origin`=lucalavezzo · `arne`=reimersa · `upstream`=WMass | the physics framework — the canonical checkout |
+| `WRemnants-<branch>/` | worktree of `WRemnants` | on-demand 2nd branch — make with `wtree` |
 | `AN-25-085/` | gitlab `tdr/notes` | **physics ground truth** — the analysis note |
 | `SMP-25-017/` | gitlab `tdr/papers` | the public paper |
 
 ### Which WRemnants tree / remote
-- **One primary checkout: `main/WRemnants`**, carrying three remotes — `origin`
+- **One primary checkout: `WRemnants`**, carrying three remotes — `origin`
   (your fork), `arne` (reimersa; the shared working branches), `upstream` (WMass).
 - Work Arne's shared branches via `arne/<branch>`; PR to `origin` or `arne` as
   appropriate; `upstream` is the true WMass repo.

@@ -20,7 +20,7 @@ fi
 BRANCH="$1"
 
 # Primary WRemnants checkout: prefer WREM_BASE (set by setup.sh), else fall back.
-PRIMARY="${WREM_BASE:-${MY_WORK_DIR:-$(dirname "$0")/..}/../main/WRemnants}"
+PRIMARY="${WREM_BASE:-${MY_WORK_DIR:-$(dirname "$0")/..}/../WRemnants}"
 if [ ! -e "$PRIMARY/.git" ]; then
     echo "Cannot find the primary WRemnants checkout at: $PRIMARY"
     echo "Source WRemnantsHelpers/setup.sh (sets WREM_BASE) and retry."

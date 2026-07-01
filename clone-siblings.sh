@@ -5,7 +5,7 @@
 #
 # Layout produced (all under the workspace root, the parent of this repo):
 #   WRemnantsHelpers/   this repo (the hub)
-#   main/WRemnants/     physics framework (origin=your fork, arne=reimersa, upstream=WMass)
+#   WRemnants/     physics framework (origin=your fork, arne=reimersa, upstream=WMass)
 #   AN-25-085/          analysis note (physics ground truth)
 #   SMP-25-017/         the paper
 #
@@ -29,15 +29,14 @@ clone_if_missing() {
 }
 
 # --- WRemnants: one primary checkout with three remotes ---
-if [ -e main/WRemnants ]; then
-    echo "[skip]  main/WRemnants already exists"
+if [ -e WRemnants ]; then
+    echo "[skip]  WRemnants already exists"
 else
-    echo "[clone] main/WRemnants <- fork (origin) + arne + upstream"
-    mkdir -p main
-    git clone git@github.com:lucalavezzo/WRemnants.git main/WRemnants
-    git -C main/WRemnants remote add arne     git@github.com:reimersa/WRemnants.git 2>/dev/null || true
-    git -C main/WRemnants remote add upstream git@github.com:WMass/WRemnants.git    2>/dev/null || true
-    git -C main/WRemnants fetch --all
+    echo "[clone] WRemnants <- fork (origin) + arne + upstream"
+    git clone git@github.com:lucalavezzo/WRemnants.git WRemnants
+    git -C WRemnants remote add arne     git@github.com:reimersa/WRemnants.git 2>/dev/null || true
+    git -C WRemnants remote add upstream git@github.com:WMass/WRemnants.git    2>/dev/null || true
+    git -C WRemnants fetch --all
 fi
 
 # --- Analysis documents (CMS GitLab) ---

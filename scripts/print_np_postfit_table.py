@@ -62,9 +62,7 @@ def read_postfit_pulls(fitresults_path):
 
     sys.path.insert(
         0,
-        os.environ.get(
-            "RABBIT_BASE", "/home/submit/lavezzo/alphaS/main/WRemnants/rabbit"
-        ),
+        os.environ.get("RABBIT_BASE", "/home/submit/lavezzo/alphaS/WRemnants/rabbit"),
     )
     from rabbit.io_tools import get_fitresult, get_syst_labels
 

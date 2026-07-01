@@ -1,5 +1,5 @@
 echo "--- WRemnants"
-source ../main/WRemnants/setup.sh
+source ../WRemnants/setup.sh
 echo
 echo "--- WRemnantsHelpers"
 export MY_WORK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

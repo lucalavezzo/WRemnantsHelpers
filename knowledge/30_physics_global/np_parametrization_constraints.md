@@ -147,12 +147,12 @@ AN alternative variation is $\Lambda_4{}_{-0.05}^{+0.1}$, so the (b) floor sits 
 
 - **Criterion to enforce.** Decision: **(b) monotonicity**. Both (a) and (b) are encoded in the regularizer (param-map `"criterion"` field, default `"b"`); switch is a one-line config flip.
 - **TMD binding-$y$ handling.** Decision: evaluate at **both** $y=0$ and $y=y_{\max}=2.5$ and sum the penalties. Safest under floating $\Delta\Lambda_2$ (correct sign-handling without runtime case analysis).
-- **Enforcement strategy.** Decision: **soft hinge-loss penalty** as a custom rabbit Regularizer. Strength controlled at fit time via `--regularizationStrength`. Implementation in `main/WRemnants/wremnants/postprocessing/np_monotonicity.py`.
+- **Enforcement strategy.** Decision: **soft hinge-loss penalty** as a custom rabbit Regularizer. Strength controlled at fit time via `--regularizationStrength`. Implementation in `WRemnants/wremnants/postprocessing/np_monotonicity.py`.
 - Confirm $y_{\max}=2.5$ matches the operational dilepton acceptance; revisit if a wider $y$ range is ever fit.
 
 ## 8. Implementation (provisional)
 
-File: `main/WRemnants/wremnants/postprocessing/np_monotonicity.py`. Self-contained module.
+File: `WRemnants/wremnants/postprocessing/np_monotonicity.py`. Self-contained module.
 
 **Hard-coded `PARAM_MAP`.** Single source of truth: for each of the six NP nuisances (`scetlibNPgammaLambda2/4/Inf`, `scetlibNPLambda2`, `scetlibNPDelta_Lambda2`, `scetlibNPLambda4`), store the physical `{nominal, up_value, down_value}` plus the matching `{hist_up_label, hist_down_label}` from the histmaker syst axis. Values are the AN-25-085 centrals plus the lattice-uncertainty templates (`rabbit_theory_helper.py:686-711` for CS LatticeNoConstraints; `:827-882` for TMD Delta_Lambda).
 
