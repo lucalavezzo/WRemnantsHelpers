@@ -23,7 +23,7 @@ do_2D=false
 do_impacts=false
 do_fit=true
 
-PARSED=$(getopt -o o:e:f:hp: --long output:,extra-setup:,extra-fit:,postfix:,noSetup,2D,help -- "$@")
+PARSED=$(getopt -o o:e:f:hp: --long output:,extra-setup:,extra-fit:,postfix:,noSetup,2D,help,noFit -- "$@")
 if [[ $? -ne 0 ]]; then
     echo "Failed to parse arguments." >&2
     exit 1
@@ -108,7 +108,7 @@ if $do_setup; then
         postfix_arg="--postfix ${postfix}"
     fi
 
-    setup_command="python ${WREM_BASE}/scripts/rabbit/setupRabbit.py -i $input_file --fitvar $fitvar -o $output_dir --noi alphaS --npUnc LatticeEigvars --pdfUncFromCorr $postfix_arg $extra_setup"
+    setup_command="python ${WREM_BASE}/scripts/rabbit/setupRabbit.py -i $input_file --fitvar $fitvar -o $output_dir --noi alphaS --pdfUncFromCorr --npUnc LatticeNoConstraints --axlim ptll 0j 44j $postfix_arg $extra_setup"
 
     echo "$setup_command"
     if [ -t 1 ]; then
@@ -134,8 +134,16 @@ if $do_fit; then
 
     echo
     echo "Running the fit..."
-    fit_command="rabbit_fit.py $carrot --computeVariations -m Project ch0 ptll yll -m Project ch0 ptll -m Project ch0 yll -m Project ch0 cosThetaStarll_quantile -m Project ch0 phiStarll_quantile --computeHistErrors --computeHistImpacts --doImpacts -o $output --globalImpacts --saveHists --saveHistsPerProcess $extra_fit"
+
+    # Keep only the 1D ptll projection by default. Running
+    # --computeSaturatedProjectionTests against the 2D ptll-yll or the
+    # full set is prohibitively slow (the 2D projection's saturated
+    # fit is the dominant cost). If you need the others, append them
+    # via -f / --extra-fit at call time.
+    mappings="-m Project ch0 ptll"
+    fit_command="rabbit_fit.py $carrot --computeVariations ${mappings} --computeHistErrors --computeHistImpacts --doImpacts -o $output --globalImpacts --saveHists --saveHistsPerProcess $extra_fit"
     echo "$fit_command"
+    
     if [ -t 1 ]; then
         fit_output=$($fit_command 2>&1 | tee /dev/tty)
     else

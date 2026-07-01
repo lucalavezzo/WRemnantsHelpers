@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "linearization": "param(theta) = nominal + max(theta,0)*(Up - nominal) - max(-theta,0)*(nominal - Down)",
+  "comment": "FranksVals NP model param map (LatticeNoConstraintsFranks branch in rabbit_theory_helper.py). Centrals and template ranges differ from the AN LatticeNoConstraints map: tanh_2 on both sides; lambda_4_nu and lambda_inf_nu are fixed (no nuisance) so not listed here. No helper_internal_kfactor (the new branch does not apply scale=10). 2026-05-19.",
+
+  "important_conventions": {
+    "CS_side_convention": "Frank's CS gamma kernel uses lambda_2_nu = 0.15 +/- 0.1 (templates lambda2_nu0.05 / lambda2_nu0.25). lambda_4_nu = 0 and lambda_inf_nu = 2 are FIXED (no template), so no scetlibNPgammaLambda4 / scetlibNPgammaLambdaInf nuisances in this map.",
+    "TMD_side_convention": "Frank's TMD BC uses lambda_2 = 0.4 +0.6/-0.4 (templates lambda20.0 / lambda21.0) and lambda_4 = 0.4 +0.6/-0.4 (templates lambda40.0 / lambda41.0), both ASYMMETRIC. delta_lambda2 unchanged from prior config (templates +/-0.02 around 0).",
+    "no_internal_scale_10": "LatticeNoConstraintsFranks does NOT apply helper internal kfactor=10 on the CS side (unlike the original LatticeNoConstraints). Effective kfactor = 1 with no --scaleParams override."
+  },
+
+  "nuisances": {
+
+    "scetlibNPgammaLambda2": {
+      "side": "CS",
+      "param_AN": "lambda_2_nu",
+      "nominal": 0.15,
+      "Up_template_value": 0.25,
+      "Down_template_value": 0.05,
+      "hist_label_at_Up":   "lambda2_nu0.25",
+      "hist_label_at_Down": "lambda2_nu0.05",
+      "convention": "Standard: Up = larger physical value",
+      "helper_internal_kfactor": 1
+    },
+
+    "chargeVgenNP0scetlibNPZlambda2": {
+      "side": "TMD",
+      "param_AN": "Lambda_2",
+      "nominal": 0.40,
+      "Up_template_value": 1.00,
+      "Down_template_value": 0.00,
+      "hist_label_at_Up":   "lambda21.0",
+      "hist_label_at_Down": "lambda20.0",
+      "convention": "Standard: Up = larger physical value (asymmetric: d_up=0.6, d_dn=0.4)",
+      "helper_internal_kfactor": 1
+    },
+
+    "chargeVgenNP0scetlibNPZdelta_lambda2": {
+      "side": "TMD",
+      "param_AN": "Delta_Lambda_2",
+      "nominal": 0.00,
+      "Up_template_value": 0.02,
+      "Down_template_value": -0.02,
+      "hist_label_at_Up":   "delta_lambda20.02",
+      "hist_label_at_Down": "delta_lambda2-0.02",
+      "convention": "Standard: Up = larger physical value. NOMINAL = 0.",
+      "helper_internal_kfactor": 1
+    },
+
+    "chargeVgenNP0scetlibNPZlambda4": {
+      "side": "TMD",
+      "param_AN": "Lambda_4",
+      "nominal": 0.40,
+      "Up_template_value": 1.00,
+      "Down_template_value": 0.00,
+      "hist_label_at_Up":   "lambda41.0",
+      "hist_label_at_Down": "lambda40.0",
+      "convention": "Standard: Up = larger physical value (asymmetric: d_up=0.6, d_dn=0.4)",
+      "helper_internal_kfactor": 1
+    }
+
+  }
+}

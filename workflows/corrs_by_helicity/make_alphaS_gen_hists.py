@@ -15,6 +15,7 @@ THEORY_PREDS = {
     "scetlib_nnlojetN4p0LLN3LO_pdfas": {"pdf": "ct18z"},
     "scetlib_dyturboN3p0LL_LatticeNP_pdfas": {"pdf": "ct18z"},
     "scetlib_nnlojetN4p0LLN3LO_pdfas": {"pdf": "msht20an3lo"},
+    "scetlib_dyturbo_NewVarsCT18ZLambda6_N3p0LL_N2LO_pdfas": {"pdf": "ct18z"},
 }
 
 
@@ -55,7 +56,7 @@ def main():
 
         pdf = THEORY_PREDS[pred]["pdf"]
 
-        command = f"python {os.environ['WREM_BASE']}/scripts/histmakers/w_z_gen_dists.py --useCorrByHelicityBinning --theoryCorr {pred} -o {args.outdir} --maxFiles '-1' -j 300 --filterProcs ZmumuPostVFP WplusmunuPostVFP WminusmunuPostVFP --addHelicityAxis --pdf {pdf}"
+        command = f"python {os.environ['WREM_BASE']}/scripts/histmakers/w_z_gen_dists.py --theoryCorr {pred} -o {args.outdir} --maxFiles '-1' -j 300 --filterProcs ZmumuPostVFP WplusmunuPostVFP WminusmunuPostVFP --addHelicityAxis --pdf {pdf}"
         print(f"Running command: {command}")
         os.system(command)
 

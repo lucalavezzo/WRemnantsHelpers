@@ -3,3 +3,6 @@
 logs/
 outputs/
 __pycache__
+
+# Claude Code local state (per-developer settings, worktrees, symlinks into cooper/).
+.claude/

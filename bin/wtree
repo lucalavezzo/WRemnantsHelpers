@@ -1,0 +1,40 @@
+#!/bin/bash
+# wtree <branch> [target-dir]
+#
+# Create an on-demand git worktree of the primary WRemnants checkout so you can
+# have a second branch checked out at once — no second clone needed.
+#   wtree np-active-params-pr        -> <workspace>/WRemnants-np-active-params-pr
+#   wtree arne/some-branch mydir     -> <workspace>/mydir
+#
+# Remove it later with:
+#   git -C "$WREM_BASE" worktree remove <target-dir>
+
+set -euo pipefail
+
+if [ -z "${1:-}" ]; then
+    echo "Usage: wtree <branch> [target-dir]"
+    echo "Creates a git worktree of the primary WRemnants checkout for <branch>."
+    exit 1
+fi
+
+BRANCH="$1"
+
+# Primary WRemnants checkout: prefer WREM_BASE (set by setup.sh), else fall back.
+PRIMARY="${WREM_BASE:-${MY_WORK_DIR:-$(dirname "$0")/..}/../main/WRemnants}"
+if [ ! -e "$PRIMARY/.git" ]; then
+    echo "Cannot find the primary WRemnants checkout at: $PRIMARY"
+    echo "Source WRemnantsHelpers/setup.sh (sets WREM_BASE) and retry."
+    exit 1
+fi
+PRIMARY="$(cd "$PRIMARY" && pwd)"
+
+# Place worktrees at the workspace root (parent of WRemnantsHelpers).
+WORKSPACE="$(cd "${MY_WORK_DIR:-$(dirname "$0")/..}/.." && pwd)"
+TARGET="${2:-$WORKSPACE/WRemnants-${BRANCH##*/}}"
+
+echo "Primary checkout: $PRIMARY"
+echo "New worktree:     $TARGET   (branch: $BRANCH)"
+git -C "$PRIMARY" fetch --all --quiet || true
+git -C "$PRIMARY" worktree add "$TARGET" "$BRANCH"
+echo
+echo "Done. Remove later with:  git -C \"$PRIMARY\" worktree remove \"$TARGET\""

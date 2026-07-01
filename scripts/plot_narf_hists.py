@@ -15,10 +15,15 @@ import mplhep as hep
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 from wums import logging, output_tools, plot_tools  # isort: skip
-from wremnants.utilities import parsing
 import hist
 from hist import Hist
 import datetime
+
+from hist_selection import (
+    apply_selections,
+    collect_selections,
+    format_selection_label,
+)
 
 hep.style.use("CMS")
 
@@ -251,36 +256,8 @@ def main():
             h_ref = output[hists_to_plot[0]]
             if not (type(h_ref) is Hist):
                 h_ref = h_ref.get()
-            ref_selection = []
-            if args.selectByHist:
-                # allow multiple selections per histogram separated by ';'
-                first = args.selectByHist[0]
-                for part in [p.strip() for p in first.split(";") if p.strip()]:
-                    ref_selection.append(part)
-            if args.selection:
-                ref_selection.extend(args.selection)
-            if ref_selection:
-                for sel in ref_selection:
-                    sel = sel.split()
-                    if len(sel) == 3:
-                        sel_ax, sel_lb, sel_ub = sel
-                        sel_lb = parsing.str_to_complex_or_int(sel_lb)
-                        sel_ub = parsing.str_to_complex_or_int(sel_ub)
-                        h_ref = h_ref[{sel_ax: slice(sel_lb, sel_ub)}]
-                    elif len(sel) == 2:
-                        sel_ax, sel_val = sel
-                        try:
-                            sel_val = parsing.str_to_complex_or_int(sel_val)
-                        except argparse.ArgumentTypeError as e:
-                            print(e)
-                            print("Trying to use as string...")
-                            pass
-                        if sel_ax not in h_ref.axes.name:
-                            print(
-                                f"Axis '{sel_ax}' not found in histogram axes {h_ref.axes.name}. Available axes: {h_ref.axes.name}"
-                            )
-                        else:
-                            h_ref = h_ref[{sel_ax: sel_val}]
+            ref_selection = collect_selections(args.selection, args.selectByHist, 0)
+            h_ref = apply_selections(h_ref, ref_selection)
             if args.axes:
                 h_ref = h_ref.project(*args.axes)
             if len(h_ref.axes) > 1:
@@ -320,32 +297,10 @@ def main():
                 h = output[hist_to_plot]
                 if not (type(h) is Hist):
                     h = h.get()
-                h_selection = []
-                if args.selectByHist:
-                    # support multiple selections per-hist separated by ';'
-                    raw = args.selectByHist[ihist]
-                    parts = [p.strip() for p in raw.split(";") if p.strip()]
-                    for part in parts:
-                        h_selection.append(part)
-                if args.selection:
-                    h_selection.extend(args.selection)
-                for sel in h_selection:
-                    sel = sel.split()
-                    if len(sel) == 3:
-                        sel_ax, sel_lb, sel_ub = sel
-                        sel_lb = parsing.str_to_complex_or_int(sel_lb)
-                        sel_ub = parsing.str_to_complex_or_int(sel_ub)
-                        h = h[{sel_ax: slice(sel_lb, sel_ub)}]
-                    elif len(sel) == 2:
-                        sel_ax, sel_val = sel
-                        try:
-                            sel_val = parsing.str_to_complex_or_int(sel_val)
-                        except argparse.ArgumentTypeError as e:
-                            print(e)
-                            print("Trying to use as string...")
-                            pass
-                        print(sel_ax, sel_val)
-                        h = h[{sel_ax: sel_val}]
+                h_selection = collect_selections(
+                    args.selection, args.selectByHist, ihist
+                )
+                h = apply_selections(h, h_selection)
                 if args.axes:
                     h = h.project(*args.axes)
                 if len(h.axes) > 1:
@@ -382,38 +337,18 @@ def main():
                 )
 
             # Prepare selection strings to include in the legend instead of a separate text box.
-            # global selection (applies to all hists)
-            global_sel_label = None
-            if args.selection:
-                parts = [p.split() for p in args.selection]
-                s = "Selections:\n"
-                for sel in parts:
-                    if len(sel) == 3:
-                        sel_ax, sel_lb, sel_ub = sel
-                        s += f"{sel_ax}: [{sel_lb}, {sel_ub})\n"
-                    elif len(sel) == 2:
-                        sel_ax, sel_val = sel
-                        s += f"{sel_ax}: {sel_val}\n"
-                global_sel_label = s.strip()
+            global_sel_label = format_selection_label(args.selection)
+            if global_sel_label:
+                global_sel_label = "Selections:\n" + global_sel_label
 
-            # per-hist selections (one per histogram)
             per_hist_selections = None
             if args.selectByHist:
-                # for legend, build a single string per histogram joining multiple per-hist selections with newlines
-                per_hist_selections = [None] * len(args.selectByHist)
-                for i, sel_raw in enumerate(args.selectByHist):
-                    parts = [p.strip() for p in sel_raw.split(";") if p.strip()]
-                    sel_lines = []
-                    for part in parts:
-                        sel = part.split()
-                        if len(sel) == 3:
-                            sel_ax, sel_lb, sel_ub = sel
-                            sel_lines.append(f"{sel_ax}: [{sel_lb}, {sel_ub})")
-                        elif len(sel) == 2:
-                            sel_ax, sel_val = sel
-                            sel_lines.append(f"{sel_ax}: {sel_val}")
-                    if sel_lines:
-                        per_hist_selections[i] = "\n".join(sel_lines)
+                per_hist_selections = [
+                    format_selection_label(
+                        [p.strip() for p in raw.split(";") if p.strip()]
+                    )
+                    for raw in args.selectByHist
+                ]
             if args.logy:
                 ax1.set_yscale("log")
             if args.xlabel:
@@ -472,7 +407,7 @@ def main():
             fig.savefig(oname + ".png", bbox_inches="tight", dpi=300)
             plt.close(fig)
             output_tools.write_index_and_log(
-                args.outdir, proc + "_" + "_".join(hists_to_plot) + _postfix, args=args
+                args.outdir, oname.split("/")[-1], args=args
             )
             print(f"Saved {oname}(.png)(.png)(.log)")
 

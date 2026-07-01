@@ -317,9 +317,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description="Render a study summary Beamer deck from JSON outline."
     )
-    parser.add_argument(
-        "--study-dir", required=True, help="Path to agents/studies/<topic>"
-    )
+    parser.add_argument("--study-dir", required=True, help="Path to studies/<slug>")
     parser.add_argument(
         "--outline",
         default=None,

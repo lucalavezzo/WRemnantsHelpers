@@ -54,7 +54,7 @@ output=$(dirname "$combine_file")
 echo "Output: $output"
 echo
 
-combine_command="rabbit_fit.py ${combine_file} -o ${output} --doImpacts --globalImpacts --saveHists --computeHistErrors --computeVariations --covarianceFit -t -1 -m BaseMapping -m Project ch0 ptVGen -m Project ch0 absYVGen ${extra_fit}"
+combine_command="rabbit_fit.py ${combine_file} -o ${output} --doImpacts --globalImpacts --saveHists --computeHistErrors --computeVariations --covarianceFit -t 0 --unblind -m BaseMapping -m Project ch0 ptVGen -m Project ch0 absYVGen ${extra_fit}"
 echo "Executing command: $combine_command"
 combine_command_output=$(eval "$combine_command 2>&1" | tee /dev/tty)
 echo

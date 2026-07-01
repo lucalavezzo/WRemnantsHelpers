@@ -1,0 +1,63 @@
+# Nuisance groups to freeze, one at a time, in the partial-LRT scan.
+#
+# Each entry is a list of strings passed verbatim to rabbit_fit.py
+# `--freezeParameters` (space-separated). Matching is exact-name first, then
+# Python `re.match` (i.e. anchored to the start), per
+# `rabbit/fitter.py:match_regexp_params`. Anchor with `^...$` for exact.
+#
+# Group selection is informed by the top of the spread*pull table from
+# diff_alphaS_impacts.py on the unblinded-as-group decorr fit.
+
+pdf_mb:
+  # MSHT20 m_b range and the standalone mb_up nuisance — top spread*pull entry
+  # and a strongly correlated +1.5σ pull elsewhere.
+  - 'mb_up'
+  - 'pdfMSHT20mbrange.*'
+
+pdfCT18Z:
+  # All CT18Z directional PDF nuisances (pdfNNCT18Z*, both SymAvg and SymDiff).
+  - 'pdf\d+CT18Z.*'
+
+pdf_mb_and_CT18Z:
+  - 'mb_up'
+  - 'pdfMSHT20mbrange.*'
+  - 'pdf\d+CT18Z.*'
+
+scetlibNP:
+  # Non-perturbative TNP / lambda parameters — chargeVgenNP* lambda2 hit +1.8σ.
+  - '.*scetlibNP.*'
+  - 'chargeVgenNP.*'
+
+resumTNP:
+  # Resummation TNP shape parameters.
+  - 'resumTNP_.*'
+
+prefire_stat:
+  # Statistical prefire variations — multiple regions pulled >1σ; suspicious.
+  - 'CMS_prefire_stat_.*'
+
+pixel_multiplicity:
+  - 'pixel_multiplicity_.*'
+
+fsr_photos:
+  - 'horacelophotos.*'
+  - '.*FSR.*'
+
+qcdscale_helicity:
+  - 'QCDscaleZfine_.*'
+
+# A maximalist freeze that knocks out everything implicated in the top of
+# the spread*pull table at once. If even this group leaves spread > 0, the
+# remaining freedom is elsewhere.
+all_top_suspects:
+  - 'mb_up'
+  - 'pdfMSHT20mbrange.*'
+  - 'pdf\d+CT18Z.*'
+  - '.*scetlibNP.*'
+  - 'chargeVgenNP.*'
+  - 'resumTNP_.*'
+  - 'CMS_prefire_stat_.*'
+  - 'pixel_multiplicity_.*'
+  - 'horacelophotos.*'
+  - '.*FSR.*'
+  - 'QCDscaleZfine_.*'

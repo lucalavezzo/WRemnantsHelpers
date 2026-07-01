@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "linearization": "param(theta) = nominal + max(theta,0)*(Up - nominal) - max(-theta,0)*(nominal - Down)",
+  "comment": "Canonical mapping from rabbit nuisance name to physical NP parameter for the dilepton-Z alphaS analysis (LatticeNoConstraints CS + lowercase TMD). Generated 2026-05-11. Source of truth for translating rabbit pulls to physical lambda values; used by post-processing scripts to make tables and by the np_monotonicity regularizer to enforce walls.",
+
+  "important_conventions": {
+    "CS_side_Up_Down_convention": "STANDARD: Up = larger physical value. Fixed 2026-05-11 in rabbit_theory_helper.py (line 706-715): the iteration order is now ['Down','Up'] inside the name loop, so the smaller-value template (e.g. lambda2_nu0.0538) is paired with 'Down' and the larger (lambda2_nu0.1202) with 'Up'. Positive rabbit pull -> larger physical lambda. CAVEAT: HDF5s produced BEFORE the fix used the inverted convention -- in those, scetlibNPgammaLambda2Up was paired with lambda2_nu0.0538. Identify the convention used by checking the hist_label_at_Up/Down entries against the actual histogram syst-axis values.",
+    "TMD_delta_lambda2_nominal_is_zero": "In the LatticeNoConstraints branch, the histmaker uses delta_lambda2 nominal = 0 (NO y-dependence in nominal). Templates at +/-0.02 absolute. This is DIFFERENT from the AN-quoted Delta_Lambda_2 = 0.125 GeV^2 which applies to the uppercase 'Delta_Lambda' parametrization branch. The 0.125 baseline is NOT included in the LatticeNoConstraints templates.",
+    "TMD_lambda4_asymmetric": "Lambda_4 templates at [0.01, 0.12] are absolute, asymmetric around AN nominal 0.06. delta_up != delta_down.",
+    "CS_helper_internal_scale_10": "rabbit_theory_helper.py:738-739 applies kfactor=10 to all scetlibNPgamma* nuisances under LatticeNoConstraints. Equivalent to a 10x wider effective prior on rabbit-theta. Whether this amplifies the physical interpretation of a unit-theta pull depends on convention; this map encodes the physical values at theta=+/-1 IGNORING the scale=10 (i.e., as if scale=1)."
+  },
+
+  "nuisances": {
+
+    "scetlibNPgammaLambda2": {
+      "side": "CS",
+      "param_AN": "lambda_2",
+      "nominal": 0.0870,
+      "Up_template_value": 0.1202,
+      "Down_template_value": 0.0538,
+      "hist_label_at_Up":   "lambda2_nu0.1202",
+      "hist_label_at_Down": "lambda2_nu0.0538",
+      "convention": "Standard: Up = larger physical value (post-2026-05-11 fix)",
+      "helper_internal_kfactor": 10
+    },
+
+    "scetlibNPgammaLambda4": {
+      "side": "CS",
+      "param_AN": "lambda_4",
+      "nominal": 0.0074,
+      "Up_template_value": 0.0140,
+      "Down_template_value": 0.0008,
+      "hist_label_at_Up":   "lambda4_nu0.014",
+      "hist_label_at_Down": "lambda4_nu0.0008",
+      "convention": "Standard: Up = larger physical value (post-2026-05-11 fix)",
+      "helper_internal_kfactor": 10
+    },
+
+    "scetlibNPgammaLambdaInf": {
+      "side": "CS",
+      "param_AN": "lambda_inf",
+      "nominal": 1.6853,
+      "Up_template_value": 2.1922,
+      "Down_template_value": 1.1784,
+      "hist_label_at_Up":   "lambda_inf_nu2.1922",
+      "hist_label_at_Down": "lambda_inf_nu1.1784",
+      "convention": "Standard: Up = larger physical value (post-2026-05-11 fix)",
+      "helper_internal_kfactor": 10
+    },
+
+    "chargeVgenNP0scetlibNPZlambda2": {
+      "side": "TMD",
+      "param_AN": "Lambda_2",
+      "nominal": 0.25,
+      "Up_template_value": 0.50,
+      "Down_template_value": 0.00,
+      "hist_label_at_Up":   "lambda20.5",
+      "hist_label_at_Down": "lambda20.0",
+      "convention": "Standard: Up = larger physical value",
+      "helper_internal_kfactor": 1
+    },
+
+    "chargeVgenNP0scetlibNPZdelta_lambda2": {
+      "side": "TMD",
+      "param_AN": "Delta_Lambda_2",
+      "nominal": 0.00,
+      "Up_template_value": 0.02,
+      "Down_template_value": -0.02,
+      "hist_label_at_Up":   "delta_lambda20.02",
+      "hist_label_at_Down": "delta_lambda2-0.02",
+      "convention": "Standard: Up = larger physical value. NOMINAL = 0 (NOT the AN's 0.125 which applies to a different parametrization branch).",
+      "helper_internal_kfactor": 1
+    },
+
+    "chargeVgenNP0scetlibNPZlambda4": {
+      "side": "TMD",
+      "param_AN": "Lambda_4",
+      "nominal": 0.06,
+      "Up_template_value": 0.12,
+      "Down_template_value": 0.01,
+      "hist_label_at_Up":   "lambda40.12",
+      "hist_label_at_Down": "lambda40.01",
+      "convention": "Standard: Up = larger physical value; asymmetric range",
+      "helper_internal_kfactor": 1
+    }
+  },
+
+  "fixed_parameters": {
+    "lambda_6":       {"value": 0.0007, "role": "CS extension: coeff of b_T^6 / lambda_inf"},
+    "Lambda_6":       {"value": 0.016,  "role": "TMD extension: coeff of b_T^5 / Lambda_inf"},
+    "Lambda_inf_TMD": {"value": 1.0,    "role": "fixed by histmaker"}
+  }
+}

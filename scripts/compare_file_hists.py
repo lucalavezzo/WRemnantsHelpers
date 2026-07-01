@@ -1,20 +1,22 @@
 import os
 import sys
 
-sys.path.append("../../WRemnants/")
-import hist
 import numpy as np
 import matplotlib.pyplot as plt
 import mplhep as hep
-import rabbit.io_tools
 import argparse
 import h5py
 from itertools import product
-from utilities import common, parsing
+import datetime
+
+sys.path.append("../../WRemnants/")
+
+import rabbit.io_tools
 from wums import ioutils
 from wums import boostHistHelpers as hh  # isort: skip
-from wums import logging, output_tools, plot_tools  # isort: skip
-import datetime
+from wums import output_tools, plot_tools  # isort: skip
+
+from hist_selection import apply_selections, collect_selections
 
 hep.style.use("CMS")
 
@@ -83,7 +85,20 @@ def main():
         dest="selection",
         type=str,
         default=[],
-        help="Apply a selection to the histograms, if the axis exists. This option can be applied to any of the axis, not necessarily one of the fitaxes, unlike --axlim. e.g. '--select 'ptll 0 10'",
+        help="Apply a selection to the histograms, if the axis exists."
+        "This option can be applied to any of the axis, not necessarily one of the fitaxes, unlike --axlim."
+        "Use complex numbers for axis value, integers for bin number."
+        "e.g. --select 'ptll 0 10"
+        "e.g. --select 'ptll 0j 10j",
+    )
+    parser.add_argument(
+        "--selectByHist",
+        nargs="+",
+        type=str,
+        default=None,
+        help="Pass one selection per input file. The index of the selection matches the index of the file."
+        "Can be used on top of --select to have a base selection and then per-file selections."
+        "Each --selectByHist item may contain multiple selections separated by ';' (e.g. 'pt 0 10;eta -2 2').",
     )
     parser.add_argument(
         "--compareVars",
@@ -148,6 +163,11 @@ def main():
     else:
         args.hist = args.hist * len(args.infiles)
 
+    if args.selectByHist is not None and len(args.selectByHist) != len(args.infiles):
+        raise Exception(
+            f"Length of --selectByHist ({len(args.selectByHist)}) does not match number of input files ({len(args.infiles)})."
+        )
+
     files_hists = {}
     for ifile, (infile, hist_name) in enumerate(zip(args.infiles, args.hist)):
         print(f"Processing file: {infile}")
@@ -190,32 +210,8 @@ def main():
                 )
 
         # apply selections if specified
-        for sel in args.selection:
-            split = sel.split()
-            if len(split) == 3:
-                sel_ax, sel_lb, sel_ub = split
-                sel_lb = parsing.str_to_complex_or_int(sel_lb)
-                sel_ub = parsing.str_to_complex_or_int(sel_ub)
-                if sel_ax not in h.axes.name:
-                    print(
-                        f"Selection axis '{sel_ax}' not found in histogram axes. Available axes: {h.axes.name}"
-                    )
-                else:
-                    h = h[{sel_ax: slice(sel_lb, sel_ub)}]
-            else:
-                sel_ax, sel_val = split
-                try:
-                    sel_val = parsing.str_to_complex_or_int(sel_val)
-                except argparse.ArgumentTypeError as e:
-                    print(e)
-                    print("Trying to use as string...")
-                    pass
-                if sel_ax not in h.axes.name:
-                    print(
-                        f"Selection axis '{sel_ax}' not found in histogram axes. Available axes: {h.axes.name}"
-                    )
-                else:
-                    h = h[{sel_ax: sel_val}]
+        selections = collect_selections(args.selection, args.selectByHist, ifile)
+        h = apply_selections(h, selections)
 
         # take only relevant axes for plotting
         if len(args.axes):
@@ -334,12 +330,6 @@ def main():
             color="black",
             yerr=not args.norm,
         )
-
-        print(_h_ref)
-        for i in range(6):
-            print(
-                f"Flavor {i}: {_h_ref[{'presel_z_mother_flavor': i*1.j}].value / _h_ref[{'presel_z_mother_flavor': slice(1j, None)}].sum().value}"
-            )
 
         for i, (infile, hists) in enumerate(files_hists.items()):
             if i == 0:

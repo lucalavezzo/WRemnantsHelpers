@@ -1,0 +1,91 @@
+\documentclass[landscape]{article}
+\usepackage[margin=1.5cm,landscape]{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\begin{document}
+
+% Postfit NP table for the 260430_debug 1D-vs-4D study (mode: physical).
+% cell = rabbit_pull × scaleParams_factor × σ_phys
+% σ_phys = base_kfactor × template half-range (per-column constant)
+
+\begin{table}[h]
+  \centering
+  \caption{Postfit nuisance pulls and saturated $p$-value for the 4D fit ($p_T^{\ell\ell}\times y^{\ell\ell}\times\cos\theta^*_{\ell\ell}\times\phi^*_{\ell\ell}$). Each NP cell is the physical postfit shift (rabbit pull $\times$ Nominal-config prior $\sigma$ in physical units), so values are directly in the natural units of each NP (GeV$^2$-like for $\lambda$'s, $\nu$ for the lattice $\gamma$ parameters). Per-column $1\sigma_{\mathrm{prior}}$ in the header is base kfactor $\times$ template half-range. \texttt{--scaleParams} factors in Scale5p0 configs are additionally absorbed into the cell so that a 1-$\sigma$ pull in any config maps to the same physical shift. $\Delta$pull on $\alpha_S$ is relative to Nominal and scaled $\times 2$ to convert from the rabbit template step (0.001) to the analysis's quoted $1\sigma_{\alpha_S}=0.002$ (matches \texttt{pullsAndImpacts.sh --scaleImpacts 2.0}); $\sigma(\alpha_S)$ is the absolute postfit total uncertainty in the same $10^{-3}$ units. The \textit{Asimov} column is the postfit $\sigma(\alpha_S)$ from a separate \texttt{rabbit\_fit -t -1} run on the same \texttt{ZMassDilepton.hdf5} (expected uncertainty under nominal-MC truth). Sat. $p$ entries showing `---' are configurations where the saturated covariance Cholesky factorisation failed (Hessian not positive-definite) so the test could not be computed; the rest of the fit is unaffected.}
+  \label{tab:debug_4d}
+  \resizebox{\textwidth}{!}{%
+  \begin{tabular}{lccccccccrrr}
+    \hline\hline
+    Configuration & \shortstack{$\lambda_2$ \\ ($\mathrm{prefit}=0.25,\,1\sigma_{\mathrm{prior}}=0.25$)} & \shortstack{$\Delta\lambda_2$ \\ ($\mathrm{prefit}=0.125,\,1\sigma_{\mathrm{prior}}=0.02$)} & \shortstack{$\lambda_4$ \\ ($\mathrm{prefit}=0.06,\,1\sigma_{\mathrm{prior}}=0.055$)} & \shortstack{$\gamma_{\Lambda_2}$ \\ ($\mathrm{prefit}=0.087,\,1\sigma_{\mathrm{prior}}=0.332$)} & \shortstack{$\gamma_{\Lambda_4}$ \\ ($\mathrm{prefit}=0.0074,\,1\sigma_{\mathrm{prior}}=0.066$)} & \shortstack{$\gamma_{\Lambda_\infty}$ \\ ($\mathrm{prefit}=1.6853,\,1\sigma_{\mathrm{prior}}=5.069$)} & \shortstack{$f_{\rm fake}$ \\ ($\mathrm{prefit}=0,\,1\sigma_{\mathrm{prior}}=0.1$)} & Sat. $p$ & $\Delta$pull($\alpha_S$) [$10^{-3}$] & $\sigma(\alpha_S)$ [$10^{-3}$] & $\sigma(\alpha_S)$ Asimov [$10^{-3}$] \\
+    \hline
+    Nominal & $+0.450\pm0.235$ & $-0.013\pm0.007$ & $-0.061\pm0.051$ & $+0.306\pm0.111$ & $-0.011\pm0.025$ & $-1.022\pm5.057$ & --- & 2.54\% & ref & $1.103$ & $1.089$ \\
+    Nominal + fakelumi & $+0.304\pm0.221$ & $-0.014\pm0.007$ & $-0.045\pm0.051$ & $+0.272\pm0.103$ & $-0.022\pm0.025$ & $-0.850\pm5.058$ & $-0.085\pm0.036$ & 7.18\% & $+2.33$ & $1.471$ & $1.521$ \\
+    \hline
+    $\Lambda_4 \times 5$ & $+0.346\pm0.215$ & $-0.013\pm0.007$ & $-0.332\pm0.120$ & $+0.227\pm0.105$ & $-0.086\pm0.039$ & $-0.603\pm5.060$ & --- & 7.64\% & $-0.44$ & $1.094$ & $1.107$ \\
+    $\Lambda_4 \times 5$ + fakelumi & $+0.259\pm0.217$ & $-0.013\pm0.007$ & $-0.266\pm0.126$ & $+0.217\pm0.104$ & $-0.079\pm0.039$ & $-0.537\pm5.060$ & $-0.064\pm0.037$ & 12.41\% & $+1.43$ & $1.543$ & $1.610$ \\
+    \hline
+    $\Lambda$s $\times 5$ & $+1.102\pm0.352$ & $-0.015\pm0.008$ & $-0.248\pm0.124$ & $+0.589\pm0.171$ & $-0.105\pm0.040$ & $-0.717\pm5.060$ & --- & 26.00\% & $-1.91$ & $1.226$ & $1.249$ \\
+    $\Lambda$s $\times 5$ + fakelumi & $+0.961\pm0.388$ & $-0.015\pm0.008$ & $-0.222\pm0.128$ & $+0.538\pm0.181$ & $-0.098\pm0.040$ & $-0.667\pm5.060$ & $-0.035\pm0.040$ & 24.43\% & $-0.70$ & $1.846$ & $1.918$ \\
+    \hline
+    all NP asym. & $+0.448\pm0.179$ & $-0.013\pm0.007$ & $-0.009\pm0.028$ & $+0.304\pm0.084$ & $-0.050\pm0.036$ & $-0.660\pm4.100$ & --- & 2.75\% & $-0.15$ & $1.080$ & $1.089$ \\
+    all NP asym. + fakelumi & $+0.315\pm0.190$ & $-0.013\pm0.007$ & $-0.008\pm0.029$ & $+0.274\pm0.085$ & $-0.052\pm0.036$ & $-0.605\pm4.154$ & $-0.079\pm0.036$ & 6.76\% & $+2.04$ & $1.503$ & $1.521$ \\
+    \hline
+    all NP $\times 5$ & $+1.747\pm0.429$ & $-0.014\pm0.008$ & $-0.320\pm0.150$ & $+0.892\pm0.207$ & $-0.173\pm0.053$ & $-7.09\pm24.88$ & --- & 63.25\% & $-3.12$ & $1.302$ & $1.323$ \\
+    all NP $\times 5$ + fakelumi & $+1.716\pm0.481$ & $-0.014\pm0.008$ & $-0.316\pm0.154$ & $+0.880\pm0.223$ & $-0.172\pm0.054$ & $-6.98\pm24.89$ & $-0.006\pm0.041$ & --- & $-2.91$ & $1.989$ & $2.087$ \\
+    \hline
+    all NP $\times 5$, $\gamma_{\Lambda_\infty}$ default & $+1.744\pm0.429$ & $-0.014\pm0.008$ & $-0.331\pm0.145$ & $+0.891\pm0.207$ & $-0.178\pm0.050$ & $-0.294\pm5.065$ & --- & 63.05\% & $-3.11$ & $1.302$ & $1.323$ \\
+    all NP $\times 5$, $\gamma_{\Lambda_\infty}$ default + fakelumi & $+1.712\pm0.481$ & $-0.014\pm0.008$ & $-0.326\pm0.149$ & $+0.878\pm0.223$ & $-0.176\pm0.051$ & $-0.289\pm5.065$ & $-0.006\pm0.041$ & 63.15\% & $-2.89$ & $1.987$ & $2.085$ \\
+    \hline
+    all NP $\times 2$ & $+1.099\pm0.331$ & $-0.014\pm0.008$ & $-0.155\pm0.091$ & $+0.602\pm0.158$ & $-0.080\pm0.036$ & $-3.00\pm10.07$ & --- & 15.32\% & $-1.51$ & $1.196$ & $1.204$ \\
+    all NP $\times 2$ + fakelumi & $+0.909\pm0.357$ & $-0.015\pm0.008$ & $-0.133\pm0.092$ & $+0.535\pm0.165$ & $-0.077\pm0.036$ & $-2.60\pm10.07$ & $-0.053\pm0.038$ & 20.30\% & $+0.22$ & $1.726$ & $1.777$ \\
+    \hline
+    all NP unconstrained & $+0.843\pm0.075$ & $-0.014\pm0.008$ & $-0.878\pm0.526$ & $+0.436\pm0.048$ & $-0.339\pm0.231$ & $+152.83\pm240.10$ & --- & 60.17\% & $-1.83$ & $1.068$ & $1.465$ \\
+    all NP unconstrained + fakelumi & $+0.839\pm0.078$ & $-0.014\pm0.008$ & $-0.765\pm0.558$ & $+0.455\pm0.059$ & $-0.306\pm0.237$ & $+127.66\pm243.74$ & $-0.034\pm0.044$ & --- & $-0.79$ & $1.937$ & $2.331$ \\
+    \hline
+    all NP unconstr., $\gamma_{\Lambda_\infty}$ default & $+0.844\pm0.076$ & $-0.014\pm0.008$ & $-0.560\pm0.165$ & $+0.446\pm0.045$ & $-0.196\pm0.055$ & $+0.068\pm5.068$ & --- & 58.41\% & $-1.71$ & $1.053$ & $1.365$ \\
+    all NP unconstr., $\gamma_{\Lambda_\infty}$ default + fakelumi & $+0.841\pm0.077$ & $-0.015\pm0.008$ & $-0.489\pm0.185$ & $+0.467\pm0.052$ & $-0.185\pm0.056$ & $+0.055\pm5.068$ & $-0.037\pm0.041$ & --- & $-0.54$ & $1.737$ & $2.212$ \\
+    \hline\hline
+  \end{tabular}%
+  }
+\end{table}
+
+\begin{table}[h]
+  \centering
+  \caption{Postfit nuisance pulls and saturated $p$-value for the 1D fit ($p_T^{\ell\ell}$). Each NP cell is the physical postfit shift (rabbit pull $\times$ Nominal-config prior $\sigma$ in physical units), so values are directly in the natural units of each NP (GeV$^2$-like for $\lambda$'s, $\nu$ for the lattice $\gamma$ parameters). Per-column $1\sigma_{\mathrm{prior}}$ in the header is base kfactor $\times$ template half-range. \texttt{--scaleParams} factors in Scale5p0 configs are additionally absorbed into the cell so that a 1-$\sigma$ pull in any config maps to the same physical shift.}
+  \label{tab:debug_1d}
+  \resizebox{\textwidth}{!}{%
+  \begin{tabular}{lcccccccc}
+    \hline\hline
+    Configuration & \shortstack{$\lambda_2$ \\ ($\mathrm{prefit}=0.25,\,1\sigma_{\mathrm{prior}}=0.25$)} & \shortstack{$\Delta\lambda_2$ \\ ($\mathrm{prefit}=0.125,\,1\sigma_{\mathrm{prior}}=0.02$)} & \shortstack{$\lambda_4$ \\ ($\mathrm{prefit}=0.06,\,1\sigma_{\mathrm{prior}}=0.055$)} & \shortstack{$\gamma_{\Lambda_2}$ \\ ($\mathrm{prefit}=0.087,\,1\sigma_{\mathrm{prior}}=0.332$)} & \shortstack{$\gamma_{\Lambda_4}$ \\ ($\mathrm{prefit}=0.0074,\,1\sigma_{\mathrm{prior}}=0.066$)} & \shortstack{$\gamma_{\Lambda_\infty}$ \\ ($\mathrm{prefit}=1.6853,\,1\sigma_{\mathrm{prior}}=5.069$)} & \shortstack{$f_{\rm fake}$ \\ ($\mathrm{prefit}=0,\,1\sigma_{\mathrm{prior}}=0.1$)} & Sat. $p$ \\
+    \hline
+    Nominal & $+0.315\pm0.216$ & $+0.004\pm0.020$ & $-0.045\pm0.051$ & $+0.264\pm0.104$ & $-0.004\pm0.026$ & $-0.750\pm5.060$ & --- & 12.18\% \\
+    Nominal + fakelumi & $+0.156\pm0.225$ & $+0.002\pm0.020$ & $-0.026\pm0.052$ & $+0.236\pm0.105$ & $-0.024\pm0.027$ & $-0.554\pm5.060$ & $-0.117\pm0.047$ & 25.44\% \\
+    \hline
+    $\Lambda_4 \times 5$ & $+0.249\pm0.218$ & $+0.003\pm0.020$ & $-0.284\pm0.129$ & $+0.201\pm0.109$ & $-0.069\pm0.041$ & $-0.496\pm5.061$ & --- & 22.48\% \\
+    $\Lambda_4 \times 5$ + fakelumi & --- & --- & --- & --- & --- & --- & --- & --- \\
+    \hline
+    $\Lambda$s $\times 5$ & $+0.902\pm0.437$ & $+0.021\pm0.099$ & $-0.215\pm0.135$ & $+0.523\pm0.203$ & $-0.087\pm0.042$ & $-0.588\pm5.061$ & --- & 35.43\% \\
+    $\Lambda$s $\times 5$ + fakelumi & $+0.631\pm0.493$ & $+0.016\pm0.099$ & $-0.169\pm0.141$ & $+0.426\pm0.219$ & $-0.078\pm0.043$ & $-0.509\pm5.062$ & $-0.066\pm0.056$ & 36.94\% \\
+    \hline
+    all NP asym. & $+0.306\pm0.204$ & $+0.004\pm0.021$ & $-0.009\pm0.031$ & $+0.256\pm0.097$ & $-0.031\pm0.042$ & $-0.549\pm4.221$ & --- & 11.82\% \\
+    all NP asym. + fakelumi & --- & --- & --- & --- & --- & --- & --- & --- \\
+    \hline
+    all NP $\times 5$ & $+1.761\pm0.552$ & $+0.024\pm0.099$ & $-0.281\pm0.163$ & $+0.932\pm0.260$ & $-0.167\pm0.059$ & $-6.30\pm24.95$ & --- & 69.75\% \\
+    all NP $\times 5$ + fakelumi & --- & --- & --- & --- & --- & --- & --- & --- \\
+    \hline
+    all NP $\times 5$, $\gamma_{\Lambda_\infty}$ default & --- & --- & --- & --- & --- & --- & --- & --- \\
+    all NP $\times 5$, $\gamma_{\Lambda_\infty}$ default + fakelumi & --- & --- & --- & --- & --- & --- & --- & --- \\
+    \hline
+    all NP $\times 2$ & --- & --- & --- & --- & --- & --- & --- & --- \\
+    all NP $\times 2$ + fakelumi & --- & --- & --- & --- & --- & --- & --- & --- \\
+    \hline
+    all NP unconstrained & $+4.986\pm3.983$ & $-1.454\pm2.588$ & $+1.031\pm1.454$ & $+1.672\pm0.612$ & $+0.471\pm0.638$ & $-797.57\pm712.91$ & --- & 71.38\% \\
+    all NP unconstrained + fakelumi & --- & --- & --- & --- & --- & --- & --- & --- \\
+    \hline
+    all NP unconstr., $\gamma_{\Lambda_\infty}$ default & --- & --- & --- & --- & --- & --- & --- & --- \\
+    all NP unconstr., $\gamma_{\Lambda_\infty}$ default + fakelumi & --- & --- & --- & --- & --- & --- & --- & --- \\
+    \hline\hline
+  \end{tabular}%
+  }
+\end{table}
+
+\end{document}

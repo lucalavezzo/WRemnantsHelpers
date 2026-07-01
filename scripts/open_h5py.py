@@ -27,10 +27,8 @@ if args.path:
     if type(group) is h5py.Dataset:
         # print the data
         print(f"Contents of group {args.path}:")
-        print(group[()])
         for g in group:
-            if "mb" in str(g):
-                print(g)
+            print(g)
     elif hasattr(group, "keys"):
         print(f"Keys of group {args.path}:")
         print(group.keys())

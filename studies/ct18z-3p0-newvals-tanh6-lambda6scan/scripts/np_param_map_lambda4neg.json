@@ -1,0 +1,91 @@
+{
+  "schema_version": 2,
+  "linearization": "param(theta) = nominal + max(theta,0)*(Up - nominal) - max(-theta,0)*(nominal - Down)",
+  "comment": "NewVarsCT18ZLambda6 + LatticeNoConstraintsFranksLambda4Neg NP model. tanh_6 on both sides + CT18ZNNLO PDF. Asymmetric Lambda_4 nuisance pairs lambda41.0 (Up) with the explicit lambda4-0.4 SCETlib template (Down), reaching further negative than the franks-vals (lambda40.0 Down) variant. CS-side gamma NP identical to LatticeNoConstraintsFranks. 2026-05-26.",
+
+  "important_conventions": {
+    "TMD_Lambda4_asymmetric_to_negative": "Down = lambda4-0.4 (explicit SCETlib template, not a linear extrapolation). Up = lambda41.0. Nominal = 0.4. d_up = 0.6, d_dn = 0.8.",
+    "tanh_6_NP_model": "Both sides use np_model = tanh_6 (vs tanh_2 in franks-vals-fit). lambda_6 (TMD) is a runtime parameter (=0.016 in central); lambda_6_nu (CS) is hardcoded in scetlib (=0.0007).",
+    "no_internal_scale_10": "LatticeNoConstraintsFranksLambda4Neg shares the franks branch: no helper kfactor=10."
+  },
+
+  "nuisances": {
+    "scetlibNPgammaLambda2": {
+      "side": "CS",
+      "param_AN": "lambda_2_nu",
+      "nominal": 0.15,
+      "Up_template_value": 0.25,
+      "Down_template_value": 0.05,
+      "hist_label_at_Up":   "lambda2_nu0.25",
+      "hist_label_at_Down": "lambda2_nu0.05",
+      "convention": "Standard: Up = larger physical value",
+      "helper_internal_kfactor": 1
+    },
+    "chargeVgenNP0scetlibNPZlambda2": {
+      "side": "TMD",
+      "param_AN": "Lambda_2",
+      "nominal": 0.40,
+      "Up_template_value": 1.00,
+      "Down_template_value": 0.00,
+      "hist_label_at_Up":   "lambda21.0",
+      "hist_label_at_Down": "lambda20.0",
+      "convention": "Standard: Up = larger physical value (asymmetric: d_up=0.6, d_dn=0.4)",
+      "helper_internal_kfactor": 1
+    },
+    "chargeVgenNP0scetlibNPZdelta_lambda2": {
+      "side": "TMD",
+      "param_AN": "Delta_Lambda_2",
+      "nominal": 0.00,
+      "Up_template_value": 0.02,
+      "Down_template_value": -0.02,
+      "hist_label_at_Up":   "delta_lambda20.02",
+      "hist_label_at_Down": "delta_lambda2-0.02",
+      "convention": "Standard: Up = larger physical value. NOMINAL = 0.",
+      "helper_internal_kfactor": 1
+    },
+    "chargeVgenNP0scetlibNPZlambda4": {
+      "side": "TMD",
+      "param_AN": "Lambda_4",
+      "nominal": 0.40,
+      "Up_template_value": 1.00,
+      "Down_template_value": -0.40,
+      "hist_label_at_Up":   "lambda41.0",
+      "hist_label_at_Down": "lambda4-0.4",
+      "convention": "Standard: Up = larger physical value. Asymmetric reach into negative: d_up=0.6, d_dn=0.8.",
+      "helper_internal_kfactor": 1
+    }
+  },
+
+  "fixed_parameters": {
+    "TMD_lambda_6": {
+      "side": "TMD",
+      "param_AN": "Lambda_6",
+      "value": 0.016,
+      "note": "Runtime parameter introduced in NP_models.hpp patch (was hardcoded 0.016 before). The corr also contains scan templates at 0.05, 0.1, 0.2, 0.5 but they are not used by this fit's NP model."
+    },
+    "TMD_lambda_inf": {
+      "side": "TMD",
+      "param_AN": "Lambda_inf",
+      "value": 1.0,
+      "note": "Fixed in the fit; corr contains a 2.0 excursion template that is not used by this fit's NP model."
+    },
+    "CS_lambda_6_nu": {
+      "side": "CS",
+      "param_AN": "lambda_6_nu",
+      "value": 0.0007,
+      "note": "Hardcoded constant in scetlib (not a runtime parameter)."
+    },
+    "CS_lambda_4_nu": {
+      "side": "CS",
+      "param_AN": "lambda_4_nu",
+      "value": 0.0,
+      "note": "Fixed."
+    },
+    "CS_lambda_inf_nu": {
+      "side": "CS",
+      "param_AN": "lambda_inf_nu",
+      "value": 2.0,
+      "note": "Fixed."
+    }
+  }
+}

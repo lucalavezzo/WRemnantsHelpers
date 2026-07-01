@@ -1,103 +1,115 @@
-# AGENTS
+# alphaS analysis — agent guide
 
-## Overview
-This repo is a set of scripts that use the `WRemnants` framework to run various studies (`scripts/`), or common operations (`workflows/`).
+This repo (`WRemnantsHelpers`) is the **hub** for the α_s / W-mass analysis: your
+own scripts, workflows, per-study logbooks, and durable knowledge. The physics
+framework (`WRemnants`) and the analysis documents (`AN-25-085`, `SMP-25-017`)
+are **sibling repos**, referenced but not part of this one — see the map below.
 
-## Runtime Environment
-- **Python runtime:** Provided by the `wmassdevrolling` Singularity image. Start an interactive shell with:
-  `singularity run --bind /scratch/,/work/,/home/,/ceph/ /cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/bendavid/cmswmassdocker/wmassdevrolling\:latest`
-- **Codex container execution note:** In this Codex environment, Singularity may require unsandboxed execution permissions. When debugging through Codex tools, prefer simple commands or script files over complex inline quoting.
-- **Key packages:** Core `WRemnants` dependencies including `rabbit` (handles fitting procedures), `wums` (a series of helpers for HDF5 files, plotting, etc.).
-- **Environment variables:** Exported by `setup.sh` — `MY_WORK_DIR`, `MY_PLOT_DIR`, `MY_OUT_DIR`, `NANO_DIR`, `SCRATCH_DIR`, `PYTHON_JULIAPKG_PROJECT`, and `JULIA_DEPOT_PATH`; plus any variables defined by the WRemnants `setup.sh` sourced internally by this repo.
-- **Canonical WRemnants location:** Always follow the path referenced by `WRemnantsHelpers/setup.sh`. It can change over time and takes precedence over assumptions in docs.
-- **Workspace/editing rule for Codex:** In this setup, the `WREM_BASE` path selected by `setup.sh` is within the editable workspace. Codex should treat files under `$WREM_BASE` as normal editable project files and should not request extra permission solely because a file is under `$WREM_BASE`.
-- **Analysis note repository:** Physics context for this project is in `/home/submit/lavezzo/alphaS/AN-25-085` (main file: `AN-25-085.tex`).
+> Claude loads this through `CLAUDE.md` (`@AGENTS.md`), and the workspace root
+> `../CLAUDE.md` points here too, so any session under `alphaS/` finds it. This
+> file is tool-agnostic — keep it readable by any agent (Codex/Copilot included).
 
-## Setup Checklist
-1. Start the container first:
-   `singularity run --bind /scratch/,/work/,/home/,/ceph/ /cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/bendavid/cmswmassdocker/wmassdevrolling\:latest`
-2. Enter `WRemnantsHelpers` and source:
-   `source setup.sh`
-3. Let `setup.sh` initialize the linked WRemnants environment (do not hardcode relative paths elsewhere).
-4. Verify key variables (`MY_WORK_DIR`, `MY_PLOT_DIR`, `MY_OUT_DIR`, `NANO_DIR`, `SCRATCH_DIR`, `PYTHON_JULIAPKG_PROJECT`, `JULIA_DEPOT_PATH`) and run a smoke test, e.g. `bin/run --help`.
+## Workspace map
 
-## Session Quickstart
+Everything lives side-by-side under the workspace root (`alphaS/`, the parent of
+this repo). Reconstruct it with `./clone-siblings.sh`.
+
+| Path | Repo / remote | Role |
+|---|---|---|
+| `WRemnantsHelpers/` | github `lucalavezzo/WRemnantsHelpers` | **this repo** — the hub (you own it) |
+| `main/WRemnants/` | github `origin`=lucalavezzo · `arne`=reimersa · `upstream`=WMass | the physics framework — the canonical checkout |
+| `WRemnants-<branch>/` | worktree of `main/WRemnants` | on-demand 2nd branch — make with `wtree` |
+| `AN-25-085/` | gitlab `tdr/notes` | **physics ground truth** — the analysis note |
+| `SMP-25-017/` | gitlab `tdr/papers` | the public paper |
+
+### Which WRemnants tree / remote
+- **One primary checkout: `main/WRemnants`**, carrying three remotes — `origin`
+  (your fork), `arne` (reimersa; the shared working branches), `upstream` (WMass).
+- Work Arne's shared branches via `arne/<branch>`; PR to `origin` or `arne` as
+  appropriate; `upstream` is the true WMass repo.
+- **Need a second branch checked out at once?** `wtree <branch>` — a git worktree
+  of the primary checkout. Do **not** clone a second copy.
+
+## Setup / runtime
+
+Run inside the WRemnants singularity, activate the venv, then source `setup.sh`:
+
 ```bash
-singularity run --bind /scratch/,/work/,/home/,/ceph/ /cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/bendavid/cmswmassdocker/wmassdevrolling\:latest
-cd /home/submit/lavezzo/alphaS/WRemnantsHelpers
-source setup.sh
-echo "$WREM_BASE" "$MY_WORK_DIR" "$MY_OUT_DIR" "$NANO_DIR"
-bin/run --help
+singularity run --bind /scratch/,/work/,/home/,/ceph/ \
+  /cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/bendavid/cmswmassdocker/wmassdevrolling:latest
+source /opt/venv/bin/activate                 # required for rabbit/tensorflow
+cd WRemnantsHelpers && source setup.sh        # sets WREM_BASE, MY_*, PATH; regenerates ../CLAUDE.md
 ```
 
-## Codex Session Handoff
-- At the start of a session, ask Codex to read `AGENTS.md` and `agents/knowledge/00_index.md`.
-- Use `agents/knowledge/` as the canonical long-lived knowledge base by topic.
-- Keep `agents/studies/<topic>/` as run-by-run lab notebooks and promote stable lessons into `agents/knowledge/`.
-- For physics source of truth, keep using `/home/submit/lavezzo/alphaS/AN-25-085`.
-- When canonical paths change (for example WRemnants location), update `setup.sh` first, then update docs.
+Key packages: `WRemnants`, `rabbit` (fitting), `wums` (HDF5/plot helpers). Their
+sources live under `$WREM_BASE` (resolved by `setup.sh`) — always use that path,
+never hardcode.
 
-## Development Guidelines
-- Keep workflows reproducible: prefer scriptable commands over ad hoc shell history.
-- Keep logs in `logs/` with timestamps; `bin/run` is the default launcher for detached jobs.
-- For plot scripts, prefer `wums` plotting/output utilities (`plot_tools`, `boostHistHelpers`, `output_tools`) over ad hoc matplotlib-only helpers.
-- Treat documentation as a living artifact: when Codex learns new workflow, physics-context, environment, or failure-mode details, update the relevant files in `agents/knowledge/` and `AGENTS.md` in the same working session.
-- Prefer small, incremental doc updates over delayed large rewrites, so future sessions start from current reality.
-- Always perform a physics-sense check for produced plots/results (not only technical script success), and explicitly record the interpretation in the active study notes.
-- Persist reusable lessons to long-lived memory: promote stable, cross-study findings/rules into `agents/knowledge/` during the same session.
+## Repo layout — where things go
 
-## Study Recording Convention
-- Default for research studies: create a study folder under `agents/studies/<topic>/`.
-- Required files:
-  - `README.md`: study question, guiding questions, current understanding, decisions taken, and next steps.
-  - `runlog.md`: dated command log with output locations and brief interpretation.
-- Optional file:
-  - `results_index.md`: add only when outputs/plots become numerous and hard to track.
-  - `slides/outline.json`: slide blueprint used by `scripts/study_slides.py` to generate a study summary deck.
-- Live-update rule:
-  - During study sessions, Codex should update the study files incrementally as new understanding is gained (not only at the end of the chat).
-  - Record both technical decisions and physics assumptions in `README.md`, and append executed commands/quick outcomes to `runlog.md`.
-  - Continuously capture newly learned facts and emerging questions from discussion and outputs; mark whether each question is answered, partially answered, or open.
-  - For every newly requested check or hypothesis, add a corresponding note entry before running commands and then update that same entry with outcome/status immediately after results are available.
-- Guiding-questions rule:
-  - Each study must define a short list of guiding questions near the top of `README.md`.
-  - As new questions appear during discussion, add them to the study notes and track their status.
-- Standard iteration loop for studies:
-  - Implement requested code/config changes.
-  - Run the study workflow end-to-end (hist production and plotting/summary), using a fresh unique run tag/postfix on every run for traceability.
-  - Inspect outputs directly (plots and/or printed histogram values), including a physics-sense sanity check.
-  - Update study docs with new knowledge and question status.
-  - When requested, update `slides/outline.json`, regenerate slides via `scripts/study_slides.py`, and iterate with the user on slide content.
-  - Summarize concise physics takeaways and propose concrete suggestions for the next iteration.
-- In new Codex sessions, when a study is requested, follow this structure unless explicitly overridden.
+The `bin/` / `scripts/` / `workflows/` / `studies/` split is deliberate; respect it.
 
-## Troubleshooting
-- **Logs & monitoring:** logs should be saved in `logs/` with timestamps.
-- **Optional FastJet overlay (Arch package path):**
-  - Base `wmassdevrolling` image is Arch Linux and can install `fastjet` via `pacman`.
-  - Because `/cvmfs` image is immutable, use a writable overlay once, then mount it read-only for normal runs.
-  - One-time setup:
-    - `agents/install_fastjet_overlay.sh`
-  - FastJet-enabled launch:
-    - `agents/run_wmass_with_fastjet.sh`
-- **Container checks from Codex:** If an inline `singularity run ... bash -lc '...'` command behaves unexpectedly, run a small script file from `/home/submit/lavezzo/alphaS/WRemnantsHelpers/agents/` inside the container instead.
-- **Known Codex runtime limitation:** In some Codex sessions, container startup can fail with
-  - `ERROR: Installation issue: starter-suid doesn't have setuid bit set`, or
-  - user-namespace mapping errors (`Could not write info to setgroups`).
-  In this case, run the study command in your normal interactive container shell and share the printed diagnostics/output path back to Codex for analysis.
-- **Known-good Codex execution pattern (when unsandboxed permission is available):**
-  - First validate container access with a single-command test:
-    `singularity run --bind /scratch/,/work/,/home/,/ceph/ /cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/bendavid/cmswmassdocker/wmassdevrolling\:latest /bin/bash -lc 'echo CONTAINER_OK && python --version'`
-  - Then run the real workload as one `singularity run ... /bin/bash -lc 'cd ...; source setup.sh; python ...'` command.
-  - Avoid splitting into multiple command segments when possible; in Codex this can cause mixed sandbox/escalation handling and re-trigger setuid errors.
+| Dir | Holds | Put here when… |
+|---|---|---|
+| `bin/` | executables on `PATH` (`run`, `wtree`) | it's a reusable command you'll invoke by name |
+| `scripts/` | general-purpose tools (plot histmaker output, read fitresults…) | it's useful across many studies |
+| `workflows/` | standard recipe chains (histmaker→fit→plot, pulls & impacts…) | it runs the framework end-to-end |
+| `studies/<slug>/` | one folder per investigation: `LOGBOOK.md` + `scripts/` + artifacts | it's specific to a single study |
+| `knowledge/` | durable cross-study facts (the reference layer) | it's a fact true across the whole analysis |
 
-## Roadmap / TODOs
+**Tooling order — before writing new code:** rabbit `bin/` → this repo's `bin/` +
+`scripts/` + `workflows/` → only then ad hoc. Read `--help` and existing flags
+first. Ad hoc study code belongs in `studies/<slug>/`, not the repo root.
 
-## Revision History
-- **YYYY-MM-DD:** Created skeleton (Codex).
-- **2026-02-13:** Added container-first setup order, canonical path policy, and Codex session handoff notes.
-- **2026-02-13:** Added live-update policy for `agents/studies/<topic>/` documentation during active studies.
-- **2026-02-13:** Documented that `$WREM_BASE` is inside the editable workspace for Codex sessions.
-- **2026-02-13:** Added study-to-slides workflow (`agents/knowledge/70_slides/study_slides_workflow.md`) and `slides/outline.json` convention.
-- **2026-02-16:** Migrated reusable documentation into `agents/knowledge/` and made it the canonical long-lived knowledge base.
-- **2026-02-26:** Added explicit policy to always perform and document physics-sense checks on plots/results, and to promote reusable lessons to `agents/knowledge/` in-session.
+## Logbooks (soft contract)
+
+When you do a study — anything beyond a one-shot lookup — keep a logbook at
+`studies/<slug>/LOGBOOK.md` (copy `studies/_TEMPLATE/LOGBOOK.md`; see
+`studies/README.md`):
+
+1. **Resuming** → read the **START HERE** block first (current state · next action
+   · what's blocking). Don't re-derive what's recorded; don't re-open settled Decisions.
+2. **As you work** → append dated bullets under `## Log`; promote durable
+   conclusions to `## Findings` and choices to `## Decisions`.
+3. **Before ending** → refresh **START HERE** and bump `updated:`. This is the one
+   non-optional step; it's what makes the next session cheap.
+
+This is a *soft* contract — enforced by the user directing you to keep it, not by
+hooks. Honor it anyway.
+
+## Three durable stores (don't confuse them)
+
+Two live in the repo and are the source of truth; one is Claude's private cache.
+
+| Store | Holds | One-liner |
+|---|---|---|
+| `studies/<slug>/LOGBOOK.md` | per-study narrative: hypothesis → tried → found → decided | *"what we're doing"* |
+| `knowledge/` | cross-study durable facts, distilled from finished studies | *"what's true"* |
+| Claude memory (`~/.claude/…`) | auto-loaded index + Claude-only quirks | *"where to look"* |
+
+**Rule:** Claude memory never holds an analysis fact that isn't already in the repo
+— it only points to it. **When memory and the repo disagree, the repo wins.**
+A finding that proves durable across studies gets promoted from a logbook into
+`knowledge/`.
+
+## Physics ground truth
+
+The analysis note **`AN-25-085/AN-25-085.tex`** (env `$MY_AN_DIR`) is the physics
+ground truth. Cross-check physics claims against it rather than inferring from
+code. A distilled digest lives in `knowledge/30_physics_global/an25_085_digest.md`.
+Results aren't "done" until a short physics interpretation is recorded in the
+study's logbook — not just "ran successfully".
+
+## More detail (in `knowledge/`)
+
+- Environment / container / bootstrap → `knowledge/10_environment/runtime_bootstrap.md`
+- Nominal workflow + rabbit pitfalls → `knowledge/20_frameworks/nominal_workflow.md`,
+  `knowledge/20_frameworks/profile_likelihood_pitfalls.md`
+- Theory weights & corrections (histmaker weight formulas) → `knowledge/20_frameworks/theory_weights_and_corrections.md`
+- Frozen-nominal / validation → `knowledge/20_frameworks/{frozen_nominal_spec,validation_contract}.md`
+- W/Z gen dists, utilities → `knowledge/20_frameworks/{w_z_gen_dists_summary,utilities}.md`
+- dokan / NNLOJET production → `knowledge/20_frameworks/dokan_nnlojet.md`
+- NP parametrization constraints (CS + TMD tanh) → `knowledge/30_physics_global/np_parametrization_constraints.md`
+- Plotting style / labels → `knowledge/60_plotting_style/plotting_and_labels.md`
+- Slide workflow → `knowledge/70_slides/study_slides_workflow.md`
+- Glossary → `knowledge/90_glossary.md`

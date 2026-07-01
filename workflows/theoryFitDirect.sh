@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 if [ -z "$1" ]; then
-    echo "Usage: theoryFitDirect.sh <unfolding_fitresult> -o <output_dir> -e <extra feedRabbitSigmaUL arguments> -f <extra rabbit_fit arguments> -p <postfix> -g <predGenerator>"
+    echo "Usage: theoryFitDirect.sh <unfolding_fitresult> [-o|--output <output_dir>] [-e|--extra-setup <extra feedRabbitSigmaUL arguments>] [-f|--extra-fit <extra rabbit_fit arguments>] [-p|--postfix <postfix>] [-g|--generator <predGenerator>] [-n|--name <outname>] [--pdf <pdf>]"
     exit 1
 fi
 
@@ -11,32 +11,43 @@ shift
 output_dir=""
 extra_setup=""
 extra_fit=""
-postfix="direct_sigmaul"
+postfix=""
 pred_generator="scetlib_dyturbo_LatticeNP_CT18Z_N3p0LL_N2LO"
-outname="direct_sigmaul_carrot"
+outname="carrot"
+pdf="ct18z"
 
-while getopts "o:e:f:p:g:n:" opt; do
-    case $opt in
-        o)
-            output_dir=$OPTARG
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -o|--output)
+            output_dir="$2"
+            shift 2
             ;;
-        e)
-            extra_setup=$OPTARG
+        -e|--extra-setup)
+            extra_setup="$2"
+            shift 2
             ;;
-        f)
-            extra_fit=$OPTARG
+        -f|--extra-fit)
+            extra_fit="$2"
+            shift 2
             ;;
-        p)
-            postfix=$OPTARG
+        -p|--postfix)
+            postfix="$2"
+            shift 2
             ;;
-        g)
-            pred_generator=$OPTARG
+        -g|--generator)
+            pred_generator="$2"
+            shift 2
             ;;
-        n)
-            outname=$OPTARG
+        -n|--name)
+            outname="$2"
+            shift 2
             ;;
-        \?)
-            echo "Invalid option: -$OPTARG" >&2
+        --pdf)
+            pdf="$2"
+            shift 2
+            ;;
+        *)
+            echo "Invalid option: $1" >&2
             exit 1
             ;;
     esac
@@ -58,7 +69,7 @@ echo "Postfix: $postfix"
 echo "Prediction generator: $pred_generator"
 echo
 
-theory_setup_command="python ${WREM_BASE}/scripts/rabbit/feedRabbitSigmaUL.py --infile ${input_file} --predGenerator ${pred_generator} -o ${output_dir} --systematicType log_normal --fitresultMapping 'Select helicitySig:0' --channelSigmaUL ch0_masked --outname ${outname} --postfix ${postfix} ${extra_setup}"
+theory_setup_command="python ${WREM_BASE}/scripts/rabbit/feedRabbitSigmaUL.py --infile ${input_file} --predGenerator ${pred_generator} --pdfs ${pdf} -o ${output_dir} --systematicType log_normal --fitresultMapping 'Select helicitySig:0' --channelSigmaUL ch0_masked --outname ${outname} ${postfix:+--postfix ${postfix}} ${extra_setup}"
 echo "Executing command: $theory_setup_command"
 theory_setup_command_output=$(eval "$theory_setup_command 2>&1" | tee /dev/tty)
 
@@ -67,7 +78,7 @@ theory_file=$(echo "$theory_file" | sed 's/\x1B\[[0-9;]*[a-zA-Z]//g')
 echo "Direct-theory rabbit input: $theory_file"
 echo
 
-fit_command="rabbit_fit.py ${theory_file} -o ${output_dir} --doImpacts --covarianceFit --globalImpacts --saveHists --computeVariations --computeHistErrors --postfix ${postfix} ${extra_fit}"
+fit_command="rabbit_fit.py ${theory_file} -o ${output_dir} --doImpacts --covarianceFit --globalImpacts --saveHists --computeVariations --computeHistErrors --unblind -t 0 -m BaseMapping -m Project chSigmaUL ptVGen -m Project chSigmaUL absYVGen ${postfix:+--postfix ${postfix}} ${extra_fit}"
 echo "Executing command: $fit_command"
 fit_command_output=$(eval "$fit_command 2>&1" | tee /dev/tty)
 echo
