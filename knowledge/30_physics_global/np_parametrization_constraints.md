@@ -14,7 +14,19 @@ $$\tilde\gamma_\zeta^{\rm NP}(b_T) \;=\; -\frac{\lambda_\infty}{2}\,\tanh\!A(b_T
 
 **TMD boundary condition** (with $\Lambda_6\,b_T^5$ added inside the tanh, paralleling the AN's odd-power TMD argument):
 $$f^{\rm NP}(b_T,y) \;=\; \exp\!\big[-2\Lambda_\infty\,b_T\,\tanh B(b_T,y)\big],$$
-$$B(b_T,y)\;=\;\frac{L_2(y)}{\Lambda_\infty}b_T+\frac{\Lambda_4}{\Lambda_\infty}b_T^3+\frac{L_2(y)^3}{3\Lambda_\infty}b_T^3+\frac{\Lambda_6}{\Lambda_\infty}b_T^5.$$
+$$B(b_T,y)\;=\;\frac{L_2(y)}{\Lambda_\infty}b_T+\frac{\Lambda_4}{\Lambda_\infty}b_T^3+\frac{L_2(y)^3}{3\Lambda_\infty^{3}}b_T^3+\frac{\Lambda_6}{\Lambda_\infty}b_T^5.$$
+
+> **Cross-checked against SCETlib source** (`scetlib-cms-newnp-lambda4fix/include/scetlib/qT/NP_models.hpp`,
+> `NP_model_effective::operator()`, case `tanh_6`, 2026-07-17): the cube term is
+> `(1/3)·pow<3>(lambda2_Y·bT/lambda_inf)` = $L_2^3\,b_T^3/(3\Lambda_\infty^{3})$ — **three** powers of
+> $\Lambda_\infty$ (an earlier version of this note wrote $/(3\Lambda_\infty)$, which was wrong). It is the
+> leading **arctanh correction**: `B = arctanh(arg/Λ∞)` so that `tanh(B)` reproduces the un-saturated
+> `identity` model `exp(−2·bT·arg)` (i.e. keeps the intended $\Lambda_4 b_T^4$ exponent coefficient,
+> cancelling the tanh's own $-B^3/3$). The **CS kernel has no analogous term** (Gamma_nu.hpp tanh_6:
+> `A = (λ2_ν b² + λ4_ν b⁴ + λ6_ν b⁶)/λ∞_ν` only) — there $\tilde\gamma$ is *linear* in the tanh, so
+> $\tanh(A)\to A$ already gives the small-$b_T$ series with no correction needed. Consequence for the wall:
+> the TMD interior coefficient is $B_{\rm wall}=\Lambda_4+L_2^3/(3\Lambda_\infty^2)$ (used in
+> `np_damping_wall.py`), **not** just $\Lambda_4$.
 
 In the current fit, $\lambda_6$ and $\Lambda_6$ are **fixed positive constants**; $\lambda_{2,4,\infty}$ and $\Lambda_{2,4,\infty},\Delta\Lambda_2$ float.
 

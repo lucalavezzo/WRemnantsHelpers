@@ -4,7 +4,9 @@
 
 ## Install
 
-- Editable install of dokan v1.0.2: `/work/submit/lavezzo/alphaS/NNLOJET/dokan/` (separate `dokan_pristine_control/` checkout sits next to it for diffing).
+- Editable install of dokan: `/work/submit/lavezzo/alphaS/NNLOJET/dokan/` (separate `dokan_pristine_control/` checkout sits next to it for diffing).
+- State as of 2026-07-14: local `main` = `upstream/main` (aykhuss, merged 2026-06-24) + 21 fork commits (HTCondor robustness, dispatch tuning, A1 SQL-side aggregation, MergePart dedup fix, runbooks/DEVLOG under `docs/`). Remotes: `origin`=kdlong, `luca`=lucalavezzo, `upstream`=aykhuss. PineAPPL grid generation is included (upstream main since 2025-06-15; `finalize --skip-grids` exists).
+- Upstream `hdf5` branch (unreleased, 99 commits ahead): HDF5-based merge rewrite + parallel grid merging + dispatch/DB rework; solves the same problems as our fork patches but by rewrite — merging it conflicts in 8 files (incl. modify/delete on `combine/_util.py`). Evaluate in a separate worktree; migration = re-port surviving patches, not a merge. Never point hdf5 code at an in-flight run dir.
 - Venv python: `/work/submit/lavezzo/alphaS/NNLOJET/nnlojet/bin/python3.12`
 - CLI: `/work/submit/lavezzo/alphaS/NNLOJET/nnlojet/bin/nnlojet-run` — entry point is `dokan:main` (per `dokan/pyproject.toml`).
 - Deps: `luigi`, `numpy`, `rich`, `sqlalchemy` (state lives in a per-run `db.sqlite`).

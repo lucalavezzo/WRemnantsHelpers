@@ -1,0 +1,76 @@
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1783012990.393692  355930 cpu_feature_guard.cc:227] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 AVX512F AVX512_VNNI AVX512_BF16 AVX_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+E0000 00:00:1783012999.014811  355930 cuda_platform.cc:52] failed call to cuInit: INTERNAL: CUDA error: Failed call to cuInit: UNKNOWN ERROR (303)
+[λ base] from hdf5 metadata /ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260623_Zhistmaker/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile_realdata/ZMassDilepton.hdf5
+[gen-axes] reading the scetlib_np auxiliary of /ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260623_Zhistmaker/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile_realdata/ZMassDilepton.hdf5
+ch0 {'axes': [Variable(array([ 0. ,  1. ,  1.5,  2. ,  2.5,  3. ,  3.5,  4. ,  4.5,  5. ,  5.5,
+        6. ,  6.5,  7. ,  7.5,  8. ,  8.5,  9. ,  9.5, 10. , 10.5, 11. ,
+       11.5, 12. , 13. , 14. , 15. , 16. , 17. , 18. , 19. , 20. , 22. ,
+       24. , 26. , 28. , 30. , 33. , 37. , 44. ]), underflow=False, name='ptll'), Variable([-2.5, -1.8, -1.5, -1.3, -1.1, -0.9, -0.7, -0.5, -0.3, -0.15, 0, 0.15, 0.3, 0.5, 0.7, 0.9, 1.1, 1.3, 1.5, 1.8, 2.5], name='yll'), Regular(8, 0, 1, underflow=False, overflow=False, name='cosThetaStarll_quantile'), Regular(8, 0, 1, underflow=False, overflow=False, name='phiStarll_quantile')], 'masked': False, 'flow': False, 'era': '2016PostVFP', 'flavor': None, 'lumi': 16.809083707, 'start': 0, 'stop': 49920}
+[gen-axes] ptVGen: from /ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260623_Zhistmaker/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile_realdata/ZMassDilepton.hdf5 (21 bins)
+[gen-axes] absYVGen: from /ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260623_Zhistmaker/ZMassDilepton_ptll_yll_cosThetaStarll_quantile_phiStarll_quantile_realdata/ZMassDilepton.hdf5 (10 bins)
+
+[core] constructing SigmaGenModel at the base tune (bt-grid integral) …
+[SigmaGenModel] loaded factorized btgrid cache /scratch/submit/cms/wmass/scetlib_np/Z_COM13_CT18Z_N3p0LL_btgrid_fineall/combined_btgrid.factorized.npz
+  constructed in 5.6s; gen grid (21, 10) (['ptVGen', 'absYVGen'])
+
+[λ] evaluating matched σ_gen at:
+  F_eff  : {'np_model': 'tanh_2', 'lambda_inf': 1.0, 'lambda2': 0.4, 'lambda4': 0.4, 'lambda6': 0.0, 'delta_lambda2': 0.0}
+  γ_ν^NP : {'np_model_nu': 'tanh_2', 'lambda2_nu': 0.15, 'lambda4_nu': 0.0, 'lambda_inf_nu': 2.0}
+  (no overrides — evaluating at the base tune itself)
+  σ_gen computed in 0.0s; shape (21, 10)
+
+  Σ σ_gen        = 1337.2
+  per-bin σ_gen  : min 0.8783  max 31.61
+
+  σ_gen(λ) per (ptVGen × absY) bin:
+[[ 0.8789  0.8783  1.1688  1.1648  1.1593  1.1523  1.1439  1.1342  1.6811  3.818 ]
+ [ 2.4246  2.4218  3.2201  3.2035  3.1802  3.1535  3.1223  3.0879  4.5621 10.3049]
+ [ 3.5732  3.5701  4.7493  4.7297  4.7025  4.6686  4.6283  4.5828  6.7789 15.3316]
+ [ 4.2318  4.2279  5.624   5.6002  5.5673  5.5256  5.476   5.4191  8.0099 18.072 ]
+ [ 4.4591  4.4547  5.9245  5.8976  5.8605  5.8131  5.7568  5.6921  8.4029 18.8959]
+ [ 4.3896  4.3848  5.8304  5.8017  5.7621  5.7117  5.6517  5.5829  8.2301 18.4416]
+ [ 4.1592  4.1543  5.5227  5.4935  5.4531  5.4018  5.3406  5.2706  7.7592 17.3258]
+ [ 3.8672  3.8623  5.1335  5.1046  5.0645  5.0138  4.9533  4.8841  7.1811 15.984 ]
+ [ 3.5697  3.5649  4.7374  4.7092  4.6702  4.6209  4.5621  4.4949  6.6015 14.6529]
+ [ 3.2908  3.2862  4.3664  4.3392  4.3016  4.2542  4.1976  4.1331  6.0643 13.4277]
+ [ 3.0373  3.0328  4.0292  4.0031  3.9672  3.9217  3.8676  3.8059  5.5796 12.3281]
+ [ 2.8083  2.8041  3.7248  3.7     3.6656  3.6223  3.5707  3.5119  5.1446 11.345 ]
+ [ 5.0155  5.0075  6.6507  6.6045  6.5405  6.4599  6.3641  6.2549  9.1536 20.1333]
+ [ 4.3336  4.3264  5.745   5.703   5.6451  5.5721  5.4853  5.3866  7.8731 17.2618]
+ [ 3.7698  3.7632  4.9963  4.9583  4.9058  4.8397  4.7613  4.6721  6.8214 14.9133]
+ [ 3.2992  3.2933  4.3717  4.3372  4.2897  4.23    4.1591  4.0785  5.9491 12.9735]
+ [ 5.4617  5.4515  7.2354  7.1759  7.0942  6.9914  6.8695  6.7309  9.8066 21.3186]
+ [ 4.2865  4.2782  5.677   5.6283  5.5615  5.4775  5.3781  5.2653  7.6619 16.5981]
+ [ 4.1677  4.1592  5.518   5.4688  5.4013  5.3165  5.2162  5.1024  7.4157 16.0053]
+ [ 6.1186  6.1054  8.0975  8.021   7.916   7.7844  7.6289  7.4526 10.8095 23.1818]
+ [ 8.701   8.6796 11.5028 11.3785 11.2083 10.9956 10.7442 10.4578 15.0771 31.6058]]
+
+  NP physical-validity:
+    γ_ν^NP damping : OK  (max γ_ν over probe bT = -0.0135; must be ≤ 0)
+    F_eff decays   : OK
+    native σ(qT)≥0 : neg_area_frac=6.43e-05 (λ_central 6.43e-05), min/peak=-0.00604, n_neg_bins=376
+    worst neg cell : σ=-0.09199 (-0.6% of peak) at Y=+3.5, qT=100 GeV
+    neg-cell split : 152 inside |Y|≤2.5, 224 outside (|Y|≤5 reached); qT∈[33.5, 100] GeV
+    worst in-acc   : σ=-0.05836 (-0.4% of peak) at Y=-2.5, qT=100 GeV   [the |Y|≤2.5 pathology the fit region could see]
+    most-negative 10 cells (Y, qT[GeV], σ, %peak):
+        [out] Y=+3.5  qT=    100  σ=-0.09199  (-0.6%)
+        [out] Y=-3.5  qT=    100  σ=-0.09199  (-0.6%)
+        [out] Y=-3.38  qT=    100  σ=-0.09052  (-0.6%)
+        [out] Y=+3.38  qT=    100  σ=-0.09052  (-0.6%)
+        [out] Y=+3.75  qT=    100  σ=-0.08868  (-0.6%)
+        [out] Y=-3.75  qT=    100  σ=-0.08868  (-0.6%)
+        [out] Y=-3.25  qT=    100  σ=-0.0876  (-0.6%)
+        [out] Y=+3.25  qT=    100  σ=-0.0876  (-0.6%)
+        [out] Y=-3.12  qT=    100  σ=-0.08365  (-0.5%)
+        [out] Y=+3.12  qT=    100  σ=-0.08365  (-0.5%)
+[theory-corr] scetlib_dyturbo_LatticeNPLambda4Bugfix_FranksVals_CT18Z_N3p0LL_N2LO_CorrZ.pkl.lz4 :: Z / scetlib_dyturbo_LatticeNPLambda4Bugfix_FranksVals_CT18Z_N3p0LL_N2LO_hist
+
+[theory-corr] projection onto ptVGen (var=pdf0):
+  Σ corr           = 1339.94
+  Σ model / Σ corr = 0.99796
+  model / corr per bin : min 0.9858  max 0.9995
+  model/corr: [0.9995 0.9995 0.9995 0.9995 0.9995 0.9995 0.9995 0.9995 0.9995 0.9995 0.9995 0.9995 0.9994 0.9994 0.9994 0.9994 0.9992 0.9991 0.9988
+ 0.9982 0.9858]
+[plot] wrote /home/submit/lavezzo/alphaS/WRemnantsHelpers/studies/scetlib-np-validation-reorg/baseline/plots/test1_sigmagen_vs_theorycorr.png(.pdf) + test1_sigmagen_vs_theorycorr.log  (axis=ptVGen, summed over absYVGen; model/corr [0.9858, 0.9995]; Δ(dσ/dx) [-0.036, -0.00714])

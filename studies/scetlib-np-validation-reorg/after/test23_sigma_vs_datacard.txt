@@ -1,0 +1,210 @@
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1783015003.742087  394408 cpu_feature_guard.cc:227] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 AVX512F AVX512_VNNI AVX512_BF16 AVX_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+Loading FitInputData …
+E0000 00:00:1783015013.781021  394408 cuda_platform.cc:52] failed call to cuInit: INTERNAL: CUDA error: Failed call to cuInit: UNKNOWN ERROR (303)
+W0000 00:00:1783015013.911466  394408 cpu_allocator_impl.cc:82] Allocation of 5984010240 exceeds 10% of free system memory.
+ch0 {'axes': [Variable(array([ 0. ,  1. ,  1.5,  2. ,  2.5,  3. ,  3.5,  4. ,  4.5,  5. ,  5.5,
+        6. ,  6.5,  7. ,  7.5,  8. ,  8.5,  9. ,  9.5, 10. , 10.5, 11. ,
+       11.5, 12. , 13. , 14. , 15. , 16. , 17. , 18. , 19. , 20. , 22. ,
+       24. , 26. , 28. , 30. , 33. , 37. , 44. ]), underflow=False, name='ptll'), Variable([-2.5, -1.8, -1.5, -1.3, -1.1, -0.9, -0.7, -0.5, -0.3, -0.15, 0, 0.15, 0.3, 0.5, 0.7, 0.9, 1.1, 1.3, 1.5, 1.8, 2.5], name='yll'), Regular(8, 0, 1, underflow=False, overflow=False, name='cosThetaStarll_quantile'), Regular(8, 0, 1, underflow=False, overflow=False, name='phiStarll_quantile')], 'masked': False, 'flow': False, 'era': '2016PostVFP', 'flavor': None, 'lumi': 16.809083707, 'start': 0, 'stop': 49920}
+  loaded in 1.6s; nproc=4
+Constructing SCETlibNPParamModel (runs the bt integral at λ_central) …
+[SCETlibNPParamModel] λ_central auto-detected from indata.metadata
+[SCETlibNPParamModel] λ_central:
+  tag = 'scetlib_dyturbo_LatticeNPLambda4Bugfix_FranksVals_CT18Z_N3p0LL_N2LO'
+  basename = 'inclusive_Z_COM13_CT18Z_N3+0LL_lattice_lambda4bugfix_franksvals_fine_combined.pkl'
+  eff_params = {'np_model': 'tanh_2', 'lambda_inf': 1.0, 'lambda2': 0.4, 'lambda4': 0.4, 'lambda6': 0.0, 'delta_lambda2': 0.0}
+  gnu_params = {'np_model_nu': 'tanh_2', 'lambda2_nu': 0.15, 'lambda4_nu': 0.0, 'lambda_inf_nu': 2.0}
+W0000 00:00:1783015018.803889  394408 cpu_allocator_impl.cc:82] Allocation of 4607520000 exceeds 10% of free system memory.
+[SigmaGenModel] loaded factorized btgrid cache /scratch/submit/cms/wmass/scetlib_np/Z_COM13_CT18Z_N3p0LL_btgrid_fineall/combined_btgrid.factorized.npz
+W0000 00:00:1783015020.534231  394408 cpu_allocator_impl.cc:82] Allocation of 4607520000 exceeds 10% of free system memory.
+W0000 00:00:1783015021.611009  394408 cpu_allocator_impl.cc:82] Allocation of 4607520000 exceeds 10% of free system memory.
+W0000 00:00:1783015021.727899  394408 cpu_allocator_impl.cc:82] Allocation of 4607520000 exceeds 10% of free system memory.
+  constructed in 7.7s
+
+======================================================================
+RECO  σ_reco(λ_c) vs card norm[signal]
+======================================================================
+
+  Σ model σ_reco : 431.659
+  Σ nominal      : 7.26835e+06
+  global scale Σmodel/Σnominal : 5.93889e-05
+
+  per-bin shape ratio  (scale·model / nominal), should ~ 1:
+    bins compared : 49920
+    mean          : 0.99993
+    median        : 1.00040
+    std           : 0.00240
+    min / max     : 0.97032 / 1.00719
+    p1            : 0.98741
+    p5            : 0.99742
+    p50           : 1.00040
+    p95           : 1.00190
+    p99           : 1.00252
+    yield-weighted mean|ratio-1| : 0.00120
+
+  --- 1D projection on ptll (n=39 bins) ---
+    idx     model(scaled)        nominal        ratio
+      0          88827.6          88817.8    1.0001
+      1           106072           106037    1.0003
+      2           141594           141539    1.0004
+      3           171453           171369    1.0005
+      4           195208           195114    1.0005
+      5           212805           212710    1.0004
+      6           224255           224147    1.0005
+      7           230623           230503    1.0005
+      8           232660           232548    1.0005
+      9           231303           231218    1.0004
+     10           226674           226610    1.0003
+     11           220901           220837    1.0003
+     12           213591           213507    1.0004
+     13           205903           205785    1.0006
+     14           197753           197625    1.0006
+     15           189279           189166    1.0006
+     16           181228           181132    1.0005
+     17           173786           173716    1.0004
+     18           166047           165994    1.0003
+     19           158740           158684    1.0004
+     20           152106           152042    1.0004
+     21           145499           145425    1.0005
+     22           139356           139283    1.0005
+     23           261212           261049    1.0006
+     24           240090           239958    1.0005
+     25           221019           220943    1.0003
+     26           203672           203611    1.0003
+     27           187693           187637    1.0003
+     28           173747           173699    1.0003
+     29           160668           160642    1.0002
+     30           149144           149131    1.0001
+     31           266525           266497    1.0001
+     32           229300           229278    1.0001
+     33           196876           196851    1.0001
+     34           164820           164821    1.0000
+     35           135999           136061    0.9995
+     36           158994           159127    0.9992
+     37           149450           149729    0.9981
+     38           163473           165503    0.9877
+
+  --- 1D projection on yll (n=20 bins) ---
+    idx     model(scaled)        nominal        ratio
+      0           312867           313061    0.9994
+      1           415631           415675    0.9999
+      2           348128           348105    1.0001
+      3           377461           377509    0.9999
+      4           389551           389554    1.0000
+      5           395259           395201    1.0001
+      6           398066           398048    1.0000
+      7           400297           400286    1.0000
+      8           300196           300112    1.0003
+      9           300212           300113    1.0003
+     10           299909           299813    1.0003
+     11           299442           299361    1.0003
+     12           397683           397684    1.0000
+     13           395673           395655    1.0000
+     14           392627           392568    1.0002
+     15           388887           388883    1.0000
+     16           376835           376871    0.9999
+     17           348050           348030    1.0001
+     18           416141           416182    0.9999
+     19           315431           315635    0.9994
+
+  --- 1D projection on cosThetaStarll_quantile (n=8 bins) ---
+    idx     model(scaled)        nominal        ratio
+      0           871303           871475    0.9998
+      1           907524           907368    1.0002
+      2           914661           914604    1.0001
+      3           916111           915990    1.0001
+      4           914678           914564    1.0001
+      5           910442           910393    1.0001
+      6           907790           907721    1.0001
+      7           925836           926233    0.9996
+
+  --- 1D projection on phiStarll_quantile (n=8 bins) ---
+    idx     model(scaled)        nominal        ratio
+      0           881917           881819    1.0001
+      1           914513           914594    0.9999
+      2           916009           916089    0.9999
+      3           905606           905529    1.0001
+      4           899931           899834    1.0001
+      5           911243           911306    0.9999
+      6           917915           918024    0.9999
+      7           921212           921150    1.0001
+
+  >> RECO  σ_reco(λ_c) vs card norm[signal]: yield-weighted mean|shape−1| = 0.120%  |  worst bin = -2.97% at (ptll=38, yll=19, cosThetaStarll_quantile=3, phiStarll_quantile=0)
+
+======================================================================
+GEN   σ_gen(λ_c) vs card N_gen
+======================================================================
+
+  Σ model σ_reco : 1337.2
+  Σ nominal      : 2.29782e+07
+  global scale Σmodel/Σnominal : 5.81944e-05
+
+  per-bin shape ratio  (scale·model / nominal), should ~ 1:
+    bins compared : 210
+    mean          : 1.01268
+    median        : 1.02154
+    std           : 0.03984
+    min / max     : 0.83203 / 1.02418
+    p1            : 0.83240
+    p5            : 1.01866
+    p50           : 1.02154
+    p95           : 1.02310
+    p99           : 1.02363
+    yield-weighted mean|ratio-1| : 0.03803
+
+  --- 1D projection on ptVGen (n=21 bins) ---
+    idx     model(scaled)        nominal        ratio
+      0           243661           238508    1.0216
+      1           664685           650384    1.0220
+      2           984890           963796    1.0219
+      3      1.16427e+06      1.13924e+06    1.0220
+      4      1.22275e+06      1.19662e+06    1.0218
+      5       1.1992e+06      1.17398e+06    1.0215
+      6      1.13208e+06      1.10779e+06    1.0219
+      7      1.04904e+06      1.02652e+06    1.0219
+      8           965446           944703    1.0220
+      9           887731           869146    1.0214
+     10           817477           800277    1.0215
+     11           754321           738270    1.0217
+     12       1.3435e+06      1.31459e+06    1.0220
+     13      1.15702e+06      1.13274e+06    1.0214
+     14      1.00355e+06           982392    1.0215
+     15           876051           857880    1.0212
+     16      1.44577e+06      1.41555e+06    1.0213
+     17       1.1309e+06      1.10719e+06    1.0214
+     18      1.09583e+06      1.07343e+06    1.0209
+     19      1.60008e+06      1.56828e+06    1.0203
+     20      2.23992e+06       2.6769e+06    0.8368
+
+  --- 1D projection on absYVGen (n=10 bins) ---
+    idx     model(scaled)        nominal        ratio
+      0      1.47512e+06      1.47712e+06    0.9986
+      1      1.47276e+06      1.47474e+06    0.9987
+      2      1.95595e+06      1.95891e+06    0.9985
+      3      1.94216e+06      1.94478e+06    0.9987
+      4      1.92315e+06      1.92532e+06    0.9989
+      5      1.89927e+06       1.9013e+06    0.9989
+      6      1.87093e+06      1.87255e+06    0.9991
+      7      1.83868e+06      1.83921e+06    0.9997
+      8      2.69035e+06      2.68943e+06    1.0003
+      9      5.90983e+06      5.89482e+06    1.0025
+
+  >> GEN   σ_gen(λ_c) vs card N_gen: yield-weighted mean|shape−1| = 3.803%  |  worst bin = -16.80% at (ptVGen=20, absYVGen=2)
+
+  >> GEN resolved-qT norm (overflow bin excluded): bulk yield-weighted mean|shape−1| = 0.067%  (the global-norm 3.80% is that truncation smeared into a pedestal — see docstring)
+
+  ptll-projection ratio plot written to: /home/submit/lavezzo/alphaS/WRemnantsHelpers/studies/scetlib-np-validation-reorg/after/plots/test23_paramdiag/reco_ptll.png(.pdf) + reco_ptll.log
+
+  yll-projection ratio plot written to: /home/submit/lavezzo/alphaS/WRemnantsHelpers/studies/scetlib-np-validation-reorg/after/plots/test23_paramdiag/reco_yll.png(.pdf) + reco_yll.log
+
+  cosThetaStarll_quantile-projection ratio plot written to: /home/submit/lavezzo/alphaS/WRemnantsHelpers/studies/scetlib-np-validation-reorg/after/plots/test23_paramdiag/reco_cosThetaStarll_quantile.png(.pdf) + reco_cosThetaStarll_quantile.log
+
+  phiStarll_quantile-projection ratio plot written to: /home/submit/lavezzo/alphaS/WRemnantsHelpers/studies/scetlib-np-validation-reorg/after/plots/test23_paramdiag/reco_phiStarll_quantile.png(.pdf) + reco_phiStarll_quantile.log
+
+  ptVGen-projection ratio plot written to: /home/submit/lavezzo/alphaS/WRemnantsHelpers/studies/scetlib-np-validation-reorg/after/plots/test23_paramdiag/gen_ptVGen.png(.pdf) + gen_ptVGen.log
+
+  absYVGen-projection ratio plot written to: /home/submit/lavezzo/alphaS/WRemnantsHelpers/studies/scetlib-np-validation-reorg/after/plots/test23_paramdiag/gen_absYVGen.png(.pdf) + gen_absYVGen.log
+
+  plots written under: /home/submit/lavezzo/alphaS/WRemnantsHelpers/studies/scetlib-np-validation-reorg/after/plots/test23_paramdiag

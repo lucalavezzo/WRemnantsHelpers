@@ -1,0 +1,42 @@
+# Descriptive names -> fitresults run dirs for scripts/fit_summary_table.py --spec.
+# Order = table row order. Runs still in progress are auto-skipped (warned) until
+# they write results. Full paths (no $VAR expansion in YAML).
+- name: "$\\lambda$-wall"
+  dir: /ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260702_2D_l6nu0p01_l60p01
+- name: "no wall"
+  # 260720 = bit-identical re-fit of 260716_2D_l6nu0p01_l60p01_nowall_matchedStartingPoint + nllvalfull; cov/sat symlinked from the original
+  dir: /ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260720_2D_l6nu0p01_l60p01_nowall_matchedStartingPoint_fullNll
+- name: "no wall, $\\lambda$-wall $\\lambda$'s seed"
+  dir: /ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260716_2D_l6nu0p01_l60p01_nowall_seedWalled
+- name: "no wall, $\\lambda$-wall full seed"
+  # 260720 = bit-identical re-fit of 260716_2D_seedWalledFull_nowall + nllvalfull; cov/sat symlinked from the original
+  dir: /ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260720_2D_seedWalledFull_nowall_fullNll
+- name: "no wall, $\\lambda$-wall full seed, $\\Delta\\lambda_2=0$"
+  dir: /ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260717_2D_C_dl2frozen0
+# - name: "func-wall $F_{{eff}}<=1.0$, $\\lambda$-wall full seed"
+#   dir: /ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260717_funcboundScan_ttmd0
+# - name: "func-wall $F_{{eff}}<=1.1$, $\\lambda$-wall full seed"
+#   dir: /ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260717_funcboundScan_ttmd0.1
+# - name: "func-wall $F_{{eff}}<=1.2$, $\\lambda$-wall full seed"
+#   dir: /ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260716_2D_funcboundMax_seedWalled
+# - name: "func-wall $F_{{eff}}<=1.4$, $\\lambda$-wall full seed"
+#   dir: /ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260717_funcboundScan_ttmd0.4
+# - name: "func-wall $F_{{eff}}<=2.0$, $\\lambda$-wall full seed"
+#  dir: /ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260717_funcboundScan_ttmd1.0
+- name: "priors sigma=0.5"
+  dir: /ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260717_2D_priors_sig0p5
+# --- lambda-wall margin scan (natural-units margin on min-of-polynomial; 260717) ---
+- name: "$\\lambda$-wall margin $+0.005$ (stricter)"
+  dir: /ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260717_2D_wallmargin_plus0p005
+- name: "$\\lambda$-wall margin $0$ (physical edge)"
+  # 260720 = bit-identical re-fit of 260717_2D_wallmargin_0 + nllvalfull; cov/sat symlinked from the original
+  dir: /ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260720_2D_wallmargin_0_fullNll
+- name: "$\\lambda$-wall margin $-0.02$ (looser)"
+  dir: /ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260717_2D_wallmargin_minus0p02
+- name: "$\\lambda$-wall margin $-0.05$"
+  dir: /ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260717_2D_wallmargin_minus0p05
+- name: "$\\lambda$-wall margin $-0.10$"
+  dir: /ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260717_2D_wallmargin_minus0p10
+- name: "$\\lambda$-wall + $\\delta\\lambda_2{=}0$"
+  dir: /ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260717_2D_wall_dl2frozen0
+

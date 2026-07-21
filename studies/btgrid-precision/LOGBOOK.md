@@ -587,3 +587,121 @@ forVale_180626 (variation λ-metadata MATCH all 7):
     floor) — physically irrelevant, outside acceptance.
   ⇒ new btgrid-derived points reference reproduces the validated forVale_180626 to
   integrator precision; b0_over_bmax_nu=1 import confirmed consistent.
+
+## 2026-07-02 — re-confirmed while validating the NEW fit's σ_gen (see [[physical-lambda]])
+
+Came at this fresh from the σ(αs) validation thread (studies/physical-lambda) — chasing a
+"gen-level disagreement" — and re-derived what THIS study already resolved. Recording so it
+doesn't happen again:
+
+- **GRID-PATH LESSON (important):** `/ceph/submit/data/user/l/lavezzo/zstuff/Z_COM13_CT18Z_N3p0LL_btgrid_fineall/`
+  is the **OLD BUGGY b0=0** source. The **FIXED b0=1 grid is the production one at
+  `/scratch/submit/cms/wmass/scetlib_np/Z_COM13_CT18Z_N3p0LL_btgrid_fineall/`** (`combined_btgrid.pkl`,
+  b0nu0 preserved as `.b0nu0_OLD_PREFIX`); fixed source also at `…/zstuff/…fineall_b0nu1/`. The code
+  defaults (`export_spectrum.py`, `sigma_gen_at_lambda.py` BTGRID_DIR) already point at the /scratch
+  fixed grid, and the production fit inherits it. **ALWAYS use /scratch/.../wmass; never zstuff/…fineall.**
+- **Re-confirmation:** `sigma_gen_at_lambda --theory-corr <FranksVals CorrZ.pkl.lz4> --meta-from <260623 dc>
+  --plot-axis ptVGen --absy-edges 0,2.5`, matched σ_gen vs official SCETlib+DYTurbo, var=pdf0:
+  buggy grid → lowest-ptV bin 0.9925 (**−0.75%** wiggle), min 0.9925; **fixed grid → 0.9995 (−0.05%),
+  min 0.9981, range 0.9981–0.9995** (flat Simpson-rebin floor only). Σmodel/Σcorr=0.99933 both.
+  ⇒ reproduces the 2026-06-24 resolution (wiggle 1.011%→0.006%); the −0.05% floor is the 3-node rebin
+  (5-node erases it). Resum-only precision plots (buggy grid, for the record):
+  `~/public_html/alphaS/260702_resum_precision/`; fixed-grid closure `official_closure_FIXEDgrid_absy2p5.png` there.
+- **TIMING RED FLAG (corrected):** `_default_btgrid_dir()` → `/scratch/.../wmass/…fineall/` (the fit's
+  default; the NEW fit passed no `btgrid_dir`). combined_btgrid.pkl there is **b0=1 dated Jun 24 20:50**,
+  but the **b0=1 fix was swapped in at 20:50 — AFTER the NEW 260623 fit ran (Jun 24 08:39 pass-1 →
+  13:56 cov)**. At fit time the combined was the Jun-9 **b0=0 buggy** grid (now `.b0nu0_OLD_PREFIX`).
+  ⇒ **the production σ(αs)=0.442 fit was computed on the BUGGY b0=0 grid** (low-qT wiggle present,
+  laundered to reco); uses **3-node** (not 5-node). A fit re-run TODAY would pick up the fixed grid.
+- **OPEN / TODO:** re-run the 260623 λ4_ν-frozen fit with the current fixed b0=1 grid and compare
+  σ(αs) + central to 0.442 — to check the b0_nu bug's (likely small, laundered) impact on the number.
+  Do NOT assume it's negligible without this check. (5-node remains an optional prediction-fidelity
+  nicety, separate from the b0=1 correctness fix.)
+
+---
+
+## 2026-07-15 — triangulation extended to the POSTFIT tune (points file, tanh_6, λ2<0)
+
+First check of the reconstruction at the **real-data postfit λ** (not λ_central). The fit
+`260702_2D_l6nu0p01_l60p01_nowall` (datacard `260701_Z_2D/…_realdata/ZMassDilepton.hdf5`)
+lands on the awkward tune **tanh_6: λ2=−0.498, δλ2=−0.024, λ4=−0.035, λ6=0.01; λ2ν=0.320,
+λ4ν=0.019, λ6ν=0.01; λ∞=1, λ∞ν=2** — verified to match the SCETlib run's `config[Nonperturbative]`
+exactly (same parametrization, no conversion). Areimers ran a direct SCETlib **points** run at
+that tune: `…_postfitLambda60p01_nowall_points/…_combined.pkl` (`calculation_piece=sing`, N3LL,
+b0_over_bmax_nu=1 — matches the production bt-grid).
+
+**Tool (committed to this study):** `compare_postfit_sigma_gen.py`. Reuses `SigmaGenModel` (the
+`sigma_gen_at_lambda` core, `include_nonsingular=False`) evaluated at the postfit λ read from
+`--fitresult` with the fit's tanh_6 numerator forms, vs the SCETlib points file projected to the
+fit gen grid (ptVGen 21 bins [0,44]+overflow, |Y|≤2.5). Plots via `make_projection_plot`. Runs
+CPU in the container. Outputs: `~/public_html/alphaS/260702_2D_l6nu0p01_l60p01_nowall/`
+(`…_ptZ.png` absolute, `…_ptZ_shape.png` shape-normalized).
+
+**KEY GOTCHA — the "points" file is DIFFERENTIAL, not bin-integrated.** Unlike the "fine"
+*spectrum* correction-input pkl (raw sum over |Y|≤2.5,Q∈[60,120] ≈ 1347 pb = physical σ, which
+`_merge_matrix`/`resum_from_correction` plain-sums), this points file stores d³σ/(dQ dY dqT)
+sampled on a fine grid (raw sum ≈ 168k). So it must be width-INTEGRATED (∫v·ΔQ·ΔY·ΔqT), with Q
+clipped to [60,120] and |Y| to ≤2.5, and qT folded into ptVGen by center-membership (0.1-GeV
+source bins). `read_scetlib_hist` returns it as-is (no width weighting); `makeAbsHist(…,'Y')`
+also FAILS here because the Y grid is centered on 0 (0 is a sample, edges ±0.05) → sum signed-Y
+|center|≤2.5 instead (grid is Y-symmetric).
+
+**RESULT.**
+- **Shape (robust):** shape-normalized, the param model reproduces the SCETlib N3LL resum qT
+  spectrum to **~0.5–1.3 % through the resummation peak (qT ≲ 30 GeV)**; mean-abs dev over all
+  21 ptVGen bins = 2.0 %. Outliers: the lowest-qT **[0,1] GeV bin is +10 %** (model high), and
+  the coarse high-qT bins (ptVGen ≳ 30, incl. the [37,44]/overflow) are ±3–5 % (partly real
+  high-qT resum drift, partly the center-membership rebin where the SCETlib qT grid coarsens to
+  0.4–1 GeV). The (model−corr) panel tracks the spectrum → the residual is multiplicative, not
+  an additive pedestal.
+- **Absolute normalization: NOT trustworthy from this file.** Σmodel/Σscetlib = 0.948 (model
+  ~5 % low), BUT the points file's **Q grid is too coarse to integrate the Breit-Wigner**:
+  dσ/dQ near the peak = (88→48, 89.75→186, **91→339**, 92.25→236, 94→55), and integrating it
+  gives 1429 (midpoint) / 1460 (cubic-spline) / 1501 (np.trapz) — a **±5 % ambiguity by itself**.
+  The qT-integral, by contrast, is method-insensitive (0.9999). So the ~5–7 % offset is dominated
+  by MY Q-integration of the coarse-Q differential file, not a reconstruction failure. The
+  trustworthy absolute check remains the λ_central "fine"-file triangulation (0.2 %, see the 2026-07-02
+  entry). To validate the absolute norm at the postfit tune one needs a bin-integrated *spectrum*
+  file (or a much finer Q grid), not this points file.
+
+**Physics read (integrated view).** At the postfit tune — which the point-mode diagnostics call
+"broken" (low-qT ringing, F_eff blow-up at |Y|>2.65; see [[physical-lambda]] / the fitpoint-breakdown
+note) — the integrated comparison tracks a direct SCETlib run to ~1 % in the qT SHAPE inside the fit
+acceptance (|Y|≤2.5, qT≲30), with a ~5 % absolute offset that is NOT interpretable (Q-integration
+ambiguity). But the integrated view is the wrong tool here — see the point-mode resolution below.
+
+### RESOLVED via POINT MODE (same day) — the reconstruction is essentially PERFECT at the postfit tune
+
+The right way to answer "does the reconstruction hold at the postfit tune?" is to **remove all
+integration** — exactly the btgrid-precision experiment-B logic (`point_mode_compare.py`). Tool:
+`compare_postfit_sigma_dense.py` (this dir). It reconstructs the param model's native
+`sigma_dense` = d³σ/(dQ dY dqT) at each bt-grid node BEFORE the Q-integral/|Y|-fold/qT-rebin
+(replicating `sigma_YqT_native` up to `sparse_to_dense_tf`) at the postfit λ, and compares it to the
+SCETlib points differential at the **(Q,Y,qT) nodes the two grids share EXACTLY** — no integration,
+no interpolation. The grids overlap generously: **14 shared Q (incl. the peak Q=91), 119 Y, 66 qT**.
+
+**Result (|Y|≤2.5, per-node param/SCETlib):**
+- **qT ≲ 16 GeV: ratio = 0.9996–1.0001, std ~1e-4 — agreement to ≈0.04 %.** qT≈24 → 0.998 (0.2 %).
+- Overall **median = 0.99975** (−0.025 %); the mean/std are meaningless (contaminated by qT≳48 nodes
+  where resum-only σ→0 and the ratio is 0/0 noise — physically irrelevant, resum-only is not a
+  prediction there).
+- Plot `sigma_dense_point_compare.png` (σ vs qT at Q=91,Y=0 overlays exactly; ratio flat at 1.000).
+- **Forward-Y spot check (Y=2, Q=91):** qT≤16 GeV mean 0.99991, range [0.99933, 1.00009] — i.e.
+  ~0.07 %, same as Y=0; wider spread only for qT 16–40 (resum-only σ falling). So the ~0.04 %
+  agreement is not special to Y=0, it holds across the acceptance. Plot `sigma_dense_point_compare_Y2.png`.
+
+NB on "no integration" (what the point check actually does): the bt-grid reconstruction still does
+the **bₜ (Hankel) integral** ∫dbₜ Iₚₑᵣₜ(bₜ)·F_eff(bₜ;λ)·J₀(bₜ qT) — that IS the resummation and is
+exactly where the NP form factors enter; it is unavoidable and is the thing being validated. What is
+skipped is the OUTER Q / qT / |Y| integration+rebin. SCETlib's node value likewise already contains
+its own internal bₜ integral. So the check = "our bₜ-integral+NP" vs "SCETlib's bₜ-integral+NP" at
+the same (Q,Y,qT) node and same λ — nothing else in between.
+
+**⇒ Conclusion. The ~5 % "offset" in the integrated comparison was ENTIRELY the coarse-Q points
+file's Breit-Wigner Q-integration artifact — NOT a reconstruction failure. Point-by-point, the
+bt-grid + on-the-fly NP (tanh_6, λ2<0, δλ2<0, λ6/λ6ν=0.01) reproduces the direct SCETlib run to
+~0.04 % through the resummation region at the fitted tune.** The λ_central triangulation (0.2 %,
+2026-07-02) and this postfit point-mode check (0.04 %) now BOTH confirm the reconstruction; the NP
+form (tanh_6), δλ2 and b\* conventions, and the on-the-fly F_eff/γ_ν all match SCETlib exactly even
+at the awkward postfit tune. LESSON: to compare against a SCETlib **points** file, compare at shared
+nodes (point mode) — never Q-integrate it (its Q grid can't resolve the BW; ±5 %).

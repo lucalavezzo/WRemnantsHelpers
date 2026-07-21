@@ -35,6 +35,11 @@ parser.add_argument(
     help="Open a specific, slash-separated, path inside the HDF5 file.",
 )
 parser.add_argument(
+    "--show-meta",
+    action="store_true",
+    help="Print the meta info, which is suppressed by default.",
+)
+parser.add_argument(
     "--show-git-diff",
     action="store_true",
     help="Print the (verbose) git_diff entries in the meta info, which are "
@@ -123,11 +128,13 @@ print(f"Fit result keys : {sorted(fitresult.keys())}")
 print(f"Meta data keys  : {sorted(meta.keys())}")
 print("=" * 80)
 
-suppress = set() if args.show_git_diff else {"git_diff"}
-for k, v in meta.items():
-    print()
-    print(f"### {k}")
-    print(fmt_meta(suppress_keys(v, suppress), indent=1))
+if args.show_meta:
+
+    suppress = set() if args.show_git_diff else {"git_diff"}
+    for k, v in meta.items():
+        print()
+        print(f"### {k}")
+        print(fmt_meta(suppress_keys(v, suppress), indent=1))
 
 if args.path:
     print()
