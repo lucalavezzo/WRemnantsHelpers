@@ -38,3 +38,38 @@ and run at most TWO SCETlib processes at once, or they abort with
 
 Outputs:
 `/ceph/.../scetlib_ad_caches/knot_scan/nak/*.json`.
+
+---
+
+## 2026-08-26 -- the FIVE-KNOT round (`fiveknot_*`)
+
+Everything named `fiveknot_*` plus `prepare_cache_5knot.py`,
+`run_cache_5knot.sh`, `configure_5knot.sh`, `incontainer_5knot.sh` belongs to
+the muF knot-COUNT round. Webdir
+`~/public_html/alphaS/260825_muf_five_knots/00_README.txt`; staged logbook entry
+in that session's tmp dir.
+
+| worktree | branch / commit | build dir |
+|---|---|---|
+| `/work/submit/lavezzo/alphaS/scetlib-5knot` | `muf-five-knots` `61123f2` | `build-5knot` |
+
+Off `eb60a04`, i.e. `near-anchor-knots`. `scetlib-cms`, `build-fix`,
+`build-knots`, `build-trans`, `build-nak`, `build-nakbase` were NOT touched.
+
+| file | what it answers |
+|---|---|
+| `fiveknot_interp_error.py` | 3 vs 5 knots against an EXACT runcard refill, both arms in ONE process off the same members |
+| `fiveknot_kappaF_error.py` | kappa_F BETWEEN the knots against a runcard refill -- the sharp test, since kappa_F = sqrt2 is a knot of one stencil only |
+| `fiveknot_closure.py` | the CorrZ closure A/B from ONE cache, via `set_muf_knots_used` |
+| `fiveknot_stencil_geometry.py` | where the transition-induced per-node shift sits relative to all three knot geometries. Arithmetic only |
+| `fiveknot_plot_stencil.py` | the mechanism figures from the above |
+| `prepare_cache_5knot.py` | `prepare_cache_for_card.py` with `MUF_NMEM` / `MUF_KNOT` overrides |
+
+**Two traps that cost time and would cost it again.**
+1. `ScetlibCachedXsecTF.values_and_jacobian` memoises on the PARAMETER VECTOR
+   alone. `set_muf_knots_used` is not in that key, so two arms evaluated back to
+   back at the same p return the FIRST arm's numbers for both -- a perfect null,
+   indistinguishable from "the change does nothing". `fiveknot_closure.py`
+   carries a hard guard against it (a kappa_F = sqrt2 probe that MUST separate).
+2. Any global the kernel reads must NOT be `thread_local`: `_stage_var_meta`
+   runs inside the TBB workers of `_ad_parallel_run`.

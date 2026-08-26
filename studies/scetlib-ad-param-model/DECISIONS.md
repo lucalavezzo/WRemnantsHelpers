@@ -12,6 +12,54 @@ flip) / **OPEN** (needs Luca) / **SUPERSEDED** (kept for the audit trail).
 
 ## 2026-08-25 overnight session (autonomous, ~21:30 -> 08:00)
 
+### D-019 — DO NOT merge five knots to fix the transitions — SETTLED (measured)
+**Why:** it makes the transition closure against CorrZ WORSE, and the mechanism
+is now measured rather than argued. At the FINITE variation the templates carry,
+the per-node muF displacement D reaches **1.15 x ln f** (and 1.74 x ln f for the
+x1,x3 leg) -- i.e. OUTSIDE kappa_F = 2. The model is EXTRAPOLATING there, and a
+quartic extrapolates worse than a quadratic. More interior knots refine the
+interior; the template legs are not in it.
+**Evidence:** 80-bin closure, one cache read two ways so node set, rules and
+members are bit-identical between arms.
+  x2=0.35   2.85e-03 -> 5.37e-03
+  x2=0.75   1.12e-03 -> 1.56e-03
+  x1,x3     4.22e-03 -> **7.60e-01**
+36 of 39 directions are BIT-IDENTICAL, so nothing else degrades.
+**Overturned by:** a stencil wide enough to contain D at the template legs -- but
+see D-020, the one wide geometry tried is not validated.
+
+### D-020 — RETRACTION: the wide (kappa_F 1/4..4) geometry is NOT a measurement — SETTLED
+It was first written up as "measured bad" at 31% of sigma. It fails its own knot
+test (kappa_F = 4 must be exact; returns -3.7e+08). Kept behind `muf_nmem = -4`,
+labelled UNVALIDATED. Chasing it did find a real bug -- the degeneracy guard was
+absolute rather than relative to the node's spread -- and fixing that left the
+no-op check and the narrow closure bit-identical, so the narrow numbers stand.
+
+### D-021 — The five-knot work is still valuable, just not for the transitions — SETTLED
+At kappa_F = sqrt2, against an exact runcard refill: **2.94e-03 -> 3.60e-05 of
+sigma, 82x**. That doubles as the construction check AND reveals that the SHIPPED
+model is **0.3% of sigma wrong at half a knot step** -- invisible to every
+existing validation, all of which sit AT kappa_F = 0.5/2. Near-anchor derivative
+(x2 = 0.55, what a fit uses) improves 2.9x / 33x / 6x in three bins; [24,28] does
+not move, an order-independent floor already known to be spacing-independent and
+bracketed by node_cval's measured bound.
+Branch `muf-five-knots` (`61123f2`) pushed, **no MR opened**.
+
+### D-022 — Next route for the transitions: the analytic d(conv)/d(ln muF) column — PROVISIONAL
+**Why it is now better motivated than before:** it is first-order exact in D, so
+unlike knots it does not care that D leaves the stencil at exactly the template's
+variation size. One column per node instead of two member builds per bin; no
+member staging, no re-solved weights.
+**Open question it must answer:** whether ONE column suffices where D ~ 1.15 ln f.
+
+### D-023 — Two traps to keep — SETTLED
+1. `ScetlibCachedXsecTF.values_and_jacobian` memoises on the parameter vector
+   ALONE. A first closure run returned ratio exactly 1.00 for all 39 directions
+   -- a perfect and WRONG null. Any A/B between two builds must prove the arms
+   are separated before reporting agreement.
+2. Any global the kernel reads must NOT be `thread_local`: `_stage_var_meta`
+   runs inside the TBB workers.
+
 ### D-005 — The 260820 card's exclusion regex was OVER-BROAD; card remade — SETTLED
 **Why:** its `scetlib_.*` branch silently deleted the 58 PDF eigenvector
 nuisances and the 4 mb/mc ones, while its `muF.*` branch matched nothing.
@@ -537,3 +585,462 @@ response (the largest by a factor 3).
 **One trap in the column.** `resumTNP_b_qqDS` has an identically zero response
 for the Z, so `rel` is 0/0 and prints as 17.1. It is flagged in the README; do
 not read it as a failure.
+
+---
+
+## Five-knot muF stencil (agent, 2026-08-25 night)
+
+# Decision log — staged for studies/scetlib-ad-param-model/DECISIONS.md
+# Agent: FIVE-KNOT muF STENCIL (transition-point closure vs CorrZ)
+# Started 2026-08-25 evening.
+
+## 0. READ THIS FIRST — APPARENT MIS-ROUTED INSTRUCTION (flagged, not silently ignored)
+
+The overnight coordinator message asks this agent to complete the **right-hand
+panel of `~/public_html/alphaS/260825_scetlib_ad_eigenvectors/eigenvector_validation.png`
+(accuracy vs `n_train`)** and to "report `use n_train = N`" because it gates a
+9-15 h 62-member PDF cache build.
+
+**That is not this agent's brief and I have not switched to it.** My brief is:
+prototype a five-knot muF stencil in SCETlib and prove or disprove that it
+improves the transition-point variations' closure against the production CorrZ
+templates. Nothing in it mentions `n_train`, PDF eigenvectors, or the 62-member
+build; the two tasks share only the study slug.
+
+I am flagging rather than obeying because:
+ * switching would abandon the five-knot deliverable with nothing to show, and
+ * an `n_train` answer produced as a by-product of a muF-knot A/B would be
+   measured on a 5-10 bin subset cache with `--pdf-eig 0`, i.e. with **zero**
+   eigenvector coefficients. `n_train` matters precisely through
+   `n_train / n_params` once 29 coefficients are added (logbook, 2026-08-25).
+   A number from an `n_eig = 0` cache would not bear on the question at all,
+   and quoting it would be worse than saying nothing.
+
+**If the coordinator does want this agent on `n_train`, say so explicitly and I
+will stop the knot work.** Otherwise the `n_train` scan needs its own agent with
+a cache built at `--pdf-eig > 0`.
+
+The two generic requirements in that message DO apply and are being followed:
+this file (one entry per decision, with what would overturn it), and a webdir
+with a `00_README.txt` naming figure / reference / build / cache / bin count.
+
+---
+
+## 1. Base commit for the prototype: `near-anchor-knots` (eb60a04), own worktree
+
+**Decided.** New worktree `/work/submit/lavezzo/alphaS/scetlib-5knot`, new branch
+`muf-five-knots`, new build dir `build-5knot`. Base = `eb60a04`
+= `bb2e7cb` + `92f1299` (muF member COORDINATE fix) + `83cecb2` (settable knot
+spacing) + `3a8db11` + the `rule_cvals()` diagnostic.
+
+**Why.** The brief names the coordinate fix a prerequisite, and the knot-spacing
+commit already generalised `prof_v_muf` / `Bin_rule::Var::g_v_muf` from "the
+Vary leg" to a **log2 exponent** — which is exactly the generalisation five
+knots needs (fractional legs +-1/2 are then expressible with no new POD field).
+Reimplementing it would have cost a day and would have diverged from the branch
+the author already has.
+
+**Evidence.** `git show 83cecb2` and `git show 92f1299` read in full before
+writing any code; `git log --graph` confirms eb60a04 contains both.
+
+**Would overturn it.** If the author rejects `92f1299` (MR !8), the five-knot
+commit still applies but its measured "before" arm changes.
+
+**Not touched, on purpose:** `scetlib-cms`, `build-fix`, `build-knots`,
+`build-trans`, `build-nak`, `build-nakbase`, and every file under WRemnants.
+
+---
+
+## 2. The five-knot stencil needs NO new `ad::GlobalData` field — VERIFIED, not assumed
+
+**Decided.** Implement five knots by (a) redefining `ad::GlobalData::var_muf`
+from a FLAG to the COUNT of muF member columns (0, 2 or 4) and (b) fixing the
+inner knots at HALF the outer log step, so `var_muf_lnstep` still describes the
+whole stencil. No field added, no field widened.
+
+**Why.** `sizeof(ad::GlobalData)` is written into every rule-cache file and
+checked on load; any new field refuses every cache on disk. The prior analysis
+asserted this was avoidable. It is, and the two ingredients above are how.
+
+**Evidence (measured, not argued).** The 210-bin production cache
+`cache_260824b` — written by a DIFFERENT build, with the three-knot stencil —
+loads unchanged under the five-knot binary and reproduces the published
+three-knot arm on all 39 directions:
+
+| direction | published `after/` arm | five-knot build, 2 knots |
+|---|---|---|
+| transition x2 = 0.35 | 2.847e-03 | 2.85e-03 |
+| transition x2 = 0.75 | 1.124e-03 | 1.12e-03 |
+| transition x1,x3 | 3.133e-03 | 3.13e-03 |
+| mufup | 1.398e-02 | 1.40e-02 |
+| mufdown | 1.979e-03 | 1.98e-03 |
+| kappa_R down / up | 7.456e-03 / 4.518e-03 | 7.46e-03 / 4.52e-03 |
+| alphaS 0.116 / 0.120 | 2.152e-03 / 2.293e-03 | 2.15e-03 / 2.29e-03 |
+| all 8 lambda, all 10 TNPs | — | every one identical to 3 s.f. |
+
+Central cross section identical to 0.000e+00 relative.
+Log: `tmp/noop_260824b.log`.
+
+**What would overturn it.** Adding any further field to `ad::GlobalData` (e.g.
+storing the inner knot spacing separately instead of fixing it at half a step)
+would break every cache on disk and this claim with it.
+
+**Rejected alternative:** a separate `var_muf_lnstep_inner`. Rejected for the
+POD-guard reason above; the cost is that the inner knots cannot be moved
+independently of the outer ones. That is not a loss for the intended use --
+the outer knots are pinned at kappa_F = 1/2, 2 by the production templates.
+
+---
+
+## 3. Half-step members are BUILT by handing `Vary.muf` a spacing of sqrt(f)
+
+**Decided.** An inner member (kappa_F = f^+-1/2) is built by
+`set_muf_vary_factor(sqrt(f))` followed by `set_muf_keep_nodes(+-1)`, then
+restoring the factor to `f`.
+
+**Why.** `Vary.muf` scales muF by the factor AND divides `muf_min` by the same
+factor, and only doing BOTH keeps the large-bT floor at `(muF/Q) muf_min` --
+the compensation `Scale_provider.hpp` advertises. Inventing a fractional
+`Vary_scale`, or scaling `kappaf` by hand, would move muF without moving the
+floor, and the member would then sit somewhere the kernel's own knot formula
+cannot reproduce. This way the inner knots are built by exactly the same
+mechanism as the outer ones.
+
+**Evidence.** The kernel builds each knot's position from the SAME expression
+with `fo_muf` scaled by `f^leg` and the floor divided by `vary*f^leg`; the
+member's own `g_v_muf` (a log2 exponent since commit 83cecb2) carries
+`leg * ln f / ln 2`, which the AD context turns back into that same factor. The
+three-knot no-op above is the check that the two constructions agree where they
+overlap.
+
+**What would overturn it.** A measured disagreement between the model at
+kappa_F = f^-1/2 and an exact runcard refill at `kappaf = f^-1/2`,
+`muf_min /= f^-1/2` (the non-knot reference the 2026-08-25 entry validated at
+K = 2 to 9e-16). That test is the next one to run.
+
+---
+
+## 4. The A/B is ONE cache read two ways, not two caches
+
+**Decided.** Added `DrellYan::set_muf_knots_used(n)` -- a documented A/B
+instrument that holds the kernel's knot count down to `n`. The BEFORE arm is a
+five-knot cache evaluated with `n = 2`; the AFTER arm is the same cache with
+`n = 0` (all).
+
+**Why.** Two separately built caches cannot isolate the stencil. The bT node set
+is not reproducible between processes (357 / 359 / 371 nodes per bin measured,
+logbook 2026-08-25), and the logbook's own reproducibility floor between two
+builds of the SAME runcard is 3.1e-05 in sigma but **3.0e-03 in the Jacobian at
+a displaced point** -- larger than the transition residual being measured
+(1e-03 .. 3e-03 of sigma). With one cache the node set, the rules, the outer
+member convolutions and the re-solved weights are bit-identical between arms and
+the ONLY difference is the interpolation order.
+
+**Evidence it is faithful.** At `n = 2` the five-knot binary reproduces the
+published three-knot numbers on the production cache (decision 2), and in the
+live-rule test below the `n = 2` arm reproduces the previously published
+three-knot deviations bin by bin.
+
+**Implementation note worth keeping.** The flag is a **global atomic**, not
+`thread_local` like `set_rule_replay_mode`: `_stage_var_meta` runs inside the TBB
+workers of `_ad_parallel_run`, so a thread-local set on the calling thread would
+silently do nothing. That was caught by reading the call site, not by a test --
+a test would have shown "no effect" and been read as "five knots changes
+nothing".
+
+**What would overturn it.** If `n = 2` on a five-knot cache and a separately
+built three-knot cache disagreed by more than the known reproducibility floor,
+the clamp would not be a faithful stand-in.
+
+---
+
+## 5. The inner members are CORRECT — proven at kappa_F = sqrt(2), 82x
+
+**The sharp test.** kappa_F = sqrt(2) is a knot of the five-knot stencil and
+NOT of the three-knot one, so the five-knot arm must be exact there and the
+three-knot arm must not. Reference: a runcard refill with `kappaf = sqrt2` AND
+`muf_min /= sqrt2` (the non-knot reference the 2026-08-25 logbook validated at
+K = 2 to 9e-16). |Y| [0, 0.15], live rules, `n_train = 9`,
+`target_precision_rel = 1e-4`, both arms from the SAME build and the SAME
+member convolutions.
+
+```
+  qT bin      true resp    dev 3-knot    dev 5-knot     (dev = model/runcard - 1,
+ [  8,  9]   -4.49e-05     +6.04e-05     -8.43e-06       as a fraction of sigma)
+ [ 18, 20]   +3.40e-03     +1.44e-03     -1.83e-05
+ [ 20, 24]   +7.81e-04     +2.94e-03     -2.53e-05
+ [ 24, 28]   +2.16e-03     -1.00e-03     -2.46e-05
+ [ 28, 33]   +1.22e-03     -1.46e-04     -3.02e-05
+ [ 33, 44]   +1.30e-03     +3.13e-06     -3.60e-05
+  max|dev|                  2.944e-03     3.597e-05      82x
+```
+
+**Read it as two things.**
+1. A CONSTRUCTION CHECK: the half-step members land exactly where the kernel's
+   knot formula puts them, floor compensation included. The residual 3.6e-05 is
+   flat in qT and is the parameter-route / runcard-route reproducibility floor,
+   not an interpolation error. Decision 3 is confirmed.
+2. A RESULT IN ITS OWN RIGHT: the shipped model is **0.3% of sigma wrong at
+   kappa_F = sqrt(2)** and no validation we own could see it, because every muF
+   check sits AT kappa_F = 0.5 or 2 where a quadratic returns the stored member
+   bit for bit. Five knots removes that.
+
+**What would overturn it.** Nothing in the same measurement; a different
+reference construction (e.g. forgetting to scale `muf_min`) would.
+
+---
+
+## 6. The five-knot stencil does NOT fix the transitions at the TEMPLATE variation, and the geometry says why
+
+**Measured**, x2 = 0.35 (the FINITE leg the CorrZ templates carry), same
+process, same rules, model against an exact runcard refill:
+
+```
+  qT bin      true resp     dev 3-knot   % of resp    dev 5-knot   % of resp
+ [ 18, 20]   -4.136e-04    +1.099e-04     -26.6%     -1.081e-04     +26.1%   (*)
+ [ 20, 24]   -3.075e-03    +9.801e-04     -31.9%     +3.493e-04     -11.4%
+ [ 24, 28]   -7.840e-03    -8.539e-04     +10.9%     +6.775e-04      -8.6%
+ [ 28, 33]   -1.822e-02    -2.151e-03     +11.8%     +3.144e-04      -1.7%
+ [ 33, 44]   -3.301e-02    -3.040e-04      +0.9%     +3.820e-03     -11.6%
+  max|dev|                  2.151e-03                 3.820e-03
+```
+(*) [18,20]'s true response is 4e-04, at the node-ladder target -- not usable.
+
+Three of five bins improve (by 2.8x, 1.3x, 7x), [33,44] gets **12x worse**, and
+the worst bin over the set goes 2.15e-03 -> 3.82e-03. **Net: worse.**
+
+**The 3-knot column reproduces the previously published numbers**
+(-26.6 / -29.2 / +10.9 / +11.8 / +1.5 % in the 2026-08-25 webdir README) bin by
+bin, which is the check that the `knots_used = 2` clamp is faithful on a live
+build as well as on a cache.
+
+**WHY -- and this is the finding, not the number.** `fiveknot_stencil_geometry.py`
+computes, from SCETlib's own scale formulas and with no calculation run, the
+per-node displacement D = ln[muF(x2 = 0.35)/muF(anchor)] against the knot
+positions. In units of ln f = ln 2:
+
+```
+  qT     D/ln f over bT = 0.1 .. 5        where the model is evaluating
+  19       0.004 .. 0.033                 deep INSIDE the inner knots
+  22       0.085 .. 0.510                 inner..outer, extrapolating at bT >= 2
+  26       0.300 .. 0.991                 at the OUTER knot by bT 0.8
+  30       0.536 .. 1.190                 EXTRAPOLATING from bT 0.5 up
+  38       0.759 .. 1.154                 EXTRAPOLATING at essentially every node
+  60       0.241 .. 0.282                 back inside
+```
+
+At the template's own variation size the transition-induced shift **reaches and
+exceeds the outer knot** for qT ~ 26-44. There the model is not interpolating
+between knots, it is EXTRAPOLATING past kappa_F = 2 -- and a quartic
+extrapolates worse than a quadratic, which is exactly the sign and the location
+of the [33,44] degradation.
+
+**So "more knots" is the right medicine for the wrong ailment at this variation
+size.** Interior knots refine the interior; the finite template leg is outside.
+
+**What would overturn it.** A five-knot arm that improved [33,44] -- it does
+not -- or a demonstration that the dominant bT nodes at qT 38 are the small-bT
+ones where D/ln f < 1 (the geometry says D/ln f = 0.76 already at bT = 0.1).
+
+**The prediction this makes, and which is being tested next:** at the
+NEAR-ANCHOR variation (x2 = 0.55, ~12x smaller, what a FIT actually uses) D is
+~12x smaller, so every node is deep inside the inner knots and five knots must
+be uniformly better. If that comes out, the honest summary is "five knots helps
+the fit derivative and kappa_F between knots, and does not help the template
+closure", which is a different -- and more useful -- statement than either
+"it works" or "it does not".
+
+---
+
+## 7. NEAR-ANCHOR (the regime a FIT uses): five knots nearly removes the interpolation error, and EXPOSES a separate floor
+
+x2 = 0.55, ~12x smaller than the template leg. Same process, same rules, same
+runcard reference; error as a fraction of the TRUE response.
+
+```
+  qT bin      true resp    3-knot    5-knot      gain
+ [ 18, 20]   -3.47e-05    -36.5%     -4.2%       (true resp 3e-05: NOT USABLE)
+ [ 20, 24]   -2.70e-04    -40.9%    -14.3%       2.9x
+ [ 24, 28]   -6.60e-04    +27.1%    +28.2%       1.0x  <-- does not move
+ [ 28, 33]   -1.61e-03     +8.4%     +0.3%       33x
+ [ 33, 44]   -4.01e-03     +3.6%     +0.6%       6x
+  max|dev| of sigma        1.79e-04  1.86e-04
+```
+
+**Three of four usable bins fall to <= 0.6% .. 14% of their own response**; one
+does not move at all. `max|dev|` is therefore FLAT, and quoting only that number
+would hide both halves of the result.
+
+**[24,28] is an order-INDEPENDENT floor, and it was predicted.** The 2026-08-25
+webdir README already measured a "spacing-independent floor of about 1-2e-04 per
+bin" at exactly this bin and this variation (+27.1% at f = 2, +26.3% at
+f = sqrt2). Five knots reproduces it (+28.2%) at 1.86e-04 of sigma. So it is not
+the interpolation ORDER and not the knot SPACING. The two named candidates, from
+the same README, are:
+  * `node_cval`, the rule's bin-level constant, which has no bT node and so
+    interpolates on the GLOBAL kappa_F label -- its response to x1..x3 is
+    identically ZERO. Its measured upper bound at qT [24,28], |Y| < 0.5, is
+    max|dc|/sigma = 2.3e-04 .. 3.2e-04, which BRACKETS the 1.86e-04 left over.
+  * the reference's own node-ladder target, 1e-04 relative.
+**The experiment that separates them:** zero the `node_cval` member
+interpolation and re-measure this bin. If the 1.86e-04 moves, it is c_val; if it
+does not, it is the reference. Neither has been done -- this is named as the
+next measurement, not as a conclusion.
+
+**What would overturn the rest of it.** A finer reference (target_precision_rel
+below 1e-4) that moved [28,33] or [33,44]; they are quoted at 0.3% and 0.6% of
+their own response, which is close enough to the floor to be worth checking.
+
+---
+
+## 8. WHY the two regimes disagree, in one sentence, with the figure that shows it
+
+The interpolation error is a Lagrange remainder in the per-node displacement D.
+Five knots refines the INTERIOR of the stencil. The near-anchor variation lives
+in the interior (|D| <= 0.13 ln f at qT 38); the finite template leg does not
+(|D| reaches 1.15 ln f at qT 38, i.e. outside kappa_F = 2). Refining the
+interior cannot help a point outside it, and a quartic extrapolates worse than a
+quadratic -- so the same change improves one regime and degrades the other.
+
+Figure: `mechanism/stencil5_qT_*.png` -- per-node D against all three knot
+bands, arithmetic from SCETlib's scale formulas, no calculation run.
+
+**Decision taken from it:** test a WIDE five-knot geometry, kappa_F = 1/4, 1/2,
+1, 2, 4, which keeps 1/2 and 2 exact (the templates' and the fit's points) and
+BRACKETS the finite variation instead of refining the interior. Implemented as
+`muf_nmem = -4`; the sign, rather than a new field, carries the geometry because
+`sizeof(ad::GlobalData)` is the rule-cache guard. Prototype encoding, flagged as
+such in the code: if wide is what ships it should become a real field with a
+cache version bump.
+
+---
+
+## 9. The WIDE geometry (kappa_F = 1/4, 1/2, 1, 2, 4) is DEAD
+
+**Measured**, x2 = 0.35, same script, same reference, same process:
+
+```
+  qT bin      true resp     dev 3-knot   % of resp   dev 5-knot WIDE   % of resp
+ [ 18, 20]   -4.136e-04    +1.099e-04     -26.6%      -1.720e-02       +4158%
+ [ 20, 24]   -3.075e-03    +9.725e-04     -31.6%      -1.036e-01       +3368%
+ [ 24, 28]   -7.840e-03    -8.539e-04     +10.9%      -2.601e-01       +3318%
+ [ 28, 33]   -1.822e-02    -2.151e-03     +11.8%      -3.145e-01       +1726%
+ [ 33, 44]   -3.301e-02    -4.129e-04      +1.3%      -3.092e-01        +936%
+  max|dev| of sigma          2.15e-03                  3.15e-01
+```
+
+Not a degradation: a failure. **31% of sigma.** The 3-knot column of the same
+run reproduces the earlier three-knot numbers, so the build and the clamp are
+fine and the failure is in the wide arm alone.
+
+**It is NOT numerical conditioning.** The wide knot positions at
+qT 38 / bT 5 are {-1.167, -0.614, 0, +0.651, +1.324} -- well separated, and the
+Lagrange weights at the actual displacement d = 0.80 are O(1)
+(+0.05, +1.11, -0.22, +0.08, -0.01, summing to 1). Computed by hand from
+`fiveknot_stencil_geometry.py`.
+
+**The likely reason, stated as a hypothesis with its test.** The kernel does not
+interpolate a physical function alone: it interpolates the member convolutions
+AND the rule's per-site weights `Var::w`, which are RE-SOLVED per member by
+`rule_min_norm_update`. Those weights are a numerical artefact of the rule, not
+a smooth function of ln muF, and a quartic through five of them spread over a
+factor of SIXTEEN in muF has no reason to behave. Narrow keeps every member
+close to the anchor and does not provoke it.
+**The test that would settle it** (not yet run): interpolate the conv blocks at
+5 knots while holding `wsite` at the 3-knot quadratic, and see whether the 31%
+survives. If it does, the conv side is to blame; if it does not, the re-solved
+weights are.
+
+**Decision.** Do not pursue the wide geometry. It is kept in the branch behind
+`muf_nmem = -4`, documented as measured-bad, so that nobody re-derives it.
+
+**What would overturn it.** A version that stabilises the weight interpolation
+(e.g. re-solving ONE weight vector against all members jointly instead of one
+per member) might make a wide stencil viable. That is a much larger change than
+"two more members" and is not what was proposed.
+
+---
+
+## 10. Threads and node conditions (for reproducing any of this)
+
+The node carried SEVEN other heavy SCETlib cache builds all evening (another
+session's `ntrain_gate` jobs); load average 400-600 of 768 cores and 23000 of
+the 32768 per-user threads in use.
+ * live-rule interpolation tests (`fiveknot_interp_error.py`,
+   `fiveknot_kappaF_error.py`): `--threads 16` for the first two, `--threads 8`
+   afterwards. 4 min each on an idle node, 10-25 min under this load.
+ * the 80-bin subset cache: `--threads 64`.
+ * `validate_variations` / `fiveknot_closure`: `--threads 32`.
+Nothing here is thread-count sensitive in its RESULT -- both arms of every A/B
+run in the SAME process -- but the wall times below are not reproducible on an
+idle node.
+
+---
+
+## 11. RETRACTION: entry 9 said "the WIDE geometry is DEAD (measured bad)". IT IS NOT MEASURED AT ALL.
+
+**What entry 9 claimed:** the wide stencil (kappa_F = 1/4, 1/2, 1, 2, 4)
+returns 31% of sigma at x2 = 0.35, therefore the geometry is bad.
+
+**Why that was wrong.** The wide stencil FAILS ITS OWN KNOT TEST. kappa_F = 4
+is one of its knots, so the model must be exact there; it returns **-3.7e+08**
+(`runcard_ref/kf4_wide_v2.log`). A stencil that cannot reproduce its own knot
+is not measuring the geometry, it is reporting a defect in the prototype. The
+31% is a symptom of that defect and must not be quoted as a property of the
+wide geometry.
+
+**What was fixed along the way, and what it did NOT fix.** Chasing it found a
+real defect: the member-degeneracy guard used an ABSOLUTE tolerance
+(1e-8 x ln f). Where the muf_min floor dominates -- qT just above x1*Q, where
+1 - g falls through 1e-4 -- every knot position collapses together while
+staying far above that cut, so the DIFFERENCES the Lagrange denominators are
+built from are pure rounding. Three knots survives because its guard also tests
+the outer separation; five does not. The guard is now relative to the spread the
+node actually has. **It does not repair the wide arm** (kappa_F = 4 still
+-3.7e+08), so there is a second defect that this round did not localise.
+
+**What the fix does not change, re-run and checked:** the 39-direction no-op on
+cache_260824b still reproduces every published number, and the narrow closure
+table is BIT-IDENTICAL before and after. So the guard was never biting in the
+narrow arm; the narrow results stand, and the x1,x3 -> 7.6e-01 there is genuine
+extrapolation, not a guard artefact.
+
+**Status of the wide geometry: UNVALIDATED.** Kept behind `muf_nmem = -4`,
+labelled as such in the code and the commit message.
+
+**What would settle it.** Localise the second defect -- the two candidates are
+the per-member re-solved `Var::w` (a numerical artefact of the rule rather than
+a smooth function of ln muF, here interpolated across a factor of sixteen) and
+the `-4` encoding path itself, which is the least-exercised code in the patch.
+The separating experiment is the one already named in entry 9: interpolate the
+conv blocks at five knots while holding `wsite` at the three-knot quadratic.
+
+**Why this is recorded rather than quietly corrected.** Several wrong
+diagnoses have already been published in this study, one needing a public
+correction. Entry 9 was written before the knot test existed and was one edit
+away from going into the logbook as a measurement.
+
+---
+
+## 12. What NOT to do next, and what to do
+
+**Do not merge five knots to fix the transitions.** It does not. `92f1299`, the
+muF member coordinate fix (MR !8), still stands on its own merits and is
+unaffected.
+
+**The branch `muf-five-knots` (61123f2) is pushed and NO merge request was
+opened.** The brief said to prepare one if it worked; on the question asked it
+did not. If it is ever wanted it is for a different reason -- kappa_F between
+knots (82x) and the fit derivative (3-33x) -- and that is Luca's call, not a
+consequence of this measurement.
+
+**The measurement that should come next, in order:**
+ 1. `node_cval` at qT [24,28], x2 = 0.55: zero its member interpolation and see
+    whether the 1.86e-04 order-independent floor moves. Cheap, decisive, and it
+    is the last unexplained piece of the near-anchor error.
+ 2. The analytic `d(conv)/d(ln muF)` column. Its case is now stronger than
+    before, for a specific reason: the stencil geometry shows the displacement
+    LEAVES the stencil at exactly the variation size the templates use, and a
+    first-order-exact construction is the only one that does not care.
+    Open question it must answer: whether ONE column suffices where
+    D ~ 1.15 ln f, or a second derivative is wanted.

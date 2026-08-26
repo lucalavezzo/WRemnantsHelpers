@@ -62,6 +62,21 @@ def main():
           f"({int((~cover).sum())} excluded)")
     anchor = core.anchor.copy()
 
+    def set_arm(used):
+        """Select the muF stencil AND drop the value cache.
+
+        THE TRAP: ScetlibCachedXsecTF.values_and_jacobian memoises on the
+        PARAMETER VECTOR alone (scetlib_tf.py, `self._cache_key = p.tobytes()`).
+        The knot count is not part of that key, so evaluating the two arms
+        back to back at the same p returns the FIRST arm's numbers for both --
+        and the A/B then shows a perfect null, which is exactly what a
+        no-effect change would show. Caught here by the kappa_F = sqrt(2)
+        probe, which must differ between the arms and did not.
+        """
+        scetlib_qT.DrellYan.set_muf_knots_used(used)
+        core.tf_fn._cache_key = None
+        core.tf_fn._hess_cache_key = None
+
     def model(overrides):
         p = anchor.copy()
         for k, val in overrides.items():
@@ -75,7 +90,7 @@ def main():
     ARMS = ((2, "knots3", "3-knot (shipped)"), (0, "knots5", "5-knot"))
     cen = {}
     for used, tag, _ in ARMS:
-        scetlib_qT.DrellYan.set_muf_knots_used(used)
+        set_arm(used)
         cen[tag] = model({})
     # The anchor must be identical: at the anchor every member weight is zero
     # and the interpolant returns the stored central. If this is not ~0 the
@@ -83,6 +98,22 @@ def main():
     dcen = np.nanmax(np.abs(cen["knots5"] / cen["knots3"] - 1.0))
     print(f"   central 5-knot/3-knot - 1, max over bins: {dcen:.3e} "
           f"(must be ~0: the anchor is not interpolated)")
+    # LIVE CHECK that the two arms really are two arms. kappa_F = sqrt(2) is a
+    # knot of the five-knot stencil only, so the arms MUST differ there; if they
+    # do not, the value cache (see set_arm) is serving one arm's numbers to both
+    # and every number below would be a spurious null.
+    probe = {}
+    for used, tag, _ in ARMS:
+        set_arm(used)
+        probe[tag] = model({"scale_kappa_F": float(np.sqrt(2.0))}) / cen[tag]
+    sep = float(np.nanmax(np.abs(probe["knots5"] / probe["knots3"] - 1.0)))
+    print(f"   ARM SEPARATION probe, kappa_F = sqrt(2): "
+          f"max|5-knot/3-knot - 1| = {sep:.3e}")
+    if not sep > 1e-6:
+        raise SystemExit(
+            "the two arms are identical at kappa_F = sqrt(2), which is a knot "
+            "of one stencil and not the other. The clamp or the value cache is "
+            "not doing what this script assumes; refusing to report a null.")
 
     overlay = args.overlay
     if overlay is None:
@@ -120,7 +151,7 @@ def main():
             rr1 = ref(L).sum(axis=0) / r_cen.sum(axis=0)
             per_arm = {}
             for used, tag, _ in ARMS:
-                scetlib_qT.DrellYan.set_muf_knots_used(used)
+                set_arm(used)
                 s_var = model(ov)
                 rm = s_var / cen[tag]
                 good = np.isfinite(rm) & np.isfinite(rr) & (rr != 0) & cover
