@@ -3329,3 +3329,8 @@ tested this way without rebuilding the nodes.
 
 ## Response-matrix gen binning (agent, 2026-08-26)
 
+
+---
+
+## PDF62 cache validation (agent, 2026-08-26)
+

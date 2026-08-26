@@ -35,10 +35,20 @@ import numpy as np  # noqa: E402
 
 from wums import output_tools, plot_tools  # noqa: E402
 
+# wums pulls in the CMS mplhep style, whose default font sizes are tuned for a
+# single-panel paper figure and clip the axis labels of these dense summary
+# panels. Scaled down here rather than by shortening the labels into jargon.
+matplotlib.rcParams.update({
+    "font.size": 10, "axes.labelsize": 11, "axes.titlesize": 10,
+    "xtick.labelsize": 9, "ytick.labelsize": 9, "legend.fontsize": 8,
+})
+
 ap = argparse.ArgumentParser()
 ap.add_argument("--npz", required=True)
 ap.add_argument("--valtable", required=True, help="parsed validate_variations table (tsv)")
-ap.add_argument("--p4table", required=True, help="published n_eig=0 p4 table (tsv)")
+ap.add_argument("--reftable", required=True,
+                help="n_eig=0 reference table (tsv): label, max|dev|, mean|dev|")
+ap.add_argument("--reflabel", default="n_eig=0 reference")
 ap.add_argument("--outdir", required=True)
 a = ap.parse_args()
 os.makedirs(a.outdir, exist_ok=True)
@@ -57,7 +67,7 @@ def read_tsv(p):
 
 
 val = read_tsv(a.valtable)
-p4 = read_tsv(a.p4table)
+p4 = read_tsv(a.reftable)
 _PDF = re.compile(r"^pdf(\d+)$")
 eig = {k: v for k, v in val.items() if _PDF.match(k)}
 oth = {k: v for k, v in val.items() if not _PDF.match(k)}
@@ -77,17 +87,22 @@ fig, ax = plt.subplots(figsize=(9.0, 5.0))
 xs = np.arange(len(tags))
 ax.semilogy(xs, da, "o", ms=4, color="#5790fc", label="58 PDF eigenvector members, all qT")
 ax.semilogy(xs, dq, "s", ms=4, color="#e42536", label="same, qT > 1 GeV")
+# b_qqDS has an identically zero response for the Z (D-016), so its residual is
+# 2.2e-16 and would stretch the band over twelve decades. Excluded from the band.
 ov = np.array([v[0] for v in oth.values()])
-ax.axhspan(ov.min(), ov.max(), color="0.85", zorder=0,
-           label=f"span of the {len(ov)} non-PDF directions ({ov.min():.0e}..{ov.max():.0e})")
-ax.axhline(np.median(ov), color="0.4", ls=":", lw=1)
-ax.set_xticks(xs[::2])
-ax.set_xticklabels([t.replace("eig", "") for t in tags][::2], rotation=90, fontsize=6)
+ovn = ov[ov > 1e-8]
+ax.axhspan(ovn.min(), ovn.max(), color="0.88", zorder=0,
+           label=f"span of the {len(ovn)} non-null non-PDF directions "
+                 f"({ovn.min():.1e}..{ovn.max():.1e})")
+ax.axhline(np.median(ovn), color="0.4", ls=":", lw=1,
+           label=f"their median ({np.median(ovn):.1e})")
+ax.set_ylim(1e-5, 4e-2)
+ax.set_xticks(xs[::4])
+ax.set_xticklabels([t.replace("eig", "e") for t in tags][::4], rotation=90, fontsize=6)
 ax.set_xlabel("PDF eigenvector member (index + up/dn)")
-ax.set_ylabel(r"max$|\sigma^{\rm model}_{\rm var}/\sigma^{\rm model}_{\rm cen}\,/\,"
-              r"(\sigma^{\rm tmpl}_{\rm var}/\sigma^{\rm tmpl}_{\rm cen}) - 1|$")
+ax.set_ylabel("max |model response / template response " + chr(8722) + " 1|")
 ax.grid(alpha=0.3)
-ax.legend(fontsize=7, loc="upper left")
+ax.legend(fontsize=7, loc="lower left", ncol=2)
 fig.tight_layout()
 save(fig, "eig_vs_template", {
     "what": "worst-bin closure of each PDF eigenvector member against its template",
@@ -144,7 +159,7 @@ fig, axs = plt.subplots(1, 2, figsize=(11.0, 4.4))
 axs[0].bar(np.arange(len(nrm)), nrm, color="#5790fc")
 axs[0].set_yscale("log")
 axs[0].set_xlabel(r"eigenvector index $e$")
-axs[0].set_ylabel(r"$\|\partial\sigma/\partial c_e\|_2$ over the 210 gen bins")
+axs[0].set_ylabel(r"$\|\partial\sigma/\partial c_e\|_2$ (210 gen bins)")
 axs[0].grid(alpha=0.3)
 axs[0].set_title(f"weakest / strongest = {nrm.min()/nrm.max():.2e}", fontsize=9)
 Cd = C.copy()
@@ -189,16 +204,16 @@ for k, x_, y_ in zip(common, xv, yv):
                     xytext=(3, 3), textcoords="offset points")
 ax.set_xlim(lo, hi)
 ax.set_ylim(lo, hi)
-ax.set_xlabel(r"max$|$dev$|$, published $n_{\rm eig}=0$ cache (cache_260825_p4)")
-ax.set_ylabel(r"max$|$dev$|$, this 62-member cache ($n_{\rm eig}=29$)")
+ax.set_xlabel("max|dev|, " + a.reflabel)
+ax.set_ylabel(r"max$|$dev$|$, this 62-member cache ($n_{\rm eig}=29$, $P=53$)")
 ax.grid(alpha=0.3, which="both")
 ax.legend(fontsize=7, loc="upper left")
 fig.tight_layout()
 r = yv / np.where(xv == 0, np.nan, xv)
-save(fig, "other39_vs_p4", {
+save(fig, "other39_vs_neig0", {
     "what": "the non-PDF directions: does turning the eigenvectors ON "
             "perturb anything already signed off",
-    "x": "cache_260825_p4, 210 bins, n_eig=0, P=24, target_precision_rel 1e-3",
+    "x": a.reflabel,
     "y": "pdf62_260826/merged_full, 210 bins, n_eig=29, P=53, same runcard base",
     "NOT an A/B in one process": "two INDEPENDENTLY built caches; the builder "
         "is not node-reproducible, and the measured floor between two builds of "
