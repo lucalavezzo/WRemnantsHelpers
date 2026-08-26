@@ -5052,3 +5052,32 @@ Cost: 32:17 wall, 21.7 GB peak, -j 160, 289 M events, 90.4 MB out; the flag
 itself is +1.9% wall.
 
 Two attributions closed, one of them a retraction -- see D-039 and D-040.
+
+### 2026-08-26 -- the 62-member PDF eigenvector cache is VALIDATED and DELIVERED
+
+Write-up, figures, tables and raw logs:
+`~/public_html/alphaS/260826_scetlib_ad_pdf62_validation/` (`00_README.txt`,
+`01_TABLES.txt`). Decisions D-042..D-048. NB the agent reported staging paste
+files that were not on disk, so this entry was written from its report and the
+webdir is the primary record.
+
+Cache: `/ceph/.../scetlib_ad_caches/pdf62_260826/merged_full/` -- 210 gen bins x
+62 members, 2288.8 MB, built as 21 bin shards overnight and merged this morning.
+SCETlib snapshot md5 0c5dd7a92fea9e2ad0cb81639e9689a2 (`near-anchor-knots`
+eb60a04, the only tree with both 92f1299 and `_rule_is_matched`).
+
+Gate passed: Hessian symmetry and fold sum rule exactly 0.00e+00, FD worst
+8.14e-07, anchor bit-identical, sum(sigma) 670.01137.
+
+All 58 eigenvector directions close at 4.02e-04..2.43e-03 (median 9.03e-04) --
+better than 8 of the 39 directions already signed off. No convention factor on
+either side, and the model reproduces CT18Z's pair asymmetry to 3-8%, so the
+closure discriminates rather than being tautological.
+
+**The physics finding: 29 eigenvectors carry ~2.76 EFFECTIVE shapes on this
+observable.** They are orthogonal in PDF space, not in the space of (qT,|Y|)
+Z-spectrum responses. Fit remains well-posed via the priors, but per-eigenvector
+postfit values are not measurements -- quote the total PDF impact.
+
+Fit-readiness: warm value+jacobian 421 ms at P=53, Hessian 68.9 s, peak resident
+48.7 GiB. Member count is free; memory is the constraint on concurrency.

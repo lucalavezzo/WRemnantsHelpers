@@ -241,6 +241,79 @@ grid splits BOTH expensive fixed-order qT cells ([0,1] and [44,100]).
 replace the bracket with a measurement. Also the strongest argument yet for
 fixing the member-loop barrier rather than sharding around it.
 
+### D-042 — The 62-member production cache PASSES and is DELIVERED — SETTLED
+Hessian symmetry exactly **0.00e+00** at (210,53,53); fold sum rule exactly
+**0.00e+00**; FD-vs-analytic worst **8.14e-07**; anchor re-evaluation
+bit-identical. `sum(sigma) = 670.01137`, 1.9e-07 from the number D-025 used to
+validate `rel 1e-3` -- so that tolerance decision is reconfirmed on the
+production artefact.
+The warned-of `pdf_eig0` FD failure **did not occur** (8.14e-07 OK vs 2.97e-04
+FAIL on the 4-bin cache): the summed derivative is -0.699 here against 3.4e-04
+there, 2000x larger against the same round-off floor. Step-size scan gives the
+textbook V with truncation rising **exactly as h^2**; a wrong gradient is flat.
+Merge re-validated in three separate processes: merged-restricted-to-one-ptV-bin
+equals that shard to all 12 digits in value AND Jacobian, at the anchor AND at a
+point moving all 29 eigenvectors, with the three totals differing (not a
+memoisation collision).
+
+### D-043 — The PDF response closes, better than most of what we already accepted — SETTLED
+All 58 eigenvector directions, full grid: **4.02e-04 … 2.43e-03, median
+9.03e-04**; above qT 1 GeV, 2.05e-05 … 8.23e-04. On the SAME cache the 39
+signed-off directions run to 1.40e-02, median 7.14e-04, and **8 of them are worse
+than the worst of the 58**. Above qT 16 GeV all 58 close to <= 1.67e-05 while the
+transitions still sit at 2.50e-03.
+The earlier "~1e-6" is **confirmed in its window, refuted as a grid number**, and
+is not eigenvector-specific -- the NP lambdas degrade by the identical factor
+between the same two windows.
+
+### D-044 — No PDF convention factor on either side; the swap is one-for-one — SETTLED
+Regressing `ln r_model = s * ln r_template` over ~200 bins per direction:
+**s = 0.999333 mean, max|s-1| = 9.47e-03**. The trap signatures (1.645, 0.608,
+-1) sit 68x the scatter away. Templates carry raw CT18ZNNLO members at native
+90% CL and `pdf_eig{i}` is that same raw pair's coefficient (+1 -> pdf(2i+1),
+-1 -> pdf(2i+2)), per pair, no 1/1.645 anywhere.
+Real discriminating power: CT18Z pairs are ASYMMETRIC (max|ln r_up + ln r_dn| to
+4.0e-02) and the model reproduces that to 3-8%, so it is not a symmetrised
+linear derivative.
+
+### D-045 — 29 PDF eigenvectors carry only ~2.76 EFFECTIVE shapes — SETTLED (act on this)
+No `pdf_eig*` column is null (only `tnp_b_qqDS`). But of 406 pairs, **154 have
+|cos| > 0.8, 78 > 0.9, 37 > 0.95, one > 0.99** (e5/e23 at 0.9964); block
+condition **2.7e+04**; 8 of 29 singular values above 1%; **participation ratio
+2.76 effective shapes of 29**. Half a typical eigenvector's leverage is pure
+normalisation (shape fraction median 0.553), and projecting that out still leaves
+28 pairs above 0.9.
+**Physics:** the eigenvectors are orthogonal in PDF space, NOT in the space of
+210-bin (qT,|Y|) Z-spectrum responses. The fit stays well-posed because the
+priors regularise it, **but per-eigenvector postfit values must NOT be reported
+as measurements -- quote the total PDF impact** -- and expect more minimiser steps.
+
+### D-046 — D-004 is OVERTURNED on its own stated condition — SETTLED
+D-004 kept the eigenvectors as templates because no production eigenvector cache
+existed. One now exists and validates. Next card change: exclude
+`scetlib_dyturbo_.*pdfvars` (against the SYSTEMATIC name, per D-006) and float
+`pdfEig{0..28}`, keeping the 4 MSHT20 mb/mc nuisances, which the model does not
+provide. **Not executed** -- separate task, separate gate.
+This validation is **gen-level only**; reco-level eigenvector closure is
+unmeasured, and that is where D-038 says granularity used to dominate.
+
+### D-047 — Fit-readiness measured; the earlier projections were pessimistic — SETTLED
+Warm value+jacobian **421 ms** at P=53 against 155 ms at P=24 -- the "~1.2 s"
+figure was the COLD call (1.27 s), 2.9x pessimistic. Hessian **68.9 s**, not the
+projected 4-5 min. Peak resident **48.7 GiB**, low end of the 50-64 GB band and
+still the constraint on concurrency.
+Member count confirmed free: 15x the members cost 2.72x, for 2.21x in P. In a fit
+the model is ~8% of a P=24 iteration, so eigenvectors add ~266 ms, about 13% per
+iteration if rabbit's overhead is P-independent. **Unmeasured: the iteration
+count**, which D-045's conditioning may raise.
+
+### D-048 — The transitions' 20-39% improvement here is NOT attributable — SETTLED
+34 of 37 non-null directions identical to 3 s.f. against `cache_260824b` (n_eig=0,
+same 1e-3, same nak build -- chosen over the published p4 table, which changes
+tolerance AND kernel). Only the transitions move, by 4-6e-04, **inside the
+3.0e-03 two-build Jacobian floor**. Separating experiment: read THIS cache with a
+build lacking `92f1299` -- one cache, two readers, no build-to-build floor.
+
 ### D-005 — The 260820 card's exclusion regex was OVER-BROAD; card remade — SETTLED
 **Why:** its `scetlib_.*` branch silently deleted the 58 PDF eigenvector
 nuisances and the 4 mb/mc ones, while its `muF.*` branch matched nothing.
