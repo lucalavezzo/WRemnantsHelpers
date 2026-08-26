@@ -4131,3 +4131,172 @@ webdir `~/public_html/alphaS/260825_scetlib_ad_gen2d_validation/` (00_README.txt
 - All deliverables use rabbit's own tools (`rabbit_print_pulls_and_constraints`,
   `rabbit_print_impacts`, `rabbit_plot_pulls_and_impacts`); only the averaging
   over toys is local, and it reads `rabbit.io_tools.get_pulls_and_constraints`.
+
+### 2026-08-25/26 (overnight) -- RECO-LEVEL 2D CLOSURE: card remade, central 0.128%, all 39 directions <= 7.1e-03
+
+**The model works at reco level.** The 2D (ptll, yll) card is remade with the
+SCETlib-provided uncertainties excluded, the central reco prediction closes at
+**0.128 %** (shape) / **0.146 %** (absolute), matching the `scetlib_np`
+precedent of 0.14 % / 0.149 %, and **all 39 theory directions close at
+<= 7.07e-03** with a median of 7.2e-04 -- better than the gen-level table's
+worst of 1.40e-02, because detector smearing dilutes the one bad gen bin.
+
+Everything on the **PATCHED** SCETlib build: `92f1299 fix-muf-member-coordinate`
+(MR !8), snapshot of `/work/.../scetlib-trans/build-trans`,
+md5(libscet-qT.so) `e6a7faf1...`. Cache `cache_260825_p4` (1e-4, production).
+Plots + tables + the full decision log:
+`~/public_html/alphaS/260825_scetlib_ad_reco2d_closure/` (00_README.txt states
+provenance for every figure).
+
+#### The new card
+
+`/ceph/.../260826_Z_2D_card_scetlib_ad/ZMassDilepton_ptll_yll_adexcl/ZMassDilepton.hdf5`
+
+```
+--excludeNuisances '^(resumTNP|scetlibNP|resumScaleZ|resumFOScaleZ|
+                      resumTransitionFOScale|scetlib_dyturbo.*pdfas.*)'
+```
+
+Exactly **15** nuisances gone vs the full-template card (`260723_Z_2D_card_davidFix`):
+`pdfAlphaS`, `resumTNP_*` (10), `resumFOScaleZSym{Avg,Diff}`,
+`resumTransitionZSym{Avg,Diff}`. Nothing else changes and the response
+auxiliary is **bit-identical** to both that card and the 260820 one, so the
+caches stay valid. The model constructs on it with all **18** parameters
+floating and `_check_double_counting()` passes.
+
+**Two traps that cost the 260820 card real uncertainty, now fixed.**
+1. `--excludeNuisances` matches the *systematic* name (`addSystematic`'s `name=`,
+   falling back to `histname`), **not** the card-level nuisance name, with
+   `re.match`. So `^pdfAlphaS$` would NOT have excluded alphaS -- its systematic
+   is called `scetlib_dyturbo_..._pdfas_CorrByHelicity`. And
+   `resumTransitionZSym*` and `resumFOScaleZSym*` are four outputs of ONE
+   systematic named `resumTransitionFOScaleZ`: all-or-nothing.
+2. **The 260820 regex was over-broad and silently deleted real uncertainty.**
+   Its `scetlib_.*` branch removed the 58 CT18Z eigenvectors and the 4 MSHT20
+   mb/mc-range nuisances along with alphaS (`bcQuarkMass` went 5 -> 1 members,
+   the visible fingerprint). Its `muF.*` branch matched nothing at all.
+
+**PDF eigenvectors stay as templates**, and the reason is stronger than "still
+being validated": every production cache has `n_eig = 0`, so the model registers
+no `pdfEig*` at all and there is nothing to double count. The split is clean --
+in CT18Z alphaS is a separate member pair, not one of the 29 eigenvectors
+(`pdfCT18Z` 59 vs `pdfCT18ZNoAlphaS` 58).
+
+**Two asymmetries in the scale sector that are NOT like-for-like** and are
+Luca's to rule on:
+* the card's `resumFOScaleZ` is `renorm_scale_pt20_envelope`, i.e. the kappa_R
+  envelope **restricted to qT > 20** (`theory_corrections.py`, deliberately,
+  "redundant with the TNPs" below); the model's `resumScaleMuR` is the full
+  kappa_R response at all qT. The model is BROADER below 20.
+* **`resumScaleMuF` has no card counterpart whatsoever** -- with `--resumUnc tnp`
+  there is no muF nuisance (zero matches for `muf` among 3746 names). Floating it
+  ADDS a term the template analysis never carried.
+
+#### Central closure, and where the residual lives
+
+| | yield-weighted mean\|dev\| | max |
+|---|---|---|
+| TOTAL model / histmaker nominal | **0.128 %** | 2.24 % |
+| CALC model / (R (x) CorrZ) | 0.075 % | 2.11 % |
+| MC (R (x) CorrZ) / nominal | 0.073 % | 1.73 % |
+
+* **ptll [0,1]: -1.55e-02, 100 % CALC.** The known nonsingular cutoff convention
+  (production 1.0 GeV, ours 0.1). 1.2 % of the yield.
+* **ptll [37,44]: -1.03e-02, 100 % MC -- and root-caused, see below.**
+* everything between: <= 9e-04. Restricted to ptll > 1 GeV: **0.111 %**.
+
+**NEW ROOT CAUSE -- the card's last gen bin is an OVERFLOW.** The histmaker's
+`ptVGen` axis is `[0,...,33,44]` with `overflow=True` (checked on `prefsr`,
+`prefsr_full`, `nominal_prefsr_yieldsUnfolding`), while the datacard declares a
+bin `[44, 100]`. That bin **is the overflow** and holds every event with gen
+qT > 44 (11.6 % of `N_gen`). The correction file's own qT axis stops at 100, so
+the model can fill only 44-100 and is **15.3 % short there** (sigma_CorrZ/N_gen
+= 0.847, flat in |Y|), against **1.020 +- 0.002 in all 20 bins below 44**. That
+deficit leaks into the top reco ptll bin. It does NOT bias the fit at first order
+-- the model supplies a ratio to its own anchor and the deficit cancels -- but the
+response in `ptll [37,44]` is computed on 44-100 GeV only. Unresolved: whether
+the 15.3 % is entirely the qT > 100 tail or partly the correction not being
+applied above 100. Every gen hist in this file stops at 44, so it cannot be
+answered from it; the experiment is a histmaker rerun with a ptVGen axis that
+resolves qT > 44.
+
+#### Variations: a three-term split, and the limiting term is the GEN BINNING
+
+Reference = the histmaker's **own** reco variation hists
+(`nominal_ptll_yll_..._Corr` + `..._pdfas_Corr`), i.e. `H_var/H_central` per
+(ptll, yll) bin -- the 39 directions individually and unsymmetrised, the reco
+analogue of the gen-level `Corr[var]/Corr[central]`. Not the card's `hlogk`,
+which is symmetrised into SymAvg/SymDiff and would need un-mixing first.
+Sanity checked: the corr hist's `central` equals the plain `nominal` to 2.9e-14.
+
+```
+r_model / r_ref = (r_model / r_A) x (r_A / r_B) x (r_B / r_ref)
+                   \__ CALC __/     \__ WGT __/    \__ GRAIN __/
+```
+CALC = model gen response vs the correction file's;
+WGT = the same response folded with our anchor spectrum vs with `N_gen`;
+GRAIN = bin-averaged response vs the histmaker's PER-EVENT one -- pure gen-binning
+granularity, no model physics.
+
+| | as shipped | qT[0,1] aligned |
+|---|---|---|
+| worst TOTAL max\|dev\| | 7.07e-03 (mufup) | 4.57e-03 (transition 0.35) |
+| median TOTAL max\|dev\| | 7.2e-04 | 7.8e-04 |
+| CALC median / worst | 4.3e-04 / 7.5e-03 | 1.8e-04 / 3.4e-03 |
+| WGT median / worst | 3.3e-05 / 4.2e-04 | -- (negligible) |
+| GRAIN median / worst | 6.7e-04 / 4.2e-03 | unchanged by construction |
+| GRAIN > CALC | 14 of 39 | **30 of 39** |
+
+**The headline finding.** Once the qT [0,1] convention is aligned, the limiting
+residual at reco level is **GRAIN -- the 210-bin gen grid -- in 30 of 39
+directions, not the calculation.** GRAIN is a cost the discrete templates do NOT
+pay, because they are built by the same per-event reweighting the reference uses.
+It is bounded at 4.2e-03 max / 3.9e-04 yield-weighted and the fix is a finer gen
+grid plus a new cache, not anything in SCETlib. That reorders the next round of
+work: further SCETlib precision buys little at reco level until the gen binning
+is finer.
+
+**Relative to each direction's own response** (the quantity the "-30 % to +12 %"
+transition statement refers to): NP lambdas 1.3-3.7 %, TNPs 0.2-0.9 %, alphaS
+1.8-2.2 %, kappa_R/muF 1.7-7.3 %, and the **transitions 11.3 / 12.6 / 19.4 %** --
+the worst by a factor 3. Their CALC parts are 5.7 %, 8.5 % and 11.9 %: for the
+two shipped variations about half the reco error is the SCETlib derivative
+problem and half is GRAIN, while for the 0.3_0.6_0.9 cross-check it is almost
+entirely CALC. The gen-level ~30 % dilutes to ~10 % at reco through smearing and through
+averaging over the bins where the response is right.
+(`resumTNP_b_qqDS` has an identically zero Z response, so its `rel` of 17 is 0/0.)
+
+#### A wrong attribution caught before publication
+
+The first version of the central decomposition called its second term "FOLD" and
+described it as bin-averaged R vs per-event reweighting. **That was wrong.** R is
+stored as `R_raw/N_gen`, so `R @ N_gen` reconstructs the histmaker's reco nominal
+up to the events with no gen column at all -- measured, a nearly flat -7.6e-4
+(max 2.3e-3), which is reco-selected events with gen |Y| > 2.5, dropped by the
+gen grid. The central prediction therefore carries essentially no fold
+approximation; granularity enters only through the variations, which is why the
+variation table splits three ways and the central one splits two. Relabelled MC.
+
+#### New tooling (studies/scetlib-ad-param-model/)
+
+* `validate_variations_reco.py` -- the 39-direction reco table, three-term split,
+  `--fix-genbin0` to isolate the qT [0,1] convention, per-direction plots and 2D
+  maps, CSV out.
+* `reco_central_decompose.py` -- the central two-term split, the per-ptll
+  profile, the `R @ N_gen` identity check, and the 2D maps.
+Both reuse `scripts/rabbit/scetlib_ad/validate_variations.py`'s loaders; the
+central closure itself is the existing `validate_reco.py`, unmodified.
+
+#### NEXT
+
+1. **A finer gen grid is now the highest-value change**, not more SCETlib
+   precision: GRAIN dominates 30 of 39 directions. Quantify first by rebuilding a
+   card with a finer ptVGen/absYVGen and re-running `validate_variations_reco.py`
+   -- the GRAIN column should fall and CALC should not move.
+2. Decide the qT [0,1] convention (`matched_nons_qt_cut = 1.0`), which is still
+   the largest single-bin central residual.
+3. Resolve the gen ptVGen overflow labelling (D-R13); at minimum record that the
+   model under-fills it by 15 %.
+4. Rule on `resumScaleMuF`, which the card never carried, and on the qT > 20
+   restriction of `resumFOScaleZ`.
+5. Then, and only then, an Asimov fit on the new card.
