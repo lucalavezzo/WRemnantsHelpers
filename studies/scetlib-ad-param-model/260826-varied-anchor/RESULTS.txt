@@ -1,0 +1,145 @@
+The three-way comparison, stated as DIFFERENCES and in ONE unit.
+
+Notation, per bin, all of them sigma in pb:
+
+  A0  direct runcard refill at the NOMINAL point           (live, no cache)
+  A   direct runcard refill at the VARIED point            (live, no cache)
+  C0  cache built at NOMINAL, evaluated at its OWN anchor
+  C   cache built at NOMINAL, evaluated at the VARIED point   <- displaced
+  B   cache built at VARIED,  evaluated at its OWN anchor     <- the new reference
+  D   cache built at VARIED,  evaluated at the NOMINAL point  <- displaced, reverse
+  Cb  a SECOND independent build of the NOMINAL runcard, same points (the floor)
+
+The true finite shift the displacement has to traverse is  dS = A - A0.
+Every error is quoted as a fraction of dS, which is the "% of the direction's
+response" the previous rounds used, and the decomposition is exact:
+
+  (C - A)/dS   =   (C - B)/dS   +   (B - A)/dS
+  what every       PURE            CACHE
+  previous round   DISPLACEMENT    CONSTRUCTION
+  measured         error           error (anchor-exactness of the new cache)
+
+
+====================================================================================================
+LEG x2: 0.6 -> 0.35  (FINITE variation, what the templates carry)   (|Y| [0, 0.15], knot f = 2, n_eig 0, alphaS pair off)
+====================================================================================================
+        qT      A0 (nom)       A (var)    dS = A-A0      dS/A0
+   [20,24]       2.73281      2.724406  -8.4038e-03 -3.075e-03
+   [24,28]      2.145199      2.128381  -1.6818e-02 -7.840e-03
+   [28,33]      2.086261      2.048254  -3.8007e-02 -1.822e-02
+   [33,44]      3.064956      2.963768  -1.0119e-01 -3.301e-02
+  [44,100]       4.41219      4.307308  -1.0488e-01 -2.377e-02
+
+-- 1. VALIDATION of the two caches AT THEIR OWN ANCHOR (cache replay vs the live runcard at the same point)
+        qT   C0/A0-1 (nom)     B/A-1 (var)    (C0-A0)/dS      (B-A)/dS
+   [20,24]      -4.441e-15      -7.661e-15       +0.0000       +0.0000
+   [24,28]      -9.548e-15      -3.997e-15       +0.0000       +0.0000
+   [28,33]      -6.772e-15      +1.940e-07       +0.0000       -0.0000
+   [33,44]      +2.220e-16      -6.106e-15       -0.0000       +0.0000
+  [44,100]      -2.632e-07      -9.574e-07       +0.0000       +0.0000
+
+-- 1b. the same split into rule-vs-live INSIDE one object, and live-vs-direct ACROSS two configures
+        qT   rule/live-1 nom   rule/live-1 var   live/direct-1 nom   live/direct-1 var
+   [20,24]        -4.663e-15        -7.661e-15          +2.220e-16          +0.000e+00
+   [24,28]        -9.770e-15        -3.997e-15          +2.220e-16          +0.000e+00
+   [28,33]        -6.550e-15        -1.332e-15          -2.220e-16          +1.940e-07
+   [33,44]        -3.331e-16        -5.551e-15          +4.441e-16          -5.551e-16
+  [44,100]        -9.215e-15        -3.664e-15          -2.632e-07          -9.574e-07
+
+-- 2. IN-SITU BUILD-TO-BUILD FLOOR: two independent builds of the SAME (nominal) runcard
+        qT       at anchor    at displaced     (Cb-C)/dS
+   [20,24]      +2.220e-16      -6.679e-05       +0.0217
+   [24,28]      +1.554e-15      -6.132e-04       +0.0775
+   [28,33]      -4.441e-16      +1.910e-03       -0.1027
+   [33,44]      +6.661e-16      +6.559e-04       -0.0192
+  [44,100]      -1.423e-06      -4.338e-04       +0.0178
+
+-- 3. THE MEASUREMENT.  Errors as a FRACTION OF THE TRUE SHIFT dS
+        qT    OLD (C-A)/dS   PURE DISPL (C-B)/dS   CACHE CONSTR (B-A)/dS   REVERSE (D-A0)/dS
+   [20,24]         -0.3177               -0.3177                 +0.0000             +0.2772
+   [24,28]         +0.1081               +0.1081                 +0.0000             -0.1778
+   [28,33]         +0.1159               +0.1160                 -0.0000             -0.0037
+   [33,44]         +0.0228               +0.0228                 +0.0000             -0.0159
+  [44,100]         +0.0119               +0.0119                 +0.0000             +0.0415
+
+   the same in PERCENT of the response, the units the previous rounds published
+        qT    true resp        OLD   PURE DISPL   CACHE CONSTR    REVERSE
+   [20,24]   -3.075e-03     -31.8%       -31.8%          +0.0%     +27.7%
+   [24,28]   -7.840e-03     +10.8%       +10.8%          +0.0%     -17.8%
+   [28,33]   -1.822e-02     +11.6%       +11.6%          -0.0%      -0.4%
+   [33,44]   -3.301e-02      +2.3%        +2.3%          +0.0%      -1.6%
+  [44,100]   -2.377e-02      +1.2%        +1.2%          +0.0%      +4.1%
+
+====================================================================================================
+LEG x1,x3: 0.2,1.0 -> 0.3,0.9  (FINITE variation)
+====================================================================================================
+        qT    true resp   OLD (C-A)/dS   PURE DISPL   CACHE CONSTR    REVERSE   anchor B/A-1
+   [20,24]   +1.784e-03         -32.4%       -32.4%          -0.0%    +239.3%     -6.772e-15
+   [24,28]   +5.752e-03         -18.5%       -18.5%          +0.0%    -123.0%     +2.887e-15
+   [28,33]   +7.537e-03         +43.1%       +43.1%          -0.0%     -46.4%     -1.799e-14
+   [33,44]   +1.157e-02          +7.9%        +7.9%          -0.0%      -3.5%     -1.332e-15
+  [44,100]   -1.033e-03         -35.4%       -35.4%          +0.0%     -50.2%     -3.997e-15
+
+        qT   FLOOR (Cb-C)/dS
+   [20,24]             -1.1%
+   [24,28]            +30.2%
+   [28,33]            -32.4%
+   [33,44]             -3.9%
+  [44,100]            +40.8%
+
+========================================================================================================
+x2 0.6 -> 0.35
+========================================================================================================
+        qT   true resp  FWD recovered  REV recovered  rule/live displ FWD  live/direct displ FWD
+   [20,24]  -3.075e-03         0.6823         0.7228           -2.570e-02             +2.738e-02
+   [24,28]  -7.840e-03         1.1081         1.1778           -7.163e-02             +7.623e-02
+   [28,33]  -1.822e-02         1.1159         1.0036           -1.216e-01             +1.360e-01
+   [33,44]  -3.301e-02         1.0228         1.0159           -1.664e-01             +1.987e-01
+  [44,100]  -2.377e-02         1.0119         0.9586           -1.185e-01             +1.341e-01
+
+        qT   signal (C-B)/dS   floor (Cb-C)/dS  |signal|/|floor|   floor abs Cb/C-1
+   [20,24]            -31.8%              2.2%              14.7         -6.679e-05
+   [24,28]             10.8%              7.8%               1.4         -6.132e-04
+   [28,33]             11.6%            -10.3%               1.1         +1.910e-03
+   [33,44]              2.3%             -1.9%               1.2         +6.559e-04
+  [44,100]              1.2%              1.8%               0.7         -4.338e-04
+
+========================================================================================================
+x1,x3 0.2,1.0 -> 0.3,0.9
+========================================================================================================
+        qT   true resp  FWD recovered  REV recovered  rule/live displ FWD  live/direct displ FWD
+   [20,24]  +1.784e-03         0.6757        -1.3930           +1.836e-02             -1.859e-02
+   [24,28]  +5.752e-03         0.8154         2.2305           +6.138e-02             -5.882e-02
+   [28,33]  +7.537e-03         1.4305         1.4642           +1.209e-01             -1.050e-01
+   [33,44]  +1.157e-02         1.0787         1.0349           +1.287e-01             -1.132e-01
+  [44,100]  -1.033e-03         0.6453         1.5017           -1.078e-02             +1.127e-02
+
+        qT   signal (C-B)/dS   floor (Cb-C)/dS  |signal|/|floor|   floor abs Cb/C-1
+   [20,24]            -32.4%             -1.1%              30.4         -1.899e-05
+   [24,28]            -18.5%             30.2%               0.6         +1.728e-03
+   [28,33]             43.1%            -32.4%               1.3         -2.418e-03
+   [33,44]              7.9%             -3.9%               2.0         -4.410e-04
+  [44,100]            -35.4%             40.8%               0.9         -4.213e-04
+
+
+BY-PRODUCT, and NOT a live calculation: `live` at a DISPLACED point
+re-sweeps the kernels over the NodeData FROZEN at the anchor
+(set_gradient_node_cache(True) caches the profile scales and the
+PDF/beam-grid convolutions), so it is the frozen-conv path WITHOUT the
+muF member interpolation. Response it delivers, as a fraction of dS:
+
+  x2 0.6 -> 0.35
+          qT   frozen-node only   + members (rule)
+     [20,24]             -7.877              0.682
+     [24,28]             -8.648              1.108
+     [28,33]             -6.329              1.116
+     [33,44]             -4.821              1.023
+    [44,100]             -4.506              1.012
+
+  x1,x3 0.2,1.0 -> 0.3,0.9
+          qT   frozen-node only   + members (rule)
+     [20,24]             -9.444              0.676
+     [24,28]             -9.285              0.815
+     [28,33]            -13.030              1.431
+     [33,44]             -8.897              1.079
+    [44,100]             -9.903              0.645

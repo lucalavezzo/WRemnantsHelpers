@@ -312,3 +312,50 @@ reading only the TOTAL PDF impact from either treatment.
 **What would overturn it:** a postfit at which `c_0`, `c_3` sit far enough from 0
 that the local derivative is no longer ~`D_e`; check the postfit values before
 assuming the understatement persists in a real fit.
+
+## D-P13 — 29 extra collinear PDF parameters do NOT degrade convergence; rabbit's `tol=0.0` does — SETTLED
+
+One frequentist toy per arm (`-t 1`, seed 123456789, same node/cache/build; the
+arms have different nuisance counts so the RNG draws differ — not literally the
+same throw, and that caveat is why the *pattern* matters more than the digits):
+
+| | PDF as templates (18 float) | PDF in model (47 float) |
+|---|---|---|
+| iterations to REACH the final loss | 35 | **99** |
+| iterations actually run | 1259 (killed) | **118** |
+| exit | **never terminated** | status 2, \|jac\|max 4.3e-05 |
+| total minimiser wall | 3367 s | **1107 s** |
+| median s/iteration | 2.44 | 5.00 |
+
+**Read.** The 29 extra parameters cost ~3x the iterations to the minimum and
+2.05x per iteration (against a parameter ratio 2.6, and D-047's ~13% estimate for
+the model's own share of an iteration). Real, and entirely affordable: 18.5 min.
+**Convergence did not degrade — the arm that failed to terminate is the one
+WITHOUT them.**
+
+**The termination failure is rabbit's `tol=0.0`, not the model.** `fitter.py`
+passes `tol=0.0` to `scipy.optimize.minimize`, so `gtol = 0`, and scipy's
+trust-region loop is `while m.jac_mag >= gtol` — never false. The only exits left
+are `predicted_reduction <= 0` (trust-radius underflow; this is how the model arm
+exited, status 2) and `maxiter = 200*len(x0) = 749,800`. The templates arm hit its
+final loss at iteration 35 and then made 1223 identical-loss null steps, ~50 min
+of pure waste. **Fix: `--minimizerGtol 1e-6`** — free, and the relaunched arm-A toy
+uses it. This is the known `rabbit_minimizer_tolerances` trap showing up in a new
+place (trust-krylov, not trust-constr).
+
+**Bounds:** nothing sits at one, and there is nothing to sit at — rabbit imposes
+parameter bounds only via regularizers (`-r`), unused here.
+
+## D-P14 — UNFINISHED: sigma(alpha_s) and the grouped PDF impact — NOT MEASURED
+
+Both Asimov arms got past their Hessian (`edmval` 9.95e-28 arm A, 1.27e-27 arm B,
+i.e. the Asimov minimum is exactly the prefit point as D-P09 explains) and were
+still in the saturated fit when this agent stopped. Nothing is blocked; an Asimov
+reco fit simply costs ~2.5 h at this card size.
+Ready to run the moment they land:
+`tmp/pdfcard/ab_report.py --a <armA> --b <armB>` (table) and
+`tmp/pdfcard/plots.py` (grouped-impact bars + the pdfEig postfit panel).
+**Read them with D-P07 and D-P12 in hand:** the model arm's PDF prior is 17%
+wider prefit and eigenvectors 0/3 are understated by the linearisation, so a
+grouped-PDF-impact difference of that size is EXPECTED, not evidence. Group names
+differ by construction: `pdfCT18ZNoAlphaS` (arm A) vs `pdfEig` (arm B).

@@ -142,3 +142,87 @@ Figure: `pdf_prefit_band.png`.
 uses). As shipped, arm B quotes a 90%-CL-wide PDF prior only partly compensated by
 the absent `sqrt(3)`. Not a bug — an unmatched convention that changes
 sigma(alpha_s).
+
+#### The eigenvector caveat is WORSE at reco level than at gen level
+
+D-045's collinearity was measured on the 210-bin gen grid. The fit sees the
+780-bin reco response. Measured with the model itself (58 evaluations at
+`c_e = +-1`, folded through R):
+
+| | gen (D-045) | **reco** |
+|---|---|---|
+| pairs \|cos\| > 0.8 / 0.9 / 0.95 / 0.99, of 406 | 154 / 78 / 37 / 1 | **180 / 102 / 44 / 2** |
+| worst pair | e5,e23 = 0.9964 | **e5,e23 = 0.9975** |
+| cond of the normalised block | 2.72e+04 | **7.00e+04** |
+| **participation ratio** | **2.76** | **1.827** |
+
+**29 parameters carrying 1.8 effective shapes.** Folding through R averages over
+gen bins and destroys distinguishing information. No column is null (they span a
+factor 18 in norm), so the fit is well posed — but only because the unit priors
+regularise it. **Per-eigenvector postfit values are NOT measurements; quote the
+total PDF impact and nothing finer.**
+The model's own prefit PDF band, 4.470e-02 wmean, confirms the histmaker proxy
+above to 0.8%, so the card/model ratio is **0.853** (model 17% wider), not 0.845.
+
+A second, new reason to quote only the total: **eigenvectors 0 (pdf1/pdf2) and 3
+(pdf7/pdf8) are QUADRATIC in c_e**, `||A||/||D||` = 8.58 and 8.29 against a median
+of 0.533 — their up and down members move the reco spectrum the same way. The
+templates carry that as its own nuisance (`pdf{1,4}CT18ZSymAvg`, norm 0.32,
+comparable to the largest antisymmetric column 0.65); the model's `compute()` is
+genuinely quadratic so the MINIMISER sees it, but sigma and the impacts come from
+the Hessian, whose derivative at `c_e = 0` is ~1/8 of the real excursion. **The
+linearised PDF impact understates those two** — pushing the opposite way from the
+90%-CL effect above.
+
+#### How the fit behaves — and a correction to how every Asimov fit here reads
+
+**A rabbit Asimov fit NEVER RUNS THE MINIMISER.** `rabbit_fit.py` calls
+`fit(..., dofit = ifit >= 0 and not args.noFit)` and `ifit = -1` for Asimov, so
+`fitter.minimize()` is never called: for Asimov the data IS the prefit
+expectation, so the prefit point already is the minimum (confirmed by the arms'
+own `edmval`, 9.95e-28 and 1.27e-27). The ~90 min each Asimov arm spends in
+silence is the postfit machinery — the dense `t2.jacobian` Hessian over the FULL
+parameter vector (3749 for arm A, 3720 for arm B), the covariance, `--doImpacts`
+and the saturated fit — with the main thread parked in a futex inside
+`libtensorflow_framework.so.2`, i.e. inside a TF op, NOT the SCETlib
+`py_function`. Cost is nsyst-driven, not P-driven; D-047's model timings are a
+few percent of it. **So an Asimov fit measures nothing about convergence**, which
+is why both toy arms were run.
+
+One frequentist toy per arm (`-t 1`, seed 123456789 both; different nuisance
+counts mean the RNG draws differ, so this is a pattern, not a paired throw):
+
+| | PDF as templates (18 float) | PDF in model (47 float) |
+|---|---|---|
+| iterations to REACH the final loss | 35 | **99** |
+| iterations actually run | 1259 (killed) | **118** |
+| exit | **never terminated** | status 2, \|jac\|max 4.3e-05 |
+| total minimiser wall | 3367 s | **1107 s** |
+| median s/iteration | 2.44 | 5.00 |
+
+**29 strongly collinear extra parameters cost ~3x the iterations to the minimum
+and 2.05x per iteration — and convergence did NOT degrade. The arm that failed to
+terminate is the one WITHOUT them.** That failure is rabbit's `tol=0.0`:
+`scipy.optimize.minimize(..., tol=0.0)` sets `gtol = 0` and the trust-region loop
+is `while m.jac_mag >= gtol`, never false, so the only exits are
+`predicted_reduction <= 0` (trust-radius underflow — how the model arm exited) and
+`maxiter = 200*len(x0) = 749,800`. The templates arm made 1223 identical-loss null
+steps, ~50 min of waste. **Fix: `--minimizerGtol 1e-6`** — the known
+`rabbit_minimizer_tolerances` trap in a new place (trust-krylov, not
+trust-constr). Nothing sits at a bound in either arm, and there is nothing to sit
+at: rabbit imposes bounds only through regularizers (`-r`), unused here.
+
+#### UNFINISHED
+
+**sigma(alpha_s) and the grouped PDF impact, both ways, are NOT measured.** All
+four fits were still running (past the Hessian, in the saturated fit) when this
+agent stopped; an Asimov reco fit costs ~2.5 h at this card size. Nothing is
+blocked. Ready to run:
+`tmp/pdfcard/ab_report.py --a <armA> --b <armB>` and `tmp/pdfcard/plots.py`.
+Read them with the two caveats above in hand — the model arm's PDF prior is 17%
+wider prefit and eigenvectors 0/3 are understated by the linearisation, so a
+grouped-PDF-impact difference of that size is EXPECTED and is not evidence about
+the model. Group names differ by construction: `pdfCT18ZNoAlphaS` vs `pdfEig`.
+
+Plots and full provenance: `~/public_html/alphaS/260826_scetlib_ad_pdf_in_model/`
+(`00_README.txt` indexes it; `01_EXCLUSION_TABLE.txt` is the full exclusion table).

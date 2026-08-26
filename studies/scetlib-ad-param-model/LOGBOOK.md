@@ -6138,3 +6138,30 @@ Also confirmed by Luca: the MiNNLO `w_z_gen_dists` file must be modified and
 re-run. Its single bin [100, 13000] would otherwise collapse the whole region,
 since `make_theory_corr` rebins to the COMMON binning of its inputs. This is the
 blocking prerequisite for the correction production.
+
+### 2026-08-26 — varied-anchor discriminator → [260826-varied-anchor](260826-varied-anchor/LOGBOOK.md)
+
+VERDICT: the cache-construction term is **exactly zero** in every bin and both
+legs, so the assembly is exonerated and every previous transition number was
+already measuring pure displacement. My "the error is in the rule assembly"
+hypothesis (D-050) is REFUTED.
+
+And the low-qT shortfall is EXPLAINED rather than open: the displaced evaluation
+is a difference of two halves, −7.9·dS (frozen nodes, no muF members) and +8.6·dS
+(members), giving +0.68·dS. That is the ~9x RG cancellation measured at the sigma
+level PER BIN, so a ~4% error on either half is 32% of the answer — reconciling
+"<= 1.8% per node" with "−32% in sigma" with no third mechanism. Corroborated on
+three anchors (forward 68.2%, reverse 72.3%, x1,x3 67.6%).
+
+CAVEAT that limits several earlier numbers: two independent builds of the SAME
+nominal runcard agree bit-level at the anchor but part by up to **1.9e-03 in sigma
+at a displaced point** — 60x the published two-build sigma floor. Only qT [20,24]
+clears it. The +10.8 / +11.6 / +2.3 / +1.2% at [24,28] and above are within a
+rebuild and must not be read as measurements. This does NOT touch A/B differences
+taken within ONE cache (0.1 pp), which is how the analytic-correction result was
+measured.
+
+TRAP: `prepare_cache_for_card.py --no-pdf` sets `plan = None` and skips
+`build_pdf_variations` ENTIRELY, including the muF pair — so a literal --no-pdf
+cache has no transition response at all. Use `--pdf-eig 0 --as-pair off` for the
+intended saving.
