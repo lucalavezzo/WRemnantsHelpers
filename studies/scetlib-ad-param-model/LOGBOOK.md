@@ -5013,3 +5013,42 @@ the uncached route and close that gap. Deliberately not done tonight: it would
 change behaviour on a path other people are measuring and would confound this
 round's A/B. `mfk_live` would have to be hoisted out of the `var_muf` guard,
 which is a two-line change.
+
+
+### 2026-08-26 -- response matrix on the CORRECTION's gen grid: the model is now calculation-limited
+
+Full write-up, figures and tables:
+`~/public_html/alphaS/260826_scetlib_ad_response_genbinning/` (`00_README.txt`
+carries the provenance and reproduce lines; `03_report.log` the numbers).
+NB the agent reported staging a logbook/decisions paste that was not on disk --
+this entry and D-037..D-041 were written from its report, so the webdir is the
+primary record.
+
+`mz_dilepton --responseGenBinning theoryCorr` (default OFF) writes two EXTRA
+hists, `nominal_prefsr_yieldsResponse` + `prefsr_response`, beside the untouched
+unfolding pair. Unfolding proven unaffected: `-j 1` so fill order cannot differ,
+**464 histograms bit-identical, 0 differing, 0 axis changes, 0 lost, exactly 2
+new**. Consumption plumbed through `load_R` and
+`setupRabbit --responseMatrixGenBinning response`; `prepare_cache_for_card`
+needs no change since it reads the gen axes off the card.
+
+Grid read FROM the corr file: Q is one bin [60,120] and the gen acceptance IS
+that window (no Q granularity to resolve); |Y| truncated at the 2.5 acceptance
+edge is exactly CorrZ's 11 bins; qT keeps the full range so gen qT>44 -- 11.65%
+of N_gen, ONE column in the shipped grid -- is resolved. All shipped axes nest,
+so `GenFold` tiles and coarsening back is an exact sum (verified 2.8e-14 against
+the unfolding hist summed over `helicitySig`).
+
+**GRAIN, measured with no model and no cache in the loop:** yield-weighted median
+5.357e-05 -> 3.410e-06 (15.7x); directions where GRAIN exceeds CALC 32/39 ->
+4/39, and the four left are the two identically-zero `b_qqDS` and the two alphaS
+legs. alpha_s-equivalent worst 0.152 -> 0.034 sigma, or 0.0017 excluding those
+alphaS legs. Composed with CALC: TOTAL max|dev| median 7.77e-04 -> 2.25e-04,
+alpha_s equiv worst 0.199 -> 0.092 sigma. **TOTAL now equals CALC alone -- there
+is no binning headroom left.** `mufup`'s 7.07e-03 is unmoved: that is the qT[0,1]
+cutoff convention, not binning.
+
+Cost: 32:17 wall, 21.7 GB peak, -j 160, 289 M events, 90.4 MB out; the flag
+itself is +1.9% wall.
+
+Two attributions closed, one of them a retraction -- see D-039 and D-040.

@@ -204,6 +204,43 @@ The original qt0 is left running: its node-set work is not checkpointed, so
 killing it would throw away 27 min for certain in exchange for an expected but
 unmeasured speedup.
 
+### D-037 — Response matrix gets the CORRECTION's gen grid; unfolding untouched — SETTLED (Luca)
+`--responseGenBinning theoryCorr`, default OFF, two EXTRA hists beside the
+untouched unfolding pair. Proof: `-j 1`, **464 histograms bit-identical, exactly
+2 new**; and the response hist coarsened onto the unfolding grid equals the
+unfolding hist summed over `helicitySig` to 2.8e-14. Grid read from the corr
+file: Q already exact (the gen acceptance IS its single Q cell), |Y| truncated at
+2.5 = its 11 bins, qT full range so gen qT>44 (11.65% of N_gen) is resolved. All
+shipped axes nest. Cost 32:17 wall; the flag is +1.9%.
+
+### D-038 — The model is now CALCULATION-limited at reco level — SETTLED (measured)
+GRAIN yield-weighted median 5.357e-05 -> 3.410e-06 (15.7x); GRAIN>CALC in 32/39
+directions -> 4/39 (the two zero-derivative `b_qqDS` and the two alphaS legs);
+alpha_s-equivalent worst 0.152 -> 0.034 sigma, 0.0017 excluding those legs. TOTAL
+max|dev| median 7.77e-04 -> 2.25e-04 and now EQUALS CALC alone -- no binning
+headroom remains. `mufup` 7.07e-03 unmoved (qT[0,1] cutoff convention).
+
+### D-039 — RETRACTION: the -7.5e-04 central offset is the gen MASS window, not |Y|>2.5 — SETTLED
+Measured acceptance=False split: mass window **7.470e-04** vs |Y|>2.5
+**2.950e-06**; the |Y| hypothesis predicts 0.4% of the measurement. Real effect:
+reco m(ll) in-window while preFSR mass is not, given the correction's Q FLOW bin
+(exactly 1.0). Predicted with no free parameter by `f_mass * |rho-1|`,
+f_mass = 7.47e-04 -- measured/predicted 1.11 median, log-log corr +0.9989 over 35
+directions. It under-shoots the two alphaS legs by x23, confirming those are the
+event-level LHAPDF weight rather than a fold error.
+
+### D-040 — CLOSED: the 15.3% deficit above qT 44 is the tail — SETTLED
+gen qT>100 is 1.977% of N_gen = **16.97%** of the shipped overflow column against
+17.0% measured. Corr flow bins are exactly 1.0; nothing is missing.
+
+### D-041 — OPEN (needs Luca): the 781-bin cache costs ~55-80 h
+TOTAL/CALC on the new grid need a cache over 781 gen bins; none exists.
+~55-80 h at 210 threads, ~800 MB -- 3-4.5x the shipped 17.6 h, because the new
+grid splits BOTH expensive fixed-order qT cells ([0,1] and [44,100]).
+**Run the 1-bin `--subset` timing test on the new runcard first** (minutes) to
+replace the bracket with a measurement. Also the strongest argument yet for
+fixing the member-loop barrier rather than sharding around it.
+
 ### D-005 — The 260820 card's exclusion regex was OVER-BROAD; card remade — SETTLED
 **Why:** its `scetlib_.*` branch silently deleted the 58 PDF eigenvector
 nuisances and the 4 mb/mc ones, while its `muF.*` branch matched nothing.
