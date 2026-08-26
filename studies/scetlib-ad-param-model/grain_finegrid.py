@@ -73,15 +73,15 @@ def _with_overflow(h, axname):
     return full[tuple(idx)]
 
 
-def load_fine(path, corr_names, reco_pt_hi=44.0):
+def load_fine(path, corr_names, reco_pt_hi=44.0, joint=None, gentot=None):
     import h5py
 
     from wums import ioutils as wums_io
 
     with h5py.File(path, "r") as f:
         out = wums_io.pickle_load_h5py(f[SAMPLE])["output"]
-        hj = _get(out, JOINT)
-        hg = _get(out, GENTOT)
+        hj = _get(out, joint or JOINT)
+        hg = _get(out, gentot or GENTOT)
         refs = {n: _get(out, n) for n in corr_names}
         hn = _get(out, "nominal_ptll_yll") if "nominal_ptll_yll" in out else None
 
@@ -209,8 +209,17 @@ def main():
     ap = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--histmaker", required=True)
+    ap.add_argument("--joint", default=None,
+                    help="reco x gen hist name (default nominal_prefsr_yieldsUnfolding; "
+                         "use nominal_prefsr_yieldsResponse for the parallel finer grid "
+                         "written by mz_dilepton --responseGenBinning)")
+    ap.add_argument("--gentot", default=None,
+                    help="gen-total hist name (default prefsr; prefsr_response for the "
+                         "parallel finer grid)")
     ap.add_argument("--corr", nargs="+", default=[CORR_MAIN, CORR_AS])
     ap.add_argument("--csv", required=True)
+    ap.add_argument("--profile-npz", default=None,
+                    help="also save the per-direction |GRAIN| profile in reco ptll")
     ap.add_argument("--tail-at", type=float, default=44.0,
                     help="gen qT above which everything is ONE tail bin whose "
                          "response is the correction's (tail-at, 100] average. "
@@ -224,7 +233,7 @@ def main():
 
     import validate_variations as VV
 
-    D = load_fine(args.histmaker, args.corr)
+    D = load_fine(args.histmaker, args.corr, joint=args.joint, gentot=args.gentot)
     Te, Ye = D["Te"], D["Ye"]
     R, Ng = D["R"], D["N_gen"]
     npt, nyl, nT, nY = R.shape
@@ -411,6 +420,21 @@ def main():
                 print(f"   {tag:<44} card {np.median(mc[sel]):.2e} -> "
                       f"fine {np.median(mf[sel]):.2e}  "
                       f"({np.median(mc[sel]) / max(np.median(mf[sel]), 1e-30):.1f}x)")
+
+    if args.profile_npz:
+        # per-direction |GRAIN| profile in reco ptll, one row per direction, for
+        # each gen qT rung that was measured at the card's |Y| grid. This is the
+        # saw-tooth figure's data.
+        np.savez(
+            args.profile_npz,
+            ptll_edges=pt,
+            **{
+                f"{qname}__{L}": prof_store[qname][L]
+                for qname in prof_store
+                for L in prof_store[qname]
+            },
+        )
+        print(f"profiles -> {args.profile_npz}")
 
     import csv
     with open(args.csv, "w", newline="") as fh:

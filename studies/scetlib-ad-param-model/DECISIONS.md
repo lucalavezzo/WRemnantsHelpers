@@ -3287,3 +3287,8 @@ instances at rel 1e-3 vs 1e-4. The clean attribution is the runcard comparison.
 **Do not oversell this.** Mode 1 is the WEAKEST tier, chosen precisely because it
 runs on an existing cache; mode 3 is 2-3x better at the conv level and cannot be
 tested this way without rebuilding the nodes.
+
+---
+
+## Response-matrix gen binning (agent, 2026-08-26)
+
