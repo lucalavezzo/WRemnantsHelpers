@@ -60,6 +60,70 @@ member staging, no re-solved weights.
 2. Any global the kernel reads must NOT be `thread_local`: `_stage_var_meta`
    runs inside the TBB workers.
 
+### D-024 — `--n-train 9` (the default). The worry was BACKWARDS — SETTLED
+**Why:** the rule solve's unknowns are retained SITE weights, not parameters.
+`blk = 1 + P + n_hvp*P`, `nrow = 1 + n_train*blk` -- every parameter adds TWO
+ROWS per training point and almost no unknowns. So `n_train/n_params = 0.17`
+compares two quantities on opposite sides of the equation.
+**Evidence:** constraints per unknown, parsed per bin on the real 210-bin card:
+production `cache_260825_p4` (n_train 9, P 24) = **1.51** rows/site, worst bin
+1.09; the full card with 29 eigenvector pairs (n_train 9, P 53) = **3.48**.
+Turning the eigenvectors ON makes the solve **2.3x better conditioned than every
+cache the analysis has used to date**, and keeps FEWER sites (277 vs 292).
+Against the templates, accuracy is flat from 9 up and alpha_s is identical
+(1.88e-05) at n_train 5, 9, 14, 27. In sigma(alpha_s) units the n_train 9
+residual is **1e-5 sigma** where the fit sits.
+**Do NOT raise it:** 9 -> 27 doubles the retained nodes, hence the cache
+(13 -> 28 GB), the fit's RAM, every iteration and the covariance pass.
+**Caveat, stated:** no 210-bin cache was built at two n_train values (that is the
+full build, twice). The bridge is that a bin's rule is self-contained -- which is
+why bins from separate processes merge byte-exactly -- plus coverage of the
+card's site range. Argument plus coverage, not a direct 210-bin scan.
+
+### D-025 — Build the PDF cache at `target_precision_rel = 1e-3`, NOT 1e-4 — SETTLED
+**Why:** it is a 13x lever that nobody had costed, and 1e-4 is not an option.
+**Evidence:** production `cache_260825_p4` runs 1e-4 with `abs 0`; its 4-member
+fixed-order stage took **715.6 min against 54.8** at 1e-3, and its node set
+325.3 min against 21.9. For 62 members that is **~8.7 h at 1e-3 against ~114 h
+at 1e-4**. The cost of 1e-3 is x25 on NP lambda and x28 on TNP residuals --
+leaving them at 1.5e-05, still far below the muF residual -- and only **x1.08 on
+alpha_s**, the parameter we actually quote.
+**Note:** this makes the PDF cache a different tolerance from the reco-closure
+cache. 1e-3 was already validated independently (cache total 670.0115 against a
+direct 670.018).
+**Overturned by:** evidence that the x25 on the NP lambdas matters somewhere it
+currently does not.
+
+### D-026 — Split the build by BINS so partial progress is usable — SETTLED
+**Why:** there is a hard deadline (08:00) and an ~8.7 h job. Bin groups merge
+EXACTLY (0.000e+00 in value and Jacobian), so whatever finishes is a usable
+cache on a partial grid; a single monolithic build that is 80% done at 08:00 is
+worth nothing. Members must never be split (D-013).
+**Cost note:** bins are wildly unequal (2.3 min vs ~25 min for the same
+members), so groups must be balanced by COST, not by count.
+
+### D-027 — The Hessian "3.2x for two parameters" scaling worry is REFUTED — SETTLED
+**Why it looked real:** the 8.1 s -> 25.4 s pair came from two SEPARATE
+`backend_check` runs on a node at load 250-570.
+**Measured properly**, interleaved in ONE process: P 24 -> 26 is **x1.09**,
+P 24 -> 53 is **x2.95**. Not a scaling law. Projected to 210 bins at P = 53:
+value+jacobian ~1.2 s, Hessian ~4-5 min (two independent extrapolations; the
+P=24 bin-extrapolation reproduces the measured 89.8 s to 3%).
+**Cost scales with bins x retained nodes x P, NOT with member count** -- 4 -> 62
+members at fixed nodes is free.
+**The real binding constraint is MEMORY: 50-64 GB per loaded model**, which rules
+out a wide concurrent toy ensemble with eigenvectors.
+
+### D-028 — CORRECTION: too small an n_train degrades SILENTLY — SETTLED
+An inherited claim that "n_train 5 would make the build ABORT" is false. The
+guard is a residual check; a thin-bin cache at n_train 5 wrote itself at
+7.1e-09 residual while being 9.3x worse in the NP lambdas. Nothing warns.
+
+### D-029 — `py/scetlib_tf.py` committed in the shared checkout — SETTLED
+It sat UNCOMMITTED while matching `origin/autodiff-sigmaul` (where MR !7 is
+merged). Any checkout or stash in that tree would have silently reverted it, and
+without it **every Hessian changes by 152%**. Committed as `cc4ece2`.
+
 ### D-005 — The 260820 card's exclusion regex was OVER-BROAD; card remade — SETTLED
 **Why:** its `scetlib_.*` branch silently deleted the 58 PDF eigenvector
 nuisances and the 4 mb/mc ones, while its `muF.*` branch matched nothing.
@@ -1044,3 +1108,1415 @@ consequence of this measurement.
     first-order-exact construction is the only one that does not care.
     Open question it must answer: whether ONE column suffices where
     D ~ 1.15 ln f, or a second derivative is wanted.
+
+---
+
+## n_train gate (agent, 2026-08-25 night)
+
+# DECISIONS -- `--n-train` gate for the 62-member (29 PDF eigenvector pair) cache
+
+Agent: n-train gate. Started 2026-08-25 21:20. Scratch:
+`/home/submit/lavezzo/.claude/jobs/140d052c/tmp/ntrain/`.
+Caches under `/ceph/.../scetlib_ad_caches/ntrain_gate/`.
+Webdir: `~/public_html/alphaS/260825_scetlib_ad_ntrain_gate/`.
+
+Every entry: WHAT / WHY / EVIDENCE / WHAT WOULD OVERTURN IT.
+
+
+## SUMMARY OF THE DECISIONS BELOW
+
+| # | decision | one-line evidence |
+|---|---|---|
+| D13 | **Use `--n-train 9`** (the default). Do not raise it, do not lower it. | 9 -> 27 is flat within a measured +-10-14% build-to-build floor in every group; 9 -> 5 is 9.3x worse in NP lambda |
+| D27 | **In sigma(alpha_s) units:** at n-train 9 the rule error is **1e-5 sigma** where the fit sits and **0.003 sigma** at 8x the template step; at n-train 5 it is **0.024 sigma**, the top of the transition band | fig9 / T18 |
+| D20/D21 | The "9/53 = 0.17 is under-determined" premise is BACKWARDS | the solve's unknowns are SITE WEIGHTS; P is in the rows. Constraints per unknown on the real 210-bin card: **1.51 at P=24, 3.48 at P=53** |
+| D16 | **The build cost is set by the INTEGRATION TOLERANCE, not by n_train** -- a 13x lever nobody costed | 210-bin 4-member fixed-order stage: 54.8 min at rel 1e-3 vs **715.6 min** at the production rel 1e-4 + abs 0 |
+| D15 | The Hessian's "3.2x for two extra parameters" is REFUTED -- it was node contention | interleaved one-process A/B: P 24 -> 26 is **x1.09**, P 24 -> 53 is x2.95. Projected 210-bin P=53 hessian ~4-5 min |
+| D15 | The uncommitted `py/scetlib_tf.py` in the shared tree changes every Hessian by **152%** | toggling `_rule_is_matched` -- commit it before the build |
+| D19a | The live route is BLIND to the eigenvector coefficients | `pdf_eig0 = +1` gives `max|v/v0-1| = 0.000e+00` |
+| D19b | Thin bins are BETTER, not worse | per-bin, within one build, log-log corr(sites, error) = **+0.78** |
+| D22 | RETRACTED: "n_train 5 shifts sigma(alpha_s) by 1%" | the build-to-build floor on that quantity is 0.70%; the test resolves nothing |
+| D23 | CORRECTED: "n_train 5 would make the build ABORT" is too strong | the guard is a residual check; `thin_nt5` ran fine at 159 sites against m = 163 |
+| D28 | **The thin-bin hedge is CLOSED, in the opposite direction to the worry** | the card's thinnest corner is **46x BETTER** than the corner the scan used, and 4.03 constraints per unknown against 2.65 |
+| D23 | CORRECTED: `thin_nt5` has 3 of 4 bins BELOW the m=163 constraint count and did not abort | too small an n_train degrades SILENTLY, it does not refuse |
+| D8/D12 | Two experiments that did NOT work, and why | the low-qT template metric is saturated by the nonsingular-cutoff difference; rule_vs_direct v1 had unphysical displacements and transition contamination |
+
+Numbers: `ntrain/TABLES.md`. Figures: `~/public_html/alphaS/260825_scetlib_ad_ntrain_gate/`.
+
+---
+
+## D1. Build on the previous agent's `eig_test` caches instead of rebuilding them
+
+**WHAT.** Reuse `/ceph/.../scetlib_ad_caches/eig_test/{ref0a,ref0b,ref0c_t64,
+smoke_eig2,eig29_nt5,eig29_nt9,eig29_nt27,y20_ref0,y20_eig29,lowqt_ref0,
+lowqt_eig29}` and their `val_*.log`, and only build what is missing.
+
+**WHY.** They are a complete, same-day, same-SCETlib-build family (`build-fix`,
+`libscet-qT.so` of 2026-08-25 09:20) on one runcard; rebuilding would cost hours
+and would ADD a build-to-build irreproducibility term (3.1e-05 in sigma,
+3.0e-03 in the Jacobian) to every comparison for no gain.
+
+**EVIDENCE.** `eig_test/base.conf` is the 210-bin production `base.conf` with
+exactly one edit (`target_precision_rel 1.e-4`, identical to production p4);
+`diff` against `cache_260824b/base_from_reference.conf` shows only that line.
+
+**WOULD OVERTURN.** If any of those caches turns out to have been built against a
+different SCETlib library than the one the eigenvector build will use.
+
+---
+
+## D2. `eig29_nt27` existed but was never validated -- validating it is the FIRST
+   thing, because it can settle the question on its own
+
+**WHAT.** Run `validate_variations.py --partial` on the already-built
+`eig29_nt27` (4 bins, P=53) before building anything new.
+
+**WHY.** The previous agent's table left `n_train = 27` as `(PLACEHOLDER)` for
+every accuracy column and concluded "keep 9" from the ROW COUNT argument and the
+memory cost, not from a measured response accuracy. That is precisely the
+inference the brief forbids ("a small training residual on an under-determined
+solve proves nothing"). n_train 27 is 3x the default, so if 27 does not beat 9
+against the production templates, the scan is answered at its expensive end
+first and everything else is refinement.
+
+**EVIDENCE.** `tmp/LOGBOOK_eigenvector_paste.md` section 3, table rows for 5 and
+27 are placeholders; `eig_test/eig29_nt27/cache.npz` (105.8 MB) exists and its
+build log reports "rules built in 135.3 min (median 719 nodes/bin)".
+
+**WOULD OVERTURN.** Nothing -- this is a measurement, not a choice.
+
+---
+
+## D3. Figure of merit = `validate_variations.py --partial` max|dev| per GROUP
+   against the production corr files, NOT the build-time training residual
+
+**WHY.** The training residual is the in-sample fit of the rule solve. Under-
+determination shows up as good in-sample fit and bad out-of-sample response,
+which is the failure mode being tested. The response test is out-of-sample by
+construction: the templates sit at finite variation size (lambda2 = 1.0 is 2.5x
+the anchor, kappa_F = 0.5/2.0, c_e = +-1), not at the anchor where `c_val`
+forces exactness regardless of `n_train`.
+
+**EVIDENCE.** Logbook 2026-08-20 (late): "`c_val` forces exactness AT the anchor
+regardless, which is why anchor checks and training residuals say nothing about
+generalisation."
+
+**WOULD OVERTURN.** Nothing.
+
+---
+
+## D4. Reference for "is this difference real": three independent n_eig = 0 builds
+
+**WHAT.** Quote every n_train difference against the spread of `ref0a`, `ref0b`,
+`ref0c_t64` -- same runcard, same bins, three separate processes.
+
+**WHY.** The builder is not reproducible (median nodes/bin 357/359/359/371 over
+four identical builds), so an A/B between two separately built caches has a
+floor. The floor must be quoted in the SAME units as the comparison, i.e. as
+`validate_variations` max|dev| per group, not as the sigma/Jacobian numbers in
+the knowledge note.
+
+**EVIDENCE.** `knowledge/20_frameworks/scetlib_ad_cache_build_parallelism.md`;
+the three ref0 logs give per-group floors 7.7e-07..1.0e-06 (lambda),
+1.78..1.93e-07 (TNP), 1.32..1.38e-04 (muF/kappa_R), 1.64..2.74e-03
+(transitions), 1.88e-05 (alphaS, identical to 3 digits).
+
+**WOULD OVERTURN.** Nothing; it is the floor by construction.
+
+---
+
+## D5. Bins: the CHEAP high-qT central corner `0,1/16,17` for the scan, plus the
+   HARD low-qT corner `0,1/1,2` as the stress test
+
+**WHAT.** Run the n_train scan on |Y| < 0.3, qT in [20,28] (4 bins), and check
+the conclusion against |Y| < 0.3, qT in [1,3] (4 bins).
+
+**WHY.** (a) cost: the cheap corner's member stage is 2.3 min against ~25 min for
+ptV 18,19,20, and the lowest-qT bin alone costs more than all the others
+together; (b) attribution: the cheap corner excludes qT [0,1] entirely, so the
+OPEN nonsingular-cutoff difference (ours 0.1 GeV, the production templates 1.0
+GeV) cannot contaminate a single number; (c) the honest hedge the brief asks
+for is exactly "can this degrade elsewhere on the 210-bin card", and the low-qT
+corner is where the known residual lives AND where the site count is thinnest
+(228 sites/bin at nt9 against 364 in the cheap corner), i.e. closest to the real
+card's thin end (min 223 / median 292 at P=24).
+
+**EVIDENCE.** `eig_test/build.sh` header; build logs' "median N nodes/bin".
+
+**WOULD OVERTURN.** If the two corners disagreed about n_train, the scan would
+have to be repeated on a representative sample of all 210 bins.
+
+---
+
+## D6. Measure the EIGENVECTOR per-member cost at 210 bins directly, at
+   `target_precision_rel = 1e-3`, as two shard builds
+
+**WHAT.** Two full-210-bin builds, `--pdf-eig 29 --n-train 9 --threads 210`,
+differing only in `--members`: `0:4` (eigenvector pairs 0 and 1, 4 members) and
+`58:62` (the alphaS pair + the muF pair, 4 members). Launched concurrently.
+
+**WHY.** The ~14 h / 15 h projection came from `cache_260824b`, whose 4-member
+fixed-order stage (54.8 min, 13.7 min/member) was 2 alphaS + 2 muF members --
+NOT PDF members. `--members 58:62` reproduces exactly that member set under
+tonight's load, and `--members 0:4` is the same everything with eigenvector
+members instead, so the RATIO is a controlled within-night measurement and the
+absolute is directly comparable to the 13.7 that the projection used.
+`target_precision_rel = 1e-3` is chosen because that is the setting
+`cache_260824b` used; comparing against it at any other tolerance would confound
+the member class with the tolerance.
+
+**WHY CONCURRENT.** Any contention from the rest of the node hits both equally,
+so the ratio -- the quantity item 4 needs -- is protected even if the absolutes
+drift.
+
+**EVIDENCE.** `cache_260824b/build.log`: "0 PDF eigenvector pairs for the
+resummed piece in 1.6 min / ... and for the fixed-order piece in 54.8 min",
+`--threads 210`, `target_precision_rel = 1.e-3`.
+
+**WOULD OVERTURN.** If `--members 58:62` does not reproduce 54.8 min to within
+~30%, tonight's load is not comparable to that build's and only the ratio may be
+quoted.
+
+---
+
+## D7. Treat the INTEGRATION TOLERANCE as a separate, and much larger, cost axis
+   than n_train -- and measure it on identical bins
+
+**WHAT.** Also build the 4-bin cheap corner at `target_precision_rel = 1e-3`
+with `--pdf-eig 29 --n-train 9`, to sit against the existing 1e-4 build of the
+same 4 bins.
+
+**WHY.** The production 210-bin cache `cache_260825_p4` runs at
+`rel = 1e-4, abs = 0` and its stages were 325.3 min (node set) and 715.6 min
+(4-member fixed order) -- 14.9x and 13.1x the 1e-3 build `cache_260824b`
+(21.9 and 54.8 min) on the same card, same `--threads 210`. If the eigenvector
+build uses production settings, the member loop is not 9-15 h but of order 100 h,
+and that dwarfs anything `--n-train` does. This is a discrepancy in the premise
+of the task and has to be measured, not assumed. Doing it on the identical 4 bins
+removes the "different day / different load" objection to the p4-vs-260824b
+comparison.
+
+**EVIDENCE.** the two build logs; `cache_260825_p4/build.sh` documents the
+`target_precision_abs 1.e-8 -> 0.` change ("relaxed on Josh's advice").
+
+**WOULD OVERTURN.** If the 4-bin A/B does not reproduce a ~13x factor, then the
+p4 build was load-contaminated and the projection reverts to the 1e-3 numbers.
+
+---
+
+## D8. The low-qT corner CANNOT test `n_train` through the template metric.
+   Recorded as a thing that did not work.
+
+**WHAT.** Dropped the plan to run the n_train scan at qT 1-3 GeV against
+`validate_variations.py`.
+
+**WHY.** At qT 1-3 GeV the residual against the production templates is
+dominated by a difference in the CALCULATION, not by the rule: our nonsingular
+vanishes below qT = 0.1 GeV, the production templates' below 1.0 GeV. Both
+builds carry it identically, so the metric there is a constant, not a
+measurement of compression.
+
+**EVIDENCE.** `lowqt_ref0` (P = 24, 24 params) and `lowqt_eig29` (P = 53), two
+INDEPENDENT builds, agree row for row to the printed 3 digits on 38 of 39
+shared variations (`mufdown-kappaFO0.5-kappaf2.` differs in the 4th digit of the
+model range only). Per group: NP lambda 6.67e-04 both, TNP 1.26e-04 both,
+muF/kappa_R 3.54e-03 both, alphaS 5.09e-04 both. Two independent builds cannot
+agree that well on a rule-limited quantity -- the build-to-build floor is 1e-4
+in sigma -- so the residual is a common physics term. The three transition
+variations are identically 1.0000 in BOTH model and reference there, i.e. the
+transitions do nothing at qT < 3 GeV and carry no information at all.
+
+**REPLACEMENT.** `ntrain/rule_vs_direct.py`: compare the rule replay against a
+LIVE `sigma_binned_batch` of the same calculation at the same points. No
+template, so no cutoff mismatch, and it works in any qT region.
+
+**WOULD OVERTURN.** Aligning our nonsingular cutoff to 1.0 GeV would make the
+low-qT template metric informative again.
+
+---
+
+## D9. Add a JOINT-displacement test, because every production template is
+   single-direction and a fit is not
+
+**WHAT.** `rule_vs_direct.py` evaluates, besides one-direction-at-a-time points,
+random points with ALL rule directions displaced simultaneously, at 1x, 2x and
+4x the template displacement.
+
+**WHY.** This is the actual content of the under-determination worry. `n_train`
+points sample the P-dimensional parameter space jointly; 9 points in 53
+dimensions can reproduce every single-axis probe (the value row plus P gradient
+rows pin the axes) while failing on a generic joint displacement. Every
+production template moves ONE direction, so `validate_variations.py` cannot see
+that failure mode even in principle. A fit moves 18+ at once.
+
+**EVIDENCE.** The rows the solve is given are `1 + n_train * (1 + 2P)` -- a value
+row, P gradient rows and P HVP rows per training point -- so the AXES are
+constrained by construction and only the joint/cross structure depends on how
+many points there are.
+
+**WOULD OVERTURN.** Nothing; it is an added test. If joint and single agree, the
+worry is empirically dead rather than argued away.
+
+**EXCLUSION.** The member-interpolated directions (`pdf_eig*`, `alphas`,
+`scale_kappa_F`) are ZEROED in this test (`--rule-only`). They do not come from
+the `--n-train` solve at all: `build_pdf_variations` re-solves with its own
+`n_train_var = 3` and is exact at `c_e = +-1` by construction of the quadratic
+member interpolation. Including them would dilute the measurement with a
+mechanism `--n-train` does not control.
+
+---
+
+## D10. ONE direct run serves every `n_train`
+
+**WHAT.** `--mode direct` is run once, on `eig29_nt9`'s runcard, and every rule
+run is compared against that single file.
+
+**WHY.** `--n-train` is a build-time flag; it does not appear in the runcard.
+All four caches on the cheap corner therefore share bins, anchor, parameter
+names and integration tolerance, so the live calculation is the same function
+for all of them. Running it once also removes the direct route's own
+irreproducibility from the n_train comparison -- every n_train is measured
+against the SAME reference numbers, so differences between them are pure rule.
+
+**EVIDENCE.** `diff` of the four `cache.conf` files (identical); `--n-train`
+appears only in the npz metadata.
+
+**WOULD OVERTURN.** Nothing.
+
+---
+
+## D11. The "Hessian rises 3.2x for two extra parameters" premise is a THRESHOLD,
+   not a scaling law -- and the numbers to check it already existed
+
+**WHAT.** Re-derived the P-scaling of the Hessian from `backend_check` logs the
+previous agent had already written, and confirmed it with contention-robust
+interleaved A/B.
+
+**EVIDENCE.** `backend_check` warm value+jacobian x its own reported Hessian
+ratio, 4 bins each:
+  P = 24, n_eig = 0  (`bc_ref0b.log`)     122 ms x  66 =  8.1 s
+  P = 26, n_eig = 2  (`bc_smoke.log`)     205 ms x 124 = 25.4 s
+  P = 53, n_eig = 29 (`bc_eig29_nt9.log`) 156 ms x 162 = 25.3 s
+The 8.1 -> 25.4 s step quoted in the brief is 24 -> 26 params, and 26 -> 53
+params is 25.4 -> 25.3 s, i.e. FLAT. Interleaved A/B in one process
+(`ev_P24_vs_P53_4bin.log`): value+jacobian 47.5 -> 62.4 ms (x1.31), Hessian
+4044 -> 11926 ms (x2.95) for P = 24 -> 53.
+
+**READING.** The cost step is switching PDF eigenvector members ON at all
+(n_eig 0 -> 2), not the number of parameters. Extrapolating 3.2x-per-2-params to
+P = 53 would have predicted ~10^6 s and is simply the wrong functional form.
+
+**WOULD OVERTURN.** A measurement at n_eig = 10-20 that does NOT sit at the
+n_eig = 2 value would mean there is a slow growth on top of the step. The
+interleaved P = 26 vs P = 53 A/B now running is exactly that check.
+
+---
+
+## D12. `rule_vs_direct.py` v1 THROWN AWAY -- what did not work, and why
+
+**WHAT.** The first version of the generalisation test produced NaNs at 2x and
+4x displacement and a joint-point deviation of 5e-02 that was IDENTICAL at
+n_train 5, 9 and 27. Rewritten (v2) with an explicit physical box per parameter,
+template-derived asymmetric displacements, and the direction families reported
+separately.
+
+**WHY IT FAILED.** (a) symmetric displacements: `np_eff_lambda2` sits at 0.4 with
+a template endpoint at 1.0, so a symmetric "1x down" was -0.2 -- negative lambda,
+which the model turns into NaN (the known negative-lambda4 trap), and 2x down on
+`scale_kappa_R` was kappa_R = 0. (b) the three transition directions were mixed
+into the joint points, and they carry a rule-vs-live difference of ~1.0e-01 at
+1x that does NOT move with n_train (9.989e-02 / 1.002e-01 / 1.003e-01 at
+n_train 5 / 9 / 27), so they set the worst-point value for every configuration
+and hid everything else.
+
+**WHAT v1 DID SHOW, and it is worth keeping.** With the transitions excluded, the
+MEDIAN single-direction rule-vs-direct deviation does move with n_train, and
+monotonically: 2.61e-07 (nt5) -> 1.49e-08 (nt9) -> 9.40e-10 (nt27). So the rule
+solve genuinely does get better with more training points -- by 2 orders of
+magnitude from 5 to 27 -- at a level 3 to 5 orders below the residual the
+PRODUCTION TEMPLATES can resolve. That is the whole answer in one line: n_train
+improves a quantity that is already negligible.
+
+**AND A HANDOVER.** The ~1e-1 rule-vs-live gap on `scale_x1` at 1x, flat in
+n_train, is a route difference, not a training deficiency. It belongs with the
+transition-derivative work (the muF member coordinate / five-knot stencil), not
+here. Attribution is not complete: it could be the frozen fixed-order piece the
+rule carries (`rule.fo_w`) against the live route recomputing the nonsingular at
+the new transition point, or the known frozen-beam-convolution bug. THE
+EXPERIMENT THAT WOULD SEPARATE THEM: rebuild a cache from a RUNCARD with
+`transition_points = [0.15, 0.6, 1.0]` and compare its anchor against the
+parameter route at `scale_x1 = 0.15` -- the runcard route refills the nodes, the
+parameter route cannot, and the difference is the frozen-convolution term.
+
+---
+
+## D13. RECOMMENDATION: keep `--n-train 9`. Do not raise it, do not lower it.
+
+**WHAT.** The 62-member eigenvector build should use the default `--n-train 9`.
+
+**WHY.** Two independent measurements agree, and they disagree with the
+upstream heuristic `max(9, ceil(1.5 P)) = 80` for a reason that is now
+understood.
+
+**EVIDENCE 1 -- against the production templates (the figure of merit).**
+4 bins, P = 53, worst max|dev| per group; the "floor" column is min..max over
+three independent n_eig = 0 builds of the identical runcard:
+
+| group | nt 5 | nt 9 | nt 14 | nt 27 | 3-build floor |
+|---|---|---|---|---|---|
+| NP lambda (8)   | 6.08e-06 | 6.53e-07 | 5.60e-07 | 5.72e-07 | 7.7e-07 .. 1.0e-06 |
+| TNP (20)        | 2.90e-07 | 1.96e-07 | 1.89e-07 | 1.88e-07 | 1.78 .. 1.93e-07 |
+| muF/kappa_R (6) | 1.57e-04 | 1.40e-04 | 1.39e-04 | 1.39e-04 | 1.32 .. 1.38e-04 |
+| transitions (3) | 4.43e-03 | 2.17e-03 | 1.66e-03 | 1.76e-03 | 1.64 .. 2.74e-03 |
+| alphaS (2)      | 1.88e-05 | 1.88e-05 | 1.88e-05 | 1.88e-05 | 1.88e-05 (all 3) |
+| PDF eig (58)    | 1.50e-06 | 1.50e-06 | 7.65e-07 | 1.50e-06 | -- |
+
+From 9 upward every group is flat INSIDE the build-to-build floor, and alphaS
+-- the number the analysis exists for -- is identical to three digits at every
+n_train. Below 9 the NP lambda response degrades by 10x, out of the floor.
+
+**EVIDENCE 2 -- against a LIVE evaluation, no template (the sharper test).**
+Worst over 12 random JOINT points, all directions of the family displaced at
+once, at 1x the production template step:
+
+| set | nt 5 | nt 9 | nt 14 | nt 27 |
+|---|---|---|---|---|
+| NP joint 1x  | 6.98e-06 | 6.03e-07 | 5.80e-08 | 4.63e-08 |
+| TNP joint 1x | 4.92e-07 | 4.19e-08 | 1.61e-08 | 1.45e-08 |
+| NP joint 8x  | 8.88e-04 | 2.17e-04 | 5.27e-05 | 2.84e-05 |
+
+So the rule solve DOES keep improving past 9 -- by 10x from 9 to 14. It
+improves a quantity that at n_train 9 is already 6e-07, i.e. 200x below the
+muF/kappa_R residual (1.4e-04) and 3600x below the transition residual
+(2.2e-03) that actually limit the model. Buying 10x on the smallest error in
+the stack changes nothing measurable, which is exactly what EVIDENCE 1 shows.
+
+**WHY THE 9/53 = 0.17 RATIO WAS THE WRONG QUANTITY.** The solve is not
+n_train points against P unknowns. Each training point contributes a value row,
+P gradient rows and n_hvp x P HVP rows, so
+`rows = 1 + n_train*(1 + 2P)` -- 442 at P = 24 and **964 at P = 53**, both at
+n_train = 9. The row count already scales with P; the ratio does not need to.
+
+**COST OF RAISING IT (all measured, 4 bins, P = 53):**
+
+| | nt 5 | nt 9 | nt 14 | nt 27 |
+|---|---|---|---|---|
+| retained nodes/bin | 220 | 364 | 507 | 719 |
+| rules blob (4 bins) | 180.6 MB | 299.0 MB | 410.1 MB | 588.7 MB |
+| fit value+jacobian | 32.8 ms | 52.9 ms | 76.7 ms | 122.5 ms |
+| fit hessian | 6.47 s | 10.89 s | 15.59 s | 25.29 s |
+| loaded model RSS | 1618 MB | 2058 MB | 2500 MB | 3173 MB |
+
+n_train 9 -> 27 doubles the retained nodes and therefore doubles the cache
+(2.5 -> 5.0 GB npz, 14 -> 28 GB uncompressed), doubles the fit's RAM
+(55 -> 108 GB), doubles every fit iteration and doubles the covariance pass.
+The rules STAGE also grows superlinearly (7.0 -> 135.3 min on 4 bins measured
+under mixed load, ~n_train^2.7), but that is the least of it.
+
+**WHY NOT LOWER.** n_train = 5 both degrades the response (above) and takes
+the retained nodes to 220 on OUR bins; the member re-solve raises
+"Fewer sites than constraints" when a bin has fewer than
+`1 + n_train_var*(1 + P) = 1 + 3*54 = 163` at P = 53, and the real card's
+thinnest bins already sit at ~223 nodes at n_train 9. Scaling 220/364 = 0.60
+onto them gives ~134 -- the build would ABORT, not degrade.
+
+**WHAT WOULD OVERTURN IT.** A demonstration that a residual of order 1e-06 in
+the NP-lambda or TNP response moves sigma(alpha_s). It cannot: the alphaS
+templates themselves are reproduced at 1.88e-05 independent of n_train, and
+the residual-to-alpha_s projection already in the study
+(`residual_structure_map.py`) scores the far larger transition residual at
+0.002-0.025 sigma. Equally, if the production card were changed to bins much
+thinner than 220 retained nodes, the n_train = 5 row shows what happens.
+
+---
+
+## D14. Test the recommendation where the real card is THINNEST, not only where
+   it is cheap -- the honest hedge, made quantitative
+
+**WHAT.** A second 4-bin scan at `--subset '0,1/5,6'` = |Y| < 0.3,
+qT 5-7 GeV, at n_train 5 / 9 / 14 plus two independent n_eig = 0 builds for the
+floor.
+
+**WHY.** The scan so far lives on `0,1/16,17`, which retains 364 sites per bin.
+The REAL 210-bin card is thinner than that nearly everywhere. Extracted from the
+production cache's own rule blob (`ntrain/sites.py`, which parses the
+`SCTRULE8` records rather than trusting the log's median):
+
+| cache | min | p05 | q25 | median | q75 | p95 | max |
+|---|---|---|---|---|---|---|---|
+| `cache_260825_p4` (1e-4, P=24, nt9) | 247 | 259 | 278 | **300** | 376 | 398 | 406 |
+| `cache_260824b`   (1e-3, P=24, nt9) | 223 | 244 | 270 | **292** | 371 | 392 | 404 |
+
+and the thinnest bins are named: |Y| < 0.3 with qT between 1 and 11 GeV
+(thinnest of all, 247 sites, is |Y| [0, 0.15] x qT [8, 9]). So the corner the
+scan used sits at the card's q75, and the conclusion has to be checked at the
+thin end before it can be quoted for 210 bins.
+
+**WHY qT 5-7 AND NOT qT 1-3.** qT 5-7 GeV is where the thin bins are AND it is
+above the nonsingular-cutoff region (the known template mismatch is confined to
+qT < 3-4 GeV, and dominates below 1 GeV), so BOTH metrics -- template response
+and rule-vs-live -- stay informative there. At qT 1-3 the template metric is
+saturated (see D8).
+
+**WHAT IT WOULD TAKE TO CHANGE THE ANSWER.** If the thin corner at n_train 9
+lands at the n_train 5 accuracy of the thick corner (NP lambda ~6e-06 against
+the templates), then thin bins ARE under-resolved at 9 and the recommendation
+becomes n_train 12-14. If it lands where the thick corner's n_train 9 does, the
+recommendation stands for the whole card.
+
+**PRE-REGISTERED.** Written before the builds finished.
+
+---
+
+## D15. The Hessian's P-scaling: the brief's premise is REFUTED, and it was a
+   contention artefact, not the `_rule_is_matched` short-circuit
+
+**WHAT.** Two candidate explanations for "the Hessian rises 3.2x for two extra
+parameters (8.1 s -> 25.4 s, P = 24 -> 26)". Both tested; the first is right.
+
+**H1 (contention).** The 8.1 / 25.4 s pair came from two SEPARATE
+`backend_check.py` runs at 14:47 and 14:52 on a node whose load average was
+250-570. Interleaving the same two caches in ONE process and taking the min over
+alternating rounds -- the estimator that cancels contention -- gives:
+
+| A -> B (4 bins) | value+jacobian | hessian |
+|---|---|---|
+| P 24 -> 26 (n_eig 0 -> 2) | x1.01 | **x1.09** |
+| P 26 -> 53 (n_eig 2 -> 29) | x1.25 | x2.77 |
+| P 24 -> 53 | x1.31 | x2.95 |
+
+So 24 -> 26 is 1.09x, not 3.2x, and the whole way to P = 53 is 2.95x. The
+functional form is not "3.2x per 2 parameters" and never was.
+
+**H2 (the uncommitted `_rule_is_matched` short-circuit removed the expensive
+fixed-order Hessian block).** REFUTED by direct toggle
+(`ntrain/hess_attrib.py`): at P = 24, forcing the flag off changes the Hessian
+time from 8823 ms to 9017 ms -- **2%**. The block is not the cost.
+
+**AND A SEPARATE, IMPORTANT SIDE RESULT.** Toggling that same flag changes the
+Hessian VALUE by `max|H(True) - H(False)| / max|H| = 1.52`, i.e. 152%. The
+uncommitted `py/scetlib_tf.py` change in the SHARED tree is therefore not a
+performance tweak -- it materially determines the curvature the covariance pass
+uses. It is live on `PYTHONPATH` for every session. **Anyone who stashes or
+reverts that file changes every Hessian and every uncertainty by an O(1)
+factor.** It should be committed (branch `fix-nons-double-count` exists) before
+the eigenvector build, so the cache and the evaluation code are pinned together.
+
+**PROJECTION (item 5).** With the correct scaling, at 210 bins and P = 53:
+value+jacobian ~1.2 s and hessian ~4-5 min (two independent extrapolations,
+240 s from the bins x nodes fit and 285 s from the P-ratio applied to the
+measured 210-bin P = 24 Hessian of 89.8 s). The covariance pass is NOT the
+binding constraint. Memory is: ~55 GB for the loaded model.
+
+**WHAT WOULD OVERTURN IT.** A P = 53, 210-bin Hessian that is not ~5 min. The
+only way to check directly is to build the cache, which is what this is gating.
+
+---
+
+## D16. THE PREMISE OF THE 9-15 h ESTIMATE IS AT THE WRONG TOLERANCE.
+   The integration settings are a 13x lever; `--n-train` is not.
+
+**WHAT.** Reporting, unasked, that the "~14 h / 15 h for 62 members" projection
+in `knowledge/20_frameworks/scetlib_ad_cache_build_parallelism.md` was measured
+at `target_precision_rel = 1e-3`, while the PRODUCTION cache
+`cache_260825_p4` runs at `rel = 1e-4, abs = 0` and is 13x more expensive per
+member. Nobody asked me to check this; the numbers fell out of reading the build
+logs to normalise the eigenvector member cost, and the gap is far larger than
+anything `--n-train` does.
+
+**EVIDENCE.** 210 bins, `--threads 210`, 4 members (2 alphaS + 2 muF),
+`--pdf-eig 0`, same card, same builder:
+
+| cache | rel | abs | node set | rules | fixed-order member stage |
+|---|---|---|---|---|---|
+| cache_260824b | 1e-3 | 0 | 21.9 min | 4.4 min | **54.8 min** |
+| cache_aspair_260821_kRfix | 1e-4 | 1e-8 | (not logged) | 8.5 min | 82.8 min |
+| cache_260825_p4 (production) | 1e-4 | 0 | **325.3 min** | 10.6 min | **715.6 min** |
+
+`1e-4 + abs 0` is 14.9x the node set and 13.1x the member loop of `1e-3 + abs 0`.
+Of that, the `target_precision_abs 1e-8 -> 0` change alone (made 2026-08-24 "on
+Josh's advice") is worth **8.6x** (715.6 / 82.8).
+
+**NOT CONTENTION.** The p4 node-set stage ran 00:05-05:30 on a quiet node and
+still took 325.3 min. And tonight, on the same card with `--threads 210`, my two
+1e-3 builds took 23.3 and 23.4 min for that stage against cache_260824b's 21.9 --
+6% -- so tonight's numbers are like-for-like with that build.
+
+**WHAT IT MEANS FOR THE 62-MEMBER BUILD.** Taking the muF:PDF member ratio r and
+solving `2a + 2ra = (measured 4-member stage)`, then `60a + 2(ra)` for 62:
+
+| integration settings | per ordinary member | 62-member loop |
+|---|---|---|
+| rel 1e-3, abs 0 | 8.1 min | **8.7 h** |
+| rel 1e-4, abs 1e-8 | 12.2 min | 13.2 h |
+| rel 1e-4, abs 0 (production today) | 105 min | **114 h** |
+
+(r = 2.4 assumed here from the previous agent's fork measurement; my own 210-bin
+measurement of r is in flight -- `m210_eig` vs `m210_asmuf`.)
+
+**ACCURACY COST OF DROPPING TO 1e-3, measured on IDENTICAL bins**
+(4 bins, P = 53, n_train 9, the only difference being that one runcard line):
+
+| group | rel 1e-4 | rel 1e-3 | ratio |
+|---|---|---|---|
+| NP lambda (8) | 6.53e-07 | 1.47e-05 | 22x |
+| TNP (20) | 1.96e-07 | 5.45e-06 | 28x |
+| muF/kappa_R (6) | 1.40e-04 | 2.07e-04 | 1.5x |
+| transitions (3) | 2.17e-03 | 1.94e-03 | 0.9x |
+| **alphaS (2)** | **1.88e-05** | **2.03e-05** | **1.08x** |
+| PDF eig (58) | 1.50e-06 | 2.42e-06 | 1.6x |
+
+So 1e-3 costs 22-28x on the two SMALLEST residuals, leaving them at 1.5e-05 --
+still an order of magnitude below the muF/kappa_R residual and two below the
+transition residual, i.e. still not what limits the model -- and it costs only
+8% on alphaS, the number the analysis is for.
+
+**THE ONE CAUTION AGAINST 1e-3.** The rule solve's worst per-bin TRAINING
+residual on the 210-bin card is 6.1e-07 at 1e-3 against 2.5e-08 at 1e-4, and
+`prepare_cache_for_card.py` prints a WARNING above 1e-6. 1e-3 sits a factor 1.6
+under its own alarm; 1e-4 sits a factor 40 under. That is a reason to prefer
+`rel 1e-4, abs 1e-8` (13 h, residual comparable to p4's) over `rel 1e-3`
+(8.7 h) if a 4-hour difference is affordable.
+
+**I AM NOT DECIDING THIS.** It is a physics/precision decision for Luca, it was
+taken deliberately on Josh's advice, and reverting `abs` to 1e-8 needs the
+reasoning behind aa42bbc re-read. What I am saying is that the build cannot be
+costed without stating which of the three rows above it will use, and that the
+answer moves the launch decision from "one night" to "five days".
+
+**WHAT WOULD OVERTURN IT.** If `abs = 0` is required for correctness at 1e-4
+(i.e. the 1e-8 absolute floor was masking a real cancellation error rather than
+saving time), then 114 h is simply the price and the build must be split over
+condor nodes BY BINS. That is testable: compare `cache_aspair_260821_kRfix`
+(abs 1e-8) against `cache_260825_p4` (abs 0) bin by bin at the anchor and at a
+displaced point -- both exist on disk, no new build needed.
+
+---
+
+## D17. Spend the overnight window on a PRODUCTION-tolerance 210-bin eigenvector
+   member, rather than inferring it from the 1e-3 measurement
+
+**WHAT.** Launched `m210_eig_1e4`: 210 bins, `--pdf-eig 29 --n-train 9
+--members 0:2 --threads 210`, at `rel 1e-4, abs 0` -- byte-for-byte the
+integration settings of the production cache `cache_260825_p4`.
+
+**WHY.** The cost answer has one large remaining inference in it: I measure the
+eigenvector member cost at `rel 1e-3` (cheap, and directly comparable to the
+54.8 min / 13.7-min-per-member number the 15 h projection came from), and then
+multiply by a 13.1x tolerance factor taken from a DIFFERENT member mix (2 alphaS
++ 2 muF). That product decides whether the real build is ~9 h or ~114 h -- the
+single biggest number in the report -- so it should be measured, not inferred.
+The prologue at these settings is ~5.5 h, which is exactly what an overnight
+window is for.
+
+**COST AND RISK.** One process, ~1874 OS threads and ~50 GB resident for ~9 h,
+against a node with 1178 GB free and 768 cores. It does not gate anything else:
+every other measurement is already running or done.
+
+**WHAT IT SETTLES.** If the fixed-order stage for ONE eigenvector pair at
+production settings is ~2 x 105 min, the 62-member build at those settings is
+~110 h and MUST be split over condor nodes by bins (or the tolerance revisited).
+If it is much less, the tolerance factor is member-class dependent and the 1e-3
+scaling was wrong.
+
+**WHAT WOULD OVERTURN IT.** Nothing -- it is the direct measurement. It can only
+fail by running out of time, in which case the inferred number stands and is
+labelled as inferred.
+
+---
+
+## D18. Take the question all the way to sigma(alpha_s), with the model's OWN
+   Jacobian, rather than stopping at a response residual
+
+**WHAT.** `ntrain/jac_vs_ntrain.py`: for each n_train cache, take
+`L = d ln sigma / dp` from `values_and_jacobian`, build a toy Asimov Fisher
+matrix `F = L^T W L + I` (unit Gaussian priors on all 53 nuisances,
+W = 1/(0.3% per bin)^2) and read `sigma(alpha_s) = sqrt[(F^-1)_{as,as}]`.
+Evaluated BOTH at the anchor and at a displaced point of postfit size
+(lambda2 +0.15, lambda4 -0.10, gnu_lambda2 +0.03, every TNP and eigenvector
+coefficient +-0.3).
+
+**WHY.** A residual against a template is one step removed from the answer. The
+fit does not see templates; it sees the Jacobian. And it does not sit at the
+anchor, where `c_val` makes the rule exact by construction -- so the anchor
+alone would be a rigged test, which is why the displaced point is there.
+
+**WHY THE ABSOLUTE VALUE IS A TOY AND ONLY THE RATIO IS QUOTED.** 4 bins, a made-
+up 0.3% per-bin uncertainty and unit priors are not the analysis; the number that
+means something is the RATIO between two n_train values evaluated identically.
+
+**RESULT so far (4 bins, P = 53):**
+
+| | sigma(alpha_s), anchor | displaced |
+|---|---|---|
+| n_train 9  | 3.418177e-03 | 3.452807e-03 |
+| n_train 14 | 3.415627e-03 | 3.449588e-03 |
+| ratio 14/9 | 0.99925 | 0.99907 |
+
+**0.07-0.09%**, and the two caches are separate builds so that difference also
+contains the build-to-build floor. n_train 5 and 27 in flight.
+
+**WHAT WOULD OVERTURN IT.** A ratio departing from 1 by more than the
+build-to-build floor -- which is itself measurable, by running the same tool on
+the two independent n_train 9 builds (`eig_test/eig29_nt9` and
+`ntrain_gate/sub4_1e4_nt9b`). That control is queued.
+
+---
+
+## D19. TWO RESULTS THAT CHANGE HOW THE 4-BIN SCAN GENERALISES
+
+### (a) The live route is BLIND to the eigenvector coefficients -- so those
+    directions can only ever be validated against the templates
+
+`ntrain/eig_live_probe.py`, 4 bins, P = 53, `sigma_binned_batch`:
+
+```
+pdf_eig0 = +1            max|v/v0 - 1| = 0.000e+00
+pdf_eig5 = -1            max|v/v0 - 1| = 0.000e+00
+lambda2  = 1.0           max|v/v0 - 1| = 1.234e-02
+lambda2 = 1.0 & eig0=+1  max|v/v0 - 1| = 1.234e-02   <- identical to lambda2 alone
+```
+
+The member data that carries the eigenvector response exists only inside the
+CACHE (`build_pdf_variations` writes it); a live evaluation of the same
+calculation has no PDF member to interpolate and returns the c = 0 value
+exactly. **Consequence:** (i) the rule-vs-live test cannot include eigenvector
+directions, and cannot test lambda-x-c CROSS terms either -- there is nothing to
+compare against; (ii) the eigenvector response is therefore validated ONLY
+against the production `pdfvars` templates, where it is 1.50e-06 and FLAT across
+n_train 5 -> 27, consistent with it not coming from the `--n-train` solve at all
+(`build_pdf_variations` re-solves with its own `n_train_var = 3` and is exact at
+c = +-1 by construction of the quadratic member interpolation).
+**The experiment that WOULD test the cross terms** is a cache-to-cache A/B: two
+caches built at different `--n-train`, compared at a joint (lambda, c) point.
+That is a rule-vs-rule comparison and so carries the build-to-build floor
+(3.0e-03 in the Jacobian at a displaced point), which is 3 orders above the
+effect -- i.e. the test exists but has no resolution. Recorded as a genuine
+limitation, not papered over.
+
+### (b) Within ONE build, thin bins are BETTER, not worse. The thin-bin worry is
+    backwards at fixed n_train.
+
+`ntrain/perbin.py` on `y20_eig29` (20 bins, |Y| 0-2.5 at qT 20-28, P = 53,
+n_train 9), per-bin worst rule-vs-live deviation over the joint 1x points
+against that bin's own retained-site count:
+
+```
+log-log corr(sites, worst dev) = +0.781
+thinnest quartile (359-364 sites) mean 3.62e-07
+thickest quartile (392-397 sites) mean 1.64e-06
+worst bin: |Y| [1.80, 2.50] x qT [20,24], 397 sites, 4.15e-06
+best  bin: |Y| [0.00, 0.15] x qT [24,28], 359 sites, 8.24e-08
+```
+
+The site count is a measure of how HARD the bin's integrand is, not of how
+well-determined its solve is: a bin that needs many nodes is also a bin that is
+hard to compress. So "the real card has bins with only 247 sites, they may be
+under-resolved" had the sign backwards -- inside a build, those are the easy
+ones. This is a WITHIN-BUILD comparison, so no build-to-build term enters.
+
+**CAVEAT, stated because it is real.** The site range here is narrow (359-397).
+The genuinely thin corner of the real card is ~239-257 sites, a 1.5x
+extrapolation beyond this fit. That is why the qT 5-7 GeV builds
+(`thin_nt5/nt9/nt14`, and two `thin_ref0` for the floor) were launched -- they
+put a measurement there rather than an extrapolation. `thin_nt9` retains
+**239 nodes/bin at P = 53**, against 247 for the thinnest bin of the real
+production cache: representative.
+
+### D19 (b) -- CONFOUND, stated rather than glossed
+
+In `fig6` the per-bin rule error is correlated with the site count (+0.78 in
+log-log) but ALSO with |Y|, and the two are correlated with each other (forward
+bins need more nodes). Both effects are visible separately in the same table:
+
+* at fixed |Y| [1.80, 2.50]: qT [24,28] (385 sites) 1.32e-06 vs
+  qT [20,24] (397 sites) 4.15e-06 -- more sites, 3x worse;
+* at fixed qT [24,28]: |Y| [0,0.15] (359 sites) 8.24e-08 vs
+  |Y| [1.80,2.50] (385 sites) 1.32e-06 -- 16x worse going forward.
+
+So |Y| is the stronger driver and site count is partly a proxy for it. **I cannot
+separate them from this dataset.** THE EXPERIMENT THAT WOULD: a cache on bins
+chosen to break the correlation -- e.g. |Y| < 0.3 at qT 5-7 (thin, central) and
+|Y| 1.8-2.5 at qT 44-100 (thick, forward) in the same build -- and compare the
+per-bin error at matched site count across |Y|. The `thin_*` builds are the first
+half of exactly that.
+
+What the plot DOES establish, and it is the point: nothing in the measured range
+says a bin with fewer retained sites is reproduced worse. The worry that
+motivated raising n_train had the sign backwards.
+
+---
+
+## D20. THE MECHANISM, from the SCETlib source and the cache blobs:
+   the unknowns are SITE WEIGHTS, not parameters, and adding the eigenvectors
+   makes the solve MORE over-determined, not less
+
+**WHAT the rule solve actually is** (`DrellYan.hpp` `Bin_rule_opts`,
+`DrellYanAD.cpp::_rule_directions`, `qT.cpp` bindings):
+
+* `n_train = K` random directions in the FULL P-dimensional parameter space,
+  Gram-Schmidt orthogonalised, unit sup-norm, displaced by `scale = 0.15`
+  (relative for a non-zero parameter, absolute over +-1 for one anchored at 0 --
+  which is every TNP and every eigenvector coefficient);
+* at each training point the solve reproduces the bin's VALUE, its GRADIENT
+  (P rows) and `n_hvp = 1` HVP direction (P rows) EXACTLY;
+* plus the anchor's own value and gradient;
+* the UNKNOWNS are one non-negative weight per RETAINED SITE.
+
+So the design matrix is `rows = 1 + n_train*(1 + 2P)` by `n_sites`, and P enters
+the ROW count, not the unknown count. Verified in the source rather than
+inferred -- `DrellYanAD.cpp` inside `build_bin_rules`:
+
+```
+const std::size_t blk  = 1 + P + (wh ? ntri : M * P);   // M = n_hvp = 1
+const std::size_t nrow = 1 + K * blk;                   // K = n_train
+```
+
+i.e. `blk = 1 + 2P` and `nrow = 1 + n_train(1 + 2P)`: 442 at P = 24 and 964 at
+P = 53, both at n_train = 9. The 9/53 = 0.17 "ratio" compares two things
+that are not on the same side of the equation.
+
+**MEASURED, by parsing `n_sites` and `n_sites_full` out of the rule blobs
+(`ntrain/sitesfull.py`):**
+
+| cache | n_train | P | rows | sites kept (median) | of full | **rows / sites** |
+|---|---|---|---|---|---|---|
+| eig29_nt5 | 5 | 53 | 536 | 220 | 17374 (1.29%) | **2.43** |
+| eig29_nt9 | 9 | 53 | 964 | 364 | 17374 (2.13%) | **2.65** |
+| sub4_1e4_nt14 | 14 | 53 | 1499 | 507 | 17374 (2.98%) | **2.96** |
+| eig29_nt27 | 27 | 53 | 2890 | 720 | 17374 (4.27%) | **4.02** |
+| y20_eig29 (20 bins) | 9 | 53 | 964 | 377 | 16731 (2.30%) | 2.56 |
+| ref0a | 9 | 24 | 442 | 372 | 17374 (2.17%) | **1.19** |
+| **cache_260825_p4 (production, 210 bins)** | 9 | 24 | 442 | 300 | 16731 (1.82%) | **1.47**, worst bin **1.09** |
+
+**Read the last two rows.** The solve is over-determined at every configuration
+tested -- and it is over-determined by MORE at P = 53 (2.65) than at the P = 24
+of every cache the analysis has used so far (1.19-1.47, with the worst bin of
+the current production cache at 1.09, i.e. barely). Registering 29 eigenvector
+coefficients adds 2 rows per coefficient per training point (a gradient row and
+an HVP row) while the retained site count barely moves (372 -> 364 on the same
+4 bins). **Turning the eigenvectors on IMPROVES the conditioning of the rule
+solve.**
+
+That is why the P = 53 accuracy at n_train 9 equals the P = 24 accuracy at
+n_train 9 in every group (D13, EVIDENCE 1, compared against the ref0 floor), and
+why raising n_train does almost nothing: it mostly buys more retained sites
+(1.3% -> 4.3% of the 17374 available) rather than better-determined ones.
+
+**ONE THING TO WATCH, and it is the opposite of the original worry.** The
+current PRODUCTION cache's worst bin sits at rows/sites = 1.09. If a future
+cache is ever built at P = 24 with a lower n_train, or on bins that retain more
+sites, that ratio can cross 1 and the solve becomes genuinely under-determined.
+At P = 53 there is a factor 2.4 of headroom.
+
+**WHAT WOULD OVERTURN IT.** A bin whose `rows/sites` at P = 53, n_train 9 is
+below ~1.5. None of the 4 + 20 + 4 bins measured is (worst 2.41). The 210-bin
+`m210_eig` build in flight will give the full distribution at P = 53.
+
+---
+
+## D21. FULL-CARD CONFIRMATION of D20 -- the 210-bin card at P = 53 is BETTER
+   conditioned than the P = 24 cache in production today
+
+**MEASURED tonight**, `m210_asmuf`, all 210 bins, `--pdf-eig 29 --n-train 9
+--threads 210`, rel 1e-3 (the settings of `cache_260824b`, so like-for-like):
+
+```
+outer node set  23.3 min   (cache_260824b at P=24: 21.9 min -- 6% contention)
+rules built     28.2 min   (median 277 nodes/bin, worst training residual 3.2e-08)
+```
+
+against `cache_260824b` at P = 24: 4.4 min, median 292 nodes/bin, worst residual
+6.1e-07.
+
+So on the REAL card, going P = 24 -> 53 at fixed n_train = 9:
+* rows 442 -> 964,
+* retained sites 292 -> 277 (it keeps FEWER),
+* **constraints per unknown 1.51 -> 3.48**,
+* worst training residual 6.1e-07 -> 3.2e-08 (19x better).
+
+**This is the measurement the whole gate turned on, made on the production
+binning rather than a 4-bin corner.** The concern was that adding 29 parameters
+would leave the rule solve under-determined at n_train = 9. It does the
+opposite. `--n-train 9` at P = 53 is better constrained than the P = 24 caches
+every result so far has been built on.
+
+**CAVEAT.** The rules stage grew 4.4 -> 28.2 min. Tonight's node carried load
+average 600-690 with ~10 of my own processes, and the node-set stage of the same
+build shows only a 6% contention term, so most of the 6.4x is real (2.2x the
+rows, and a solve that is superlinear in rows). Even so, 28 min of rules against
+a member loop of many hours is not a lever; and it is the reason I did NOT try to
+extract an n_train^2.7 law from the 4-bin ladder tonight -- those timings ran
+under a load that changed by a factor 20 during the evening and are not
+comparable. The load-independent cost proxy is the retained site count, which is
+what fig3 uses.
+
+---
+
+## D22. RETRACTION AND CORRECTION: the sigma(alpha_s) test does NOT resolve
+   n_train = 5 either. The floor is 0.70%.
+
+**WHAT I WROTE EARLIER (D18, and an interim reading of fig5):** "n_train 5
+shifts sigma(alpha_s) by +0.75 to +1.0%; 9, 14 and 27 agree to 0.3%." The first
+half of that is not supported and I am retracting it.
+
+**WHY.** The build-to-build floor on this quantity had not been measured when I
+wrote it. It now has been: a SECOND independent n_train 9 build of the identical
+runcard on the identical bins (`ntrain_gate/sub4_1e4_nt9b`) gives
+
+| | sigma(alpha_s) anchor | displaced |
+|---|---|---|
+| n_train 9  (eig_test/eig29_nt9)   | 3.418177e-03 | 3.452807e-03 |
+| n_train 9  (ntrain_gate/sub4_1e4_nt9b) | 3.442092e-03 | 3.476730e-03 |
+| **floor** | **+0.70%** | **+0.69%** |
+| n_train 5  | 3.452126e-03 (+0.99%) | 3.478682e-03 (+0.75%) |
+| n_train 14 | 3.415627e-03 (-0.07%) | 3.449588e-03 (-0.09%) |
+| n_train 27 | 3.427039e-03 (+0.26%) | 3.460959e-03 (+0.24%) |
+
+n_train 9, 14 and 27 all sit INSIDE the 0.70% floor. n_train 5 is the only
+point that leaves it, and only at the anchor: +0.99% against a +0.70% floor
+(1.4x), while its displaced point at +0.75% is on the band edge. The correct
+statement is therefore: **this test cleanly resolves nothing -- not even
+n_train = 5 -- and certainly does not distinguish 9 from 14 or 27.**
+
+**THIS DOES NOT WEAKEN THE RECOMMENDATION -- it sharpens it.** n_train = 5 IS
+resolved as worse by the two tests that have the resolution to see it:
+* against the production templates, NP lambda 6.08e-06 vs 6.53e-07 -- a factor
+  9.3, against a measured +-10-14% floor at P = 53 (T13);
+* against a LIVE evaluation with ONE shared reference (so only the rule
+  differs), NP joint 1x 6.98e-06 vs 6.03e-07 -- a factor 11.6.
+What the sigma(alpha_s) test adds is that even a 10x worse RESPONSE does not
+move the fit's alpha_s uncertainty out of the noise, because the response error
+is 3 orders below what limits the model. That is the reason to keep 9 rather
+than raise it, stated at the level of the actual deliverable.
+
+**HOW THE ERROR HAPPENED, for the record.** I quoted a difference before
+measuring its floor. The floor build was already queued when I wrote D18 -- the
+D18 entry says so ("that control is queued") -- but the interim number went into
+a figure caption before the control landed. fig5 has been regenerated with the
+measured floor drawn as a band.
+
+---
+
+## D23. CORRECTION to an inherited claim: "n_train 5 would make the build ABORT"
+   is too strong. The guard is a RESIDUAL check, not a rank check.
+
+**THE INHERITED CLAIM** (previous agent, `LOGBOOK_eigenvector_paste.md` sec. 3):
+"the member re-solve raises `Fewer sites than constraints` when a bin has fewer
+sites than `m = 1 + n_train_var*(1 + P) = 163` at P = 53 ... n_train = 5 ...
+would put the thinnest real bins at ~134 and the build would **ABORT**, not
+merely degrade."
+
+**WHAT THE CODE ACTUALLY DOES** (`DrellYanAD.cpp`, `build_pdf_variations`):
+`m = 1 + K*(1 + P)` with `K = n_train_var = 3` is confirmed (line 4493), but the
+throw is conditional on the RESIDUAL:
+
+```
+if (rmax > 1e-6 * max(bmax, 1e-300))
+   throw ... + to_string(m) + " constraints on " + to_string(nsel) + " sites)."
+            + (nsel < m ? " Fewer sites than constraints: ..." : "");
+```
+
+`nsel < m` only appends an explanatory sentence to an error that has already
+been triggered by the residual. A bin with fewer sites than constraints can
+still satisfy them to 1e-6 if the constraints are nearly consistent -- which,
+for a smooth member response, they are.
+
+**MEASURED.** `thin_nt5` (|Y| < 0.3, qT 5-7 GeV, P = 53, n_train 5) retains a
+MEDIAN of **159 nodes/bin -- below the m = 163 threshold** -- and its resummed
+member stage completed normally in 11.1 min with no error.
+
+**WHY IT MATTERS.** "Do not lower n_train" is still the right advice, but it now
+rests on the measured accuracy degradation (NP lambda 9.3x worse against the
+templates, 11.6x worse against a live evaluation) rather than on a hard failure
+that may not happen. A build at too low an n_train can therefore come out
+SILENTLY worse rather than refusing -- which is the more dangerous failure mode
+and is worth saying out loud.
+
+**CONFIRMED FROM THE WRITTEN CACHE.** `thin_nt5`'s four bins retain
+**154 / 159 / 160 / 164** sites (parsed per bin from the rule blob) against
+`m = 163`. THREE OF FOUR are below the constraint count, the build wrote its
+cache normally (23.4 MB, fixed-order stage 28.2 min) and its worst training
+residual is **7.1e-09**. The claim is falsified as stated.
+
+For completeness, the thin corner's conditioning at n_train 9:
+`thin_nt9` retains 235-240 sites for 964 rows = **4.03 constraints per unknown**,
+against `thin_ref0a` at P = 24 with 249-257 sites for 442 rows = **1.72**. The
+same 2.3x improvement from turning the eigenvectors on that D20/D21 found in the
+thick corner and on the full card.
+
+---
+
+## D24. FOLLOW-UP my own results opened: chase the 7.8% transition rule-vs-live
+   gap far enough to hand the transition work a usable diagnosis
+
+**WHAT.** Two extra experiments, neither of which is on the n_train critical
+path, both cheap, run because fig2's black line is the largest number anywhere
+in this study and nobody has attributed it:
+
+1. **Is it an eigenvector effect?** Same rule-vs-live test on the scale family
+   at P = 24 (`eig_test/ref0a`, no eigenvectors at all). If the gap is the same
+   7-8% there, the eigenvectors are irrelevant to it.
+2. **Does the muF-member-coordinate fix close it?** A 4-bin `--pdf-eig 29
+   --n-train 9` cache built against `/work/submit/lavezzo/alphaS/scetlib-trans/
+   build-trans` -- the OTHER agent's already-compiled library at 92f1299
+   "qT/ad: the muF members are three muF samples, so interpolate in muF" --
+   then the same test. **Read-only use of an existing build; no SCETlib was
+   rebuilt, in the shared tree or anywhere else.**
+
+**WHY THIS HYPOTHESIS.** The transition points move muF (the study's own
+diagnosis: "the transition points move muf ~20% for x2"), and the cached rule
+reaches muF through the muF MEMBER interpolation `tf = log(kF)/var_muf_lnstep`,
+while a live parameter-route evaluation does not use members at all. A wrong muF
+member coordinate would therefore show up as a rule-vs-live disagreement that is
+flat in n_train -- which is exactly the observed signature (7.736e-02 /
+7.855e-02 / 7.801e-02 / 7.813e-02 at n_train 5 / 9 / 14 / 27).
+
+**WHAT IS ALREADY KNOWN AND CONSTRAINS THE ANSWER.** The cached rule reproduces
+the RUNCARD-route production template `transition_points0.2_0.35_1.0` -- the
+same displacement -- to 2.17e-03, while disagreeing with the LIVE PARAMETER
+route by 7.9e-02 at that point. Three routes, and the rule agrees with the
+runcard one. So the live parameter route is the odd one out, and this is a
+diagnosis of `sigma_binned_batch` under a moved transition point, not of the
+cache. `scale_kappa_R` is clean on the same test (6.0e-08 at 1x), which is the
+control: kappa_R holds muF fixed by construction.
+
+**CAVEAT ON MY OWN TEST.** Because the live parameter route is the suspect, my
+rule-vs-live test is only trustworthy for the NP and TNP families, where all
+three routes agree. That limitation is already reflected in fig2 (the scale
+family is drawn separately and excluded from every joint set) and in D12.
+
+**RESULT OF (1): the eigenvectors are irrelevant.** At P = 24 with `n_eig = 0`
+(`eig_test/ref0a`), the same test gives `scale_x2` down = **7.842e-02** against
+7.855e-02 at P = 53 -- identical to three digits, direction by direction (T14).
+`scale_kappa_R` is 6.7e-07 there, five orders cleaner, which is the control.
+**So the gap is present in the P = 24 configuration the analysis is using
+today**; it is not something the eigenvector build introduces.
+
+**RESULT OF (2): FALSIFIED -- `trans_nt9` shows the same 7.8%.** See D34. If `trans_nt9` shows the same 7.8%,
+the muF member coordinate is not the cause and the next suspect is the frozen
+beam convolutions (`bfc6be6` was supposed to let the transitions move muF for
+them). That would be separated by the runcard-vs-parameter A/B the study already
+has a tool for (`ab_scale_route.py`).
+
+---
+
+## D25. PRE-LAUNCH CHECKLIST for the 62-member build (not a decision -- the
+   operational residue of everything above, in one place)
+
+**Settings**
+* `--pdf-eig 29 --n-train 9` (D13). `--threads`: 210 gave 137 busy cores tonight
+  (65% of requested); the node has 768, and the knowledge note's 145/200 (72%)
+  is the same number. Above ~200 the efficiency is an extrapolation, not a
+  measurement.
+* **DECIDE THE INTEGRATION TOLERANCE FIRST (D16).** It is a 13x lever on the
+  member loop -- 8.7 h at `rel 1e-3, abs 0`, ~13 h at `rel 1e-4, abs 1e-8`,
+  ~114 h at the production `rel 1e-4, abs 0`. Nothing else in this report moves
+  the wall clock by more than a factor 1.2.
+
+**Before launching**
+* **COMMIT `py/scetlib_tf.py`.** The uncommitted `_rule_is_matched` change in
+  the SHARED tree changes every Hessian by 152% (D15). A cache built tonight and
+  evaluated after someone stashes that file would give silently different
+  uncertainties. Branch `fix-nons-double-count` already exists.
+* `backend_check.py` will report a SPURIOUS `pdf_eig0` FD failure: its step is
+  `h = 1e-4 * max(|p|, 1e-3) = 1e-7` for a parameter anchored at 0, and every
+  `pdf_eig` is. The analytic gradient is right to 5e-08 on an h-scan. Fix the
+  step or expect the false alarm (inherited finding, previous agent).
+
+**Resources, measured**
+* build process: ~1874 OS threads whatever `--threads` says (TF's own pools),
+  and **~60 GB resident** for 210 bins x 62 members at P = 53 (measured 47-49 GB
+  at 4 members in the rules stage, plus 13 GB of member payload). At the
+  32768 threads/user ceiling that is ~17 concurrent build processes.
+* output: **~14.3 GB uncompressed rules, ~2.5 GB npz.** /ceph has 388 TB free.
+* the FIT that loads it: **50-64 GB RSS** (a range, not a point: the linear
+  RSS model and a pure RSS/rules ratio disagree by 15% when extrapolated 10x
+  past the largest measured blob), ~1.2 s per value+jacobian call and
+  ~4-5 min for the hessian, at 8 threads (fig4). That rules out a wide
+  concurrent toy ensemble on one machine: 1447 GB / 55 GB is ~26 fits, and
+  they would also contend for cores.
+* if bins are split and merged: the merge wants ~4x the blob, i.e. also ~60 GB
+  and ~10 min (knowledge note, measured on the 4-member 210-bin cache).
+
+**Do NOT**
+* split MEMBERS across processes (unmergeable; the node set is not
+  reproducible). Split BINS with `--subset` / `--bin-groups` + `--merge-bins`.
+* raise `--n-train` (D13): it doubles the cache, the fit's RAM, every fit
+  iteration and the covariance pass, for an accuracy gain 3 orders below what
+  limits the model.
+
+---
+
+## D26. A THIRD member-count point at 210 bins, because the fixed overhead of the
+   member stage is NOT small and a two-point comparison cannot separate it
+
+**WHAT.** Launched `m210_eig8`: 210 bins, `--pdf-eig 29 --n-train 9 --members
+0:8 --threads 210`, rel 1e-3 -- identical to `m210_eig` except that it builds
+FOUR eigenvector pairs instead of two.
+
+**WHY.** The fixed-order member stage is `F + n_members * a`, and F is large.
+On the 4-bin corner, comparing `ref0a` (4 members, FO 1.4 min) with
+`eig29_nt9` (62 members, FO 7.8 min) gives a = 0.110 min/member and
+**F = 0.96 min -- 69% of the 4-member stage**. Extrapolating a 4-member stage
+LINEARLY to 62 members therefore over-counts badly:
+
+* linear from 54.8 min / 4 members: 62 x 13.7 = 14.2 h
+* with F separated (if F is a similar fraction at 210 bins): F + 62a could be
+  half that.
+
+The difference between those two answers is the difference between a one-night
+build and a two-night one, so it has to be measured rather than assumed. Two
+shards with 4 and 8 eigenvector members share F exactly, so
+`a_eig = (FO_8 - FO_4)/4` and `F = FO_4 - 4 a_eig`, with no assumption at all.
+
+**AND IT ALSO FIXES THE muF RATIO.** With `a_eig` known and `m210_asmuf`
+(2 alphaS + 2 muF) measured on the same night and the same bins,
+`a_muf = (FO_asmuf - F - 2 a_alphaS)/2` with `a_alphaS = a_eig` (both are one
+node refill). That is a direct measurement of the 2.4x muF:PDF ratio the 15 h
+projection depends on, rather than the inherited fork-based number.
+
+**COST.** ~24 min prologue + ~30 min rules + the member stage, on a node whose
+load has dropped to 270. It does not gate anything else.
+
+**WHAT WOULD OVERTURN IT.** If `FO_8 - FO_4` is not ~2x `FO_4 - F`, the stage is
+not linear in the member count and the whole cost model needs rethinking -- in
+which case say so and quote the measured points only.
+
+---
+
+## D27. Close the loop: express the rule error as an equivalent shift on
+   alpha_s, not as a residual
+
+**WHAT.** `ntrain/resid_to_alphas.py`. For the same Fisher matrix used in D18
+(`F = L^T W L + I`), a residual `r` (per bin, in ln sigma) induces the parameter
+shift `dp = F^-1 L^T W r`; the alpha_s component of that, divided by the
+sigma(alpha_s) the SAME matrix gives, is the number that matters. Applied to the
+signed per-bin rule-vs-live residual at every point of the joint sets, on
+`y20_eig29` (20 bins spanning |Y| 0-2.5 at qT 20-28, P = 53, n_train 9).
+
+**WHY.** Every number in this report so far is a residual. A residual is only
+worth something once it is projected onto d ln sigma / d alpha_s AND the other
+52 nuisances have absorbed what they can -- which is exactly what the study's own
+`residual_structure_map.py` does for the OTHER directions, and what makes the
+transition residual worth 0.002-0.025 sigma rather than "2e-03".
+
+**WHY THIS IS THE RIGHT CLOSING NUMBER.** It converts "the rule error at
+n_train 9 is 6e-07" -- which no one can weigh -- into "the rule error at
+n_train 9 is X sigma(alpha_s)", which is directly comparable to the 0.002-0.025
+sigma the study already assigns to the transitions, and to the 1.0 sigma that
+would make it a problem.
+
+**CAVEAT, same as D18.** Unit priors, an invented 0.3% per-bin uncertainty and
+20 of 210 bins. The FRACTION of sigma is far more robust than the absolute,
+because both numerator and denominator come from the same Fisher matrix.
+
+---
+
+## D28. THE HEDGE IS CLOSED, and it closed in the opposite direction to the worry
+
+**THE PRE-REGISTERED QUESTION (D14).** "If the thin corner at n_train 9 lands at
+the n_train 5 accuracy of the thick corner, then thin bins ARE under-resolved at
+9 and the recommendation becomes n_train 12-14. If it lands where the thick
+corner's n_train 9 does, the recommendation stands for the whole card."
+
+**THE ANSWER.** It lands 46x BETTER than the thick corner's n_train 9. Rule vs a
+LIVE evaluation, worst over 12 random joint NP points at the template step,
+P = 53:
+
+| | thick (qT 20-28) | thin (qT 5-7) |
+|---|---|---|
+| n_train 5 | 6.98e-06 | **1.24e-07** |
+| n_train 9 | 6.03e-07 | **1.31e-08** |
+
+and the thin corner's conditioning is 4.03 constraints per unknown against 2.65
+in the thick one. So the recommendation stands for the whole card, and the
+reason the thin bins are thin is that their integrand is EASY, not that the
+solve gave up on them -- which is the same conclusion the within-build per-bin
+correlation reached (D19b), now confirmed between corners where site count and
+|Y| are not confounded.
+
+**THE ONE PLACE IT REVERSES, stated because it is real.** At 4x the template
+displacement the thin corner is 9x WORSE than the thick one (4.61e-04 vs
+5.15e-05 at n_train 9). Low-qT bins sit closer to the nonperturbative region, so
+a large lambda excursion moves their integrand much more than it moves a
+qT 20-28 bin's, and the rule extrapolates less well there. At 1x and 2x -- where
+a converging fit lives -- the thin corner wins, and at 4x both are still
+<= 5e-04. If a fit is ever seen wandering to several times the template
+displacement in the NP directions, this is the number that would need
+re-examining; nothing in the current fits does.
+
+**WHAT I STILL CANNOT SAY.** Nothing in this study measures a 210-bin cache at
+more than one n_train -- that would be the full build, twice. The argument that
+carries the 4-bin and 20-bin results to 210 bins is that **a bin's rule is
+self-contained**: its own outer grid, sites, node data and members, solved
+independently, which is exactly why bins from separate processes merge
+byte-exactly (knowledge note). Under that structure a per-bin measurement
+generalises bin by bin, and the two corners bracket the card's site range
+(154-164, 235-240 and 359-397 against the card's 247-406). That is an argument
+plus coverage, not a direct 210-bin n_train scan, and it should be read as such.
+
+---
+
+## D29. Both routes of the muF-fix test must use the FIXED library
+
+**WHAT.** `after_trans.sh` runs BOTH the rule replay and the live evaluation of
+`trans_nt9` against `/work/.../scetlib-trans/build-trans`, not just the rule.
+
+**WHY.** The hypothesis is that the muF member coordinate is wrong in the CACHE's
+replay. But 92f1229 could equally change the live route. Comparing a
+trans-built rule against a build-fix live evaluation would mix a code change into
+a route comparison and could show a "fix" that is only the two libraries
+disagreeing. The clean test is rule-vs-live INSIDE each library, then compare the
+two gaps:
+
+* build-fix: rule vs live at `scale_x2 = 0.35` = **7.855e-02** (measured)
+* build-trans: the same number, to be measured
+
+**WHAT WOULD OVERTURN THE HYPOTHESIS.** the trans gap being the same 7.8%.
+**WHAT WOULD CONFIRM IT.** the trans gap collapsing toward the 2.17e-03 that the
+rule already achieves against the RUNCARD-route template.
+**WHAT WOULD BE AMBIGUOUS.** a partial reduction -- in which case the remaining
+piece is the frozen beam convolutions and `ab_scale_route.py` (runcard vs
+parameter, one library) separates them.
+
+**SCOPE NOTE.** This is a diagnosis handed to the transition work, not a change
+to anything. No SCETlib was rebuilt; the `build-trans` library was compiled by
+the other agent at 14:31 today and is used read-only.
+
+---
+
+## D30. "Where does accuracy stop improving?" -- the honest answer is that it
+   never does, and that is not the question that decides the build
+
+**THE MEASUREMENT.** Rule vs a LIVE evaluation, worst over 12 random joint NP
+points at the template step, P = 53, thick corner (|Y|<0.3, qT 20-28):
+
+| n_train | 5 | 9 | 14 | 27 |
+|---|---|---|---|---|
+| joint NP 1x | 6.98e-06 | 6.03e-07 | 5.80e-08 | 4.63e-08 |
+| ratio to the previous | -- | /11.6 | /10.4 | /1.25 |
+
+and in the thin corner (qT 5-7): 1.24e-07 -> 1.31e-08 -> 3.21e-09,
+i.e. /9.5 then /4.1.
+
+So the rule solve is still improving at n_train 27 -- the curve has a knee near
+14 but never flattens. **Anyone who asks "where does accuracy saturate" and
+takes the answer as the recommendation will pick 14 or 27.** That would be the
+wrong reading, for three reasons, each measured:
+
+1. **Against the production TEMPLATES -- the figure of merit -- it is already
+   flat from 9.** 9 -> 14 changes NP lambda by -14% and the transitions by -24%
+   against a MEASURED build-to-build floor of +-10 to 14% at P = 53 (two
+   independent n_train 9 builds, T13). There is nothing there to resolve.
+2. **In sigma(alpha_s), 9 already costs 1e-5 sigma** at the template step and
+   0.003 sigma at 8x it, against 0.002-0.025 sigma for the transitions (T18).
+   14 and 27 buy a factor 5 on the smallest term in the model.
+3. **The improvement is not free and the price is paid in the FIT.** 9 -> 27
+   doubles the retained sites, hence the cache (13 -> 28 GB), the fit's RSS
+   (51 -> 108 GB), every minimiser iteration and the covariance pass (T3).
+
+**THE ANSWER TO GIVE.** Accuracy improves monotonically to at least 27; what
+stops at 9 is any effect on a quantity anyone measures. 9 is the smallest value
+with margin: it is a factor 8 above where the rule error reaches the bottom of
+the transition band (n_train 5, 0.024 sigma), and a factor 10-12 better than
+n_train 5 on the raw metric in both corners.
+
+---
+
+## D31. `target_precision_abs = 0` costs 8.6x and, on the bins tested so far,
+   buys NOTHING. Testing it where it could actually matter.
+
+**MEASURED (4 bins, |Y| < 0.3, qT 20-28, P = 53, n_train 9, rel 1e-4, the ONLY
+difference being `target_precision_abs`):**
+
+| group | abs = 0 (`sub4_1e4_nt9b`) | abs = 1e-8 (`sub4_1e4abs8_nt9`) |
+|---|---|---|
+| NP lambda (8) | 5.91e-07 | 6.08e-07 |
+| TNP (20) | 1.95e-07 | 1.95e-07 |
+| muF/kappa_R (6) | 1.39e-04 | 1.39e-04 |
+| transitions (3) | 2.47e-03 | 2.47e-03 |
+| alphaS (2) | 1.88e-05 | 1.88e-05 |
+| PDF eig (58) | 1.50e-06 | 1.49e-06 |
+
+Identical in every group (the NP lambda difference is 3%, against a measured
++-10-14% build-to-build floor). And on the 210-bin card that same change is
+worth **8.6x** on the member loop (715.6 vs 82.8 min for 4 members) -- the
+difference between a ~114 h build and a ~13 h one.
+
+**WHY I AM NOT YET RECOMMENDING abs = 1e-8.** An ABSOLUTE floor can only bite
+where the bin's cross section is SMALL. The corner tested carries ~2.4 pb per
+bin; an absolute target of 1e-8 pb is 9 orders below that and cannot possibly
+be reached, so this test had no power. The bins where it could matter are the
+small-sigma ones: forward rapidity at high qT.
+
+**THE TEST THAT HAS POWER, now running.** Two 4-bin caches at
+`--subset '8,9/19,20'` = |Y| 1.5-2.5 x qT 33-100 -- the smallest-cross-section
+corner of the card -- differing only in `target_precision_abs` (0 vs 1e-8),
+compared with the same tool against the same templates.
+
+* If they agree there too, `abs = 1e-8` is safe and the production build should
+  use it: same accuracy, 8.6x cheaper, and the same setting every cache before
+  2026-08-24 used.
+* If `abs = 0` is measurably better in that corner, then it is buying something
+  real and 114 h is the price -- in which case the build MUST be split over
+  condor nodes BY BINS (which is validated exact), not run in one process.
+
+**ATTRIBUTION LIMIT I CANNOT REMOVE TONIGHT.** Even a null result on 4 forward
+bins is 4 of 210. The full statement would need the comparison on the whole
+card, which is two 210-bin builds. What I can offer is a corner chosen to
+maximise the chance of seeing the effect, plus the observation that every cache
+built before 2026-08-24 used `abs = 1e-8` and none of the validation work in
+this study found a problem attributable to it.
+
+### D31 (correction, written before the result): my "corner with power" reasoning
+    for the `target_precision_abs` test is WRONG, and I cannot fix it with a
+    subset
+
+**WHAT I ASSUMED.** That an absolute integration floor of 1e-8 pb can only bite
+where the BIN cross section is small, so a forward high-qT corner would have
+power.
+
+**WHY THAT IS WRONG.** Two reasons, and I should have checked both before
+launching.
+1. The corner I picked is not small: `small_abs0/8` report a node-set sum of
+   **40.708 pb over 4 bins = 10.2 pb/bin**, against 2.44 pb/bin for the
+   qT 20-28 corner and 1.5 pb/bin for qT 1-3. The wide qT [44,100] bin
+   integrates a lot. The genuinely smallest bins on the card are the NARROW
+   ones (|Y| 0.15-wide x qT 1-GeV-wide), of order 0.3-1.5 pb -- still eight
+   orders above 1e-8 pb.
+2. More fundamentally, the tolerance is applied **per NODE**, not per bin
+   ("the node ladder targets 0.0001 relative to the matched cross section at
+   each node"), and p4's own build script says the `abs` change was safe
+   "now that the per-bin absolute target comes from the resummed piece
+   (aa42bbc) instead of a tolerance against a **cancellation residue**". The
+   quantity the floor guards is a near-cancelling node-level integrand, whose
+   size is not a simple function of the bin's cross section. **No choice of
+   bins guarantees power.**
+
+**WHERE THAT LEAVES IT.** Two corners (qT 20-28 at 2.4 pb/bin, and the forward
+one at 10.2 pb/bin) show `abs = 0` and `abs = 1e-8` agreeing in every group to
+within the build-to-build floor, with identical retained node counts. That is
+evidence, not proof, and I am labelling it as such rather than turning a
+null result on 8 of 210 bins into a recommendation.
+
+**THE EXPERIMENT THAT WOULD SETTLE IT** is a 210-bin A/B at fixed rel 1e-4 --
+i.e. two full builds, ~6 h at abs 1e-8 and ~18 h at abs 0 for 4 members, which
+is a day of the node and is a decision for Luca, not something to start
+unasked. A cheaper 80% version: build both at 210 bins with `--no-pdf` (no
+member loop at all), which costs only the node set plus the rules -- about
+6 h at abs 0 and 40 min at abs 1e-8 -- and compare the two caches' sigma and
+Jacobian bin by bin. That isolates exactly the stage the `abs` change makes
+expensive (the node set, 325.3 vs ~22 min) and needs no members.
+
+---
+
+## D32. Queued the cheap 210-bin `abs` A/B, but BEHIND the member-cost shards
+
+**WHAT.** `queue_abs210.sh` waits for `m210_eig` and `m210_asmuf` to write their
+caches, then launches two 210-bin `--no-pdf --threads 200` builds differing only
+in `target_precision_abs` (1e-8 vs 0), both at rel 1e-4.
+
+**WHY `--no-pdf`.** It skips the member loop entirely, so the build costs only
+the node set plus the rules -- and the node set is exactly the stage the `abs`
+change makes expensive (325.3 min at abs 0 against ~22 min at 1e-3; the rules
+stage barely moves, 10.6 vs 4.4 min). So this isolates the effect for ~50 min
+at abs 1e-8 and ~6 h at abs 0, instead of two full 18 h builds.
+
+**WHY BEHIND, NOT NOW.** The node is at ~500 of 768 busy cores with the three
+member-cost shards and the production-tolerance run. Adding two more 210-thread
+builds now would slow `m210_eig`/`m210_asmuf`, and their RATIO is the deliverable
+for item 4. Correctness of the primary measurement beats speed on a secondary
+one.
+
+**WHAT IT WILL AND WILL NOT SETTLE.** It compares sigma and the Jacobian bin by
+bin on the FULL card at the two `abs` settings. It will NOT cover the member
+data (no members are built), so if `abs` matters only through
+`set_pdf_keep_nodes`, this test will miss it -- and that is a real possibility,
+because the member refill is where 8.6x of the cost is. Stated so nobody reads
+a null result here as a green light on its own.
+
+---
+
+## D33. MEMOISATION CHECK -- the arms in every comparison here are provably
+   separated (prompted by another agent's exactly-1.00 null)
+
+**THE HAZARD.** `ScetlibCachedXsecTF.values_and_jacobian` memoises on the
+parameter vector ALONE, so two configurations compared inside one process can be
+served the same cached result and return a perfect, meaningless null.
+
+**WHY THIS STUDY IS NOT AFFECTED, by construction and by measurement.**
+* Every `rule_vs_direct.py` arm ran in its OWN PROCESS writing its OWN npz
+  (`--mode rule` and `--mode direct` are separate invocations, one per cache);
+  a per-instance memo cannot cross processes.
+* Every `validate_variations.py` run was one process on one cache.
+* Verified from the saved data rather than argued: the nt9 arm has **245
+  DISTINCT value rows out of 261 points** (the 16 repeats are the deliberately
+  duplicated anchor and the points that clip onto the same physical vector), and
+  sigma varies by 21% across the point set. A memo serving one result would give
+  ONE distinct row.
+* The arms differ: nt9-rule vs nt5-rule by 1.05e-03, rule vs direct by 2.19e-04.
+  Nothing here is a 1.000 null.
+* The interleaved `eval_cost_ab.py` timings use a different parameter point on
+  every round and per tag, and the measured times (47-170 ms) are far above a
+  dictionary hit.
+
+**THE ONE PLACE A "TOO CLEAN" NULL DOES APPEAR, and its cause is different.**
+`thin_ref0a` vs `thin_ref0b`, and `lowqt_ref0` vs `lowqt_eig29`, agree to the
+printed 3 digits. Those are DIFFERENT cache FILES validated in DIFFERENT
+processes, and the caches are demonstrably not the same object (257 vs 254
+retained nodes/bin). The agreement is the physics floor described in T11 -- at
+qT < 10 GeV the residual is a common difference between our calculation and the
+production templates -- not a memo artefact. And it is not perfect: the
+`mufdown-kappaFO0.5-kappaf2.` row differs in its 4th digit.
+
+---
+
+## D34. HYPOTHESIS FALSIFIED: the muF-member-coordinate fix does NOT close the
+   transition rule-vs-live gap
+
+**THE HYPOTHESIS (D24).** The 7.8% disagreement between the cached rule replay
+and the live parameter route on the transition directions is the muF member
+interpolation, because the transition points move muF and the rule reaches muF
+through the member pair while the live route does not.
+
+**THE TEST.** A 4-bin `--pdf-eig 29 --n-train 9` cache built against
+`/work/submit/lavezzo/alphaS/scetlib-trans/build-trans` (92f1299, "the muF
+members are three muF samples, so interpolate in muF"), with BOTH the rule
+replay and the live evaluation run against that same library (D29).
+
+**THE RESULT -- no change whatever:**
+
+| direction, 1x down | build-fix (bb2e7cb) | muF fix (92f1299) |
+|---|---|---|
+| `scale_x1` | 5.308e-02 | **5.309e-02** |
+| `scale_x2` | 7.855e-02 | **7.873e-02** |
+| `scale_x3` | 8.025e-03 | **8.048e-03** |
+| `scale_kappa_R` | 2.822e-07 | 4.352e-07 |
+
+Three digits, direction by direction. Combined with T26 (the fix also changes
+nothing against the production templates on this corner) and T14 (the gap is
+identical at P = 24 with no eigenvectors at all), the transition gap is:
+**independent of n_train, independent of the eigenvectors, and independent of
+the muF member coordinate.**
+
+**WHAT IS LEFT, and it is now the only candidate on the table.** The frozen beam
+convolutions. The study's own diagnosis says the transition points move muF
+(~20% for x2) and that the per-node beam convolutions are frozen at the config's
+muf, changing by 7-16% over that range; `bfc6be6` ("let the transition points
+move muF for the beam convolutions too") was supposed to address it and is in
+bb2e7cb, so either it does not cover the parameter route or it does not cover
+the compressed replay. `scale_kappa_R` is clean by five orders on the same test,
+which is exactly the control the mechanism predicts: kappa_R holds muF fixed by
+construction.
+
+**THE EXPERIMENT THAT SEPARATES THE REMAINDER.** `ab_scale_route.py` already in
+the study directory: the same transition point reached by the RUNCARD (which
+refills the nodes) against the PARAMETER (which cannot), inside one library.
+The rule agrees with the runcard-route production template to 2.17e-03 at
+x2 = 0.35 while disagreeing with the live parameter route by 7.9e-02, so the
+prediction is that the runcard-vs-parameter A/B reproduces ~7.9e-02 and the
+compressed rule is not implicated at all.
+
+**SCOPE.** Handed to the transition work. No SCETlib was rebuilt; `build-trans`
+was compiled by the other agent at 14:31 today and used read-only.

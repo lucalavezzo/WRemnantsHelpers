@@ -4495,3 +4495,111 @@ it does not. `92f1299` (the coordinate fix, MR !8) still stands on its own
 merits. The five-knot branch is pushed and NOT proposed as an MR; if it is ever
 wanted it is for kappa_F between knots (82x) and the fit derivative (3-33x),
 which is a different argument from the one it was built for, and Luca's call.
+
+### 2026-08-25/26 (overnight) -- `--n-train` GATE RESOLVED: keep 9. And the build cost is set by the TOLERANCE, not by n_train.
+
+**The gate.** `--n-train` defaults to 9; with 29 PDF eigenvector pairs the
+parameter count goes 24 -> 53, so the ratio n_train/n_params falls to 0.17 and
+upstream would use `max(9, ceil(1.5 P)) = 80`. The 62-member build was gated on
+whether that matters.
+
+**It does not, and the premise is backwards.** The rule solve's UNKNOWNS are the
+retained site weights; P appears in the ROWS. From the source
+(`DrellYanAD.cpp::build_bin_rules`): `blk = 1 + P + n_hvp*P`,
+`nrow = 1 + n_train*blk`, so each parameter adds two rows per training point.
+Constraints per unknown, parsed per bin out of the rule blobs:
+
+| cache | n_train | P | rows | sites/bin | rows/sites |
+|---|---|---|---|---|---|
+| **cache_260825_p4 (210 bins, in production TODAY)** | 9 | 24 | 442 | 300 (min 247) | **1.51**, worst bin **1.09** |
+| **m210_asmuf (210 bins, tonight)** | 9 | 53 | 964 | **277** | **3.48** |
+| eig29_nt9 (4 bins, qT 20-28) | 9 | 53 | 964 | 364 | 2.65 |
+| thin_nt9 (4 bins, qT 5-7) | 9 | 53 | 964 | 239 | 4.03 |
+| ref0a (same 4 bins) | 9 | 24 | 442 | 372 | 1.19 |
+
+Turning the eigenvectors on makes the solve **2.3x better conditioned on the
+real card**, and it keeps FEWER sites (277 vs 292), so the cache is slightly
+smaller per member than a naive scaling gives.
+
+**Measured accuracy, five ways, all consistent.**
+1. Against the production templates (4 bins, P = 53): flat from n_train 9 up,
+   inside a MEASURED build-to-build floor of +-10-14% (two independent nt9
+   builds). alphaS is 1.88e-05 at n_train 5, 9, 14 AND 27 -- identical.
+   n_train 5 is 9.3x worse in NP lambda.
+2. Against a LIVE SCETlib evaluation (no template, so no cutoff mismatch), 12
+   random JOINT points: 6.98e-06 / 6.03e-07 / 5.80e-08 / 4.63e-08 at
+   n_train 5 / 9 / 14 / 27. It keeps improving -- but from a level 3 orders
+   below what limits the model.
+3. In sigma(alpha_s) units (residual projected through F^-1 L^T W with the
+   other 52 nuisances profiled): **1e-5 sigma at n_train 9** where the fit sits,
+   0.003 sigma at 8x the template displacement, against **0.002-0.025 sigma**
+   for the transition residual. n_train 5 gives 0.024 sigma -- the top of that
+   band. 9 clears it by a factor 8.
+4. Toy Asimov sigma(alpha_s) from the model's own Jacobian: 9, 14, 27 all inside
+   a measured 0.70% build-to-build floor.
+5. The card's THIN bins (qT 5-7 GeV, 239 sites, matching the card's min of 247)
+   are **46x BETTER** than the corner the scan used, not worse.
+
+**Cost of raising it (all measured, 4 bins, P = 53):** 9 -> 27 doubles the
+retained nodes (364 -> 720) and therefore doubles the cache (13 -> 28 GB), the
+fit's RSS (51 -> 108 GB), every value+jacobian call (52.9 -> 122.5 ms) and the
+hessian (10.9 -> 25.3 s). Retained sites are 1.3-4.3% of the 17374 available.
+
+**The 62-member build, measured:** rules stage at P = 53 on 210 bins **28.2 min**
+(vs 4.4 at P = 24); rules blob **~13-14 GB**, npz **~2.3-2.5 GB**; build process
+**~60 GB resident and ~1874 OS threads whatever `--threads` says**; the loaded
+model in a fit **~51-55 GB**, ~1.2 s per value+jacobian and ~4-5 min per hessian
+at 210 bins.
+
+**THE THING NOBODY COSTED, and it is 13x bigger than anything n_train does.**
+The "~14 h for 62 members" projection is at `target_precision_rel = 1e-3`. The
+PRODUCTION cache `cache_260825_p4` runs at `rel = 1e-4, abs = 0`:
+
+| | node set | rules | fixed-order, 4 members |
+|---|---|---|---|
+| cache_260824b (rel 1e-3, abs 0) | 21.9 min | 4.4 min | **54.8 min** |
+| cache_aspair_260821_kRfix (1e-4, abs 1e-8) | -- | 8.5 min | 82.8 min |
+| cache_260825_p4 (1e-4, abs 0) | **325.3 min** | 10.6 min | **715.6 min** |
+
+`abs 1e-8 -> 0` alone (changed 2026-08-24 on Josh's advice) is worth **8.6x**.
+Accuracy cost of dropping to rel 1e-3, measured on IDENTICAL bins and confirmed
+by a second thread-matched pair: NP lambda x25, TNP x28, muF x1.5,
+**alphaS x1.08**, transitions unchanged -- leaving lambda/TNP at 1.5e-05/5.5e-06,
+still an order below the muF residual and two below the transitions. The one
+caution: the worst per-bin TRAINING residual on the 210-bin card is 6.1e-07 at
+1e-3 against 2.5e-08 at 1e-4, and the builder WARNS above 1e-6.
+**This is a decision for Luca. The build cannot be costed without it.**
+
+**Two corrections to inherited claims.**
+* "The hessian rises 3.2x for two extra parameters" -- REFUTED. That came from
+  two `backend_check` runs on a node at load 250-570. Interleaved in ONE
+  process: P 24 -> 26 is **x1.09**, P 24 -> 53 is x2.95, and toggling the
+  `_rule_is_matched` short-circuit changes the TIME by 2%. The covariance pass
+  is not the binding constraint; memory is.
+* "n_train 5 would make the build ABORT" -- too strong. The guard is a RESIDUAL
+  check (`rmax > 1e-6`), and the "fewer sites than constraints" text is only an
+  explanatory suffix. `thin_nt5` has THREE of four bins below `m = 163` and
+  wrote its cache with a residual of 7.1e-09. **Too small an n_train degrades
+  silently rather than refusing** -- the more dangerous failure mode.
+
+**One thing to fix before the build.** The uncommitted `py/scetlib_tf.py` in the
+SHARED tree (`_rule_is_matched`, the nonsingular double-count fix) changes every
+Hessian by **152%**. It is live on PYTHONPATH for every session. Commit it
+(branch `fix-nons-double-count` exists) so the cache and the evaluation code are
+pinned together.
+
+**Handover to the transition work.** The rule replay and the LIVE parameter route
+disagree by **7.8%** at `scale_x2 = 0.35` -- flat in n_train (7.74/7.86/7.80/
+7.81e-02 at 5/9/14/27) and **identical at P = 24 with no eigenvectors at all**
+(7.842e-02), so it is in the configuration in production today. `scale_kappa_R`
+is clean at 6e-07 on the same test, which is the control. The rule agrees with
+the RUNCARD-route template to 2.17e-03 at that same point, so the live parameter
+route is the outlier. A 4-bin cache built against the muF-member-coordinate fix (`build-trans`,
+92f1299), with BOTH routes on that library, gives **the same 7.873e-02** -- so
+the muF member coordinate is NOT the cause either. The only candidate left is
+the frozen beam convolutions, and `ab_scale_route.py` (runcard route vs
+parameter route, one library) is the experiment that isolates it.
+
+Everything: `~/public_html/alphaS/260825_scetlib_ad_ntrain_gate/` (9 figures,
+00_README.txt with per-figure provenance, TABLES.md with 24 tables) and
+`DECISIONS_ntrain_gate.md` (30 decisions).

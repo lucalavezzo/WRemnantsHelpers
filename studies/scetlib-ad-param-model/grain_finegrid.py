@@ -43,7 +43,7 @@ for _p in (_WREM, os.path.join(_WREM, "scripts", "rabbit", "scetlib_ad"), _HERE)
     if _p not in sys.path:
         sys.path.insert(0, _p)
 
-from grain_vs_grid import merge_matrix  # noqa: E402
+from grain_vs_grid import BASIS, fisher, merge_matrix  # noqa: E402
 
 CORR_MAIN = (
     "nominal_ptll_yll_scetlib_dyturbo_LatticeNPLambda4Bugfix_FranksValsVars_"
@@ -283,6 +283,28 @@ def main():
     top[-1, :] = False
     top = top.reshape(-1)
 
+    # ---- the alpha_s projection, built from the REFERENCE responses ---------
+    # A's columns are the histmaker's own per-event responses, so the design
+    # matrix is identical at every resolution and model-free; the only thing
+    # that moves between rows of the table is the residual being projected.
+    n_evt = None
+    for hname in args.corr:
+        v, labels = D["var"][hname]
+        n_evt = v[..., labels.index(VV.central_label(labels))].reshape(-1)
+        break
+    basis = [L for L in BASIS if L in refs]
+    AS_UP, AS_STEP = "pdfCT18ZNNLO_as_0120", 0.002
+    have_as = AS_UP in refs
+
+    def as_solver(exclude=None):
+        cols = [np.nan_to_num(refs[AS_UP][0] - 1.0) / AS_STEP]
+        cols += [np.nan_to_num(refs[b][0] - 1.0) for b in basis if b != exclude]
+        return fisher(np.stack(cols, axis=1), n_evt, 0)
+
+    sig_as = as_solver()[0] if have_as else np.nan
+    print(f"Fisher sigma(alpha_s) from the reference responses: {sig_as:.4e}")
+
+    prof_store = {}
     rows = []
     for qname, qe in qt_grids:
         M_R, M_rho = qt_merges(Te, qe, Tn0, i44, tail=args.tail)
@@ -303,9 +325,18 @@ def main():
                 rB = (Rc @ rho) / den_reco
                 good = np.isfinite(rr) & (rr != 0) & (w > 0)
                 dev = np.abs(rB / rr - 1.0)
+                eq = np.nan
+                if have_as:
+                    eq = as_solver(exclude=L)[1](
+                        np.where(good, rB / rr - 1.0, 0.0))
+                if yname == "card":
+                    d2 = (rB / rr - 1.0).reshape(npt, nyl)
+                    wc = np.nan_to_num(w).reshape(npt, nyl)
+                    prof_store.setdefault(qname, {})[L] = (
+                        np.nansum(np.abs(d2) * wc, axis=1) / wc.sum(axis=1))
                 rows.append(dict(
                     qgrid=qname, ygrid=yname, nT=nq, nY=ny, ngen=nq * ny,
-                    direction=L,
+                    direction=L, eq_as_grain=eq, sigma_as=sig_as,
                     grain_max=float(dev[good].max()),
                     grain_wmean=float(np.average(dev[good], weights=w[good])),
                     grain_max_notop=float(dev[good & top].max()),
@@ -320,6 +351,31 @@ def main():
             print(f"qT {qname:<8} |Y| {yname:<8} {nq:3d} x {ny:3d} = {nq*ny:4d} : "
                   f"wmean med {np.median(g):.3e} worst {g.max():.3e} | "
                   f"max med {np.median(gm):.3e} worst {gm.max():.3e}", flush=True)
+
+    # ---- where in reco ptll the residual sits, finest vs the card's grid ----
+    pt = D["pt"]
+    for qname in ("fine", "card"):
+        if qname not in prof_store:
+            continue
+        P = np.array([prof_store[qname][L] for L in sorted(prof_store[qname])])
+        med = np.median(P, axis=0)
+        print(f"\nmedian |GRAIN| per reco ptll bin, gen qT grid = {qname} "
+              f"(x 1e4):")
+        print("   " + " ".join(f"{pt[i]:g}:{med[i]*1e4:.2f}"
+                               for i in range(len(med))))
+    if "fine" in prof_store and "card" in prof_store:
+        Pf = np.array([prof_store["fine"][L] for L in sorted(prof_store["fine"])])
+        Pc = np.array([prof_store["card"][L] for L in sorted(prof_store["card"])])
+        mf, mc = np.median(Pf, axis=0), np.median(Pc, axis=0)
+        for lo, hi, tag in ((1.0, 12.0, "1-12 GeV (fine grid == correction grid)"),
+                            (12.0, 20.0, "12-20 GeV"),
+                            (20.0, 44.0, "20-44 GeV"),
+                            (0.0, 1.0, "0-1 GeV (fine grid still coarser)")):
+            sel = (pt[:-1] >= lo - 1e-9) & (pt[:-1] < hi - 1e-9)
+            if sel.any():
+                print(f"   {tag:<44} card {np.median(mc[sel]):.2e} -> "
+                      f"fine {np.median(mf[sel]):.2e}  "
+                      f"({np.median(mc[sel]) / max(np.median(mf[sel]), 1e-30):.1f}x)")
 
     import csv
     with open(args.csv, "w", newline="") as fh:
