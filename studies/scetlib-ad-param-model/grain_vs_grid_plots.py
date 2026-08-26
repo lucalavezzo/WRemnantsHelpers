@@ -124,9 +124,13 @@ def plot_vs_resolution(rows, outdir, axis, meta, measured=None):
     ax.set_xlabel(xlabel); ax.set_ylabel(r"yield-weighted mean $|$model/ref $-1|$")
     ax.grid(alpha=0.3, which="major")
     ax.legend(fontsize=8, loc="upper right")
-    ax.set_title("Reco-level residual against gen-grid resolution\n"
-                 "(coarsenings of the shipped card; finer is an extrapolation)",
-                 fontsize=10)
+    ax.set_title(
+        "Reco-level residual against gen-grid resolution\n"
+        + ("(coarsenings of the shipped card; the star past 21 is the fitted "
+           "power law, not a measurement)" if axis == "qt" else
+           "(coarsenings of the shipped card; the star at 11 is MEASURED -- "
+           "refining $|Y|$ buys 1.05x)"),
+        fontsize=9.5)
     save(fig, outdir, f"grain_vs_{axis}_resolution", meta)
 
 
@@ -145,7 +149,7 @@ def plot_heatmap(rows, outdir, meta):
         for j in range(len(ms)):
             ax.text(i, j, f"{Z[i, j]*1e4:.1f}", ha="center", va="center",
                     color="w", fontsize=8)
-    ax.set_title(r"median GRAIN $\times 10^{4}$; shipped grid is the top-left cell",
+    ax.set_title(r"median GRAIN $\times 10^{4}$; the SHIPPED grid is the 21 x 10 cell, bottom left",
                  fontsize=10)
     save(fig, outdir, "grain_heatmap", meta)
 

@@ -230,3 +230,38 @@ unbalanced. The lowest ptV bin (qT 0-1) is pathological: >27 min in the OUTER
 NODE SET stage alone, against 0.2-1.0 min for every other shard, and it
 under-utilises its threads (~43 of 128 cores) because 10 bins cannot feed them.
 Split that one further by |Y|.
+
+## A bin split does NOT accelerate the node-set stage — the limit is per BIN
+
+Tempting and wrong: "this shard is using only 43 of its 128 threads, so give it
+fewer bins per process and it will go faster." Measured live 2026-08-26 on the
+qT [0,1] shard and five |Y| sub-shards of the SAME ptV bin, all in their
+node-set stage:
+
+```
+qt0     `*/0`     34.1 cores / 10 bins = 3.41 cores/bin
+qt0y01  `0,1/0`    8.5 cores /  2 bins = 4.23
+qt0y23  `2,3/0`    5.5 cores /  2 bins = 2.75
+qt0y45  `4,5/0`    6.3 cores /  2 bins = 3.15
+contrast: groups in their MEMBER stage      9.04, 8.46 cores/bin
+```
+
+Every sub-shard runs at the same ~3-4 cores per bin the parent already got. Five
+of them sum to the same ~34 cores at the same rate, having started later — so
+the split **cannot overtake the parent**. The adaptive node ladder within a
+single qT bin carries only ~3-4 cores of parallelism and no more.
+
+**The rule.** The node-set stage scales with BINS, not with threads. It is the
+MEMBER loop that scales with threads ("parallel over ALL nodes of ALL bins at
+once"). So:
+
+* split bins for **partial-result safety** (a contiguous run is a usable cache)
+  and to parallelise the **member loop** across processes -- both real wins;
+* do NOT split bins expecting to accelerate a build still in its node set;
+* the only lever on a node-set-bound bin is to **start it first**. The qT [0,1]
+  bin is pathological (>27 min in node set against 0.2-1.0 min for every other
+  ptV shard) and sets the wall time of the whole partition.
+
+A sub-shard hedge on such a bin is still worth running as INSURANCE — the
+lowest-qT shard is a single point of failure, since `GenFold` refuses a merged
+cache with a hole — but it should be justified as insurance, not as speed.

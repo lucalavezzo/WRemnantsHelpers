@@ -178,6 +178,22 @@ is **7.3-12.9 h**, not ~14 h.
 *Caveat:* the two fixed-order stages did not overlap in time, so 2.07 is an
 UPPER bound on the ratio.
 
+### D-036 — CORRECTION to D-035's premise: the qt0 split is INSURANCE, not speed — SETTLED
+My direction rested on "qt0 is under-utilised at ~43 of 128 cores, so ten bins
+cannot feed the thread pool." **Measured, that is wrong.** The limit is per BIN,
+not per pool: qt0 runs at 3.41 cores/bin in its node-set stage and each |Y|
+sub-shard at 2.75-4.23 cores/bin -- the same rate. Five sub-shards sum to the
+same ~34 cores, having started 34 minutes later, so the split **cannot overtake
+the parent**.
+**Kept running anyway, for a smaller and different reason:** qt0 is the single
+point of failure for the whole partition (GenFold refuses a hole) and is one of
+three processes launched BEFORE the TF thread cap, so it still holds 1808 threads
+and is the most exposed to another `pthread_create` abort. The hedge costs ~20
+cores on a node with headroom.
+**Generalises:** do not expect a bin split to accelerate a build whose cost is in
+the NODE-SET stage; that stage scales with bins, not threads. Split bins for
+partial-result safety and for the MEMBER loop. Written into the knowledge note.
+
 ### D-035 — qt0 split FIVE ways by |Y|, hedged rather than switched — SETTLED
 Two is only a 2x hedge on the bin that sets the wall time; ten multiplies a fixed
 per-process cost by ten on the most expensive bin of the card. Five keeps two

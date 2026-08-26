@@ -144,3 +144,34 @@ affordable at all. Whichever lands first is used; the loser is killed.
 cover the same bins, and `merge_bin_caches` raises on a duplicate bin key
 ("bin ... claimed twice"), which is a safe failure rather than a silent one.
 **Overturned by:** qt0 printing its node set before the sub-shards pass it.
+
+### P-007 — CORRECTION to P-006's premise: splitting qt0 by |Y| does NOT add cores — MEASURED
+**The premise was:** qt0 runs at ~40 of the 128 cores it asked for, so ten bins
+is too few to feed the thread pool and sub-shards with their own pools will get
+more. **That is wrong, and here is the measurement that says so** — cores per
+BIN, taken live at 00:07 across every running process:
+
+| process | subset | cores | bins | **cores/bin** |
+|---|---|---|---|---|
+| qt0 (node-set stage) | `*/0` | 34.1 | 10 | **3.41** |
+| qt0y01 (node-set stage) | `0,1/0` | 8.5 | 2 | **4.23** |
+| qt0y23 (node-set stage) | `2,3/0` | 5.5 | 2 | **2.75** |
+| qt0y45 (node-set stage) | `4,5/0` | 6.3 | 2 | **3.15** |
+| for contrast, groups in their MEMBER stage | `*/1`, `*/10` | 90.3, 84.6 | 10 | 9.04, 8.46 |
+
+The outer node-set stage on the qT [0,1] bins is limited to **~3-4 cores per bin**
+whatever the arena size — the adaptive node ladder inside one bin has that much
+parallelism and no more. Five sub-shards therefore get 5 x (2 bins x ~3.4) =
+the same ~34 cores qt0 already has, at the same rate, having started 34 min later.
+**So the split cannot overtake qt0 and is not a speedup.** The member stage is
+the one that scales with threads (9 cores/bin, and the note's "parallel over ALL
+nodes of ALL bins at once"); the node-set stage is not.
+**What the sub-shards ARE worth, and why they stay running for now:** insurance.
+qt0 is the single point of failure for the whole 21-shard partition (`GenFold`
+refuses a hole), it is one of the three PRE-TF-CAP processes still holding 1808
+threads, and it is therefore the one most exposed to another `pthread_create`
+abort. The node has spare capacity right now (load 714 of 768) and the hedge
+costs ~20 cores. **Kill the sub-shards the moment qt0 prints its node set.**
+**This also generalises:** do NOT expect a bin split to accelerate a build whose
+cost sits in the node-set stage. Split bins for PARTIAL-RESULT SAFETY and for the
+member loop; the node set scales with bins, not with threads.
