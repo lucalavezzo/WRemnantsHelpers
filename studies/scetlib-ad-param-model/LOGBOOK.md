@@ -6111,3 +6111,18 @@ The question for the author from D-044 stands and now carries a number: is
 `muf_min = 1.40` intended to be deep enough that the truncated splitting series
 is 13.8% off the grid's own evolution there, and if so should the differentiable
 model take the derivative from the grid rather than from the series?
+
+### 2026-08-26 — response matrix extended above qT 100 → [260826-response-above100](260826-response-above100/LOGBOOK.md)
+
+VERDICT: three new qT edges — **110, 130, 250** — chosen from where the yield stops
+RECONSTRUCTING, not where MiNNLO stops. 803 gen bins. Everything below 100 is
+unchanged as an identity (the extended response restricted to gen qT<100 is
+bitwise equal to the old one). Enforcement is code, not convention:
+`check_gen_grid_vs_correction()` refuses a straddling edge or one past the
+correction support, from both the histmaker and the cache side.
+
+BLOCKING for the correction production: `make_theory_corr` rebins to the COMMON
+binning of its inputs, and the MiNNLO `w_z_gen_dists` file has a SINGLE bin
+[100, 13000] — without remaking it the whole region collapses to one cell.
+
+Spec (three formats): `~/public_html/alphaS/260826_scetlib_ad_response_above100/gen_binning_spec.{txt,json,py}`
