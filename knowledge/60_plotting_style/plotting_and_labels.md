@@ -16,14 +16,29 @@ General plot presentation conventions for collaborator-facing comparison plots.
 - B-hadron plots are more interpretable when labels avoid code-like names (for example not `nBhad_pt5`).
 - Distinguish clearly normalized vs unnormalized swap results in filenames and slide text.
 
+## wums plotting quirks
+- **`wums.plot_tools.makePlot2D` never draws the values.** It builds the figure
+  (`figure(...)`), computes `zlim`, writes the title and the `hep.cms.label`, and
+  then `return fig` -- there is no `pcolormesh`, `imshow` or `hist2dplot` call
+  anywhere in it, and the `colormap` / `zlim` / `logz` / `zsymmetrize` arguments
+  are computed but never consumed. The symptom is a correctly sized, correctly
+  labelled, correctly CMS-badged plot with an EMPTY axes and no colorbar --
+  which is easy to mistake for a bad z-range or an all-NaN array. Until it is
+  fixed upstream, 2D maps have to be drawn with bare matplotlib
+  (`ax.pcolormesh`) even though the project rule is that histogram plotting goes
+  through wums. Seen 2026-08-25 in
+  `studies/scetlib-ad-param-model/residual_structure_map.py`, which carries the
+  bare-matplotlib fallback and a comment saying why.
+
 ## File/Tag Conventions
 - Use explicit run tag in output folder names.
 - Keep normalized variants with a deterministic suffix (for example `_norm`).
 - Shared implementation for color defaults lives in `scripts/common_plot_style.py` (`CMS_DEFAULT_COLORS`, `build_cms_color_cycle`).
 
 ## Last Updated
-- 2026-02-28
+- 2026-08-25
 
 ## Source
+- `studies/scetlib-ad-param-model/` (wums 2D plotter)
 - `studies/z_bmass_uncertainty/runlog.md`
 - `studies/z_bb/plot_narf.py`
