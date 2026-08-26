@@ -137,6 +137,127 @@ def sigma_gen_on(conf, cache, gen_axes, Q_lo, Q_hi, threads, label):
     return sg, core, fold
 
 
+
+# --------------------------------------------------------------------------- #
+def _hist1d(edges, vals, name):
+    import hist as _h
+    o = _h.Hist(_h.axis.Variable(np.asarray(edges, float), name=name,
+                                 underflow=False, overflow=False),
+                storage=_h.storage.Double())
+    o.view(flow=False)[...] = np.asarray(vals, float)
+    return o
+
+
+def make_plots(args, out, ref, reco_axes, sh, gen_s, gen_f,
+               qt_lo, qt_hi, y_lo, y_hi, n_s, n_f, d_ref):
+    """Three figures: the central ratio on both grids (reco ptll and yll), the
+    arm-to-arm 2D map, and the gen-level CALC on both grids."""
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    from wums import plot_tools
+    from wremnants.postprocessing.scetlib_np import plot_output
+
+    os.makedirs(args.plot_dir, exist_ok=True)
+    meta = {
+        "histmaker": args.histmaker,
+        "gen region": f"qT [{qt_lo:g}, {qt_hi:g}] x |Y| [{y_lo:g}, {y_hi:g}]",
+        "gen bins": f"shipped {n_s}, fine {n_f}",
+        "fine cache": args.fine_cache,
+        "shipped cache": args.shipped_cache,
+        "reference identity max rel dev": f"{d_ref:.3e}",
+        "reference": "sum_g R_raw(b,g) over the region = corrected-MC reco yield "
+                     "fed by that gen region; identical on both arms",
+        "TOTAL shipped / fine (wmean)":
+            f"{out['shipped']['w_tot']:.6f} / {out['fine']['w_tot']:.6f}",
+    }
+    ptll_e = np.asarray(reco_axes[0][1], float)
+    yll_e = np.asarray(reco_axes[1][1], float)
+
+    # --- the central ratio, on each reco axis
+    for ax_i, (edges, axname, xlabel) in enumerate((
+        (ptll_e, "ptll", r"reco $p_{T}^{\ell\ell}$ [GeV]"),
+        (yll_e, "yll", r"reco $y^{\ell\ell}$"),
+    )):
+        other = 1 - ax_i
+        r = ref.reshape(sh).sum(axis=other)
+        hs = [_hist1d(edges, r, axname)]
+        labels = ["corrected MC (region-restricted)"]
+        for tag, lab in (("shipped", "model, shipped gen grid ($21\\times10$)"),
+                         ("fine", "model, CorrZ gen grid ($70\\times11$)")):
+            m = out[tag]["mod"].reshape(sh).sum(axis=other)
+            m = m * (r.sum() / m.sum())          # one global scale: SHAPE
+            hs.append(_hist1d(edges, m, axname))
+            labels.append(lab)
+        dev = max(
+            float(np.max(np.abs(h.values(flow=False) / np.where(r > 0, r, np.nan) - 1)))
+            for h in hs[1:]
+        )
+        pad = max(1.4 * dev, 5e-4)
+        ymax = max(float(np.max(h.values(flow=False) / np.diff(edges))) for h in hs)
+        fig = plot_tools.makePlotWithRatioToRef(
+            hs, labels=labels,
+            colors=["#5790fc", "#e42536", "#964a8b"],
+            linestyles=["solid", "dashed", "dotted"],
+            xlabel=xlabel, ylabel="yield / bin",
+            rlabel=["model / MC"], rrange=[[1 - pad, 1 + pad]],
+            binwnorm=1, logy=(axname == "ptll"), yerr=False, nlegcols=1,
+            ylim=(None, ymax * (12 if axname == "ptll" else 1.9)),
+            ratio_legend=False, legtext_size=15, width_scale=1.15,
+            cms_label="Work in progress", grid=True,
+        )
+        plot_output.save_plot(args.plot_dir, f"central_{axname}_{args.tag}",
+                              fig=fig, args=args, meta_info=meta, dpi=140)
+
+    # --- arm-to-arm difference, 2D
+    ms = out["shipped"]["mod"]
+    mf = out["fine"]["mod"]
+    d = (mf * (ms.sum() / mf.sum()) / np.where(ms > 0, ms, np.nan) - 1.0).reshape(sh)
+    fig, ax = plt.subplots(figsize=(7.6, 4.8))
+    v = float(np.nanmax(np.abs(d)) * 100)
+    pc = ax.pcolormesh(ptll_e, yll_e, (d * 100).T, cmap="RdBu_r",
+                       vmin=-v, vmax=v, shading="flat")
+    fig.colorbar(pc, ax=ax, label="fine / shipped $-$ 1  [%]")
+    ax.set_xlabel(r"reco $p_{T}^{\ell\ell}$ [GeV]")
+    ax.set_ylabel(r"reco $y^{\ell\ell}$")
+    ax.set_title("central prediction: CorrZ gen grid vs shipped, shape-matched\n"
+                 f"gen region qT [{qt_lo:g}, {qt_hi:g}], |Y| [{y_lo:g}, {y_hi:g}]",
+                 fontsize=10)
+    fig.tight_layout()
+    plot_output.save_plot(args.plot_dir, f"central_armdiff_map_{args.tag}",
+                          fig=fig, args=args, meta_info=meta, dpi=140)
+
+    # --- gen level: model / CorrZ per gen qT bin, both grids
+    (sg_s, sr_s, Ts_r, Ys_r) = gen_s
+    (sg_f, sr_f, Tf_r, Yf_r) = gen_f
+    fig, axs = plt.subplots(2, 1, figsize=(8.4, 6.2), sharex=True,
+                            gridspec_kw=dict(height_ratios=[2, 1]))
+    for (sg, sr, Te, Ye), col, lab in (
+        (gen_s, "#e42536", f"shipped ({Ts_r.size-1} qT bins)"),
+        (gen_f, "#964a8b", f"CorrZ ({Tf_r.size-1} qT bins)"),
+    ):
+        a = np.asarray(sg, float).reshape(Te.size - 1, Ye.size - 1).sum(axis=1)
+        b = np.asarray(sr, float).reshape(Te.size - 1, Ye.size - 1).sum(axis=1)
+        w = np.diff(Te)
+        axs[0].stairs(a / w, Te, color=col, lw=2, label=lab)
+        axs[1].stairs(100 * (a / b * (b.sum() / a.sum()) - 1), Te, color=col, lw=2,
+                      label=lab)
+    axs[0].set_yscale("log")
+    axs[0].set_ylabel(r"$d\sigma/dq_{T}$ [pb/GeV]", fontsize=11)
+    axs[0].legend(fontsize=9)
+    axs[0].grid(alpha=0.3)
+    axs[1].axhline(0, color="k", lw=0.8)
+    axs[1].set_ylabel("model/CorrZ $-$1 [%]", fontsize=11)
+    axs[1].set_xlabel(r"gen $q_{T}$ [GeV]")
+    axs[1].grid(alpha=0.3)
+    axs[0].set_title("gen-level CALC on the two grids (shape-matched over the region)",
+                     fontsize=10)
+    fig.tight_layout()
+    plot_output.save_plot(args.plot_dir, f"gen_calc_qt_{args.tag}",
+                          fig=fig, args=args, meta_info=meta, dpi=140)
+    print(f"\n plots -> {args.plot_dir}")
+
+
 # --------------------------------------------------------------------------- #
 def main():
     ap = argparse.ArgumentParser(
@@ -144,10 +265,12 @@ def main():
     )
     ap.add_argument("--histmaker", default=HISTMAKER)
     ap.add_argument("--corrz", default=CORRZ)
-    ap.add_argument("--fine-cache", required=True)
-    ap.add_argument("--fine-conf", required=True)
-    ap.add_argument("--shipped-cache", required=True)
-    ap.add_argument("--shipped-conf", required=True)
+    ap.add_argument("--fine-cache")
+    ap.add_argument("--fine-conf")
+    ap.add_argument("--shipped-cache")
+    ap.add_argument("--shipped-conf")
+    ap.add_argument("--skip-model", action="store_true",
+                    help="stop after the grids / nesting / reference identity")
     ap.add_argument("--qt", nargs=2, type=float, required=True,
                     help="gen qT region [lo, hi], both edges of BOTH grids")
     ap.add_argument("--absy", nargs=2, type=float, required=True)
@@ -156,6 +279,12 @@ def main():
     ap.add_argument("--reco-yll-bins", type=int, default=20)
     ap.add_argument("--threads", type=int, default=64)
     ap.add_argument("--out", default=None, help="npz to dump the arrays into")
+    ap.add_argument("--plot-dir", default=None)
+    ap.add_argument("--tag", default="region")
+    ap.add_argument("--nominal-ref", action="store_true",
+                    help="ALSO compare against the histmaker's own reco "
+                         "'nominal' (the published TOTAL definition) and report "
+                         "the fiducial leak of the region reference against it")
     ap.add_argument("--card", default=None,
                     help="optional: cross-check the shipped R against the card's "
                          "response auxiliary, and take lumi for the absolute mode")
@@ -174,10 +303,16 @@ def main():
     inf_s = load_grid(args.histmaker, fine=False)
     inf_f = load_grid(args.histmaker, fine=True)
     n_keep = (args.reco_ptll_bins, args.reco_yll_bins)
-    R_s, reco_s = crop_reco(inf_s["R"], inf_s["reco_axes"], n_keep)
-    R_f, reco_f = crop_reco(inf_f["R"], inf_f["reco_axes"], n_keep)
+    # load_R returns the RAW reco x gen yield; the model divides by N_gen
+    # (param_model._setup_binning), so do the same here.
+    Rraw_s, reco_s = crop_reco(inf_s["R"], inf_s["reco_axes"], n_keep)
+    Rraw_f, reco_f = crop_reco(inf_f["R"], inf_f["reco_axes"], n_keep)
     N_s = np.asarray(inf_s["N_gen"], float)
     N_f = np.asarray(inf_f["N_gen"], float)
+    R_s = Rraw_s / np.where(N_s > 0, N_s, 1.0)[None, None, :, :]
+    R_f = Rraw_f / np.where(N_f > 0, N_f, 1.0)[None, None, :, :]
+    print(f"empty gen bins   : shipped {int((N_s <= 0).sum())} of {N_s.size}, "
+          f"fine {int((N_f <= 0).sum())} of {N_f.size}")
     Ts, Ys = (np.asarray(e, float) for _, e in inf_s["gen_axes"])
     Tf, Yf = (np.asarray(e, float) for _, e in inf_f["gen_axes"])
     print(f"\nshipped gen grid : qT {Ts.size-1} bins to {Ts[-1]:g}, "
@@ -198,8 +333,6 @@ def main():
     # R_raw = R * N_gen is additive, so summing the fine R_raw over the fine
     # bins inside a shipped bin must reproduce the shipped R_raw exactly, for
     # every shipped gen bin below the shipped grid's last (overflow) column.
-    Rraw_s = R_s * N_s[None, None, :, :]
-    Rraw_f = R_f * N_f[None, None, :, :]
     nT_s_in = Ts.size - 2  # drop the [44, 100] overflow column
     worst = 0.0
     for i in range(nT_s_in):
@@ -241,6 +374,9 @@ def main():
           f"({ref.sum() / (R_s.reshape(-1, N_s.size) @ N_s.reshape(-1)).sum() * 100:.2f}% "
           f"of the card's whole reco yield)")
 
+    if args.skip_model:
+        return
+
     # ---- 4. sigma_gen on both grids ----------------------------------------
     print("\nsigma_gen at the anchor:")
     sg_s_full, core_s, _ = sigma_gen_on(
@@ -264,6 +400,28 @@ def main():
           f"{core_s.bins.shape[0]} vs {core_f.bins.shape[0]} cache bins; "
           f"region sigma_gen {tot_s:.8g} vs {tot_f:.8g} pb, "
           f"rel diff {tot_f / tot_s - 1:+.3e}")
+
+    # ---- 4b. THE FLOOR.  Coarsening the fine sigma_gen onto the shipped
+    # region grid must reproduce the shipped cache's own sigma_gen: both are the
+    # same integral over the same cell, computed by two independent builds. The
+    # spread of that comparison is the combined integration-tolerance and
+    # build-reproducibility floor, and it bounds how much of any arm-to-arm reco
+    # difference below can be real granularity rather than build noise.
+    sg_f2 = sg_f.reshape(Tf_r.size - 1, Yf_r.size - 1)
+    sg_s2 = sg_s.reshape(Ts_r.size - 1, Ys_r.size - 1)
+    coarse = np.zeros_like(sg_s2)
+    for i in range(Ts_r.size - 1):
+        i0 = edge_index(Tf_r, Ts_r[i], "fT"); i1 = edge_index(Tf_r, Ts_r[i + 1], "fT")
+        for j in range(Ys_r.size - 1):
+            j0 = edge_index(Yf_r, Ys_r[j], "fY"); j1 = edge_index(Yf_r, Ys_r[j + 1], "fY")
+            coarse[i, j] = sg_f2[i0:i1, j0:j1].sum()
+    d = coarse / sg_s2 - 1.0
+    print(f"\nFLOOR (fine sigma_gen coarsened onto the shipped region grid vs the "
+          f"shipped cache):\n  {d.size} shipped gen bins: median |dev| "
+          f"{np.median(np.abs(d)):.3e}, p95 {np.percentile(np.abs(d), 95):.3e}, "
+          f"max {np.abs(d).max():.3e}\n  yield-weighted (by N_gen) "
+          f"{float(np.average(np.abs(d), weights=N_s_r.reshape(sg_s2.shape))):.3e}"
+          f"   [the published two-build floor in sigma is 3.1e-05]")
 
     # ---- 5. the production CorrZ prediction on both region grids ------------
     from validate_variations_reco import _gen_reference
@@ -291,6 +449,24 @@ def main():
                         w_tot=wt, m_tot=mt, w_calc=wc, m_calc=mc, w_mc=wf, m_mc=mf)
         # gen-level, for the record
         shape_metrics(sg, sr, sr, "GEN    sigma_gen model / CorrZ")
+
+    # ---- 6b. the published reference, for continuity ------------------------
+    if args.nominal_ref:
+        import h5py
+        from wums import ioutils as wums_io
+        with h5py.File(args.histmaker, "r") as f:
+            o = wums_io.pickle_load_h5py(f[SAMPLE])["output"]["nominal"]
+            hn = o.get() if hasattr(o, "get") else o
+        nom = hn.project(*RECO).values(flow=False).astype(float)
+        nom = nom[: args.reco_ptll_bins, : args.reco_yll_bins].reshape(-1)
+        leak = ref.sum() / nom.sum() - 1.0
+        print(f"\n=== against the histmaker's own reco 'nominal' "
+              f"(the PUBLISHED reference) ===")
+        print(f"  region reference / nominal - 1, total: {leak:+.3e}  "
+              f"(gen bins outside the region + the fiducial leak)")
+        for tag in ("shipped", "fine"):
+            shape_metrics(out[tag]["mod"], nom, nom,
+                          f"TOTAL[{tag}] model / histmaker nominal")
 
     # ---- 7. before/after ---------------------------------------------------
     print("\n" + "=" * 78)
@@ -336,6 +512,12 @@ def main():
               f"{vals[0]:+9.2e} {vals[3]:+9.2e} | {vals[1]:+10.2e} {vals[4]:+9.2e} | "
               f"{vals[2]:+9.2e} {vals[5]:+9.2e}")
         rows.append([ptll_e[k], ptll_e[k + 1], w.sum() / ref.sum()] + vals)
+
+    # ---- 9. plots ----------------------------------------------------------
+    if args.plot_dir:
+        make_plots(args, out, ref, reco_s, sh,
+                   (sg_s, sr_s, Ts_r, Ys_r), (sg_f, sr_f, Tf_r, Yf_r),
+                   qt_lo, qt_hi, y_lo, y_hi, n_s, n_f, d_ref)
 
     if args.out:
         np.savez(args.out, ref=ref, ptll_edges=ptll_e,

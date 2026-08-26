@@ -5081,3 +5081,188 @@ postfit values are not measurements -- quote the total PDF impact.
 
 Fit-readiness: warm value+jacobian 421 ms at P=53, Hessian 68.9 s, peak resident
 48.7 GiB. Member count is free; memory is the constraint on concurrency.
+
+# Logbook entry — 2026-08-26: the frozen node set WORKS, and the barrier diagnosis was wrong
+
+Staged for interleaving into `studies/scetlib-ad-param-model/LOGBOOK.md`.
+Decisions staged separately in `DECISIONS_interleave.md` (D-044 .. D-050).
+Scripts committed to `studies/scetlib-ad-param-model/nodeset_split/`.
+
+## The question
+
+Luca's proposal: freeze the node set once, then build each PDF member in its own
+process against that shared frozen node set, with bins as work items in one
+thread pool. The gate was: can `build_pdf_variations` operate on LOADED rules,
+or does it need private in-memory state that `prepare`/`build_bin_rules` left
+behind?
+
+## Answer: yes, in two steps, and the reason is better than expected
+
+**Read the source first.** `build_pdf_variations` needs the FULL node pool of
+each retained outer point, not just the compacted rule: `b[0] = sum_j W0[j]` and
+`var.c_val` run over all `ns` pool sites, and the loaded rule's site record
+indexes that pool (`flat[si] = off[fi] + (pass ? n_incl[fi] : 0) + st.node`).
+The rules blob stores only the compacted grid and the SELECTED sites, so the pool
+is not in it, and the library says so by name when you try:
+`set_pdf_keep_nodes: neither cache is populated, so there is no geometry to keep.`
+
+**But the outer node set is already in the cache.** In the paired configuration
+every production build uses (the "Sharing one outer node set" line),
+`_ad_bin_grid` never adapts: it copies `_matched_partner->shared_outer_grid()`,
+which is `_fo_bin_grid()`, which is `_fo_cache` — and `save_fo_cache` writes
+every node's `(Q, Y, qT, weight)` as raw doubles. So the expensive, discrete,
+irreproducible part of the node set is a FILE today and nobody noticed.
+
+What remains to regenerate is only the per-point bT node set, and that is
+deterministic: the bT integrator's one mutable member is a double-exponential
+abscissa table derived from `_precision` alone, not accumulated history. So:
+
+```
+nons.load_fo_cache_bytes(fo)     # FIRST -- the outer grid must be the file's
+sigma.prepare(bins, p0)          # the "rewarm": repopulates the bT nodes
+sing.load_bin_rules_bytes(rules) # LAST  -- the frozen site selection is final
+build_pdf_variations / build_fo_pdf_variations   # this member slice
+```
+
+## Demonstration: byte-identical, three ways
+
+4 bins (qT [33,44] and [44,100] x |Y| [0,0.15] and [0.15,0.3]) of the 260820 Z
+card, rel 1e-3, `--pdf-eig 2` (8 members, 4 atomic pairs), P = 26.
+`compare_caches.py --bytes` on every field of both blobs:
+
+* separate process, loaded node set, all 8 members **==** the originating
+  process's own serial member loop — **IDENTICAL** (this is the closure: the
+  save/load round trip plus the rewarm reproduces the in-memory geometry)
+* merge(members 0:4 ⊕ members 4:8, two processes) **==** one process on the same
+  frozen node set — **IDENTICAL** (this is the split)
+* the same member range built at `--threads 8` and at `--threads 16` —
+  **IDENTICAL** (determinism does not depend on the pool size)
+
+Control, and the reason this is a result rather than a coincidence: three
+INDEPENDENT full builds of the identical configuration at the identical
+`--threads 8` gave retained sites/bin `[363,368,400,399]`, `[363,365,400,400]`,
+`[363,365,400,400]`. Two agreed and one did not — so the D-013 hazard is real and
+INTERMITTENT, which is exactly the case that would sometimes coincide and be
+silently accepted. Freezing removes the coin flip structurally.
+
+## The number that changes the architecture
+
+A member shard's prologue collapses from 194 s to 1.3-1.9 s at 4 bins
+(**150x**), and from 123 s to 0.6 s at qT [1,2] (**205x**). The ratio improves
+where the node set is expensive, because the fixed-order ladder is the expensive
+part and it is the part that comes from the file. `build_bin_rules` is skipped
+entirely. Matched sums reproduce exactly across the round trip
+(14.92940684 pb, 2.411335343 pb).
+
+## And the correction: the barrier is real, but it is worth ~7 %, not ~28 %
+
+Instrumented rather than inferred — 1 Hz sampling of running threads and CPU rate
+on two 50-bin builds at `--threads 48` (bins:threads = 1.04, the production
+ratio), 20 members each. Trace plot:
+`~/public_html/alphaS/260826_nodeset_split_barrier/build_utilisation.png`.
+
+| build A: qT 20-100, uniform cost | wall | busy of 48 | core-s lost | drains below 90 % |
+|---|---|---|---|---|
+| outer node set | 1.18 min | 47.4 (99 %) | 1 % | 0 |
+| bin rules | 8.54 min | 46.5 (97 %) | 3 % | 1 |
+| resummed members | 4.6 min | 32.8 (68 %) | **32 %** | **exactly 20**, 8.1 s each |
+| fixed-order members | 14.9 min | 46.0 (96 %) | **5.3 %** | 20-24, 1.9-2.5 s each |
+
+| build B: qT 1-2 / 5-6 / 10-11 / 16-18 / 44-100, 3.3x cost spread | wall | busy of 48 | core-s lost |
+|---|---|---|---|
+| outer node set | 3.52 min | 42.0 (**87 %**) | **12.9 %**, one 23 s tail |
+| bin rules | 11.1 min | 47.2 (98 %) | 2.5 % |
+| resummed members | 4.8 min | 33.6 (70 %) | 30.7 %, exactly 20 drains, 8.8 s each |
+| fixed-order members | 19.3 min | 45.8 (95 %) | 5.8 %, 18 drains, 3.3 s each |
+
+**The barrier is exactly what Luca described — one pool drain per member, 20 of
+them for 20 members, in both member stages and both builds.** The prediction was
+right; the magnitude was not. The drain is ~8 s of a ~14 s resummed member step
+but only 1.9-3.3 s of a ~45-60 s fixed-order step, and the fixed-order half is ~95 % of
+the member cost at 210 bins. Weighted: **~7 % of the member work**, 7.8 % of
+build A end to end (6533 of 84 144 core-s). Not 27.5 %.
+
+Where the rest went: build B's NODE-SET stage runs at 87 % against A's 99 %,
+purely from a 3.3x bin-cost spread, and it loses it as one long tail rather than
+as periodic drains. At 210 bins qT [0,1] is >27 min against 0.2-1.0 min for every
+other ptV shard — a ~30x spread. **The node-set tail is the missing cores.**
+
+## What it buys — and what it does not
+
+Anchored on the measured production stage costs, the 210-bin member work is
+~72 000 core-min; at the 96 % packing just measured, on 768 cores that is
+**~1.6 h — precisely what the existing 21-way bin split already delivers.** The
+8.7 h monolith was `--threads 200`-limited on a 768-core machine, not
+barrier-limited. So on one node, at 210 bins, this change buys **no wall clock.**
+
+It buys four other things: the critical path of a bin-sharded partition (the
+qT [0,1] shard stops having to run 62 members serially after its 27 min
+prologue); a second orthogonal work axis so tiles fit the cores available;
+members as partial results across the whole grid; and a legal multi-machine
+fan-out of the member loop at a ~4 min per-worker prologue instead of ~2 h.
+
+Projected for the 781-bin grid: the D-041 bracket of 55-80 h was quoted "at 210
+threads"; the same work packed at 96 % on 768 cores is **~7-9 h on one node**,
+~3.5-4 h on four. Projection, not measurement — that grid has never been built.
+
+## Next
+
+1. Repeat the byte-identity chain at production scale (210 bins, 62 members,
+   P = 53) on `build-nak`, the production library. `build-fix` was used here
+   only because it is the tree carrying the CT18ZNNLO beamfunc grids.
+2. If it holds, add `--nodeset <cache.npz>` to `prepare_cache_for_card.py` (it
+   is ~15 lines: the three calls above, in that order, replacing
+   `prepare` + `build_bin_rules`) and a `--freeze-only` mode that writes the
+   node-set cache with a sidecar. `build_cache_parallel.py --merge-only` already
+   merges the member axis and rebuilds the header from `.shard.json`.
+3. Refuse to write a node-set-only cache unless the runcard is PAIRED
+   (`fo_node_target_rel > 0`); unpaired, `_ad_bin_grid` adapts its own grid,
+   nothing persists it, and none of this works.
+4. The 781-bin runcard's one-bin `--subset` timing test (D-041) is still owed and
+   is now more informative: it should be run in BOTH modes, so it measures the
+   freeze cost and the rewarm cost separately.
+
+**Do not disturb the existing shard-and-merge path.** It is validated and it
+stays the production route until item 1 passes.
+
+---
+
+## Addendum: the coordinator's narrowed questions (same session)
+
+**Where the member barrier actually lives — the state, not the memory.** The
+member OUTPUTS are written straight through: everything a bin produces inside
+`_ad_parallel_run` goes directly into its own `Bin_rule::Var` record (`w`, `nd`,
+`c_val`, `c_grad`) or into `_fo_var_d[mi]`, and the per-bin working set (`W0`,
+`V0`, `G0`, `A`, `b`) is local to the work item. Nothing accumulates across a
+member step. But the member INPUT does: `set_pdf_keep_nodes` calls `set_pdf`
+(a whole-object reset), then **rebuilds every node-cache `Entry` as a fresh copy**
+and swaps them in — so the convolutions live in ONE shared store holding one PDF
+member at a time, transiently doubled at every switch, and convolutions are ~96 %
+of that store.
+
+So a single-process queue over (bin, member) items is not a scheduling change,
+it is a C++ redesign: K members in flight need K convolution stores and the API
+cannot express that. The multi-process route gets them for free. Kernel state is
+`thread_local` (`ad_state.cpp`) and `s_ad_mutex` is only an API re-entrancy
+guard, as the coordinator said — neither needs changing.
+
+**The memory finding, which is the biggest number in this session.** Measured
+import by import in-container: bare python 12 MB, +numpy/h5py 48, +`scetlib_qT`
+54, **+tensorflow 858**, after `configure` 930 MB. **TensorFlow is 804 MB of
+every build process and the builder never calls it** — it arrives transitively
+through `wremnants`, exactly like the ~1530 wasted threads of D-030. The
+21-process production split carries ~17 GB of resident TF that nothing uses.
+Whole-process peaks for scale: 1.36 GB (4 bins, 8 members), 6.82 GB (50 bins,
+20 members). Node cache 13 MB/bin and node cache + nominal rules 25 MB/bin at qT 33-100 (clean
+two-point fit, intercept ~1.09 GB), much denser at low qT; member records
+~1.14 MB/bin/member. Extrapolated, a 210-bin 62-member monolith is ~21 GB and a
+781-bin one ~75 GB — so memory alone forbids "one process per member over all
+bins" and forces the 2-D tile.
+
+**Recommendation.** Route 2 is not worth it: the barrier it targets is worth ~7 %
+and paying for it means rebuilding the node cache to be per-member. Route 1 is
+worth it, but as a **2-D tile** — freeze per bin group, then run (bin group x
+member group) tiles, each loading its group's frozen node set (~1 s prologue) so
+its footprint stays bounded by its bin count. Every piece of machinery for both
+axes already exists. And **before either**, drop the transitive TensorFlow import
+from the build path: 804 MB and ~1530 threads per process, no physics risk.

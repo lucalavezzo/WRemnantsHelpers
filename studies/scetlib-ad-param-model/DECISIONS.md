@@ -3407,3 +3407,409 @@ tested this way without rebuilding the nodes.
 
 ## PDF62 cache validation (agent, 2026-08-26)
 
+
+---
+
+## Parallelism routes: frozen node set vs in-process interleave (agent, 2026-08-26)
+
+NOTE: this agent numbered its entries D-044..D-054, colliding with the
+D-044..D-048 already in this file. Renumbered here as **I-044..I-054** ("I" for
+interleave); its own webdir keeps the original numbers. Cross-references INSIDE
+the block below still use the agent's own D-0xx numbering -- read those as I-0xx.
+
+HEADLINE: route 2 (single-process interleave) is NOT worth it -- it targets a
+barrier worth ~7%, not the ~27% I inferred, and needs a C++ redesign of the node
+cache. The real loss is the NODE-SET stage's per-bin tail. Route 1 works and is
+proven byte-identical with a frozen node set; the first thing to fix is the
+transitive TensorFlow import, worth 804 MB and ~1530 threads per process with no
+physics risk.
+
+# Decisions — freezing the node set and splitting the member loop across processes
+
+Session 2026-08-26, agent workstream "nodeset-split". Staged for folding into
+`studies/scetlib-ad-param-model/DECISIONS.md`. Numbering continues from D-043.
+Scripts: `studies/scetlib-ad-param-model/nodeset_split/`.
+Run tree (scratch, not durable):
+`/home/submit/lavezzo/.claude/jobs/140d052c/tmp/nodeset/{run,run2,lowqt,bar,bar2}`.
+
+---
+
+## I-044 — The OUTER node set is ALREADY persisted, in the fixed-order blob — SETTLED
+
+The cache's `fo` blob is not just "the frozen O(alphas^2) grid": each `_Fo_node`
+it writes carries `(Q, Y, qT, weight)` as raw doubles, and in the PAIRED
+configuration the analysis uses (`fo_node_target_rel > 0`, taken from
+`target_precision_rel` on a matched calculation — the "Sharing one outer node set"
+line in every build log) `_ad_bin_grid` **never adapts a grid at all**:
+
+```cpp
+if (_matched_partner) {
+   const auto shared = _matched_partner->shared_outer_grid(Q, Y, qT);
+   grid->assign(shared->begin(), shared->end());   // ... and cache it
+   return grid;
+}
+```
+and `shared_outer_grid` is a straight copy of `_fo_bin_grid(Q, Y, qT)`.
+
+So the outer (Q, Y, qT) node set of every bin is an INPUT the moment
+`load_fo_cache` has run, bit for bit. This is the fact the whole proposal turns
+on and it was not known: the knowledge note says the node set is a byproduct.
+
+**Caveat that must travel with this.** It holds only PAIRED. Unpaired
+(`fo_node_target_rel = 0`) `_ad_bin_grid` runs its own adaptive cubature, that
+grid is not serialized, and none of D-045..D-047 applies.
+
+## I-045 — A loaded rules blob is NOT sufficient on its own; one rewarm is — SETTLED
+
+`build_pdf_variations` needs more than `_bin_rules`. It sums over the FULL node
+pool of each retained outer point (`b[0] = sum_j W0[j]`, `var.c_val` likewise
+over all `ns` sites) and indexes that pool by the rule's own site record
+(`flat[si] = off[fi] + (pass ? n_incl[fi] : 0) + st.node`). The blob stores only
+the COMPACTED grid and the SELECTED sites, so the pool is not in it. Run
+against loaded rules with nothing else, the library refuses by name:
+
+```
+py::qT::DrellYan::set_pdf_keep_nodes: neither cache is populated, so there is
+no geometry to keep. Evaluate once at the reference member first.
+```
+
+The missing piece is only the per-point bT node set (`_Ad_node_cache::Entry`),
+and regenerating it is deterministic: the bT integrator's single mutable member
+`_store` is a double-exponential abscissa table that `_init()` derives from
+`_precision` alone, not accumulated history. So the working recipe is
+
+1. `nons.load_fo_cache_bytes(...)`  — FIRST, so the outer grid is the file's
+2. `sigma.prepare(bins, p0)`        — the "rewarm": repopulates the bT nodes
+3. `sing.load_bin_rules_bytes(...)` — LAST, so the frozen site selection is final
+4. `build_pdf_variations` / `build_fo_pdf_variations` on the member slice
+
+## I-046 — D-013 is SUPERSEDED: members MAY be split across processes, if every
+## process LOADS the same frozen node set — SETTLED (byte-identical)
+
+260820 Z card, `--subset 0,1/19,20` (4 bins, qT [33,44] and [44,100] x |Y|
+[0,0.15] and [0.15,0.3]), `target_precision_rel = 1e-3`, `n_train 9`,
+`--pdf-eig 2` (8 members = 2 eig pairs + alphaS pair + muF pair, 4 atomic pairs),
+P = 26, `SCETLIB_BUILD = scetlib-cms/build-fix`. `compare_caches.py --bytes`:
+
+| test | verdict |
+|---|---|
+| separate process, loaded node set, all 8 members **vs** the originating process's own serial member loop | **IDENTICAL** |
+| merge(members 0:4, members 4:8 — two processes) **vs** one process, same frozen node set, all 8 | **IDENTICAL** |
+| members 0:4 at `--threads 8` **vs** members 0:4 at `--threads 16` | **IDENTICAL** |
+
+"IDENTICAL" is the full structural comparison: header, rule-blob fingerprint,
+opts, meta, anchor, 0 of 4 bins differing in the nominal rule, 0 of 32
+(bin, member) records, frozen fixed-order grid 0 of 4 bin keys, 0 of 8 member
+delta sets, both muF grids, `var_bins`.
+
+**The control is what makes this a result.** Three INDEPENDENT full builds of the
+same configuration at the same `--threads 8` gave retained sites/bin
+`[363, 368, 400, 399]` / `[363, 365, 400, 400]` / `[363, 365, 400, 400]` — two
+agreed and one did not. So the D-013 hazard is real AND intermittent, which is
+the worst kind: an independent-shard merge would sometimes coincide and be
+silently accepted. Freezing the node set removes the coin flip by construction
+rather than by luck.
+
+**What D-013 should become:** never split PDF members across processes that each
+BUILD their own node set. Splitting them across processes that each LOAD one
+frozen node set is exact.
+
+## D-046b — WHY independent builds diverge: the NNLS site selection and the
+## node STORAGE ORDER, not the node set's content — SETTLED (decoded)
+
+Decoded the `fo` blobs of three independent builds node by node (297 nodes/bin,
+`Q, Y, qT, weight, C[3][3], mu_ref, err, rule, n_orders, muR_resolved`):
+
+* every build has the **same node count** in every bin;
+* the raw bytes differ in 3 of 4 bins, with O(1) relative differences in `Q`,
+  `weight`, `mu_ref`, `err` and the `C[n][k]`;
+* **sorted, all three grids are bit-identical in every bin.** The difference is
+  purely the ORDER the nodes are stored in — the grid is filled by a parallel
+  loop over subregions — not their content.
+
+So the outer node set is deterministic *content* in a nondeterministic *order*,
+and the rule's `Site::point` / `Site::node` index into that order. Combined with
+the genuinely nondeterministic NNLS site selection in `build_bin_rules`
+(363/368/400/399 against 363/365/400/400), that is the whole of the D-013
+hazard, and freezing pins both.
+
+**Two documentation corrections that should go upstream.** The `fork_member_build`
+docstring and the class docs blame "the integrator objects it hands out keep
+internal buffers". That is not the mechanism: `integrator_de_oscillatory`'s only
+mutable member is `_store`, a double-exponential abscissa table that `_init()`
+derives from `_precision` alone. The real causes are the two above.
+
+**And a gap in our own validation tool.** `compare_caches.py --bytes` already
+knows that `_Fo_cache::bins` is an `unordered_map` and compares per bin key, but
+it compares each bin's grid as a byte range — so a node PERMUTATION inside a bin
+reads as "frozen grid differs in 3 of 4 bins", a false positive. It should sort
+the nodes before comparing. (It did not affect any conclusion here: every
+IDENTICAL verdict in D-046 came out identical including the raw grids.)
+
+## I-047 — A member shard's prologue collapses by ~150-200x — SETTLED (measured)
+
+The expensive half of `prepare` is the fixed-order node ladder (the source puts a
+fixed-order point at ~130x a resummed one) and that half is what the fo blob
+holds; `build_bin_rules` is not needed at all.
+
+| | full build | member shard |
+|---|---|---|
+| 4 bins, qT 33-100, threads 8: `prepare` | 31 s | — |
+| load the fo blob | — | 0.05 s |
+| rewarm (`prepare` on the LOADED outer grid) | — | **1.2-1.8 s** |
+| `build_bin_rules` | 163 s | 0 (loaded) |
+| **prologue** | **194 s** | **1.3-1.9 s (150x)** |
+| 2 bins, qT [1,2], threads 16: `prepare` / rules | 34 s / 89 s | — |
+| rewarm | — | **0.6 s** |
+| **prologue** | **123 s** | **0.6 s (205x)** |
+
+The rewarm/`prepare` ratio is 3.9 % at qT 33-100 and **1.8 %** at qT [1,2], i.e.
+it gets BETTER where the node set is expensive, which is the mechanism (the
+fixed-order ladder is a larger share of `prepare` at low qT and it is the part
+that comes from the file). Matched bin sums reproduce exactly across the round
+trip: 14.92940684 pb and 2.411335343 pb, freeze and member process alike.
+
+## I-048 — The member barrier is REAL and it costs 5-8 %, not 27 % — SETTLED (instrumented)
+
+The claim under test was "the ~55 missing cores of the 200-thread 210-bin build
+are threads idling at the member barrier". Instrumented directly rather than
+inferred: 1 Hz sampling of running-thread count and CPU rate
+(`nodeset_split/sample_threads.py`) on two 50-bin builds at `--threads 48` —
+bins:threads = 1.04, the same ratio as the production 210:200 — 20 members,
+P = 32. Trace plot: `~/public_html/alphaS/260826_nodeset_split_barrier/`.
+
+**A: 50 bins, qT 20-100 x all 10 |Y| (uniform cost).**
+
+| stage | wall | busy cores of 48 | core-s lost | drains below 90 % of pool |
+|---|---|---|---|---|
+| outer node set | 1.18 min | 47.4 (99 %) | 1 % | 0 |
+| bin rules | 8.54 min | 46.5 (97 %) | 3 % | 1 |
+| resummed members (20) | 4.6 min | 32.8 (68 %) | **32 %** | **exactly 20**, 8.1 s each |
+| fixed-order members (20) | 14.9 min | 46.0 (96 %) | **5.3 %** | **20-24**, 1.9-2.5 s each |
+
+**B: 50 bins, qT [1,2] / [5,6] / [10,11] / [16,18] / [44,100] x 10 |Y| (3.3x cost spread).**
+
+| stage | wall | busy cores of 48 | core-s lost | drains below 90 % |
+|---|---|---|---|---|
+| outer node set | 3.52 min | 42.0 (**87 %**) | **12.9 %** | one 23 s tail at the end |
+| bin rules | 11.1 min | 47.2 (98 %) | 2.5 % | 1 |
+| resummed members (20) | 4.8 min | 33.6 (70 %) | 30.7 % | **exactly 20**, 8.8 s each |
+| fixed-order members (20) | 19.3 min | 45.8 (**95 %**) | 5.8 % | **18**, 3.3 s each |
+
+**The barrier exists exactly as predicted — one pool drain per member, 20 of them
+for 20 members, in BOTH member stages and in both builds. What was wrong is its
+size.** The drain is ~8 s of a ~14 s resummed member step (59 % of its duration,
+32 % of its core-seconds) but only 1.9-3.3 s of a ~45-60 s fixed-order member step
+(4-6 %). Since the fixed-order half carries ~95 % of the member cost at 210 bins
+(7.6 min/member against 0.40), the barrier's weighted cost over the member work
+is **0.32 x 5 % + 0.053 x 95 % = ~7 %**, and over the whole build A it is
+6533 of 84 144 core-s = **7.8 %**. It cannot be the 27.5 % (145 of 200).
+
+**Where the rest of the cores went.** Build B's node-set stage runs at 87 %
+against build A's 99 %, purely from a 3.3x bin-cost spread, and the loss is one
+long tail at the end rather than periodic drains. That is D-036's mechanism (the
+node set carries only ~3-4 cores per bin, so a spread leaves a tail), and at 210
+bins the qT [0,1] bins are >27 min against 0.2-1.0 min for every other ptV shard
+— a ~30x spread against B's 3.3x. **The node-set tail, not the member loop, is
+where the missing cores are.**
+
+**Consequence for the proposal.** It stands, but the barrier argument is worth
+~7 %, not ~28 %. Its real value is D-047's 150x cheaper shard prologue and the
+scheduling freedom in D-049.
+
+## I-049 — What it buys, honestly: nothing on one saturated node at 210 bins;
+## the win is the critical path and the fan-out — PROPOSED (needs Luca)
+
+Anchored on the measured production numbers (knowledge note: 210 bins at 200
+threads, `prepare` 21.9 min, rules 4.4 min, resummed members 0.40 min/member;
+monolith 8.7 h for 62 members, so fixed-order members ~7.6 min/member) the
+210-bin member work is ~72 000 core-min. On this node (768 cores) at the 96 %
+packing measured in D-048 that is **~1.6 h — exactly the wall clock the existing
+21-way bin split already achieves.** The 8.7 h monolith was not
+barrier-limited; it was limited to `--threads 200` on a 768-core machine.
+
+So on one node, at 210 bins, the frozen node set buys **no wall clock**. What it
+buys is:
+
+1. **The critical path of a bin-sharded partition.** Today the shard that owns
+   qT [0,1] must run its ~27 min prologue AND then all 62 members over its bins,
+   serially, and it sets the partition's wall time (D-032, D-036). With the
+   member axis its 62 members fan out over up to 31 processes, so its critical
+   path is prologue + one pair. On the 781-bin grid this matters more, because
+   that grid SPLITS both expensive fixed-order qT cells (D-041).
+2. **A second, orthogonal work axis**, so tiles can be sized to the cores
+   available (bins x members, up to 21 x 31 = 651 tiles at 210 bins) instead of
+   being forced to whole bin groups whose node-set stage saturates at ~3-4
+   cores/bin.
+3. **Members as partial results.** Today a shard's bins are unusable until all
+   62 members are done; with the member axis the whole grid is available at
+   reduced member coverage early.
+4. **A legal multi-machine fan-out for the member loop**, at a per-worker
+   prologue of ~4 min (rewarm at 781 bins, extrapolated from D-047) instead of
+   ~1.6-2 h.
+
+**On the 781-bin grid.** The D-041 bracket of 55-80 h was quoted "at 210
+threads". Scaling the 210-bin member work by the same 3.7-4.5x and packing it at
+96 % on 768 cores gives **~5.6-7.3 h of member work plus a ~1.6-2 h freeze**,
+i.e. **~7-9 h on one saturated node** — so most of the 55-80 h is the 210-thread
+choice, not the architecture. Divided over C nodes the member half goes as 1/C;
+on 4 nodes ~3.5-4 h all in. **These are projections from measured per-stage
+costs, not measurements; the 781-bin runcard has never been built.**
+
+## I-050 — Do NOT switch production yet; three things to check first — PROPOSED
+
+The existing shard-and-merge path stays the production route (unchanged). Before
+the frozen-node-set route replaces anything:
+
+1. **Re-run the byte-identity chain at production scale** — 210 bins, 62 members,
+   P = 53, and on the production library `build-nak` (D-031), not
+   `build-fix` (which lacks 92f1299 and was used here only because it is the
+   tree that has the CT18ZNNLO beamfunc grids). Nothing structural should
+   change, but D-046 was proven at 4 bins / 8 members / P = 26.
+2. **Mark the node-set-only cache.** It is a perfectly valid `.npz` with zero
+   member records (1.0 MB at 4 bins). A loader accepts it and only fails later
+   with "PDF variations were not built" — loud, but it should carry a sidecar
+   the way `--members` shards do so it can never be mistaken for a cache.
+3. **Confirm the paired assumption in the runcard** (D-044) rather than assuming
+   it: refuse to write a node-set-only cache when `fo_node_target_rel = 0`.
+
+---
+
+# Addendum, same session: the coordinator's three narrowed questions
+
+## I-051 — Item 3 ANSWERED, and it is a third option: the member OUTPUT is written
+## straight through; the member INPUT is one shared, in-place-mutated node cache — SETTLED
+
+Neither branch of the question as posed. Reading `build_pdf_variations` and
+`set_pdf_keep_nodes`:
+
+**Outputs: straight through.** Inside `_ad_parallel_run` over bins, everything a
+bin produces goes directly into its own per-member record — `var.w[si]` (via
+`rule_min_norm_update`), `var.nd[si]`, `var.c_val`, `var.c_grad`, and on the
+fixed-order side `_fo_var_d[mi][n]`. The per-bin working set (`W0`, `V0`, `G0`,
+`A`, `b`, `flat`, `gmap`) is local to the lambda and dies with the work item.
+Nothing accumulates across the member step. So the live cost per in-flight item
+is genuinely scratch, and *by that criterion* a queue over (bin, member) items
+would be cheap.
+
+**But the input is the blocker.** `set_pdf_keep_nodes` is called once per member,
+OUTSIDE the parallel loop, and it:
+
+1. calls `set_pdf(...)`, a **whole-object reset** ("resets, including the
+   caches"), then puts the saved geometry back;
+2. for the fixed-order side, **replaces every bin's grid with a fresh copy**
+   (`std::make_shared<_Fo_bin_grid>(*kv.second)`) and refills each node's
+   coefficients in it;
+3. for the resummed side, builds a **complete new copy of every node-cache
+   `Entry`** into a `std::vector out(keys.size())`, refills the convolutions in
+   each copy, and only after the parallel region swaps them into `keep->map`.
+
+So the convolutions every member reads live in ONE shared structure that holds
+exactly one PDF member at a time, and switching it **transiently holds two full
+copies of the node cache**. Convolutions are ~96 % of that cache.
+
+**Consequence for route 2 (single-process queue over (bin, member)).** It is not
+a scheduling change; it is a C++ redesign. K members in flight need K
+independent convolution stores, and the API cannot express that — the node cache
+is one per `DrellYan` object and `set_pdf` resets the whole object. The
+"bounded two-member double buffer" would need two node caches, i.e. 2x the
+dominant memory object, with no way to ask for it. **The barrier is a STATE
+barrier, not an accumulation barrier.**
+
+**Consequence for route 1 (frozen node set, one member per process).** Separate
+address spaces give each member its own convolution store for free, which is
+precisely the thing route 2 would have to build. Route 1 is available today and
+is proven byte-identical (D-046).
+
+Also confirmed as the coordinator said: kernel state is `thread_local`
+(`src/qT/ad/ad_state.cpp`: `ad_g`, `ad_h`, `ad_nd`, `ad_beta`, `ad_p0`,
+`ad_conv_var`, `ad_fo`, `ad_fom`, all `thread_local`), so `s_ad_mutex` is an
+API re-entrancy guard and never needs changing.
+
+## I-052 — Item 4: 804 MB of every build process is TensorFlow the builder never
+## calls — the memory twin of D-030 — SETTLED (measured)
+
+In-container, one import at a time (`--threads 16`, 260820 Z card, rel 1e-3):
+
+| | VmRSS |
+|---|---|
+| bare python | 12 MB |
+| + numpy, h5py | 48 MB |
+| + `scetlib_qT` | 54 MB |
+| **+ tensorflow** | **858 MB** |
+| after `configure` (LHAPDF central set, beamfunc grids, runcard) | **930 MB** |
+
+**TensorFlow costs 804 MB per build process and `prepare_cache_for_card.py`
+never uses it** — it arrives transitively through `wremnants`, exactly as the
+~1530 wasted OS threads of D-030 do. Today's 21-process bin split therefore
+carries **~17 GB of resident TensorFlow that nothing calls.** That is a bigger,
+cheaper win than any architecture change and it is the same one-line-of-imports
+fix as D-030.
+
+Everything else, measured (VmHWM in brackets):
+
+| build | after `configure` | after `prepare` | after rules | after members |
+|---|---|---|---|---|
+| 4 bins qT 33-100, 8 members | 930 | 1020 | 1189 [1355] | 946 [1355] |
+| 20 bins qT 33-100 | 930 | 1229 | 1596 [1717] | — |
+| 50 bins qT 1-100 mix, 20 members | 930 | — | — | 5382 [**6818**] |
+
+Fitting the two same-qT builds: the frozen node cache is **13 MB/bin** and node
+cache + nominal rules together **25 MB/bin** at qT 33-100, on a fixed intercept
+of ~1.09 GB. Extrapolated at that (cheap-bin) rate a 210-bin build needs
+~6.3 GB before any member and a 781-bin one ~21 GB; adding members at the note's
+~1.14 MB/bin/member puts a 210-bin 62-member monolith at ~21 GB (consistent with
+the note's "~15 GB uncompressed" rules blob) and a 781-bin one at ~75 GB. Memory
+is a real constraint on the bin axis, which is the other reason a member split
+must not be "one process per member over ALL bins". Denser bins cost more — the 50-bin mixed build
+peaks at 6.8 GB, i.e. ~120 MB/bin including its 20 member records (the knowledge
+note's ~240 MB/member at 210 bins is ~1.14 MB/bin/member). The rules stage's
+transient NNLS working set is the peak: +335 MB over `prepare` on 4 bins, and it
+is released afterwards (RSS falls back to 946 MB).
+
+**So the accounting is:** ~930 MB duplicated per process of which 86 % is dead
+TensorFlow; the node cache and rules are the part that is genuinely per-process,
+and they are bounded by that process's BIN count, not by members. The duplication
+is a real cost today (17 GB of it is waste) and it is fixable without touching
+the architecture.
+
+## I-053 — Item 5: the barrier measurement — see D-048
+
+Done and reported above. The instrumentation is a 1 Hz sample of running threads
+and CPU rate rather than a per-bin finish-time log, because the bin loop is
+inside C++ and the session is read-only; but it measures the same thing, since a
+pool that drains over 8 s IS bins finishing at spread times. Result: **exactly
+one drain per member, in both member stages, in both builds** — 8.1-8.8 s per
+member in the resummed stage (32 % of its core-seconds) and 1.9-2.5 s in the
+fixed-order stage (5 %). Weighted by where the cost is, **~7 %**, not the
+inferred 27.5 %. The rest is the node-set stage's per-bin tail (87 % on a 3.3x
+cost spread against 99 % on a uniform one).
+
+## I-054 — RECOMMENDATION: route 1, as a 2-D tile, and fix the TF import first — PROPOSED
+
+**Do not pursue route 2** (single-process queue over (bin, member) work items).
+It needs the convolution store to be per-member, and today it is one per object,
+reset wholesale by `set_pdf` and transiently doubled at every switch (D-051).
+That is a C++ redesign of the node cache for a barrier worth ~7 % (D-048).
+
+**Pursue route 1**, but as a two-dimensional tile rather than "one member per
+process over all bins":
+
+* **freeze** the node set once per bin group (the existing `--subset` +
+  `--merge-bins` machinery already splits and merges the bin axis);
+* run **(bin group x member group)** tiles, each loading its bin group's frozen
+  node set — prologue ~1 s instead of ~200 s (D-047), and its node-cache
+  footprint bounded by its BIN count, not by the full grid;
+* merge on both axes with `build_cache_parallel.py`, which already does members
+  from `.shard.json` and bins from `--merge-bins`.
+
+Sizing it is now arithmetic rather than guesswork: memory per tile is
+930 MB (or **126 MB once TF is gone**) + ~13-120 MB/bin + ~1.14 MB/bin/member.
+
+**Order of work, by value per unit of risk:**
+1. **Drop the transitive TensorFlow import from the build path.** ~804 MB and
+   ~1530 threads per process, no physics risk, no architecture change.
+2. Re-run the D-046 byte-identity chain at production scale on `build-nak`.
+3. Only then add `--nodeset` / `--freeze-only` to the driver.
+
+The existing shard-and-merge path stays production throughout.
