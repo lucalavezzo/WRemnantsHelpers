@@ -227,3 +227,131 @@ out the same. There is no headroom for a regression to hide in.
 B's own overflow (gen qT > 1000) is exactly 0.0: on this file nothing at all is
 generated above 1 TeV, which is the first piece of the upper-edge argument.
 
+
+## D-A10 — WHY the upper edge is 250 GeV: the analysis' own muon pT window closes the phase space — SETTLED (measured)
+
+**What.** The response gen qT axis stops at **250 GeV**. Not because the MiNNLO
+yield stops there (it runs to ~1 TeV) but because **nothing above 250 GeV
+reconstructs**.
+
+**Evidence 1 -- the reco efficiency, Σ_b R_raw(b,g) / N_gen(g), over ALL reco bins
+including the ptll overflow, full 297 M-event sample:**
+
+| gen qT | efficiency | | gen qT | efficiency |
+|---|---|---|---|---|
+| 0-4      | 0.400 | | 100-110 | 0.0191 |
+| 10-13    | 0.379 | | 110-120 | 0.0055 |
+| 37-40    | 0.198 | | 120-130 | 0.0011 |
+| 44-46    | 0.165 | | 130-140 | 0.00058 |
+| 58-60    | 0.124 | | 170-200 | 4.4e-05 |
+| 70-80    | 0.091 | | 200-250 | 1.8e-05 |
+| 80-90    | 0.067 | | **250-300** | **0.0 exactly** |
+| 90-100   | 0.040 | | 300-1000 | 0.0 exactly |
+
+Smooth and monotonic, no cliff -- and the cause is in the histmaker's own
+arguments: **`pt = [34, 26.0, 60.0]`, i.e. 26 < pT(mu) < 60 GeV.** A Z at
+qT = 100 GeV puts its muons near the top of that window; by qT ~ 130 both muons
+routinely exceed 60 and the event is thrown away; above 250 GeV not a single
+event out of the ~1.7e5 (weighted) generated there survives.
+
+**Evidence 2 -- what dropping at each edge costs, measured per reco region:**
+
+| drop everything above | N_gen fraction | reco ptll < 44 (the fit) | reco ptll [44, 100] |
+|---|---|---|---|
+| 100 | 1.9772e-02 | 1.630e-07 | 2.809e-03 |
+| 110 | 1.5168e-02 | 6.477e-08 | 6.605e-04 |
+| 120 | 1.1789e-02 | 2.330e-08 | 2.724e-04 |
+| 130 | 9.2711e-03 | **0** | 1.148e-04 |
+| 150 | 5.9226e-03 | 0 | 2.041e-05 |
+| 200 | 2.2294e-03 | 0 | 1.586e-06 |
+| **250** | **9.7602e-04** | **0** | **0** |
+| 1000 | 1.0492e-06 | 0 | 0 |
+
+So 250 GeV is the smallest edge at which the dropped phase space contributes
+EXACTLY ZERO reconstructed yield to every reco bin we have -- the fit's 780 and
+also reco ptll [44, 100], which the fit does not use today. Pushing higher would
+add gen bins whose R column is identically zero: cache cost and a correction to
+produce, with no possible effect on any prediction.
+
+**The corollary worth keeping.** The reason the whole above-100 region is nearly
+invisible (D-A2) is not the gen spectrum -- 1.98 % of N_gen is not small -- it is
+the muon pT window. If that window is ever widened, the reco efficiency above 100
+rises and every number in D-A2 grows with it.
+
+## D-A11 — THREE bins: [100, 110], [110, 130], [130, 250] — SETTLED
+
+Measured per bin on the full sample (from a 12-bin diagnostic extension; `R_raw`
+is additive so a sub-union is an exact sum, so these are measurements):
+
+| gen qT bin | N_gen fraction | reco feed, fit (ptll<44) | reco feed, ptll [44,100] |
+|---|---|---|---|
+| [100, 110] | 4.6045e-03 | 9.824e-08 (60 % of the total) | 2.148e-03 (76 %) |
+| [110, 130] | 5.8966e-03 | 6.477e-08 (40 %) | 5.457e-04 (19 %) |
+| [130, 250] | 8.2951e-03 | **0** | 1.148e-04 (4 %) |
+| dropped, > 250 | 9.7602e-04 | 0 | 0 |
+
+**Why these boundaries.**
+
+* **10 GeV for the first bin.** It carries 60 % of the fit-range feed and 76 % of
+  the ptll [44, 100] feed, and its reco efficiency (0.0191) is 3.5x the next
+  bin's, so this is the only place above 100 where resolution can matter. 10 GeV
+  also CONTINUES the correction's own pattern -- its last three bins are 70-80,
+  80-90, 90-100, all 10 GeV -- so the grid does not change character at the
+  boundary.
+* **20 GeV for the second.** It takes the rest of the resolvable feed (40 % of the
+  fit's, 19 % of [44, 100]'s) while the yield has already fallen 4x.
+* **One wide bin to 250.** [130, 250] feeds EXACTLY ZERO of the fit's reco bins
+  and 1.1e-04 of reco ptll [44, 100], so its internal granularity cannot matter
+  at any precision this analysis works to; splitting it would buy nothing and
+  cost Luca three more theory bins.
+* **Statistics per bin** are ample for the MiNNLO denominator and the DYTurbo
+  fixed order: 7.91e5, 1.01e6 and 1.43e6 in weight (0.46 %, 0.59 %, 0.83 % of
+  N_gen).
+
+Resulting grid: qT **73 bins** (70 + 3), |Y| 11 bins for the response ->
+**803 gen bins** (from 770). Literal edge lists in the webdir
+(`gen_binning_spec.{json,txt,py}`).
+
+## D-A12 — full-statistics controls on the extended grid — SETTLED (measured)
+
+On the 12-bin diagnostic run (`260826_Z_histmaker_ext100`, 2779 files, 52:38
+wall, 21.1 GB peak RSS, 90.5 MB output, `-j 128`):
+
+```
+gen bins with N_gen > 0                      902 / 902   (exact tiling, no holes)
+response coarsened onto the unfolding grid vs the unfolding hist
+    in-range max|diff| 1.37e-09   =  1.54e-14 of the largest bin (8.87e+04)
+    >44 overflow column max|diff| 2.11e-09
+vs the UNEXTENDED full run (260826_Z_histmaker_respgrid), gen qT < 100
+    R_raw max|diff| 8.08e-10  (~9e-15 relative)
+    N_gen max|diff| 7.07e-08
+    its single overflow column vs the SUM of the new columns
+                              9.10e-13 of 5.4568e+03  =  1.7e-16 relative
+```
+
+Not bitwise here, and correctly so: both are `-j 128` runs filling one shared
+atomic histogram, so summation order is not reproducible and float rounding is
+the right expectation. The bitwise statement is the `-j 1` one in D-A9.
+
+
+## D-A13 — a SECOND, independent reason to stop at 250: the cache's node stage — SETTLED (measured)
+
+The SCETlib cache shares ONE adaptive outer node set across all gen bins, so the
+hardest bin sets the node count for everything. Two builds off the SAME base
+runcard, `--no-pdf`, `--threads 200`, differing only in how far the qT axis runs:
+
+| grid | gen bins | `outer node set + matched cross sections` |
+|---|---|---|
+| qT [1, 100] x 11 abs(Y)  (`main_qt1_100`) | 748 | **22.5 min** (D-C10) |
+| qT [1, 1000] x 11 abs(Y) (`ext_qt1_1000`) | 880 | **> 82 min and still running when killed** |
+
++17.6 % more bins, > 3.6x the node-stage cost. The b_T integrand oscillates on a
+scale 1/qT, so a bin at qT ~ 1 TeV drags the shared node ladder up for the whole
+grid. Since every gen bin above 250 has an identically zero R column (D-A10),
+that cost buys nothing at all -- so the upper edge is set by the reco reach, and
+the build confirms there is a price for going past it rather than merely no gain.
+
+The build was killed rather than finished: it was in an uncheckpointed node stage,
+nothing downstream needs it, and the number above is already the useful datum.
+The deliverable cache is on the FINAL grid, qT [1, 250] (781 bins).
+

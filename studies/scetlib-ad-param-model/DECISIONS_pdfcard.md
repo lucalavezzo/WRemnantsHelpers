@@ -206,35 +206,41 @@ independently: `lumi` gives `exp(logk) - 1 = +0.01200` exactly, flat to
 3.0e-16 across all 780 bins (the 1.2% luminosity uncertainty). `CMS_background`
 is identically 0 on the Zmumu column, as it must be. The reading is correct.
 
-## D-P09 — The Asimov (`-t -1`) path has a large UNLOGGED pre-minimiser phase; a toy reaches the minimiser in ~2 min — OPEN (rabbit-side)
+## D-P09 — A rabbit Asimov (`-t -1`) fit NEVER RUNS THE MINIMISER; its whole cost is the full-parameter Hessian — SETTLED
 
-**Observed, not explained.** Four fits, same node, same cache, same build:
+**Observed first, then root-caused in the code.** The two `-t -1` arms produced no
+minimiser log line whatsoever for 90 minutes while burning ~42 cores, with the
+main thread parked in a `futex` called from `libtensorflow_framework.so.2` (i.e.
+inside a TF op, NOT in the SCETlib `py_function`). The two `-t 1` toy arms reached
+`[minimize] method=trust-krylov` about two minutes after their cache load.
 
-| fit | toys | time to the minimiser's first log line |
-|---|---|---|
-| `toyA_tmpl`, 18 floating | `-t 1` | ~2 min after the cache load (~4 min) |
-| `toyB_model`, 47 floating | `-t 1` | ~2 min after the cache load |
-| `armA_tmpl`, 18 floating | `-t -1` | **> 28 min and still silent** |
-| `armB_model`, 47 floating | `-t -1` | **> 28 min and still silent** |
+The cause is one expression in `rabbit_fit.py`:
 
-During that phase the process burns ~42 cores continuously and its MAIN thread
-sits in a `futex` wait called from `libtensorflow_framework.so.2`, i.e. it is
-blocked on TF's own thread pool inside a TF op — **not** in the SCETlib
-`py_function`. So the cost is rabbit/TF, not the model. The same signature is in
-the reference `kqt1` Asimov fit (P = 24, 9 floating), which took **11821 s total**
-with an identically silent gap between the prior list and `edmval`.
+```
+fit(args, ifitter, ws, dofit=ifit >= 0 and not args.noFit)
+```
 
-**Consequence for planning:** the affordability estimate in D-047 (421 ms per warm
-value+jacobian, 68.9 s Hessian) is about the MODEL and is correct, but it does not
-bound an Asimov reco fit, which is dominated by this phase. Budget hours, not
-minutes, for `-t -1` at this card size, and prefer a toy when the question is
-about the minimiser.
+`ifit = -1` for Asimov, so `dofit = False` and `fitter.minimize()` is never
+called. This is CORRECT: for Asimov the data IS the prefit expectation, so the
+prefit point already is the minimum — confirmed by the arms' own
+`edmval = 9.95e-28` (arm A). The 90 minutes is the postfit machinery: the dense
+`t2.jacobian(grad, x)` Hessian over the FULL parameter vector (3731 + 18 = 3749
+for arm A, 3673 + 47 = 3720 for arm B), the covariance, `--doImpacts`, and the
+saturated fit.
 
-**Not diagnosed further because:** the process runs inside singularity, so
-`/proc/<pid>/exe` is unreadable from the host and neither `gdb` nor `eu-stack`
-can resolve symbols. Cheap next step for whoever picks this up: run one Asimov
-fit at `-v 4` (DEBUG turns on the `[timing]` lines that would name the phase),
-which costs nothing extra.
+**Two consequences that matter.**
+1. **An Asimov fit measures NOTHING about convergence.** The task's convergence
+   question can only be answered by a toy, which is why both toy arms were run.
+   Any earlier claim that "the Asimov fit converged" is a statement about the
+   Hessian, not the minimiser.
+2. **The cost is nsyst-driven, not P-driven.** D-047's model timings (421 ms warm
+   value+jacobian, 68.9 s for the 210x53x53 model Hessian) are correct and are a
+   few percent of this. Budget ~1.5 h per Asimov reco fit at this card size, and
+   note it barely moves between 18 and 47 floating model parameters.
+
+**Cheap improvement for whoever picks this up:** run Asimov at `-v 4`; the DEBUG
+`[timing]` lines name each phase, at no extra cost. Also worth checking whether
+`--doImpacts` and the saturated fit each pay their own full Hessian.
 
 ## D-P10 — Card-side lint clean — SETTLED
 
