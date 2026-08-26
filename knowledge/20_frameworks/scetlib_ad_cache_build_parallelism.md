@@ -153,3 +153,39 @@ from Python (`scripts/rabbit/scetlib_ad/build_cache_parallel.py`).
   as `max(9, ceil(1.5 * n_params))`. With 29 eigenvector pairs the parameter
   count goes 24 -> 53, so the default leaves n_train/n_params at 0.17; raising
   it costs roughly n_train^2 in the rule solve.
+
+## The ~1800 threads per build process are a TensorFlow artefact — and removable
+
+Measured 2026-08-26 in-container, same image, one `env -u` apart:
+
+```
+uncapped, right after `import tensorflow`:
+    1665 threads = 768 tf_Compute (one per core) + 895 python3
+with TF_NUM_INTRAOP_THREADS=4, TF_NUM_INTEROP_THREADS=2:
+     135 threads
+```
+
+`prepare_cache_for_card.py` **never uses TensorFlow**. It imports argparse,
+configparser, h5py, numpy and the `scetlib_ad` backend; TF arrives only
+transitively through the `wremnants` package. So roughly **1530 of every build
+process's ~1800 OS threads are pure waste**, and they are charged against
+exactly the axis we parallelise the build over.
+
+Confirmed on a real 21-shard build, not just on the import: three groups
+launched before the fix sit at 1808 / 2432 / 2429 threads; groups launched after
+it sit at **262-902 threads for the same work at the same `--threads 128`**.
+
+**Why it matters.** The ceiling is **32768 OS threads per user**, and the failure
+mode is silent and misattributed: a build that needs a new thread mid-stage dies
+with `pthread_create has failed: Resource temporarily unavailable`, exit 134 --
+and it lands on whichever process next ASKS for a thread, not on the one that
+took the last of them. Capped, the practical limit goes from ~15 concurrent
+build processes to several times that.
+
+```bash
+export TF_NUM_INTRAOP_THREADS=4
+export TF_NUM_INTEROP_THREADS=2
+```
+
+**Do NOT export these for rabbit fits.** Those really do use TensorFlow, and
+capping the pools there would slow the minimiser.

@@ -124,6 +124,38 @@ It sat UNCOMMITTED while matching `origin/autodiff-sigmaul` (where MR !7 is
 merged). Any checkout or stash in that tree would have silently reverted it, and
 without it **every Hessian changes by 152%**. Committed as `cc4ece2`.
 
+### D-030 — Cap the TF thread pools for cache builds — SETTLED (measured)
+**Why:** the "~1800 OS threads per build process whatever `--threads` says" is an
+ARTEFACT, not a property of the build. `prepare_cache_for_card.py` never uses
+TensorFlow; TF arrives transitively through `wremnants` and grabs one
+`tf_Compute` thread per core.
+**Evidence:** in-container, one `env -u` apart -- 1665 threads uncapped
+(768 tf_Compute + 895 python3) against **135** with
+`TF_NUM_INTRAOP_THREADS=4, TF_NUM_INTEROP_THREADS=2`. On the real 21-shard build,
+groups launched before the fix sit at 1808/2432/2429 threads and groups launched
+after at **262-902** for the same work at the same `--threads 128`.
+**Consequence:** the practical concurrency ceiling is not ~15 build processes but
+several times that. The 32768-threads-per-user limit fails SILENTLY and is
+MISATTRIBUTED -- `pthread_create has failed`, exit 134, landing on whichever
+process next asks for a thread rather than the one that exhausted the pool.
+**Do NOT apply to rabbit fits** -- those genuinely use TF.
+
+### D-031 — The build library is `build-nak` (eb60a04), and why — SETTLED
+It is the ONLY tree carrying BOTH `92f1299` (the muF member-coordinate fix the
+build requires) and `3a8db11` / `_rule_is_matched` (the non-singular
+double-count fix). `build-fix` has the second but not the first; `build-trans`
+has the first but its `py/` has zero occurrences of the second. Snapshotted so a
+concurrent rebuild cannot move the results:
+`tmp/pdf62/scetlib_snapshot`, md5(libscet-qT.so) 0c5dd7a92fea9e2ad0cb81639e9689a2.
+
+### D-032 — Shards are queued in ASCENDING ptV order — SETTLED
+So that whatever completes is a CONTIGUOUS run and never a hole. `GenFold`
+refuses a merged cache that does not exactly tile its gen bins, so a hole is
+fatal while a short contiguous run is a valid rectangle. The scheduler is
+thread-aware (re-reads a budget every 30 s, refuses to launch above it) and
+retries any group without a `done` marker, so a repeat of the qt4 abort cannot
+silently leave a gap.
+
 ### D-005 — The 260820 card's exclusion regex was OVER-BROAD; card remade — SETTLED
 **Why:** its `scetlib_.*` branch silently deleted the 58 PDF eigenvector
 nuisances and the 4 mb/mc ones, while its `muF.*` branch matched nothing.

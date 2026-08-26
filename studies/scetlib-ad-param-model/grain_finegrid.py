@@ -92,8 +92,11 @@ def load_fine(path, corr_names, reco_pt_hi=44.0):
     yl = np.asarray(hs.axes["yll"].edges, float)
     Te = np.asarray(hs.axes["ptVGen"].edges, float)
     Ye = np.asarray(hs.axes["absYVGen"].edges, float)
-    # crop the reco ptll axis to the fit's 0-44
-    npt = int(np.searchsorted(pt, reco_pt_hi + 1e-9))
+    # crop the reco ptll axis to the fit's 0-44. Note the -1e-9: the histmaker
+    # axis runs [..., 37, 44, 100] and the fit's last bin is [37, 44], so the
+    # crop must EXCLUDE the [44, 100] reco bin -- keeping it would add a bin the
+    # card does not have, fed almost entirely by the gen tail.
+    npt = int(np.searchsorted(pt, reco_pt_hi - 1e-9))
     R = R[:npt]
     pt = pt[: npt + 1]
 
@@ -170,34 +173,35 @@ def qt_ladder(Te_fine, tail_at=44.0):
     return i44, out
 
 
-def qt_merges(Te_fine, qt_edges, Tn, i44, tail="card"):
+def qt_merges(Te_fine, qt_edges, Tn, i44, ncol_total, tail="card"):
     """(M_R, M_rho) for one qT resolution.
 
-    ``M_R`` (n_coarse, n_gen_columns) merges the histmaker's gen qT columns --
-    the 39 resolved ones below 44 plus the [44, 100] bin plus the > 100 overflow.
-    ``M_rho`` (n_coarse, n_native) merges the correction file's own qT axis the
-    same way. They differ in exactly one place, and that place is the point:
-    the correction file stops at 100 GeV, so whatever sits above 100 in the MC
-    can only ever be given the (44, 100] response. ``tail='card'`` reproduces the
-    shipped treatment (one trailing bin holding every qT > 44); ``tail='split'``
-    resolves [44, 100] and leaves > 100 on its own.
+    ``M_R`` (n_coarse, ncol_total) merges the histmaker's gen qT columns: the
+    ``i44`` resolved ones below the tail edge, plus every column above it lumped
+    into ONE trailing bin.  ``M_rho`` (n_coarse, n_native) merges the correction
+    file's own qT axis the same way -- except for that trailing bin, which can
+    only ever be given the correction's (tail edge, 100] response, because the
+    correction file stops at 100 GeV.  That asymmetry is the RANGE limit, and
+    holding it fixed across the ladder is what isolates granularity from it.
+    Raising ``--tail-at`` to 100 shrinks the trailing bin to the > 100 overflow
+    alone and so measures how much of the residual the range limit owns.
     """
     res = merge_matrix(Te_fine[: i44 + 1], qt_edges, "qT resolved")
-    nres, ncol = res.shape                      # ncol = i44 resolved columns
-    ntot = i44 + 2                              # + [44, 100] + the > 100 overflow
+    nres = res.shape[0]
     resn = merge_matrix(Tn, qt_edges, "qT native")
-    tailn = merge_matrix(Tn, np.array([qt_edges[-1], 100.0]), "qT tail")
-    if tail == "card":
-        M_R = np.zeros((nres + 1, ntot))
-        M_R[:nres, :ncol] = res
-        M_R[nres, ncol:] = 1.0
-        M_rho = np.vstack([resn, tailn])
-    else:
-        M_R = np.zeros((nres + 2, ntot))
-        M_R[:nres, :ncol] = res
-        M_R[nres, ncol] = 1.0
-        M_R[nres + 1, ncol + 1] = 1.0
-        M_rho = np.vstack([resn, tailn, tailn])
+    # The trailing bin can only be given a response the correction file HAS, and
+    # that file stops at 100 GeV. When the resolved region already reaches 100
+    # the only thing left above it is the > 100 overflow, which gets the file's
+    # topmost cell -- the best any model can do without a longer correction.
+    lo = float(qt_edges[-1])
+    tail_hi = 100.0
+    if lo >= 100.0 - 1e-9:
+        lo = float(Tn[-2])
+    tailn = merge_matrix(Tn, np.array([lo, tail_hi]), "qT tail")
+    M_R = np.zeros((nres + 1, ncol_total))
+    M_R[:nres, :i44] = res
+    M_R[nres, i44:] = 1.0
+    M_rho = np.vstack([resn, tailn])
     return M_R, M_rho
 
 
@@ -207,7 +211,15 @@ def main():
     ap.add_argument("--histmaker", required=True)
     ap.add_argument("--corr", nargs="+", default=[CORR_MAIN, CORR_AS])
     ap.add_argument("--csv", required=True)
-    ap.add_argument("--tail", default="card", choices=["card", "split"])
+    ap.add_argument("--tail-at", type=float, default=44.0,
+                    help="gen qT above which everything is ONE tail bin whose "
+                         "response is the correction's (tail-at, 100] average. "
+                         "44 reproduces the shipped treatment; 100 resolves "
+                         "[44, 100] as well and leaves only the >100 overflow, "
+                         "which separates the granularity from the RANGE limit")
+    ap.add_argument("--yield-norm", type=float, default=7250381.83,
+                    help="total reco yield to normalise the Fisher weights to "
+                         "(default: the production card's)")
     args = ap.parse_args()
 
     import validate_variations as VV
@@ -216,7 +228,7 @@ def main():
     Te, Ye = D["Te"], D["Ye"]
     R, Ng = D["R"], D["N_gen"]
     npt, nyl, nT, nY = R.shape
-    i44 = int(np.argmin(np.abs(Te - 44.0)))
+    i44 = int(np.argmin(np.abs(Te - args.tail_at)))
     print(f"fine gen grid : ptVGen {nT} columns "
           f"({i44} resolved below 44, [44,100], >100), absYVGen {nY}")
     print(f"reco          : ptll {npt} x yll {nyl}")
@@ -261,23 +273,39 @@ def main():
     qt_grids = [("fine", np.asarray(Te[: i44 + 1], float))]
     for k in (1, 2, 4, 5, 10, 20):
         e = merge_blocks(CARD_QT, k)
-        if e is not None:
-            qt_grids.append((("card" if k == 1 else f"card/{k}"), e))
-    # |Y| ladder. It CANNOT go finer than the card's own 10 bins, and that is a
-    # fact about the reference, not a limitation of this run: the theory
-    # correction is applied as a BIN LOOKUP on the correction file's own grid
-    # (correctionsTensor_helper.makeCorrectionsTensor -- "returns what is in the
-    # bin of the histogram", no interpolation), whose absY edges are
-    # [0, .15, .3, .5, .7, .9, 1.1, 1.3, 1.5, 1.8, 2.0, 2.5]. The card's gen |Y|
-    # edges are exactly those minus the 2.0 one, so a |Y| grid that is not a
-    # union of correction cells has no bin-averaged response to compare against.
-    # The midpoint-refined 20-bin axis this run carries is such a grid, so the
-    # ladder starts at the card's.
+        if e is None:
+            continue
+        if args.tail_at > 44.0:
+            # extend the card ladder to the same tail edge so every row of the
+            # table treats the tail identically and only the granularity moves
+            extra = [v for v in Te[: i44 + 1] if v > 44.0 + 1e-9]
+            e = np.concatenate([e, np.asarray(extra, float)])
+        qt_grids.append((("card" if k == 1 else f"card/{k}"), e))
+    # |Y| ladder. Only grids that are a union of BOTH the run's own gen |Y|
+    # bins and the correction file's cells are usable: the correction is a bin
+    # lookup, so a |Y| grid that splits one of its cells has no bin-averaged
+    # response to compare against. The run's own axis is the finest rung, the
+    # card's the reference rung, and the rest are coarsenings of the card's.
     y_grids = []
-    for k in (2, 4, 10, 20):
-        e = merge_blocks(list(Ye), k)
+    cands = [("fine", np.asarray(Ye, float))]
+    for k in (1, 2, 5, 10):
+        e = merge_blocks(CARD_Y, k)
         if e is not None:
-            y_grids.append((("card" if k == 2 else f"card/{k // 2}"), e))
+            cands.append((("card" if k == 1 else f"card/{k}"), e))
+    seen = set()
+    for name, e in cands:
+        key = tuple(np.round(e, 9))
+        if key in seen:
+            continue
+        try:
+            merge_matrix(Ye, e, "absY")
+            merge_matrix(Yn0, e, "absY native")
+        except SystemExit:
+            print(f"   [|Y| ladder] {name}: not a union of this run's gen bins "
+                  "AND the correction's cells, skipped")
+            continue
+        seen.add(key)
+        y_grids.append((name, e))
 
     top = np.ones((npt, nyl), bool)
     top[-1, :] = False
@@ -292,6 +320,13 @@ def main():
         v, labels = D["var"][hname]
         n_evt = v[..., labels.index(VV.central_label(labels))].reshape(-1)
         break
+    # Normalise the Poisson weights to the PRODUCTION CARD's total yield. These
+    # runs are Zmumu-only with --noScaleToData, so their absolute yield is not
+    # the analysis' -- and sigma(alpha_s) scales as 1/sqrt(N) while the residual
+    # -> alpha_s map does not, so leaving it unnormalised would make the
+    # alpha_s-equivalent columns incomparable between runs. The SHAPE, which is
+    # what the projection actually uses, is unchanged by this.
+    n_evt = n_evt / n_evt.sum() * args.yield_norm
     basis = [L for L in BASIS if L in refs]
     AS_UP, AS_STEP = "pdfCT18ZNNLO_as_0120", 0.002
     have_as = AS_UP in refs
@@ -307,7 +342,7 @@ def main():
     prof_store = {}
     rows = []
     for qname, qe in qt_grids:
-        M_R, M_rho = qt_merges(Te, qe, Tn0, i44, tail=args.tail)
+        M_R, M_rho = qt_merges(Te, qe, Tn0, i44, nT)
         for yname, ye in y_grids:
             MY = merge_matrix(Ye, ye, "absY")
             MYn = merge_matrix(Yn0, ye, "absY native")

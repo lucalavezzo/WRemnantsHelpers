@@ -210,6 +210,10 @@ Depends on `theoryCorr[0]`: yes.
 
 ### 2.8 `pdfXXXByHelicity` — primary-PDF uncertainty, helicity-decomposed
 
+> For *why* the ByHelicity variants (§2.8–2.11) reduce template noise, what they
+> assume, and which validity checks are still missing, see
+> `helicity_smoothing_of_theory_uncertainties.md`.
+
 From `add_pdfUncertByHelicity_hist(from_theory_corr=False)` — called for each `pdf` in `args.pdfs`.
 
 - **Step 1a — helper tensor** (per helicity mode h, per variation i; helper called with `unity`):
@@ -394,3 +398,39 @@ No other files changed.
 - **All other systematics** (BW, mass/width/sin2theta, qcdScale, EW, QMC, experimental): differ by the `tc` ratio across runs with different `theoryCorr[0]` — expected.
 
 Verdict: fix is working as intended.
+
+---
+
+## Reading a Corr file for VALIDATION (as opposed to filling weights)
+
+Practical facts, learned while validating the `scetlib_ad` model against these
+files (2026-08-21):
+
+- **The main `*_CorrZ.pkl.lz4` contains NO alphaS and NO PDF variations.** For
+  the `FranksValsVars_CT18Z_N3p0LL_N2LO` tune it has exactly 38 labels: `central`
+  plus 8 NP lambda, 20 TNP, 2 muF, 2 kappaFO, 2 joint muF+kappaFO and 3
+  `transition_points*`. Those directions live in SIDECAR files for the same tune:
+  - `..._pdfas_CorrZ.pkl.lz4` -- 3 labels, e.g. `pdfCT18ZNNLO_as_0116 /
+    _as_0118 / _as_0120`. **Its central is `_as_0118`, NOT `central`.**
+  - `..._pdfvars_CorrZ.pkl.lz4` -- `pdf0` (central) .. `pdfN`, with
+    `pdf(2i+1)`/`pdf(2i+2)` the up/down of eigenvector `i` (standard Hessian
+    ordering). Label names carry the PDF set, so resolve them by pattern
+    (`(?:_as_0|ALPHAS_)(\d{3})$`) rather than hardcoding.
+- **Every Corr file carries the full production config.** `pickle.load` gives
+  `{"Z", "meta_data", "file_meta_data"}`; `file_meta_data[<source scetlib pkl>]`
+  has `time`, `command`, `condor_submit` and **`config`** -- the complete
+  `[Calculation_settings]`, `[QCD]`, `[TNPs]`, ... as a dict. Read that before
+  inferring anything about how a variation was defined. It is how we confirmed a
+  reference run used `calculation_piece = sing`, `compensate_fo = yes` and
+  `transition_points = [0.2, 0.6, 1.0]`.
+- **The production inputs are usually still on disk.** `condor_submit` names the
+  run directory, e.g.
+  `/work/submit/areimers/wmass/TheoryCorrections/SCETlib/com13_ct18z_newnps_n3+0ll_lattice_lambda4bugfix_franksvalsvars_fine/`,
+  which holds `base.conf`, `variations_resummed.conf`, the `.ini` and the
+  combined pkl. `variations_resummed.conf` is the AUTHORITATIVE definition of
+  what each label varied -- check a mapping against it rather than guessing from
+  the label string.
+- **The raw production pkl is directly comparable.** It has `{"hist", "config",
+  "meta_data"}` with axes `(Q, Y, qT, vars)`, so a variation/central ratio can be
+  taken straight from it -- which separates "SCETlib produced this" from
+  "`make_theory_corr` did something to it".

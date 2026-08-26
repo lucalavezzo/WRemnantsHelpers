@@ -5,7 +5,8 @@ Container/runtime startup, environment sanity checks, and Codex execution caveat
 
 ## Canonical Facts
 - Start environment in this order:
-  1. `singularity run --bind /scratch/,/work/,/home/,/ceph/ /cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/bendavid/cmswmassdocker/wmassdevrolling\:latest`
+  1. `singularity run --bind /scratch/,/work/,/home/,/ceph/,/cvmfs/ /cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/bendavid/cmswmassdocker/wmassdevrolling\:latest`
+     (`/cvmfs/` in the bind list is not optional if anything will touch LHAPDF or LaTeX -- see "LaTeX in the container" below)
   2. `cd /home/submit/lavezzo/alphaS/WRemnantsHelpers`
   3. `source setup.sh`
 - `setup.sh` is the source of truth for `WREM_BASE` and environment variables.
@@ -30,6 +31,24 @@ bin/run --help
 - Activate the venv inside the container **before** sourcing `setup.sh`, otherwise `import tensorflow` fails and `rabbit_fit.py` will not start. `setup.sh` does not activate it for you.
   - `source /opt/venv/bin/activate`
 - `fitter.sh` and other rabbit-driving scripts assume the venv is already active.
+
+## LaTeX in the container (verified 2026-07-29)
+- The image has **no TeX at all** — no `pdflatex`, `pdftex`, `latexmk`, `tectonic`. The login node has `/usr/bin/pdflatex`; that one is not reachable from inside.
+- `/cvmfs` is **not** visible inside the container with the standard `--bind /scratch/,/work/,/home/,/ceph/` launch: add `/cvmfs/` to the bind list.
+  - This is not only a LaTeX nicety: **LHAPDF's sets live there too**
+    (`LHAPDF_DATA_PATH=/cvmfs/sft.cern.ch/lcg/external/lhapdfsets/current/:...`,
+    set by the container's login profile). Without `/cvmfs/` bound the container
+    sees a partial `/cvmfs` in which that directory does not resolve, and
+    anything using LHAPDF -- SCETlib in particular -- dies with
+    `RuntimeError: Info file not found for PDF set 'CT18ZNNLO'`. The path prints
+    correctly in the environment, so the error looks like a missing PDF set
+    rather than a missing bind.
+  - Two related ways to lose the same thing: `--cleanenv` drops
+    `LHAPDF_DATA_PATH` outright, and so does invoking a bare `#!/bin/bash`
+    script as the container command -- the variable comes from the LOGIN
+    profile, so use `singularity run <img> bash -lc "..."`.
+- With it bound, the LCG texlive works in there: `export PATH=/cvmfs/sft.cern.ch/lcg/external/texlive/<year>/bin/x86_64-linux:$PATH` (years 2014–2025 present). Verified compiling `scripts/fit_summary_table.py`'s document.
+- Why it matters: it removes the "TF here, pdflatex there" split for scripts that need both — `fit_summary_table.py --compile` finds that pdflatex itself (`find_pdflatex()`: `--pdflatex` / `$PDFLATEX`, then PATH, then newest cvmfs texlive), so one in-container run makes both its TF-dependent NP columns and the pdf.
 
 ## Optional Overlays In Container
 - Base image is Arch Linux; extra packages can be added through a writable overlay mounted read-only at runtime.
@@ -72,6 +91,7 @@ bin/run --help
 - Frequent failure mode: helper scripts that start with `set -euo pipefail` can exit during `source setup.sh` before any useful output; prefer `set -e` (or disable nounset around sourcing) for environment bootstrap wrappers.
 
 ## Last Updated
+- 2026-07-29 (LaTeX in the container / cvmfs texlive)
 - 2026-03-04
 
 ## Source

@@ -162,3 +162,57 @@ down. Piped blanket `y` answers made doctor *remove* in-flight jobs' DB rows
 job output into the DB (the recovery tool for untracked-but-landed jobs).
 Runbook item 1 rewritten accordingly; `tools/run_status.py` is the passive
 check.
+
+## 3d. Stale HDF5 SWMR locks from hard kills → finalize breaks (RECOVERY documented, 07-26)
+
+Hard-killing the controller (SIGKILL, or SIGTERM without a clean HDF5 close;
+OOM-kills too) can leave a part's `raw/<part>.hdf5` merge cache with the
+superblock SWMR-write consistency flag SET. Thereafter h5py cannot open it
+(even read-only) — error: "file is already open for write/SWMR write (may use
+<h5clear file>...)". On the as118_ptz5 close-out, 8 RR stores were flagged →
+finalize LIVELOCKED ~20 h retrying them. Gotchas: `h5clear` is NOT installed
+(login node OR container); `HDF5_USE_FILE_LOCKING=FALSE` does NOT clear
+superblock status_flags (only OS flocks). RECOVERY (worked): the `.hdf5` are
+rebuildable caches — source is `raw/production/<part>/s*/*.dat` (intact) —
+so move the flagged stores aside (`raw/_flagged_hdf5_bak_*/`) and re-run
+finalize; `_cache_is_current`=False → clean rebuild from `.dat`. Detect
+flagged stores: try `h5py.File(f,'r')` over `raw/*.hdf5`, catch failures.
+PREVENTION: prefer clean shutdowns; kill only when throttled; or get an
+`h5clear` binary into the environment.
+
+## 11. Restart / shutdown / finalize discipline (PLAYBOOK — read before touching a live run)
+
+Consolidated from the 07-14→26 as118_ptz5 campaign. The dokan controller is
+fragile to hard interruption; follow this:
+
+1. **Kill ONLY when the dispatcher is throttled** (last log line
+   `...in-flight v.s. N max -> throttled`). Killing mid-dispatch orphans the
+   submission pipeline into phantom batches (up to ~30k rows/restart) and can
+   leave stale HDF5 locks (3d). A reboot/OOM is an involuntary hard kill —
+   expect both problems after one.
+2. **After any kill:** `pgrep -f 'nnlojet-run submit'` for orphaned luigi
+   workers (TERM does NOT propagate to them) and TERM leftovers, plus
+   `pgrep -f 'condor_q -json'` for the poll pile. NEVER `pkill -f <pattern>`
+   where the pattern appears in your own command line — it self-matches and
+   kills your shell (hit 5× this campaign). Use `ps|grep '[b]racket'|awk|xargs`
+   or kill explicit PIDs.
+3. **Before resuming:** back up `db.sqlite`, then
+   `studies/nnlojet-lowqt-cut/purge_phantoms.py` (deletes never-submitted
+   orphan batches; controller-down only). Then `submit` — resurrection
+   re-adopts state and collects done-on-disk jobs.
+4. **Collecting stragglers without generating new work:** set
+   `target_rel_acc` to an already-met value (e.g. 0.01) before `submit`, so it
+   collects+drains without registering new jobs. `doctor --scan-dir`
+   (controller down) imports on-disk output the wedge/kill left in `dispatched`
+   state (transitions → done so finalize includes them).
+5. **Finalize:** `finalize --skip-grids` (controller down). Long (~hours to a
+   day at 0.2%-scale RR stats; force-re-merges all 206 parts, writes
+   `result/final` only at the very end). If it errors on HDF5 locks → 3d.
+   Copy `result/final` to a dated immutable snapshot + README immediately.
+6. **Watcher false-positives to avoid:** main-controller-CPU-flat is NOT a
+   wedge (workers do the merges — check busy-worker count); swap-full is NOT
+   danger (watch MemAvailable, not SwapFree); QSTACK/WEDGE need 2+ consecutive
+   ticks. True wedge = 0 busy workers AND 0 new log lines >30 min.
+7. **Resumability:** run dir + `db.sqlite` intact = resumable indefinitely
+   (set `target_rel_acc` lower + `submit`). Never `finalize --reset` or delete
+   the run dir. Mind `/scratch` retention for long idle gaps.
