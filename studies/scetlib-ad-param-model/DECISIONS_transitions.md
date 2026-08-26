@@ -588,3 +588,90 @@ On the x1,x3 leg, where D reaches -1.74 ln f, it is BAD: [24,28] -18.4% ->
 residual constant beyond the stencil discards real displacement information that
 the quadratic, wrong as it is, was at least using. Rejected; kept behind the bit
 so it is neither re-derived nor believed.
+
+### D-043b — The same at the NEAR-ANCHOR derivative, and the per-bin winner map
+###           — SETTLED
+
+x2 = 0.55, dev as a % of the true response:
+
+| qT | shipped | mode 1 | mode 3 | mode3 PURE | mode1+Herm | mode3+Herm |
+|---|---|---|---|---|---|---|
+| [20,24] | -40.9 | -48.9 | -47.7 | **-1.7** | -16.8 | **+1.6** |
+| [24,28] | +27.1 | +17.2 | +18.7 | +24.2 | **+7.8** | +30.1 |
+| [28,33] | +8.4 | **+0.7** | +1.6 | +18.3 | -2.5 | +16.9 |
+| [33,44] | +3.6 | **-1.6** | -1.1 | +6.4 | -9.1 | +7.2 |
+| [44,100]| +3.2 | **-0.2** | +0.0 | +3.3 | -9.6 | +2.8 |
+
+So the conclusion is regime-independent: **the residual-quadratic construction
+owns qT >= 28 (0.2-1.6%), and the pure / quartic constructions with mode 3 own
+qT [20,24] (1.6-2.0%). No single one of the six wins everywhere**, and the
+crossover sits at [24,28], where mode1+Hermite is the best available (+7.8%, from
++27.1% shipped -- a 3.5x improvement on the bin that three previous rounds could
+not move at all).
+
+**That is the shape of the remaining work, and it is a conditioning problem on a
+known construction, not an open physics question.** The quartic's weights are
+~5x the quadratic's at the real geometry, so the natural next step is the
+intermediate: impose only r'(0) = 0 (a CUBIC, weights ~ D^2 instead of D^3), or
+guard the quartic on m_up^3 / m_dn^3 and fall back. Neither was tried.
+
+### D-043c — CORRECTION to D-043's status: the quartic DIVERGES on the x1,x3
+###           leg. It is a PROOF of mechanism, not a candidate implementation
+###           — SETTLED (measured)
+
+D-043 called the quartic "not shippable as it stands" on the strength of a
+[24,28] regression. On the x1,x3 = 0.3,0.9 direction, where the induced
+displacement reaches **D = -1.74 ln f**, it does not regress -- it explodes:
+
+| qT | shipped | mode 1 | mode3 PURE | mode1+Herm | mode3+Herm |
+|---|---|---|---|---|---|
+| [18,20] | -17.3% | -28.9% | +77.7% | +3.5% | +9.4% |
+| [20,24] | -32.4% | -40.9% | +13.6% | +105.0% | +149.7% |
+| [24,28] | -18.4% | -26.2% | -27.7% | **-557%** | **-607%** |
+| [28,33] | +42.7% | **+31.7%** | +59.3% | **-1172%** | **-1326%** |
+| [33,44] | +12.3% | **+5.5%** | +21.3% | +14.3% | +38.4% |
+| [44,100]| +14.2% | +9.4% | +29.5% | **+3.0e6%** | **+3.1e6%** |
+
+The cause is in the construction's own definition and was flagged in the code
+comment when it was written: the quartic's weights grow as D^4/m^3 outside the
+stencil where the quadratic's grow as D^2, so at D = 1.74 ln f on a
+floor-collapsed stencil they are astronomical. ([44,100] additionally has a true
+response of -1.0e-03 that changes SIGN relative to the other bins, so its
+percentage is not to be read as physics -- but -1172% at [28,33], whose response
+is +7.5e-03, is.)
+
+**So the correct status of the quartic is: a PROOF that the low-qT residual is
+information the construction discards -- it takes qT [20,24] from -31.9% to
+-0.0% at both x2 legs and both regimes -- and NOT a candidate implementation.**
+Any implementation needs extrapolation control that the quadratic gets for free.
+The clamp (bit 32) is the obvious pairing and is bad on this same leg on its own
+(D-044); clamp-AND-quartic was not measured.
+
+**This does not touch anything about mode 1**, which is monotone and safe on this
+direction too (+42.7% -> +31.7% at [28,33], +12.3% -> +5.5% at [33,44], and
+-32.4% -> -40.9% at [20,24] like everywhere else).
+
+**And it sharpens the recommendation:** ship mode 1 + c_i1, which is validated,
+bounded and cannot regress any other direction; treat the quartic as the measured
+next lead with a named failure mode, and require it to be tested on the x1,x3 leg
+FIRST, not last. That ordering is the lesson: every construction in this project
+has been designed on the x2 legs and broken on x1,x3, which is the direction
+whose displacement leaves the stencil by 74%.
+
+### D-043d — The construction map holds on all THREE x2 legs — SETTLED
+
+x2 = 0.75 (the fourth point), dev as a % of the true response:
+
+| qT | shipped | mode 1 | mode 3 | mode3 PURE | mode1+Herm | mode3+Herm |
+|---|---|---|---|---|---|---|
+| [20,24] | -40.7 | -49.1 | -47.8 | **+2.1** | -14.1 | +5.2 |
+| [24,28] | +30.8 | +20.6 | +22.1 | +24.7 | **+9.6** | +32.3 |
+| [28,33] | +7.0 | **-1.4** | -0.3 | +19.9 | -0.9 | +19.3 |
+| [33,44] | +4.7 | **-1.0** | -0.4 | +10.1 | -7.0 | +10.4 |
+| [44,100]| +1.7 | -1.9 | -1.6 | +2.7 | -11.3 | **+1.3** |
+
+Same map as D-043 and D-043b: **pure mode 3 closes [20,24] to ~2% on all three
+x2 legs (2.0%, 2.1%, -1.7%) and in both regimes; mode 1 owns qT >= 28 (0.3-1.9%);
+[24,28] is the crossover and mode1+Hermite is the best there on every leg
+(+7.7% / +9.6% / +7.8% from +10.9% / +30.8% / +27.1%).** The x1,x3 leg is the
+exception and is where the quartic diverges (D-043c).

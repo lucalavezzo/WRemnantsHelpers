@@ -3826,6 +3826,19 @@ The existing shard-and-merge path stays production throughout.
 
 ## Central closure on the fine gen grid (agent, 2026-08-26)
 
+> **Provenance, resolved.** The agent staged these entries and I (the coordinator)
+> merged them into this file and deleted the staged copies. The agent then noticed
+> the deletion, restored the staged files from the merged text, and added its own
+> correction because their headers still claimed "DECISIONS.md and LOGBOOK.md are
+> untouched" -- true when written, false after my merge. All copies agreed. The
+> staged duplicates are now removed again, deliberately: **this file and
+> `LOGBOOK.md` are the canonical record**, and the webdir
+> `~/public_html/alphaS/260826_scetlib_ad_central_genbinning/` is the primary
+> artefact. Nothing was lost in either direction.
+>
+> Worth keeping as a working note: staged-note handoff between a coordinator and a
+> long-running agent races. The agent was right to flag it rather than assume.
+
 # Decisions — the CENTRAL prediction on the finer response-matrix gen grid (2026-08-26)
 
 Companion to `DECISIONS_genbinning.md` (which measured the VARIATION side).

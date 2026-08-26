@@ -1,6 +1,8 @@
 ## 2026-08-26 — The transition points, taken end to end: the analytic DGLAP route works above qT 24 and the residual below it is a DIFFERENT defect
 
 **Plots:** `~/public_html/alphaS/260826_transition_analytic_e2e/`
+**MR:** !9, `muf-analytic-trans` -> `autodiff-sigmaul` (a7392be),
+https://gitlab.cern.ch/scetlib/contrib/scetlib-cms/-/merge_requests/9
 **Decisions:** `DECISIONS_transitions.md`, D-031 .. D-042.
 **Code:** worktree `/work/submit/lavezzo/alphaS/scetlib-anltrans`, branch
 `muf-analytic-trans` off `eb60a04`, builds `build-anltrans` (ablations) /
@@ -156,10 +158,62 @@ w_s x (conv error at that node) -- against the sigma-level residual.** That is
 the missing link between every conv-level gate this project has run and every
 sigma-level number.
 
+### THE LOW-qT LOSS IS THE CONSTRUCTION, AND IT IS FIXABLE
+
+The identity above says the construction is `Lagrange[r](D) + delta(D)`. But
+`delta` reproduces conv's VALUE, SLOPE and CURVATURE at D = 0, so
+r'(0) = r''(0) = 0 -- and a quadratic through three points THROWS THAT AWAY,
+giving r a spurious slope and curvature at the anchor. That is a
+first-order-in-D error, which is exactly the signature the residual has.
+
+Imposing both conditions makes the interpolant a QUARTIC with a closed form and
+no free parameter, still 1 at its own member and 0 at the other two (so knot
+exactness survives), with both weights vanishing as D^3 so the anchor slope and
+curvature come from `delta` alone:
+
+    w_dn = D^3 (m_up - D) / ((m_up - m_dn) m_dn^3)
+    w_up = D^3 (D - m_dn) / ((m_up - m_dn) m_up^3)
+
+With mode 3 it takes **qT [20,24] from -31.9% to -0.0%** (and [28,33] to +0.8%,
+[44,100] to +0.6%) at the finite variation, and to +1.6% at the near-anchor
+derivative. **So the low-qT loss is neither irreducible nor the muf_min DGLAP
+truncation -- it is information the construction was discarding.**
+
+Not shippable, and on one direction much worse than that: at x2 = 0.35 it
+regresses [24,28] to +30.4%, and on the **x1,x3 leg, where D reaches -1.74 ln f,
+it EXPLODES** -- [24,28] -18.4% -> -607%, [28,33] +42.7% -> -1326%. The cause is
+in its own definition and was in the code comment before it was measured: the
+quartic's weights grow as D^4/m^3 outside the stencil where the quadratic's grow
+as D^2. **So the quartic is a PROOF that the low-qT residual is information the
+construction discards, not a candidate implementation** -- any implementation
+needs the extrapolation control the quadratic gets for free (impose only
+r'(0) = 0 for a cubic with D^2 weights; or guard on m_up^3/m_dn^3; or pair it
+with the clamp). And test on x1,x3 FIRST: every construction in this project has
+been designed on the x2 legs and broken on x1,x3. Mode 1 is monotone and safe
+there (+42.7% -> +31.7%, +12.3% -> +5.5%), which is why it is the thing to
+merge. And it makes **mode 3 essential**, reversing
+half of the "no rebuild" verdict: mode 3 is a no-op in the residual construction
+by the degree-2 identity and decisive in the quartic and pure ones (mode1+Hermite
+is -19.2% at [20,24] where mode3+Hermite is -0.0%).
+
+No single construction wins everywhere. The residual quadratic owns qT >= 28
+(0.2-1.6%), the pure and quartic constructions with mode 3 own [20,24]
+(1.6-2.0%), and the crossover is [24,28], where mode1+Hermite is the best
+available (+7.8% from +27.1%). **The remaining work is conditioning a known
+construction -- impose only r'(0) = 0 for a cubic with D^2 weights, or guard the
+quartic on m_up^3 / m_dn^3 -- not an open physics question.** Neither was tried.
+
+Also rejected on the way, with numbers: clamping the interpolation coordinate to
+the stencil. Neutral at x2 = 0.35, correctly a no-op at x2 = 0.55 (near the
+anchor every node sits inside its own stencil, so a pure extrapolation guard MUST
+be the identity there -- a good check that the bit does what it says), and bad on
+the x1,x3 leg where D reaches -1.74 ln f ([28,33] +42.7% -> +90.7%).
+
 ### Recommendation
 
 Merge mode 1 + the c_i1 term, keep `set_muf_analytic` DEFAULT 0 until Luca
-rules, and do not build a mode-3 cache. It improves the mean |dev| in all four
+rules, and do not build a mode-3 cache YET (the quartic construction is the
+reason to build one later, and that reason is now measured). It improves the mean |dev| in all four
 directions (2.0x / 2.1x / 1.7x / 1.2x) and the worst bin in three of four, it
 closes the two bins that carry the response, the other 38 directions are
 untouched BY CONSTRUCTION and verified bit-identical, and it costs nothing --
