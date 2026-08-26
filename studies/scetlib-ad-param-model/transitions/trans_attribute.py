@@ -92,6 +92,32 @@ HERM_ARMS = [
     ("anl3pure",  3, 1),   # alias, kept so the label reads clearly
 ]
 
+# Arms that need the RESIDUAL INTERPOLANT FORM field, ad_muf_abl bits 7..9
+# (form = (abl >> 7) & 7).  Every form is exact at all three members, so each
+# arm keeps kappa_F = 1/f, 1, f bit-identical and leaves the other 35 directions
+# untouched -- what changes is only how the residual is carried to a
+# displacement that sits at no knot.
+#
+#   quart  = the bit-64 quartic through the form field (a CONTROL: it must
+#            reproduce the anl1herm arm to every digit)
+#   bq03   = quadratic <-> quartic blended with theta = T^2/(T^2 + (A1-1)^2
+#            + (A2-1)^2), T = 0.3   -- the conditioning-guarded quartic
+#   bq1    = the same at T = 1
+#   bq1a   = the same at T = 1, guarding on A1 alone
+#   clip   = the quadratic times min((d/m)^2, 1): the quartic INSIDE the
+#            stencil, never larger in magnitude than the quadratic OUTSIDE it
+#   bc1    = quadratic <-> cubic, guarded on A1c, T = 1
+SAFE_ARMS = [
+    ("anl1cub",   1, 1 << 7),
+    ("anl1quart", 1, 2 << 7),
+    ("anl1bq03",  1, 3 << 7),
+    ("anl1bq1",   1, 4 << 7),
+    ("anl1bq1a",  1, 5 << 7),
+    ("anl1clip",  1, 6 << 7),
+    ("anl1bc1",   1, 7 << 7),
+    ("anl1herm",  1, 64),
+]
+
 # Arms that need ad_muf_abl bit 32 (clamped extrapolation).
 CLAMP_ARMS = [
     ("clamp",      0, 32),          # clamp with no analytic term
@@ -149,6 +175,9 @@ def main():
     ap.add_argument("--with-mode3", action="store_true",
                     help="add the ad_muf_anl = 3 arms. Sets the mode BEFORE "
                          "configure so the N3LO conv kernels are loaded.")
+    ap.add_argument("--with-safe", action="store_true",
+                    help="add the residual-form arms (ad_muf_abl bits 7..9). "
+                         "Needs a build that implements the form field.")
     ap.add_argument("--with-clamp", action="store_true",
                     help="add the ad_muf_abl bit-32 arms (clamped "
                          "extrapolation). Needs a build that implements it.")
@@ -173,7 +202,12 @@ def main():
         """
         import configparser as _cp
         import os as _os
-        sl_config, sl_variations, _ = xb._import_scetlib()
+        # xb._import_scetlib returned (sl_config, sl_variations, sl_tf) until
+        # 2026-08-26 and (sl_config, sl_variations) after -- the TF import was
+        # dropped there so a cache build need not pay for TensorFlow. Take the
+        # first two either way rather than pinning to one signature.
+        _imp = xb._import_scetlib()
+        sl_config, sl_variations = _imp[0], _imp[1]
         src = xb._scetlib_src()
         conf = _cp.ConfigParser(inline_comment_prefixes="#")
         conf.read(_os.path.join(src, "prod", "scetlib_run", "defaults.conf"))
@@ -197,7 +231,8 @@ def main():
     pool = (ARMS + (EXTRA_ARMS if args.with_i1 else [])
             + (MODE3_ARMS if args.with_mode3 else [])
             + (HERM_ARMS if args.with_herm else [])
-            + (CLAMP_ARMS if args.with_clamp else []))
+            + (CLAMP_ARMS if args.with_clamp else [])
+            + (SAFE_ARMS if args.with_safe else []))
     arms_wanted = [a for a in pool if args.arms is None or a[0] in args.arms]
     # Which kernels the conv provider LOADS is decided when the calculation is
     # configured, and mode 3 fills four conv kinds one fixed order above nnlo,

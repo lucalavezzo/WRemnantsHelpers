@@ -4856,3 +4856,167 @@ x2 legs (2.0%, 2.1%, -1.7%) and in both regimes; mode 1 owns qT >= 28 (0.3-1.9%)
 [24,28] is the crossover and mode1+Hermite is the best there on every leg
 (+7.7% / +9.6% / +7.8% from +10.9% / +30.8% / +27.1%).** The x1,x3 leg is the
 exception and is where the quartic diverges (D-043c).
+
+---
+
+## Upstreaming the cache build (agent, 2026-08-26)
+
+# scetlib_ad — decisions from the upstream-move session (2026-08-26)
+
+Staged for merging into `DECISIONS.md`. Same format: WHAT was decided, WHY,
+WHAT EVIDENCE, WHAT WOULD OVERTURN it. Numbered `U-*` so nothing collides with
+the existing blocks.
+
+---
+
+### U-001 — The build and the cache FORMAT move into SCETlib; only the card side stays — SETTLED (Luca)
+**What:** three pieces, not two.
+1. `scetlib-cms/py/scetlib_cache.py` (new, upstream MR !10) — the cache file:
+   the TF-free writer, the `SCTRULE`/`SCETFOG` blob readers, and both merges
+   (`merge_bin_caches`, `merge_shards`), plus `split_pairs` and `copy_runcard`.
+2. `scetlib-cms/examples/matched_ad/prepare_cache.py` — the builder:
+   `plan_variations`, `build_prologue`, `build_variations`, `write_cache`,
+   `fork_member_build`, driven by an explicit bin list.
+3. `scripts/rabbit/scetlib_ad/prepare_cache_for_card.py` (wrapper) +
+   `build_cache_parallel.py` (scheduler) — reading the gen axes off a rabbit
+   card, writing the runcard, cutting `--subset`, orchestrating, budgeting
+   threads.
+**Why:** the deciding argument is maintenance, not tidiness. The blob-format
+knowledge lived in our Python while the format lives in their C++
+(`Bin_rule::save_bytes`, `_Fo_cache::save_bytes`): a layout change reached us as
+wrong answers. Upstream it moves in the same commit as the layout. Nothing about
+node sets, bin rules, member variations or the on-disk format was ever
+rabbit-specific — `prepare_cache_for_card` called only SCETlib's pybind API, and
+`build_cache_parallel` imported SCETlib zero times while depending entirely on
+its internals.
+**Size:** WRemnants 1863 -> 842 lines (and ~460 of the 842 is argparse help and
+the docstring); SCETlib gains 913 + ~280.
+**Overturned by:** upstream refusing the merges. Then they come back, and the
+`__getattr__` re-export in `build_cache_parallel.py` is the only seam that has
+to change.
+
+### U-002 — The proof is the CALL LOG, extended to every route — SETTLED (measured)
+**Why:** byte-identity of a rebuilt cache cannot be shown (D-013: four builds of
+one configuration gave 357/359/359/371 nodes/bin, and the blob carries
+uninitialised padding). What can be shown is that both versions hand the
+extension the same calls with the same arguments in the same order.
+**Evidence:** `default_path_equivalence.py`, extended from 3 configurations to
+**7** — default, `--no-pdf`, `--no-muf`, `--pdf-eig 2`, a member slice
+(`--members 0:2`), a bin subset, and `--fork-members 2`. All **SAME**, run
+against the installed files. The harness needed three changes, each of which is
+itself a statement about the refactor:
+* both cache writers now record ONE entry, so `ScetlibCachedXsecTF(...).save()`
+  and `scetlib_cache.save_cache(...)` are comparable;
+* a stub `scetlib_cache` module is injected — if the new builder still reached
+  for the TF wrapper, the recorded call would come from the other stub and the
+  arguments would differ;
+* a stub `build_cache_parallel` is injected for the OLD arm, because the old
+  `--fork-members` path imported that sibling. That import is the cycle the
+  refactor removed.
+**Overturned by:** a call that the stub does not intercept. The stub covers
+`sigma.prepare`, `build_bin_rules`, `build_pdf_variations`,
+`build_fo_pdf_variations`, `set_pdf_eig_params`, `sigma_binned_batch`,
+`configure` and the save; anything else the builder starts calling would pass
+unnoticed.
+
+### U-003 — TensorFlow is out of the build path, at the source — SETTLED (measured)
+**What:** `xsec_backend._import_scetlib()` no longer imports `scetlib_tf`;
+`_import_cached_xsec()` is a separate, evaluation-only import, and the builder
+saves through `scetlib_cache.save_cache` (numpy only).
+**Why it was there at all:** `configure()` needed `sl_config`/`sl_variations`
+and got `ScetlibCachedXsecTF` in the same `try:` block. The save that needed it
+needs numpy alone.
+**Evidence:** real 2-bin build, same runcard and `--threads`, one change apart —
+`tensorflow` in `sys.modules` **yes -> no**, modules **5165 -> 848**, peak RSS
+**1404 -> 681 MB**, threads at exit **203 -> 90**.
+**Consequence:** D-030's `TF_NUM_INTRAOP_THREADS` / `TF_NUM_INTEROP_THREADS`
+export is no longer needed for a cache build. It remains right for anything that
+genuinely imports TF without needing its pools, and must still NOT be applied to
+rabbit fits.
+**Overturned by:** a new module-level TF import anywhere on the
+`prepare_cache_for_card` chain. `build_probe.py` in the job scratch is a
+one-line check (`'tensorflow' in sys.modules` after the build).
+
+### U-004 — The new writer is byte-identical, and the exception is the KNOWN padding — SETTLED (measured)
+**Evidence:** load a real cache and write it back with both writers. Every array
+matches except **3 bytes at offsets 1566-1568** of the rules blob. Those sit
+inside the `Bin_rule_opts` POD, which spans `[1513, 1569)`, i.e. its last three
+bytes — and **two runs of the OLD writer differ in exactly the same three**. All
+13,025,133 bytes after the header are identical in both comparisons, and all
+three writers agree on every opts FIELD, on version, struct sizes, fingerprint
+and anchor.
+**Why it matters:** it is the direct measurement behind the knowledge note's
+"compare the FIELDS, never the raw bytes", and it means any future byte-level
+A/B of a cache must mask that window.
+
+### U-005 — Both merges re-validated through the moved code — SETTLED (measured)
+* **BINS.** Two independently built shards (2 bins + 1 bin, each with the full
+  4-member list) built by the scheduler and merged by
+  `scetlib_cache.merge_bin_caches`: merged vs each parent, value and Jacobian,
+  at the anchor and at a displaced point, **0.000e+00 and bit-identical**; parts
+  sum to whole at **0.000e+00** (16.70535994222326 both sides). The three arms
+  returned three DIFFERENT sums (16.705 / 11.600 / 5.105), so this is not the
+  memoisation collision that makes a perfect-and-wrong null look like success.
+* `backend_check` on the merged product: **all checks passed** — FD 1.16e-09,
+  `max|H - H^T|/max|H|` 0.00e+00, gen-fold sum rule 0.00e+00.
+* **MEMBERS.** `split_merge_selftest.py` on a real 4-member cache: split into
+  `[0,2)` and `[2,4)` and merged back — **all 9 arrays byte-identical**.
+* **Evaluation.** The full loader check before and after the `scetlib_tf`
+  delegation differs only in wall-clock timings: same `sum(sigma)` to every
+  printed digit, same FD 1.15e-09, same Hessian symmetry 0.00e+00.
+
+### U-006 — The cross-build member guard is intact, and now has a test — SETTLED (measured)
+**Why it is the one guard that matters:** the C++ loaders check the settings
+fingerprint, the struct sizes and the format version, and two independent builds
+of the same runcard AGREE on all of them. Only `merge_shards`'s byte comparison
+of the nominal rule stands between that and a silently wrong cache.
+**Evidence:** `cross_build_guard.py` (job scratch) on two independent builds of
+one runcard. They agree on version, sizes, fingerprint, `Bin_rule_opts` fields
+and anchor; **2 of 2 nominal rules differ byte for byte**. Same-build halves
+merge; cross-build halves are refused with "the shards' NOMINAL rule differs
+byte for byte". Worth promoting into the study directory.
+
+### U-007 — The wrapper keeps `main()`, and the steps stay REBINDABLE — SETTLED
+**Why:** `knot_scan/prepare_cache_knots.py` and
+`transition_knots/prepare_cache_5knot.py` work by loading
+`prepare_cache_for_card.py` and assigning `mod.plan_variations` /
+`mod.build_variations` before calling `mod.main()`. Had the orchestration moved
+upstream, those assignments would have been silently ignored — and the failure
+mode is the worst kind: a build that runs to completion with the DEFAULT knots
+while its log claims the override. So `main()` stays in the wrapper (it is the
+"shard orchestration" piece anyway) and reaches every step through
+`_resolve_steps()`, which prefers this module's globals over the upstream
+module. `fork_member_build` takes `build_fn`/`write_fn` so a rebound step
+reaches the forked children too.
+**Evidence:** smoke test — 13/13 names present on the wrapper, 19/19 on the
+scheduler (including the blob primitives `_U64`, `_FO_MAGIC`, `_emit_fo_grid`
+that `split_merge_selftest.py` and `compare_caches.py` use), unknown names still
+raise `AttributeError`, and a rebound `plan_variations` IS what `_resolve_steps`
+returns.
+**Trap avoided:** the first attempt used `sys.modules[__name__]`, which is
+`KeyError` when the module is loaded by path (`spec_from_file_location` does not
+register a name) — which is how every one of these callers loads it.
+
+### U-008 — The WRemnants side could NOT be put on a branch — SETTLED (constraint, not a choice)
+`scripts/rabbit/scetlib_ad/` and `wremnants/postprocessing/scetlib_ad/` are
+**untracked** in the WRemnants checkout, so there is no diff to branch. What was
+done instead: pristine copies at `/tmp/scetlib_ad_orig/` (which is also what the
+equivalence harness diffs against) and in the job scratch, the work developed
+outside the shared tree, validated there, and installed only after the call log
+came out SAME. The upstream half IS on a branch, in its own worktree
+(`/work/submit/lavezzo/alphaS/scetlib-upbuild`, branch `upstream-cache-build`).
+**Action for Luca:** these files should be committed. Until they are, any
+`git checkout` in that tree is not a risk but any `git clean` is, and there is no
+review artefact for the WRemnants half beyond `diff` against those copies.
+
+### U-009 — Found in passing: `scetlib-cms/build/` is STALE and `incontainer.sh` uses it — SETTLED (measured)
+`setup.sh` defaults `SCETLIB_BUILD` to `$SCETLIB_SRC/build`, whose
+`libscet-qT.so` is from Aug 18/21 and has no `set_matched_partner` — so
+`configure()` dies with `'scetlib_qT.DrellYan' object has no attribute
+'set_matched_partner'` for anyone who takes the default. `build-fix` (same
+checkout) has it, and every validation here used
+`SCETLIB_BUILD=$WREM/scetlib-cms/build-fix`.
+**Not fixed here** — the study's `incontainer.sh` belongs to whoever set the
+production build (D-031 pins `build-nak` via a snapshot). Worth either rebuilding
+`build/` or making `incontainer.sh` name the build explicitly, because the
+current default fails in a way that reads like a source bug.

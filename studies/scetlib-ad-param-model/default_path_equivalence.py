@@ -23,8 +23,17 @@ import tempfile
 
 import numpy as np
 
-NEW = "/home/submit/lavezzo/alphaS/WRemnants/scripts/rabbit/scetlib_ad/prepare_cache_for_card.py"
-OLD = "/tmp/prepare_cache_for_card.ORIG.py"
+NEW = os.environ.get(
+    "NEW_BUILDER",
+    "/home/submit/lavezzo/alphaS/WRemnants/scripts/rabbit/scetlib_ad/"
+    "prepare_cache_for_card.py",
+)
+# A pristine copy of the pre-refactor builder, with its sibling
+# build_cache_parallel.py beside it -- the old --fork-members path imports that
+# sibling, so the copy has to be a DIRECTORY, not a lone file.
+OLD = os.environ.get(
+    "OLD_BUILDER", "/tmp/scetlib_ad_orig/prepare_cache_for_card.py"
+)
 
 NAMES = [
     "alphas",
@@ -146,25 +155,73 @@ def run(path, argv, n_bins):
     import configparser
     import types
 
+    def _write(bins, out, n_eig, has_as, has_muf):
+        """The one record both cache writers produce.
+
+        The pre-refactor builder went through ScetlibCachedXsecTF(...).save();
+        the moved one calls the TF-free scetlib_cache.save_cache(). Different
+        call, same act -- "write THESE bins with THIS variation header to THIS
+        file" -- so both are recorded identically and the logs stay comparable.
+        """
+        _rec(
+            log,
+            "write_cache",
+            (bins, os.path.basename(out)),
+            dict(n_eig=n_eig, has_as=has_as, has_muf=has_muf),
+        )
+        with open(out + ".npz", "wb") as f:
+            f.write(b"x")
+
     fake_tf = types.ModuleType("scetlib_tf")
 
     class FakeCached:
         def __init__(self, sing, nons, bins, n_eig=0, has_as=False, has_muf=False):
-            _rec(
-                log,
-                "ScetlibCachedXsecTF",
-                (bins,),
-                dict(n_eig=n_eig, has_as=has_as, has_muf=has_muf),
-            )
+            self._a = (bins, n_eig, has_as, has_muf)
 
         def save(self, out):
-            _rec(log, "save", (os.path.basename(out),), {})
-            with open(out + ".npz", "wb") as f:
-                f.write(b"x")
+            bins, n_eig, has_as, has_muf = self._a
+            _write(bins, out, n_eig, has_as, has_muf)
 
     fake_tf.ScetlibCachedXsecTF = FakeCached
     sys.modules["scetlib_tf"] = fake_tf
 
+    # scetlib_cache is SCETlib's TF-free cache-format module. Stubbing it keeps
+    # the harness from writing real blobs AND proves the build path no longer
+    # needs scetlib_tf at all: if the module under test still reached for the TF
+    # wrapper, the recorded call would come from FakeCached above and the
+    # sing/nons arguments would differ.
+    fake_cache = types.ModuleType("scetlib_cache")
+    fake_cache.FORMAT = 1
+
+    def _save_cache(sing, nons, bins, path, n_eig=0, has_as=False, has_muf=False):
+        _write(bins, path, n_eig, has_as, has_muf)
+
+    def _split_pairs(pairs, n_procs):
+        n = len(pairs)
+        k = max(1, min(int(n_procs), n))
+        return [
+            (pairs[(i * n) // k][0], pairs[((i + 1) * n) // k - 1][1])
+            for i in range(k)
+        ]
+
+    fake_cache.save_cache = _save_cache
+    fake_cache.split_pairs = _split_pairs
+    fake_cache.merge_shards = lambda paths, out, verbose=True: out + ".npz"
+    sys.modules["scetlib_cache"] = fake_cache
+
+    # The pre-refactor builder got the same two functions from its sibling
+    # build_cache_parallel (which is the import cycle the refactor removed), so
+    # the old arm has to be given the same stubs or it would try to np.load the
+    # placeholder files _write leaves behind.
+    fake_bcp = types.ModuleType("build_cache_parallel")
+    fake_bcp.split_pairs = _split_pairs
+    fake_bcp.merge_shards = fake_cache.merge_shards
+    sys.modules["build_cache_parallel"] = fake_bcp
+
+    # The builder's own directory, so a version that imports a sibling module
+    # (the pre-refactor --fork-members path imports build_cache_parallel) finds
+    # ITS sibling and not the other arm's.
+    sys.path.insert(0, os.path.dirname(os.path.abspath(path)))
     spec = importlib.util.spec_from_file_location("builder_under_test", path)
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
@@ -184,6 +241,8 @@ def run(path, argv, n_bins):
         mod.main()
     finally:
         sys.argv = old_argv
+        sys.path.pop(0)
+        sys.modules.pop("build_cache_parallel", None)
     return log
 
 
@@ -191,10 +250,18 @@ def main():
     grid = '{"Q": [60, 120], "Y": [0, 0.25, 0.5], ' '"qT": [20, 27, 33, 44, 100]}'
     n_bins = 8
     rc = 0
+    # Every route through main(), because the refactor moved all of them: the
+    # default, the physics-only cache, the no-muF variant, the eigenvector
+    # registration, a bin subset, a member slice (partial cache + sidecar) and
+    # the forked member loop.
     for tag, extra in (
         ("--pdf-eig 0 (every cache built so far)", ["--pdf-eig", "0"]),
         ("--no-pdf", ["--no-pdf"]),
         ("--pdf-eig 0 --no-muf", ["--pdf-eig", "0", "--no-muf"]),
+        ("--pdf-eig 2", ["--pdf-eig", "2"]),
+        ("--pdf-eig 2 --members 0:2", ["--pdf-eig", "2", "--members", "0:2"]),
+        ("--pdf-eig 0 --subset '0/1,2'", ["--pdf-eig", "0", "--subset", "0/1,2"]),
+        ("--pdf-eig 2 --fork-members 2", ["--pdf-eig", "2", "--fork-members", "2"]),
     ):
         logs = []
         for path in (OLD, NEW):
