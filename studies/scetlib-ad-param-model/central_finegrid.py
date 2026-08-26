@@ -194,7 +194,9 @@ def make_plots(args, out, ref, reco_axes, sh, gen_s, gen_f,
             for h in hs[1:]
         )
         pad = max(1.4 * dev, 5e-4)
-        ymax = max(float(np.max(h.values(flow=False) / np.diff(edges))) for h in hs)
+        dens = [h.values(flow=False) / np.diff(edges) for h in hs]
+        ymax = max(float(np.max(v)) for v in dens)
+        ymin = min(float(np.min(v[v > 0])) for v in dens)
         fig = plot_tools.makePlotWithRatioToRef(
             hs, labels=labels,
             colors=["#5790fc", "#e42536", "#964a8b"],
@@ -202,7 +204,8 @@ def make_plots(args, out, ref, reco_axes, sh, gen_s, gen_f,
             xlabel=xlabel, ylabel="yield / bin",
             rlabel=["model / MC"], rrange=[[1 - pad, 1 + pad]],
             binwnorm=1, logy=(axname == "ptll"), yerr=False, nlegcols=1,
-            ylim=(None, ymax * (12 if axname == "ptll" else 1.9)),
+            ylim=((ymin * 0.7, ymax * 6.0) if axname == "ptll"
+                  else (0.0, ymax * 1.55)),
             ratio_legend=False, legtext_size=15, width_scale=1.15,
             cms_label="Work in progress", grid=True,
         )
