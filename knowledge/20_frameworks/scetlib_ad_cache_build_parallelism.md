@@ -189,3 +189,44 @@ export TF_NUM_INTEROP_THREADS=2
 
 **Do NOT export these for rabbit fits.** Those really do use TensorFlow, and
 capping the pools there would slow the minimiser.
+
+## Members are NOT all the same price — an eigenvector member is the cheap kind
+
+The "~13.7 min per member at 210 bins" figure elsewhere in this note came from a
+FOUR-member build that was the alphaS pair plus the muF pair. Both of those are
+expensive kinds. Measured 2026-08-26, same card, same runcard, same threads,
+launched together, four members each:
+
+```
+m210_eig     2 PDF eigenvector pairs      fixed-order stage  46.9 min
+m210_asmuf   alphaS pair + muF pair       fixed-order stage  96.9 min
+```
+
+Ratio **2.07**, i.e. at 210 bins an eigenvector member is **~11.7 min** and a muF
+member **~36.8 min**. A muF member pays two node refills (`set_pdf_keep_nodes`
+to restore the nominal PDF, then `set_muf_keep_nodes` for the scale) plus a
+whole-grid snapshot, against one refill for a PDF member.
+
+**Consequence for planning.** A 62-member build is 58 eigenvector members, one
+alphaS pair and one muF pair -- overwhelmingly the cheap kind. Costing it at the
+muF rate over-counts badly: the true monolithic total is **7.3-12.9 h** depending
+on node load, not ~14 h.
+
+*Caveat, stated:* the two fixed-order stages did not overlap in time, so 2.07 is
+an UPPER bound on the ratio.
+
+## Measured per-shard throughput (10 bins x 62 members, rel 1e-3, n_train 9, P=53)
+
+```
+group  qT [GeV]  node set  rules  resum  fixed order   total    size
+qt2      2-3       1.0      2.9    2.2      16.5      ~23 min   92.0 MB
+qt3      3-4       0.6      4.9    4.9       8.2      ~19 min   92.1 MB
+qt5      5-6       0.7      4.6    2.7       5.2      ~13 min   88.5 MB
+```
+
+The fixed-order stage **falls steeply with qT** (16.5 -> 8.2 -> 5.2 min), so the
+high-qT tail is much cheaper still and a naive equal-count bin split is badly
+unbalanced. The lowest ptV bin (qT 0-1) is pathological: >27 min in the OUTER
+NODE SET stage alone, against 0.2-1.0 min for every other shard, and it
+under-utilises its threads (~43 of 128 cores) because 10 bins cannot feed them.
+Split that one further by |Y|.

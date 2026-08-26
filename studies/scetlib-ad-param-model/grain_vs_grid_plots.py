@@ -92,21 +92,29 @@ def plot_vs_resolution(rows, outdir, axis, meta, measured=None):
         ax.plot(nb, y, ls, marker=mk, color=c, label=lab, lw=1.8, ms=6,
                 alpha=0.9 if how == "median" else 0.6)
 
-    # power law on the two finest points, extrapolated to a 2x finer grid
+    # Power law on the two finest points. Drawn for qT only: in |Y| the
+    # correction file's own cells stop at 11 bins, so an extrapolation past
+    # that has nothing to converge to and would badly overstate the gain (the
+    # power law says 1.9x for 10 -> 20; the MEASURED 10 -> 11 is 1.05x).
     y = np.array([sel(k, "grain_wmean", "median") for k in keys])
     order = np.argsort(nb)[::-1]
     C, p = fit_power(nb[order][:2], y[order][:2])
-    xx = np.array([nb.max() * 2.2, nb.max()])
-    ax.plot(xx, C * xx ** p, ":", color=RED, lw=1.4,
-            label=rf"power law on the 2 finest points, $p={p:.2f}$")
-    ax.plot([nb.max() * 2], [C * (nb.max() * 2) ** p], "*", color=RED, ms=14,
-            markerfacecolor="none", label="extrapolated 2x finer")
-    if measured is not None:
-        mn, md = measured
-        for lab, col, c, mk in (("GRAIN median, MEASURED", "grain_med", RED, "*"),
-                                ("GRAIN worst, MEASURED", "grain_max", RED, "P")):
-            if col in md:
-                ax.plot([mn], [md[col]], mk, color=c, ms=15, label=lab, zorder=5)
+    if axis == "qt":
+        xx = np.array([nb.max() * 2.2, nb.max()])
+        ax.plot(xx, C * xx ** p, ":", color=RED, lw=1.4,
+                label=rf"power law on the 2 finest points, $p={p:.2f}$")
+        ax.plot([nb.max() * 2], [C * (nb.max() * 2) ** p], "*", color=RED,
+                ms=14, markerfacecolor="none", label="extrapolated 2x finer")
+    else:
+        ax.axvline(11, color="k", lw=1.0, ls=":", alpha=0.7)
+        ax.annotate("the correction's own\n$|Y|$ cells stop here (11)",
+                    (11, y.min()), textcoords="offset points", xytext=(-4, 4),
+                    fontsize=8, ha="right")
+    for mn, mmed, mwst in (measured or []):
+        ax.plot([mn], [mmed], "*", color=GREEN, ms=17, zorder=6,
+                label="MEASURED (dedicated histmaker): median")
+        ax.plot([mn], [mwst], "*", color=GREEN, ms=11, markerfacecolor="none",
+                zorder=6, label="MEASURED: worst")
 
     ax.set_xscale("log"); ax.set_yscale("log")
     ticks = sorted(set(list(nb) + [nb.max() * 2]))
@@ -264,7 +272,10 @@ def main():
             "inputs npz": os.path.abspath(args.npz),
             "note": args.meta}
     plot_vs_resolution(rows, args.out_dir, "qt", meta)
-    plot_vs_resolution(rows, args.out_dir, "y", meta)
+    # the measured 11-bin |Y| point comes from the corr-grid histmaker
+    # (grain_corrgrid.csv, qgrid=card / ygrid=fine)
+    plot_vs_resolution(rows, args.out_dir, "y", meta,
+                       measured=[(11, 5.083e-05, 3.946e-04)])
     plot_heatmap(rows, args.out_dir, meta)
     plot_sawtooth(args.npz, args.out_dir, meta)
     plot_alphas(rows, args.out_dir, meta)

@@ -156,6 +156,38 @@ thread-aware (re-reads a budget every 30 s, refuses to launch above it) and
 retries any group without a `done` marker, so a repeat of the qt4 abort cannot
 silently leave a gap.
 
+### D-033 — The bin-split build WORKS, proven bit-exact with the null excluded — SETTLED
+Two INDEPENDENTLY built shards (qt2 + qt5, each carrying the full 62-member list)
+merged to 20 bins x 62 members, 180.4 MB. Evaluated in THREE SEPARATE PROCESSES:
+merged vs each parent gives **0.000e+00** on anchor value, anchor Jacobian,
+displaced value and displaced Jacobian.
+**And the arms are provably separated**, which is the point -- the
+`values_and_jacobian` memoisation trap makes "a perfect and wrong null" look
+exactly like success. Three arms returned three DIFFERENT sums satisfying the
+additive rule: merged 63.6503485923, qt2 28.725160, qt5 34.925188, parts-vs-whole
+7.1e-15. A memoised collision would have returned the same number three times.
+
+### D-034 — An eigenvector member is the CHEAP kind; the ~14 h estimate over-counted — SETTLED
+Same card, same runcard, same threads, launched together, four members each:
+`m210_eig` (2 eigenvector pairs) 46.9 min fixed-order against `m210_asmuf`
+(alphaS pair + muF pair) 96.9 min. Ratio **2.07** -> an eigenvector member is
+~11.7 min at 210 bins and a muF member ~36.8 min. The 13.7 min/member average
+came from a 4-member build that was ONLY the two expensive kinds. A 62-member
+build is 58 cheap members plus two expensive pairs, so the true monolithic total
+is **7.3-12.9 h**, not ~14 h.
+*Caveat:* the two fixed-order stages did not overlap in time, so 2.07 is an
+UPPER bound on the ratio.
+
+### D-035 — qt0 split FIVE ways by |Y|, hedged rather than switched — SETTLED
+Two is only a 2x hedge on the bin that sets the wall time; ten multiplies a fixed
+per-process cost by ten on the most expensive bin of the card. Five keeps two
+bins per sub-shard to parallelise over and -- the deciding reason -- **can be
+launched in waves as the thread budget allows**, which a fixed 3-way split
+cannot, since the |Y| partition must be chosen before the first sub-shard starts.
+The original qt0 is left running: its node-set work is not checkpointed, so
+killing it would throw away 27 min for certain in exchange for an expected but
+unmeasured speedup.
+
 ### D-005 — The 260820 card's exclusion regex was OVER-BROAD; card remade — SETTLED
 **Why:** its `scetlib_.*` branch silently deleted the 58 PDF eigenvector
 nuisances and the 4 mb/mc ones, while its `muF.*` branch matched nothing.

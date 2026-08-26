@@ -113,3 +113,34 @@ concurrent bin groups.
 **Overturned by:** a measurable slowdown of the build itself — checked by
 comparing the stage times of capped groups against qt0/qt1/qt2, which were
 launched uncapped, on the same card and thread count.
+
+### P-006 — qt0 (qT [0,1]) split by |Y| into FIVE sub-shards, as a HEDGE — SETTLED
+**The problem, measured:** every other bin group finished its outer node set in
+0.2-1.0 min; **qt0 was still in that stage at 29 min**, having burnt 19.4 CPU-hours,
+and running at only **40 of the 128 cores it asked for**. It is not saturated, it
+is starved: ten bins is too little to feed 128 threads while the node ladder
+adapts. This is the same pathology as `par_test/onebin_qt0` (one bin,
+`--threads 1`, still in its node set after 10.3 h).
+**What was done:** `--subset '0,1/0'`, `'2,3/0'`, `'4,5/0'`, `'6,7/0'`, `'8,9/0'`
+— five sub-shards of two |Y| bins each, all 62 members, `--threads 96`, each with
+its own thread pool. They tile |Y| 0..9 at ptV 0 exactly, so they merge into
+precisely the cache one qt0 shard would have produced (the bin merge is validated
+bit-exact at P = 53 with 62 members, 0.000e+00 in value and Jacobian).
+**Why FIVE and not two or ten:** two halves is only a 2x hedge on the one bin
+that sets the wall time; ten single-|Y| shards multiplies a fixed per-process
+cost (startup, PDF/beamfunc `.info` reads, its own rules stage) by ten on the
+most expensive bin of the card. Five is the point where each sub-shard still has
+two bins to parallelise over, and — the deciding practical reason — **five can be
+staged in waves against the OS-thread budget** where three cannot be re-split
+later: the partition of |Y| has to be fixed before the first sub-shard starts,
+so the finer choice is the one that keeps the launch schedule free. Three were
+launched at 00:02 (threads then 26254 of 32768); the other two go in the next
+thread window.
+**Why HEDGE and not switch:** the node-set stage is not checkpointed, so killing
+qt0 at 29 min throws away 19.4 CPU-hours for certain in exchange for a speedup
+that is expected but unmeasured. The TF cap (P-005) is what makes running both
+affordable at all. Whichever lands first is used; the loser is killed.
+**At merge time: use EITHER `qt0` OR the five sub-shards, never both** — they
+cover the same bins, and `merge_bin_caches` raises on a duplicate bin key
+("bin ... claimed twice"), which is a safe failure rather than a silent one.
+**Overturned by:** qt0 printing its node set before the sub-shards pass it.
