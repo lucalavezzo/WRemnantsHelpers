@@ -6126,3 +6126,15 @@ binning of its inputs, and the MiNNLO `w_z_gen_dists` file has a SINGLE bin
 [100, 13000] — without remaking it the whole region collapses to one cell.
 
 Spec (three formats): `~/public_html/alphaS/260826_scetlib_ad_response_above100/gen_binning_spec.{txt,json,py}`
+
+### 2026-08-26 — DECIDED (Luca): the three-edge spec stands — 110, 130, 250
+
+I had suggested trimming to `[100, 110, 250]` on the grounds that [130,250] has
+zero fit-range feed. Luca took the original three-edge recommendation. So the
+spec at `~/public_html/alphaS/260826_scetlib_ad_response_above100/gen_binning_spec.*`
+is final: qT gains 110, 130, 250 → 73 qT bins, 803 gen bins.
+
+Also confirmed by Luca: the MiNNLO `w_z_gen_dists` file must be modified and
+re-run. Its single bin [100, 13000] would otherwise collapse the whole region,
+since `make_theory_corr` rebins to the COMMON binning of its inputs. This is the
+blocking prerequisite for the correction production.
