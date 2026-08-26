@@ -2600,3 +2600,690 @@ compressed rule is not implicated at all.
 
 **SCOPE.** Handed to the transition work. No SCETlib was rebuilt; `build-trans`
 was compiled by the other agent at 14:31 today and used read-only.
+
+---
+
+## Gen-grid granularity (agent, 2026-08-26 overnight)
+
+# Decisions — GRAIN vs gen-grid resolution (2026-08-25/26 overnight)
+
+Staged for `studies/scetlib-ad-param-model/DECISIONS.md`. Follow-up to the
+reco-2D closure round (`~/public_html/alphaS/260825_scetlib_ad_reco2d_closure/`),
+which found that once the qT [0,1] nonsingular-cutoff convention is aligned,
+GRAIN — pure gen-binning granularity — is the larger of the two error terms in
+30 of 39 directions. The question here: how does GRAIN scale with the gen grid,
+what would a finer grid cost, and does any of it show up in the fit.
+
+Format: **what** / *why* / evidence / what would overturn it.
+
+---
+
+## D-G01 — Refine by rerunning the HISTMAKER, not by rebuilding the cache
+
+**A finer gen grid is a histmaker change, not a cache change; a finer cache on
+its own buys exactly nothing.**
+
+*Why.* The response matrix the model folds through is
+`P(b|g) = R_raw(b,g)/N_gen(g)`, read out of the datacard's auxiliary, which
+setupRabbit took from the histmaker's `nominal_prefsr_yieldsUnfolding`. Its gen
+axes are not free parameters of the analysis:
+
+```
+ptVGen   = rebin_pt(reco ptll edges)          # one gen bin per TWO reco bins
+absYVGen = positive half of the reco yll edges
+```
+(`wremnants/production/unfolding_tools.py:rebin_pt`,
+`wremnants/utilities/binning.py:get_unfolding_dilepton_axes`). Verified directly
+on the production file: `nominal_prefsr_yieldsUnfolding` carries
+ptVGen 20 bins `[0,1,2,…,12,14,16,18,20,24,28,33,44]` + overflow and absYVGen 10
+bins — i.e. exactly the card's 21 × 10 gen grid. **That is the finest R that
+exists on disk.**
+
+Algebraically: if a gen bin `g` is split into sub-bins `g'` but `P` is only known
+per `g`, then `Σ_{g'⊂g} P(b|g) σ(g') = P(b|g) σ(g)` — the fold is unchanged. So a
+finer SCETlib cache with the shipped R is a no-op.
+
+*Evidence.* `inspect_hists.py` on
+`260723_Z_histmaker_davidFix/mz_dilepton_…_Corr_maxFiles_m1.hdf5`, axes printed
+above; the algebra is one line.
+
+*Overturned by* a histmaker output with finer gen axes already on disk (none
+found: `rebin_pt` is applied unconditionally in `UnfolderZ.__init__`).
+
+---
+
+## D-G02 — Measure the trend by COARSENING, inside one build
+
+**The resolution scan is built by merging gen bins of the shipped card, so every
+resolution shares one cache, one set of SCETlib calls and one anchor.**
+
+*Why.* The cache build is not reproducible — two builds of the same runcard
+differ by 3.0e-03 in the Jacobian at a displaced point
+(`knowledge/20_frameworks/scetlib_ad_cache_build_parallelism.md`). A scan made of
+separately built caches would have a floor at the same size as the effect. Under
+a merge map `M`, every object transforms in closed form,
+
+```
+R_raw_c = R_raw Mᵀ    N_gen_c = M N_gen    σ_gen_c = M σ_gen    P_c = R_raw_c/N_gen_c
+```
+
+and `σ_gen(p_v)` is evaluated ONCE per direction and re-folded at each
+resolution. **The reproducibility floor does not enter the comparison at all**:
+the same numbers are folded differently.
+
+*Evidence.* `grain_vs_grid.py`. The implementation reproduces the reco agent's
+published numbers exactly at the shipped grid — worst TOTAL max|dev|
+**7.067e-03 (mufup)**, median **7.23e-04** as shipped, and **4.572e-03** with the
+qT [0,1] alignment, against the README's 7.07e-03 / 7.2e-04 / 4.57e-03; GRAIN
+median 6.745e-04 and worst 4.201e-03 against 6.7e-04 / 4.2e-03.
+
+*Overturned by* nothing in the coarse direction; the FINE direction is an
+extrapolation and is treated separately (D-G03).
+
+---
+
+## D-G03 — Get the finer point by MEASUREMENT, not extrapolation: rerun the histmaker
+
+**Two dedicated histmaker runs were launched rather than extrapolating the
+power law.**
+
+*Why.* Extrapolating a coarsening power law past the finest measured point is
+the weakest step in the chain, and the mechanism (D-G05) predicts the fine grid
+does something the power law cannot capture.
+
+*How, without touching the shared tree.* `finegen_histmaker.py` monkeypatches
+`binning.get_unfolding_dilepton_axes` **in its own process** and then runs
+`scripts/histmakers/mz_dilepton.py` through `runpy`. Three other sessions are
+live in the WRemnants checkout; nothing on disk is modified. The reco binning is
+left exactly at the card's, so the per-event reference `nominal_ptll_yll_*_Corr`
+comes out on the card's own grid with no rebinning.
+
+`helicitySig` is dropped from `--unfoldingAxes` deliberately: without it the
+joint hist is filled with `nominal_weight` instead of the
+`nominal_weight_helicity` partition, and since the partition is recovered by
+SUMMING helicitySig (`scetlib_np/response_matrix.py`) the two give the same R —
+9× smaller, and it skips the helicity-xsec rebinning a finer gen grid would
+otherwise have to satisfy.
+
+*Evidence that the patched run is sound.* On a 2-file smoke test,
+`R` summed over gen against `nominal_ptll_yll` differs by **−6.6e-04**, i.e. the
+known gen-|Y|>2.5 leak the reco agent measured as −7.6e-04, and nothing else.
+
+*Overturned by* the coarsened fine run failing to reproduce the production
+card's GRAIN at 21 × 10.
+
+---
+
+## D-G04 — The gen overflow is a RANGE defect, not a granularity one, and is
+kept separate everywhere
+
+**Every coarsening leaves the trailing gen qT bin untouched, and each metric is
+reported with and without the top reco ptll bin.**
+
+*Why.* The card's last gen bin is labelled [44,100] but is the histmaker's
+ptVGen **overflow**, holding all gen qT > 44, while the correction file's qT axis
+stops at 100. Merging it into a granularity ladder would mix two different
+problems.
+
+*Evidence.* The fine run resolves the two: of `N_gen`, **9.85 %** is in the
+explicit [44,100] bin and **2.08 %** above 100 GeV (11.93 % total above 44,
+matching the reco agent's 11.6 %). The 2.08/11.93 = 17 % that the correction
+cannot reach is the independent confirmation of their "the model is 15.3 % short
+there".
+
+---
+
+## D-G05 — The mechanism is a SAW-TOOTH, not curvature: one gen bin covers two
+reco bins
+
+**GRAIN at the shipped grid is, for 22 of the 25 directions above 3e-05, a
+sign-alternating pattern locked to the gen bin boundary.**
+
+*Why it matters.* A curvature-driven error falls like Δ²; a
+two-reco-bins-per-gen-bin error is *structural* and disappears when the gen grid
+equals the reco grid, which is a much stronger statement than any power law.
+
+*Evidence.* Split the reco ptll bins into the first and second half of their
+parent gen bin and take the yield-weighted signed GRAIN of each:
+
+| direction | wm\|GRAIN\| | half a | half b | (a−b)/2 | (a+b)/2 | oscillating frac |
+|---|---|---|---|---|---|---|
+| lambda41.0 | 1.5e-04 | +6.8e-05 | −6.8e-05 | 6.8e-05 | 3.0e-07 | 1.00 |
+| lambda21.0 | 3.8e-04 | +1.4e-04 | −1.5e-04 | 1.4e-04 | 7.4e-06 | 0.95 |
+| s1. | 4.0e-05 | −3.7e-05 | +4.0e-05 | 3.8e-05 | 1.2e-06 | 0.97 |
+| mufup | 1.9e-04 | +1.1e-04 | −7.0e-05 | 9.0e-05 | 2.0e-05 | 0.82 |
+| **pdfCT18ZNNLO_as_0120** | 3.0e-04 | **+3.5e-04** | **+2.2e-04** | 6.4e-05 | 2.9e-04 | **0.18** |
+| median over all directions | | | | 4.5e-05 | 2.0e-06 | **0.87** |
+
+The α_s pair is the exception: same sign in both halves, so its GRAIN is a
+coherent offset, not a saw-tooth. Figure: `grain_sawtooth.png`.
+
+**Corrected by the measurement (D-G13).** This entry originally predicted the
+α_s pair's coherent offset would "shrink like a power law rather than vanish".
+It does neither: it does not shrink at all (1.06× from 21 × 10 to 71 × 11),
+because it is not a granularity effect.
+
+---
+
+## D-G06 — The correction is a BIN LOOKUP, so GRAIN has an exact zero, not an
+asymptote
+
+**A gen grid that refines the correction file's own (absY, qT) cells makes GRAIN
+identically zero.**
+
+*Why.* `load_corr_helpers` builds the helper for a generator without "Helicity"
+in its name as a plain `makeCorrectionsTensor(corrh)`, and
+`correctionsTensor_helper.makeCorrectionsTensor` "returns what is in the bin of
+the histogram" — no interpolation, and no angular dependence for this generator.
+The per-event response ρ(x_e) is therefore piecewise constant on the correction
+file's cells. If every gen bin lies inside one correction cell, the bin-averaged
+ρ̄ equals ρ event by event and `r_B ≡ r_ref`.
+
+*The correction file's grid* (`scetlib_dyturbo_…_CT18Z_N3p0LL_N2LO_CorrZ.pkl.lz4`):
+
+```
+qT   70 bins: 0.5 GeV to 15, 1 GeV to 40, then 42, 44, 46, …, 60, 65, 70, 80, 90, 100
+absY 17 bins: 0, .15, .3, .5, .7, .9, 1.1, 1.3, 1.5, 1.8, 2.0, 2.5, …
+```
+
+Against it, **the card's gen |Y| grid is already the correction's grid minus a
+single edge at 2.0**, and the card's gen qT grid is exactly 2× too coarse from
+1 to 12 GeV and worse above. That is why coarsening in |Y| saturates
+immediately (D-G07) and why the qT axis is where the gain is.
+
+*Consequence for the recommendation.* The target grid is not "as fine as
+affordable" but a specific finite one: the correction's cells.
+
+*Overturned by* the correction being applied via helicities for this generator
+(it is not — the name carries no "Helicity", and the `…CorrByHelicity` hists are
+separate systematics), or by a future correction file with a finer grid.
+
+---
+
+## D-G07 — qT dominates; |Y| is already at the reference's resolution
+
+**Refining gen |Y| is both more expensive and less useful than refining gen qT.**
+
+*Evidence, measured.* Median GRAIN (yield-weighted mean over 780 reco bins,
+median over 39 directions), coarsening one axis at a time from the shipped grid:
+
+| gen qT bins (|Y| = 10) | 21 | 11 | 6 | 5 | 3 | 2 |
+|---|---|---|---|---|---|---|
+| median GRAIN | 6.69e-05 | 1.96e-04 | 5.27e-04 | 7.26e-04 | 2.04e-03 | 4.21e-03 |
+
+| gen \|Y\| bins (qT = 21) | 10 | 5 | 2 | 1 |
+|---|---|---|---|---|
+| median GRAIN | 6.69e-05 | 1.26e-04 | 1.23e-04 | 1.23e-04 |
+
+qT: a clean power law, local exponent p = 1.55 (21→11) and 1.04 at the coarse
+end; per direction the 21→11 exponent has median **1.90**. |Y|: p = 0.92 for the
+first halving and then **exactly flat** — coarsening beyond 5 bins adds nothing,
+which is D-G06's prediction (the |Y| grid is already the correction's).
+
+*Cost, from the production build log* (`cache_260825_p4/build.log`, 210 bins,
+`target_precision_rel = 1e-4`, `--threads 210`): node set + matched σ **325.3
+min**, rules **10.6 min**, resummed members **1.6 min**, fixed-order members
+**715.6 min**; total **17.6 h**, cache 222 MB. Splitting |Y| doubles EVERY bin;
+splitting qT to the reco grid splits only the cheap ones (D-G08).
+
+---
+
+## D-G08 — The bins are unequal in the FIXED-ORDER work, and the refinement we
+want lands entirely on the cheap ones
+
+**Contrary to the working assumption, per-bin cost at the production precision
+is uniform in the resummed stage and concentrated in exactly two bins in the
+fixed-order stage — and the reco-grid refinement touches neither of them.**
+
+*Evidence.* Parsed out of `cache_260825_p4/cache.npz` (`SCTRULE8` rule records,
+`build_cache_parallel.parse_rule_blob`), summed over the 10 |Y| bins:
+
+| stage proxy | min/bin | median/bin | max/bin | total |
+|---|---|---|---|---|
+| outer nodes `n_sites` | 247 | 300 | 406 | 67 599 |
+| fixed-order nodes `n_fo_w` | 396 | 396 | 10 824 | 134 739 |
+
+`n_sites` per qT bin varies by only ±20 % (4.0 %–5.9 % of the total each), so the
+325-min stage is essentially linear in bins. `n_fo_w` is not:
+
+| qT bin | share of all fixed-order nodes |
+|---|---|
+| [0, 1] | **23.2 %** |
+| [44, 100] | **18.4 %** |
+| each of the other 19 | 2.9 – 3.7 % |
+
+**41.6 % of the 715.6-min stage lives in two qT bins.** The reco-grid refinement
+keeps [0,1] as one bin (the first reco ptll bin IS [0,1]) and keeps the tail as
+one bin, splitting only the 19 cheap ones — whose `n_fo_w` is already at the
+floor of 396, so each child costs the same as its parent.
+
+*Cost model that follows.* Fixed-order nodes 134 739 → 213 411 (**×1.58**);
+outer nodes 67 599 → ≈112 000 (**×1.66**, using the measured fact that narrower
+bins need fewer nodes: the 1-GeV bins have 272–300 and the 4–11-GeV bins 372–400).
+So **gen qT = reco ptll costs ≈1.6× the shipped build ≈ 28 h at 210 threads, and
+≈420 MB**. Doubling |Y| instead costs ≈2.0× (35 h) because it doubles the two
+expensive bins too.
+
+*Overturned by* a per-bin wall-clock measurement (only node counts were
+available here; the note's "2.3 min vs 25 min on different bin pairs" was
+measured at `target_precision_rel = 1e-3` on a 10-bin subset and is consistent
+with the `n_fo_w` spread, not with a spread in `n_sites`).
+
+---
+
+## D-G09 — The fit-level statement is a linearised Asimov Fisher proxy, and it
+is only ever compared to itself
+
+**No rabbit fit was run. Each resolution gets `F = Aᵀ diag(n) A + Prior` from the
+same reco responses the closure uses, giving σ(α_s) and the α_s bias a residual
+buys.**
+
+*Why.* The real card floats 3731 nuisances and no fit has been run on it at all
+(the reco agent's README says so). A Fisher matrix over the 18 theory directions
+is an honest proxy for *differences between resolutions* and is not to be quoted
+as the analysis' σ(α_s).
+
+*Evidence it is in the right place.* At the shipped grid the proxy gives
+σ(α_s) = **4.685e-04**, between the gen-level 9-floating 1.92e-04 and 18-floating
+3.79e-04 and the earlier 6.16e-04 — the right order, from a completely different
+construction.
+
+*What it says.* Per unit pull of each nuisance, the α_s equivalent of the
+residual at the shipped grid:
+
+| | GRAIN | CALC | TOTAL |
+|---|---|---|---|
+| worst direction | **0.138 σ** (mufdown-kappaFO0.5-kappaf2.) | 0.091 σ (mufup) | 0.199 σ |
+| median | 0.003 σ | 0.004 σ | 0.007 σ |
+| quadrature over 39 | **0.291 σ** | — | — |
+
+Read the α_s pair's own entry with care: 0.119 σ is per Δα_s = 0.002, i.e. a
+2.8 % error on the *slope* of the α_s response, which over a realistic ±1σ
+excursion is 0.03 σ, not 0.12 σ.
+
+---
+
+## D-G10 — Report the headline honestly: a finer grid CANNOT move the shipped
+worst direction
+
+**The shipped worst direction, mufup at 7.07e-03, is CALC-limited (its CALC is
+7.47e-03 and its GRAIN 1.49e-03), and CALC is the known qT [0,1]
+nonsingular-cutoff convention. No gen grid touches it.**
+
+*Why this needs saying.* The natural way to phrase the deliverable — "this
+resolution brings the worst direction from 7.07e-03 to X" — invites a number
+that does not exist. The correct layered answer is in the README.
+
+*Evidence.* `grain_scan_shipped.csv`, k = 1, m = 1: mufup TOTAL max 7.067e-03,
+CALC max 7.465e-03, GRAIN max 1.492e-03.
+
+---
+
+## D-G11 — No cache was built tonight, deliberately; the recommendation's build
+must be launched with TensorFlow capped
+
+**Nothing in this round rebuilt a SCETlib cache.** The scan is coarsenings of the
+shipped `cache_260825_p4`, and GRAIN on the two new histmakers is model-free, so
+no result here can be moved by the build's non-reproducibility, by TF thread
+pressure, or by a concurrent rebuild in the shared tree (the build was also
+snapshotted read-only into scratch).
+
+*What this means for the recommendation.* Grid D is 583 gen bins, so its build is
+where the thread ceiling bites. `prepare_cache_for_card.py` never uses
+TensorFlow — TF arrives transitively through `wremnants` — and uncapped each
+build process holds ~1800 OS threads (768 `tf_Compute`, one per core) against
+~135 capped; measured on a real 21-shard build, groups launched before the fix
+sat at 1808/2432/2429 threads and after it at 262-902 for the same work at the
+same `--threads 128`. The ceiling is **32768 OS threads per USER**, shared across
+every session on this account, and the failure is silent and misattributed:
+`pthread_create has failed: Resource temporarily unavailable`, exit 134, landing
+on whichever process next asks for a thread. So:
+
+```bash
+export TF_NUM_INTRAOP_THREADS=4
+export TF_NUM_INTEROP_THREADS=2      # BUILDS ONLY -- never for rabbit fits,
+                                     # which really do use TF
+```
+
+and check `ps -u lavezzo -L --no-headers | wc -l` against 32768 before launching.
+If grid D is sharded over bins, queue in ASCENDING BIN ORDER (a hole in the merged
+cache is fatal to `GenFold`, a short contiguous prefix is a valid rectangle) and
+stage ONE base runcard that is never moved (`--merge-bins` compares `cache.conf`
+byte for byte, including the `# Base runcard:` comment).
+
+*This round's own footprint, for the record.* The two histmakers are
+RDataFrame, not TF (`-j 192` / `-j 160`, ~130 busy cores each) and both had
+exited by 23:44. The three rabbit Asimov fits of D-G12 are genuine TF and were
+correctly left UNCAPPED, at 1680 OS threads each; user-wide the pool was at
+25 623 / 32 768 (78%) at 00:01 with those three running, and no
+`pthread_create` failure appears in any log of this round.
+
+*Source:* `knowledge/20_frameworks/scetlib_ad_cache_build_parallelism.md`.
+
+---
+
+## D-G12 — The fit-level check is a real rabbit Asimov A/B across gen
+resolutions, with only the response changed
+
+**Three Asimov fits were run on the same card, same cache, same 9 floating
+parameters, differing ONLY in how finely the stored response resolves the gen
+grid.**
+
+*Why this is possible without a new cache.* Coarsening is a linear map, and
+folding the original 210-column response with
+
+```
+R_raw_eff(b, g) = N_gen(g) · R_raw_c(b, G(g)) / N_gen_c(G(g))
+```
+
+is algebraically identical to folding a coarsened response with a coarsened
+σ_gen. `R_raw_eff` has the shape the card already stores and divides by the same
+stored `N_gen`, so `coarsen_card_R.py` rewrites exactly one dataset
+(`auxiliary/scetlib_np/R`) and nothing else moves — not the cache, not the
+parameter set, not the fit configuration.
+
+*Verified before use.* The identity arm (`--kqt 1`) reproduces R to 4.4e-16 in
+the reco marginal and to the last digit in the total; the k = 2 and k = 4 arms
+change the marginal by ≤ 8.9e-16, as they must (each coarse group only
+redistributes its own events).
+
+*What it can and cannot show.* Asimov data is generated from the model itself, so
+these fits measure the INFORMATION a coarser grid throws away, not the GRAIN
+bias — the bias needs pseudo-data built from the per-event reference and is
+covered by the Fisher projection instead (D-G09). Both effects are reported and
+never conflated.
+
+*Prediction under test (recorded before the fits returned).* The Fisher proxy
+says σ(α_s) = 4.685e-04 → 4.833e-04 → 6.157e-04 for 21 → 11 → 6 gen qT bins,
+i.e. +3.2 % and +31 %.
+
+---
+
+## D-G13 — The α_s legs' residual is NOT granularity: their reference carries an
+event-level PDF weight
+
+**Exactly two of the 39 directions fail to improve on any gen grid, and they are
+exactly the two whose histmaker weight is not a pure bin lookup.**
+
+*Evidence, measured.* From the shipped 21 × 10 grid to the correction's own
+71 × 11 grid, every direction from the main `_Corr` file improves by 3× to 246×
+(median ≈ 13×). The two `pdfCT18ZNNLO_as_*` legs improve by **1.06×**. Their
+residual is a coherent offset rather than a saw-tooth (D-G05, oscillating
+fraction 0.18 against a median of 0.87), it is concentrated at |y| > 1.8
+(6.4e-04 against ~3e-04 centrally), and it survives refining gen qT, refining
+gen |Y|, and resolving the qT 44–100 range.
+
+*Mechanism, from the code.*
+`scetlib_dyturbo_..._CT18Z_N3p0LL_N2LO_pdfas` is in `theory_corr_weight_map`
+with `alphas=True, renorm=True`, so `define_theory_corr_weight_column` gives it
+
+```
+res(i) = <event-level LHAPDF member weight> * nominal_weight_uncorr / central_pdf_weight
+```
+
+and the applied response is the binned correction ratio TIMES that event-level
+factor. The main `_Corr` generator is NOT in the map and gets
+`Alias(corr_weight, nominal_weight_uncorr)`, i.e. a pure bin lookup. No gen
+binning reproduces an event-level weight.
+
+*Consequence.* For the α_s pair, 3.3e-04 yield-weighted and 0.034 σ on α_s is a
+model-vs-template CONSTRUCTION difference, not a fold error, and it should be
+reclassified out of GRAIN in the reco round's three-term split. In units that
+matter: 0.034 σ is per Δα_s = 0.002, i.e. ~2.5 % on the SLOPE of the α_s
+response, so ~0.01 σ of bias over a realistic ±1σ excursion.
+
+*Overturned by* the direct experiment: rerun the histmaker with `_pdfas` removed
+from `theory_corr_weight_map` so the correction is applied as a pure bin lookup,
+and re-measure. Those two legs should then fall like every other direction. Until
+that is done this is an attribution from code plus coincidence of the two sets,
+not a demonstration.
+
+---
+
+## D-G14 — Recommend grid D, and stop there for α_s
+
+**gen qT = the reco ptll edges to 44 GeV, continued above 44 by the correction
+file's own edges (46, 48, …, 60, 65, 70, 80, 90, 100), plus the > 100 overflow;
+gen |Y| = the card's ten edges plus one at 2.0. 52 × 11 = 583 gen bins.**
+
+*Why not less.* Grid E (shipped qT, but with the |Y| edge and the resolved tail)
+is 0.165 σ, i.e. no better than shipped — refining gen qT below 44 is the
+necessary first move. Grid B (gen qT = reco ptll) is the single biggest step,
+4.3× on the median and 2.0× on α_s. Grid C adds the |Y| 2.0 edge for 10 % more
+bins and another 1.6× on the median.
+
+*Why not more.* Grid G (the full correction grid, 781 bins) is 2.2× better than D
+on the median but IDENTICAL on α_s (0.0341 vs 0.0345 σ), because both already sit
+on the α_s-leg floor of D-G13. It costs ~34 % more bins and splits qT [0,1], the
+single most expensive bin in the build (23.2 % of all fixed-order nodes).
+
+*Evidence.* `03_candidate_grids.csv`, measured on the corr-grid histmaker so that
+every row is the same events, weights and reco binning with only the gen grid
+moving.
+
+*Overturned by* someone caring about the non-α_s worst direction at the 1e-3
+level rather than about α_s, in which case G is 12× better than D there
+(0.0017 σ vs 0.0202 σ).
+
+---
+
+## Analytic dconv/dlnmuF (agent, 2026-08-26 overnight)
+
+# scetlib_ad — decision record, ANALYTIC d(conv)/d(ln muF) round
+# 2026-08-25/26 overnight (autonomous). STAGED for merge into DECISIONS.md.
+# Same format as DECISIONS.md: WHAT was decided, WHY, WHAT EVIDENCE, WHAT WOULD
+# OVERTURN it. Numbering continues from D-023.
+
+---
+
+## 2026-08-25/26 overnight session — the analytic muF route
+
+### D-024 — THE GATE IS PASSED. The analytic route works, and the O(D^2)
+###          worry named in D-022 is NOT the thing that limits it — SETTLED
+
+**The question D-022 left open:** "whether ONE column suffices where
+D ~ 1.15 ln f". Answered, and the answer is yes, but for a reason that was not
+anticipated and that changes the construction.
+
+**Why D^2 is not the problem.** d/d(ln muF) RAISES the alphaS order of a conv
+kind by one (f -> P0(x)f -> P0xP0(x)f), and the kind set is truncated at
+`fo_lvl`. The generator is therefore NILPOTENT and the D-series TERMINATES: at
+fo_lvl = 2 the exact truncated-order solution is a quadratic in D, at fo_lvl = 3
+a cubic. There is no D-truncation to worry about at all, at any D. What limits
+the route is something else entirely: how well the fixed-order DGLAP kernels
+reproduce LHAPDF's OWN grid evolution, which is what the runcard reference
+refills against.
+
+**Evidence (`dconv_dlnmuf.py`, `dconv_gate2.py`; `DrellYan.conv_probe` returns
+the node's beam convolutions at ANY muF, so the exact muF dependence is
+sampleable directly — no prototype needed to answer this).** Analytic
+d(conv[delta])/d(ln muF) = 2g P0 + 2g^2 P1 + 2g^3 P2 against a converged central
+difference of conv_probe, g = alphaS(muF)/4pi:
+
+| muF | P0 only | P0+P1 | P0+P1+P2 |
+|---|---|---|---|
+| 2 | -45% | -8.0% | **-0.46%** |
+| 5 | -30% | -2.9% | **-0.13%** |
+| 13 | -22% | -1.4% | **+0.016%** |
+| 45 | -17% | -0.61% | **+0.006%** |
+
+The convention is fixed by SCETlib's own I1 (`k[0] = 2 Lf P0 + I1`,
+Lf = log(muB/muF)): muF-independence at O(alphaS) forces the factor 2, and the
+O(alphaS^2) Lf structure of I2 reproduces the same relation with alphaS at muF
+(the leftover b0 Lf term is exactly the running of alphaS between muB and muF).
+
+**What would overturn it:** a PDF set whose evolution is further from
+fixed-order DGLAP than CT18ZNNLO's; a different `alphas_solution`.
+
+### D-025 — The construction is ANALYTIC EVOLUTION + INTERPOLATED RESIDUAL, not
+###          a replacement of the member interpolation — SETTLED (measured)
+
+**What is added to the kernel:**
+
+    cvi[k] = SUM_m W_m conv_m[k]                      <- unchanged, today's model
+           + delta_k(D) - SUM_m W_m delta_k(m_pos)    <- NEW
+
+with delta_k(D) the integrated DGLAP evolution of the ANCHOR conv vector by the
+per-node displacement D = mfk_live, and m_pos the member positions the 92f1299
+coordinate fix already computes. delta_k(0) = 0 identically.
+
+**Why not just use the analytic evolution:** it is 0.2-0.5% wrong AT
+kappa_F = 0.5 and 2, where the member interpolation is EXACT by construction
+(`dconv_gate3.py` part C). kappa_F is the largest alphaS-relevant residual in
+the whole model and the production templates and the fit's +-1 sigma sit exactly
+there. Replacing the members would trade a fixed transition error for a new
+kappa_F error.
+
+**Why the correction form is safe:** it vanishes at the anchor AND at both
+members, so every direction that sits at a knot -- kappa_F itself, the alphaS
+pair, all 8 NP lambda, all 10 TNPs -- is UNCHANGED, and by construction rather
+than by measurement.
+
+**Also rejected, with numbers (`dconv_gate3.py` part B, real node geometry,
+error on conv[delta] as a % of its true response, worst over bT):**
+
+| construction | x2=0.35 qT22 | qT26 | qT30 | qT38 | x2=0.55 qT30 | x1,x3 qT30 |
+|---|---|---|---|---|---|---|
+| shipped 3-knot | 1.44% | 0.85% | 0.72% | 0.36% | 0.92% | 3.74% |
+| analytic ALONE | 0.50% | 0.39% | 0.54% | 0.27% | 0.10% | 0.75% |
+| Hermite (members + anchor slope) | 0.95% | 0.50% | 0.054% | 0.037% | 0.014% | 1.56% |
+| **analytic + residual** | **0.42%** | **0.28%** | **0.052%** | **0.034%** | **0.083%** | **1.24%** |
+
+Hermite (a cubic through both members with the exact analytic anchor slope) is
+the runner-up and is exact at the members too, but it EXTRAPOLATES badly where
+the member stencil has collapsed (qT 22 at large bT, and the x1,x3 leg at
+D = -1.74 ln f), which is precisely where the shipped model is worst.
+
+**What would overturn it:** a sigma-level measurement showing the correction
+moves a non-transition direction (it cannot, but it must be checked, see D-028).
+
+### D-026 — The evolution coefficients are computed from a QUADRATIC model of
+###          alphaS in ln(muF), NOT from an endpoint closed form — SETTLED
+
+**Why:** the closed forms in the endpoint couplings (one- or two-loop, fixed nf)
+were derived and MEASURED against a 256-point numerical integration
+(`dconv_gate4.py`): 0.3-0.6% off above muF ~ 6 GeV and 5-14% off below it. The
+reason is thresholds -- the interval [muF, muF e^D] crosses m_b (and m_c) where
+the PDF's own alphaS changes nf, and no fixed-nf closed form can follow that.
+0.3% on J1 is 0.3% on the response, six times what is achievable.
+
+**What is used instead** (`dconv_gate5.py`): g(L) = alphaS(muF e^L)/4pi modelled
+as a QUADRATIC through three alphaS evaluations at L = 0, D/2, D, integrated
+exactly. Measured against the 256-point integration: 1e-5 .. 3e-4 on every
+coefficient over the whole usable range, three alphas_run calls per node, no
+quadrature loop over a live bound and no division by D (the integration variable
+is v = L/D), so it is a straight line for clad and smooth through D = 0.
+
+**A second alphaS question, measured and accepted:** the conv grids were evolved
+with LHAPDF's variable-nf alphaS while the kernel runs a fixed nf = 5 solution
+from alphaS(mZ) = 0.118. They agree to <= 7e-4 above 6 GeV, 3e-3 at 4 GeV,
+1.5e-2 at 3 GeV, 3.6e-2 at 2 GeV. Using the kernel's own alphaS costs a factor
+~1.3 on the worst low-muF node (0.46% vs 0.41%) and NOTHING above muF ~ 6.
+Accepted: the alternative is to carry a second coupling into the kernel.
+
+### D-027 — TIERS. Ship mode 1 or mode 3, NOT mode 2 — PROVISIONAL (needs the
+###          sigma-level A/B, which is running)
+
+The full alphaS^3 evolution uses seven conv kinds. Four of them (P2, P0xP1,
+P1xP0, P0xP0xP0) are NOT filled at the production fo_lvl = 2. Filling them means
+loading 16 more beamfunc grid families (~260 MB for CT18ZNNLO) and extending the
+stored conv prefix from 11 to 15 -- which needs the nodes REBUILT.
+
+So there are two viable tiers, and the intermediate one is measured BAD:
+
+| tier | terms | extra cost | worst over 95 cells | median | 90th pct | worse than shipped in |
+|---|---|---|---|---|---|---|
+| T0 shipped | -- | -- | 104.8% | 0.919% | 7.80% | -- |
+| **T1** | J1,J2,K11 | **NOTHING** | 51.1% | **0.406%** | 2.72% | 17 / 95 |
+| T2 | +J3 (P2) | 5 grid families | 57.8% | 0.622% | 2.94% | 34 / 95 |
+| **T3** | all 7 | 16 families, rebuild | **20.3%** | **0.322%** | **1.46%** | **4 / 95** |
+
+(`dconv_gate7.py`: 95 diagnosable (qT, direction, |Y|, flavour, beam) cells,
+"diagnosable" = the node's own muF response exceeds 1e-3 of its convolution, the
+conv-level analogue of the "do not diagnose below 1e-4 of sigma" rule.)
+
+**Why T1 works with no new kinds at all, and it is not luck:** the terms it
+omits are smooth, LOW-ORDER POLYNOMIALS in D (degrees 1, 2, 2, 3), and the
+residual interpolation is a quadratic through three points, so it absorbs
+everything up to degree 2 exactly. T2 adds back the degree-1 piece only, which
+the quadratic was already absorbing, while changing the residual's shape -- which
+is why the intermediate tier is worse than either end.
+
+**T1 is the one to prototype first** because it needs no rebuild and can
+therefore be A/B'd on the EXISTING production cache, both arms from one cache,
+which is the only way to get a bit-identical control (the logbook's own floor
+between two separately built caches is 3e-03 in the Jacobian, larger than the
+effect).
+
+### D-028 — alphaS in the correction is taken at the ANCHOR value, not the live
+###          one — PROVISIONAL
+
+`ad_g.as0_base` rather than `pval(p, ad_g.ip_as0, ...)`. The correction then
+carries NO alphaS dependence at all and the alphaS direction cannot move, which
+is the property the brief demands ("confirm nothing else moves"). The induced
+error is second order: a ~2% shift of alphaS on a correction that is itself
+~0.5% of the response. **Overturned by:** a measurement showing the alphaS
+dependence of the correction matters, i.e. that the transition x alphaS
+cross-term is needed.
+
+### D-029 — Traps hit and how they were avoided — SETTLED
+
+1. **clad codegen stack.** The first version called an evolution helper three
+   times per (channel, beam) and had a mid-function `return`. clang's
+   `VarBypassDetector` recursed to death generating
+   `muf_evo_coeffs_pullback` (frontend exit 139). Fixed by (a) collapsing the
+   three coefficient sets into ONE combined vector before the channel loop --
+   the correction is linear in them -- and (b) replacing the early return with a
+   0/1 multiplier, since clad turns a mid-function return into a jump.
+2. **thread_local.** `ad_muf_anl` is a plain non-thread_local global, declared in
+   `ad_data.hpp` (which `ad_context.cpp` sees; `ad_kernel.hpp` is NOT included
+   there). A thread_local set on the caller would not be seen inside the TBB
+   workers -- the trap `set_muf_knots_used` hit.
+3. **Arm separation.** The A/B script REFUSES to report a null unless the two
+   arms differ on the varied point, and checks that they are identical on the
+   central one (the correction vanishes at D = 0). A clean null between two arms
+   is this study's known signature of a shared cached result.
+
+### D-030 — SIGMA-LEVEL, mode 1, on the 210-bin production cache: 36 of 39
+###          directions BIT-IDENTICAL and the transitions improve — SETTLED
+
+`anlmuf_closure.py`, `cache_260824b` (210 bins, all 10 |Y| x 21 qT,
+`--pdf-eig 0`), CorrZ + pdfas_CorrZ, BOTH ARMS FROM ONE CACHE via
+`DrellYan.set_muf_analytic(0)` vs `(1)`, so node set, rules, members and
+re-solved weights are bit-identical between them.
+
+**The guards fired first, and they are the point:**
+* central analytic/shipped - 1, max over 210 bins: **0.000e+00** exactly
+* kappa_F = 2 analytic/shipped - 1: **0.000e+00** exactly -- the "nothing else
+  moves" property is EXACT, as designed, not a small number
+* arm separation at x2 = 0.35: 8.2e-04, so the arms did separate and the null on
+  the other 36 directions is a real null, not a shared cached result
+
+**36 of 39 directions ratio 1.00 to every digit printed**: all 8 NP lambda, all
+10 TNPs, kappa_R both legs, muF both legs, both joint muF x kappa_R, both alphaS.
+The shipped arm reproduces every published number of
+`260825_transition_muf_coordinate_fix/after` (transitions 2.847e-03 / 1.124e-03 /
+3.133e-03, mufup 1.398e-02, kappa_R 7.456e-03 / 4.518e-03, alphaS 2.152e-03 /
+2.293e-03), which is the control that this build IS the shipped model at mode 0.
+
+**The three transition directions:**
+
+| direction | shipped max&#124;dev&#124; | mode 1 | ratio | shipped yield-wtd mean | mode 1 | ratio |
+|---|---|---|---|---|---|---|
+| x2 = 0.35 | 2.847e-03 | 2.273e-03 | **0.80** | 2.205e-04 | 2.043e-04 | 0.93 |
+| x2 = 0.75 | 1.124e-03 | 1.657e-03 | 1.47 | 8.587e-05 | 7.749e-05 | **0.90** |
+| x1,x3 | 3.133e-03 | 2.812e-03 | **0.90** | 2.143e-04 | 1.633e-04 | **0.76** |
+
+**Honest reading.** The yield-weighted mean -- the stable statistic, and the one
+that matters for a fit -- improves on ALL THREE (7%, 10%, 24%). `max|dev|` is a
+single-cell statistic and improves on two of three. This is a REAL but MODEST
+sigma-level gain, far smaller than the 2-14x the conv-level measurement shows,
+and the reason is that the template-closure residual is not only our
+interpolation error: the same cache carries the `node_cval` floor (measured
+1-2e-04 per bin, response to x1..x3 identically zero, no clean fix in the
+present rule format) and an instance systematic of up to 1.1e-03 between model
+instances at rel 1e-3 vs 1e-4. The clean attribution is the runcard comparison.
+
+**Do not oversell this.** Mode 1 is the WEAKEST tier, chosen precisely because it
+runs on an existing cache; mode 3 is 2-3x better at the conv level and cannot be
+tested this way without rebuilding the nodes.
