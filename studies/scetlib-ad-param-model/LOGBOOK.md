@@ -6165,3 +6165,41 @@ TRAP: `prepare_cache_for_card.py --no-pdf` sets `plan = None` and skips
 `build_pdf_variations` ENTIRELY, including the muF pair — so a literal --no-pdf
 cache has no transition response at all. Use `--pdf-eig 0 --as-pair off` for the
 intended saving.
+
+### 2026-08-27 — MR !9 flipped on by default → [260827-mr9-default-on](260827-mr9-default-on/LOGBOOK.md)
+
+Commit `b66f8de` on `muf-analytic-trans`; MR !9 description rewritten. Not merged.
+
+**THE alpha_s PROJECTION COMES OUT NEGATIVE — 3.36x worse in total**, and the
+reason is that the pre-correction total was an ACCIDENTAL CANCELLATION. In units
+of sigma(alpha_s) = 6.16e-4, quadrature over the three transition directions:
+
+| | qT < 24 | qT >= 24 | all bins |
+|---|---|---|---|
+| before | 0.0943 | 0.0845 | **0.0371** |
+| after | 0.1124 | **0.0237** | **0.1247** |
+
+The targeted window improves 3.6x. But before the fix the two windows carried
+opposite signs of near-equal size in ALL THREE directions (+0.075/-0.047,
+-0.015/+0.040, -0.055/+0.058), so closing the high-qT half destroys the
+cancellation and exposes the low-qT half. Of the 0.1124 left below 24, **0.0943
+pre-dates this MR**; only 0.0181 is added by it.
+
+PERSPECTIVE, since the 3.36x sounds worse than it is: 0.125 x 6.16e-4 = 7.7e-05
+in alpha_s, against a reco sigma(alpha_s) of ~1.28e-03 — so the transition
+residual goes from ~2% to ~6% of sigma. Both small; the ratio is real, the
+stake is not large.
+
+NB the near-cancellation appearing in all three directions is arguably STRUCTURAL
+rather than accidental — the error changes sign at ~24 GeV, so integrating over qT
+cancels by construction. Which cuts both ways: it is more stable than "accidental"
+suggests, and relying on it still means our stated accuracy is a property of
+neither half.
+
+Timing: FREE. ~1% on both value+jacobian and Hessian, inside the measurement own
++-2% scatter (arms interleaved round by round; a first blocked pass gave 0.90 and
+1.14 and could not tell 0% from 15%).
+
+Invariants re-verified post-flip: central 0.000e+00, kappa_F at both knots
+0.000e+00, 36 of 39 directions exactly 0, sizeof(ad::GlobalData) 2424 B unmoved
+and the pre-MR cache still loads.
