@@ -5,4 +5,21 @@ outputs/
 __pycache__
 
 # Claude Code local state (per-developer settings, worktrees, symlinks into cooper/).
-.claude/
+# `.claude/*` rather than `.claude/` so git still descends and the two tracked
+# subdirectories below can be re-included: the agent and skill definitions are shared
+# convention, not per-developer state.
+.claude/*
+!.claude/agents/
+!.claude/skills/
+
+# save_plot writes a gallery index.php into every directory it saves a plot to.
+studies/**/index.php
+
+# Figures inside study/task directories. They ARE published (webpublish_study.sh
+# symlinks the working tree, so untracked files are live on the web) but they are
+# not committed: a single validation round is ~250 png + 250 pdf, ~30 MB, and it
+# repeats. The script that made them and save_plot's per-plot .log are tracked,
+# so a lost figure is one rerun away. Already-tracked images stay tracked.
+studies/**/*.png
+studies/**/*.pdf
+studies/**/*.svg
