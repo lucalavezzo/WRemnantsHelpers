@@ -158,3 +158,26 @@ node, so a WRemnants commit needs `--no-verify` **plus** the container's
 `black`/`isort`/`flake8` run by hand (see `wremnants_ci_linting`). And when a
 frozen copy's md5 does drift, the run logs that printed the old hash are the
 record of what actually ran — annotate, do not rewrite them.
+
+## Never edit a shell script while an instance of it is running
+
+Bash reads a script **incrementally, by byte offset**, not all at once. Rewrite
+the file under a running instance and that instance resumes parsing at its old
+offset in the new bytes, so it fails with a syntax error at whatever line now
+sits there — or, worse, silently runs a different command than intended.
+
+Seen 2026-09-08: a stage runner was edited to fix one `case` branch while
+another branch was mid-run. The running stage finished its real work correctly
+(97 variations compared, 99 figures written) and then died with
+`syntax error near unexpected token ';;'` pointing at a line it was never
+executing, and `Exit status: 2`. The result looked like a failed stage and was
+not one.
+
+So: copy the script to a new name and launch that, or wait. And when a
+long-running stage reports a syntax error in its own driver, check whether the
+driver was edited during the run before believing the stage failed.
+
+Related: the `run_stage.sh` pattern in these study dirs pipes through `grep`
+and then reports `rc=$?`, which is **grep's** status, not the command's — so
+`STAGE DONE rc=0` says nothing about whether the stage worked. Check
+`Exit status:` from `/usr/bin/time -v` in the log instead.
