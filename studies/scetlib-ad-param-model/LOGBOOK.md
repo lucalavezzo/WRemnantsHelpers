@@ -569,6 +569,8 @@ injected truth AND the λ response matches the existing `scetlib_np` model.
 
 ## Log
 
+- **2026-09-08** Adopted Josh's head (`dce84b1`) + our MR !11 as `8e92c14`: [260908-adopt-joshhead](260908-adopt-joshhead/LOGBOOK.md). Cache survives (`GlobalData` byte-identical) and sigma_gen is bit-for-bit unchanged, so no rebuild and no central re-validation. MR !8/!9 superseded per Luca; the MR !7 scare was an ancestry artifact of a rebase. Variations pending; do not quote muF-direction uncertainties until Josh's `4179e76` kappa_F gradient note is worked through.
+
 - **2026-09-08** Slide-material commands assembled for the three validations and two fits, with the current paths: [260908-slides-validation](260908-slides-validation/LOGBOOK.md). Two scripts had to be pushed for the recipes to be reproducible from a checkout (`validate_variations_reco.py` moved in, `compare_to_scetlib_run.py` Y-convention fix). Validation 1 ran against a theory correction for the first time: total ours/ref = 1.000089, per-bin median 7.2e-05, residual entirely at low qT.
 
 ### 2026-08-20 (fork, cont. 4) — binning/sampling non-additivity BOUNDED; provenance fully traced
