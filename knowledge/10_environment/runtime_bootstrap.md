@@ -97,3 +97,64 @@ bin/run --help
 ## Source
 - Migration from legacy runtime bootstrap notes (2026-02-16)
 - `AGENTS.md`
+
+## `pkill -f` self-matches and kills your own shell
+
+`pkill -f <pattern>` matches the full command line of *every* process, including the
+shell running the `pkill` itself and any agent wrapper above it — so a pattern broad
+enough to catch your jobs is usually broad enough to catch you. This has cost three
+separate sessions now (2026-06 closure fits, 2026-08 branch-switch watcher, 2026-09
+branch audit, which lost its shell twice).
+
+Kill by PID after listing, and verify the PID is what you think before signalling:
+
+```bash
+pgrep -u "$USER" -f 'prepare_cache_260826' | while read -r p; do
+    tr '\0' ' ' < /proc/$p/cmdline | grep -q 'prepare_cache_260826' && kill -TERM "$p"
+done
+```
+
+Two related traps from the same episodes: a pattern scoped only to a script name can
+match **another user's** job (a watcher once matched a colleague's 3.8-day fit and
+would have waited forever) — always scope to your own paths and `-u "$USER"`; and
+`rabbit_fit.py` installs **no signal handlers** and writes its fitresult only at the
+end, so a `kill` discards the run's output entirely, however far along it is.
+
+## Never `git add -A` in WRemnantsHelpers
+
+The repo's `.githooks/pre-commit` runs `black` over **every staged `.py`** and
+then re-stages them. So `git add -A` after a day of agent work stages a hundred
+freshly written study scripts and reformats the lot in one go — including
+copies whose *bytes* carry meaning:
+
+- `studies/<study>/<task>/lib/` — a patched library file shipped ahead of its
+  upstream MR, whose md5 the task's `incontainer.sh` prints as provenance
+- `studies/<study>/<task>/ab/{A,B}/` — the two arms of an A/B measurement,
+  whose whole point is differing by a known handful of lines
+
+Tracked files are recoverable with `git checkout --`; **untracked ones are
+not**, and files newly created by an agent in the same session are untracked.
+That is how five frozen copies lost their recorded md5 on 2026-09-08.
+
+`pyproject.toml` now carries
+
+```toml
+force-exclude = '''
+/studies/.*/(lib|ab)/
+'''
+```
+
+which closes that specific hole. It has to be `force-exclude`: black ignores
+`exclude` and `extend-exclude` for paths named **explicitly on the command
+line**, which is exactly how the hook passes them, so the pre-existing
+`extend-exclude` list never applied to anything the hook touched.
+
+The habit still matters more than the config — commit explicit paths. It also
+keeps unrelated in-progress edits (other studies' logbooks, knowledge notes)
+out of a commit that claims to be about one thing.
+
+Two related notes: the hook needs `pylint`, which is not installed on the login
+node, so a WRemnants commit needs `--no-verify` **plus** the container's
+`black`/`isort`/`flake8` run by hand (see `wremnants_ci_linting`). And when a
+frozen copy's md5 does drift, the run logs that printed the old hash are the
+record of what actually ran — annotate, do not rewrite them.
