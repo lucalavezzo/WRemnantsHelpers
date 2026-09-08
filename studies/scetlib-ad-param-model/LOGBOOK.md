@@ -3,7 +3,7 @@ title: Fully differentiable SCETlib param model (scetlib_ad)
 slug: scetlib-ad-param-model
 status: active
 created: 2026-08-18
-updated: 2026-08-26
+updated: 2026-09-08
 ---
 
 # Fully differentiable SCETlib param model — logbook
@@ -16,7 +16,266 @@ injected truth AND the λ response matches the existing `scetlib_np` model.
 
 ---
 
-## START HERE (status as of 2026-08-25 -- read the LATEST block first; older blocks are historical)
+## START HERE (status as of 2026-09-08 -- read the LATEST block first; older blocks are historical)
+
+> ### 2026-09-08: SCOPE -- the NP function's pathology is NOT a param-model result
+>
+> Luca, after a λ-free toy on the 770-bin grid returned λ4_ν = **-0.594** and
+> EDM **0.608**: *"we need to decouple things: the NP function is a mess, and
+> consistently leads to unphysical xsec. What we're trying to solve here is the
+> new parameter model."*
+>
+> **He is right, and it is evidenced rather than convenient.** The λ pathology
+> belongs to the **NP parametrisation**, not to the differentiable model. The
+> older `scetlib_np` model hit the identical failure -- that is why
+> `np_damping_wall.py` exists at all, and why `studies/np-wall-local-minima`
+> records the likelihood as multimodal with an **unphysical global optimum**
+> (excluded there at dchi2 ~ 16.6). Nothing about the AD model introduced it.
+>
+> **So two verdicts, kept apart from here on:**
+>
+> | question | how it is tested |
+> |---|---|
+> | does the **param model** work on the 770-bin grid? | NP sector held physical (freeze λ4_ν = 0, the validated one-flag remedy from `studies/physical-lambda`: rho = 0.07, sigma(alphaS) unchanged), then judge convergence on ‖grad‖∞ / Hessian sign structure / EDM |
+> | is the **NP function** usable with λ free? | its own track. Known-bad, pre-dates this work, and the wall port is parked until after a first data fit |
+>
+> A λ-free failure is a fact about the NP function on this grid, worth recording
+> — but it is **not** a verdict on the thing being validated, and earlier entries
+> that read it that way are corrected by this one.
+>
+> **Where the param-model verdict stands:** the Asimov arm converges cleanly on
+> the new 770-bin card and cache, with the zero-skip mechanism reproducing
+> exactly (3673 of 3721 zero-seeded, 48 real sweeps). The toy in the isolated
+> configuration -- λ4_ν frozen, `threads=256`, `--minimizerGtol 1e-4` -- is what
+> closes it. See [260908-fit-770](260908-fit-770/LOGBOOK.md).
+
+
+> ### 2026-09-07 (LATEST): the reco fit is fixed, measured, and pushed
+>
+> **A reco fit plus its postfit Hessian now takes ~13 min.** The covariance pass
+> alone went from a MEASURED **7260 s (2.02 h)** to **49 s**
+> ([260907-reco-fit-speed](260907-reco-fit-speed/LOGBOOK.md)).
+>
+> | reco, fixed, `adexclpdf` (3673 systs / 47 model params), 210-bin cache | fit | Hessian |
+> |---|---|---|
+> | Asimov | 0 s (`ifit = -1`, no minimiser) | **49.0 s** |
+> | Toy (`--earlyStopping 30`) | **594 s** | **85 s** |
+>
+> **Quote 76x, not 148x.** The wall ratio is inflated by node load (arm B ran at
+> loadavg 17, arm A at 100-850). 76x is exact call-count arithmetic:
+> `len(x)+1 = 3721` sweeps, of which **3673 -- the card's nuisance count, to the
+> unit -- carry a zero seed** and **48** are real, one per model parameter.
+> Exactness: postfit parameters **bitwise identical, 3720 of 3720**; the
+> covariance differs at 9.1e-14, and a same-arm rerun reproduces that difference
+> to every digit, so it is process nondeterminism and not the fix.
+>
+> **The fix is two lines** in `scetlib-cms/py/scetlib_tf.py`: `if not vv.any():
+> return zeros`. Nothing in rabbit, nothing in the param model. An earlier
+> materialize-and-contract mode was measured, found to be a **5.9x regression**
+> below ~46 model parameters, and dropped.
+>
+> **PUSHED:**
+> * SCETlib `hvp-fast-covariance` -> `origin` (CERN GitLab). MR link in the push
+>   output; not opened yet.
+> * WRemnants `080de022` -> `scetlib-ad-param-model` (**PR #715**) -- the
+>   cache-finer-than-card warning. CI's own black/isort/flake8 run in-container
+>   first, all pass.
+> * rabbit `local-wip-260818` -> the `luca` fork, so a month of previously
+>   uncommitted work is backed up.
+>
+> **A SEPARATE FINDING, and it is not small: rabbit's default reco toy fit cannot
+> terminate.** `trust-krylov` with `tol=0.0` gets `gtol=0.0`, and scipy's fallback
+> ceiling is `len(x)*200 = 744 000` iterations, about **14 days**. The minimum is
+> reached at **iteration 73** and the loss then repeats to all 16 digits without
+> the loop breaking. Two independent sightings today, one of which burned 21.8 h.
+> This **contradicts** `knowledge/20_frameworks/rabbit_minimizer_tolerances.md`,
+> which claimed `trust-krylov` escapes via `predicted_reduction <= 0`; that note
+> has been corrected. **Always pass `--earlyStopping 30`** (below 20 silently
+> aborts `trust-constr`) or a real `--minimizerGtol` ~1e-4. The 594 s fit time
+> above is a time-to-early-stop, not a time-to-convergence.
+>
+> **IN FLIGHT, three threads (2026-09-07 ~19:45):**
+>
+> | thread | task | state |
+> |---|---|---|
+> | histmaker | [260907-histmaker-corrgrid](260907-histmaker-corrgrid/LOGBOOK.md) | **output written, 7.60 GB** (davidFix was 7.50); event loop 7196 s. Next: verify its response gen axis against the cache's `bins.shape[0]`, then build both 770-bin cards -- minutes, and it retires the spliced do-not-fit card. |
+> | reco timing | [260907-reco-fit-speed](260907-reco-fit-speed/LOGBOOK.md) | follow-ups: (a) restart seeded from the early-stopped postfit to prove we reached the minimum -- `--earlyStopping` cannot prove that from its own trace; (b) the **templates-only** 2x2, the true "before the param model existed" baseline. `AS770_A` (timing-only 770 unfixed) still running, predicted ~5.7 h. |
+> | adopt e84f0b3 | [260907-adopt-e84f0b3](260907-adopt-e84f0b3/LOGBOOK.md) | building the library, then the audit's own biggest gap: it tested only the **member-free** path and said production being unaffected is *expected, not verified*. Our fits use the membered 62-member cache. Then gen-level revalidation (no card needed). Reco revalidation deliberately out of scope until the card exists. |
+>
+> **Sequencing to the first data fit:** cards built -> `e84f0b3` membered-path
+> check -> full revalidation on (new library x 770 cache x new card) -> blinded
+> fit, lambdas free. The damping wall stays parked until after that fit.
+
+
+> ### 2026-09-07: DECISIONS for the first real-data fit, and what is parked
+>
+> Luca settled the open configuration questions. Recorded here because each one
+> changes what a data number would mean:
+>
+> | question | decision |
+> |---|---|
+> | SCETlib library | **adopt `e84f0b3`** (`scale-derivatives-rge-refill`). Not a fast-forward -- it changes the transition-point derivatives -- but it is the correct one. |
+> | NP lambda priors | **none. The lambdas float completely free**, at least to start. TNPs and PDF eigenvectors keep theirs. |
+> | gen grid | **770-bin** (the theory correction's own). Blocked on the histmaker now running, then a card built from it. |
+> | blinding | already handled: run **without `--unblind`**, so an unknown shift is added to the POI. A data fit is therefore safe to run and inspect. |
+>
+> **Sequencing to the first data fit:** reco toy confirms the fix -> review and
+> push all code -> `e84f0b3` adopted -> histmaker lands -> 770-bin card built ->
+> fit blinded, lambdas free.
+>
+> **PARKED, deliberately, until AFTER the first data fit:**
+>
+> * **Port the NP damping wall to the AD model.** With free lambdas and no wall
+>   the known failure mode is live: lambda4 < 0 drives sigma_reco negative -> NaN
+>   NLL, and the gradient is flat there (the tanh saturates) so the minimiser
+>   cannot climb out. Separately the NP likelihood is multimodal with an
+>   UNPHYSICAL global optimum (excluded in the NP work at dchi2 ~ 16.6). The
+>   failure is loud rather than silent, so free-lambda-first is a defensible
+>   start -- but watch **lambda4's sign** in the postfit, not alpha_s, since
+>   alpha_s is blinded and lambda4 is where an unphysical minimum shows.
+> * The port is small. `np_damping_wall.py` needs only two things from the model
+>   -- `_param_order` and `fit_forms` -- and its criterion ("the tanh argument is
+>   >= 0 for all b") is pure algebra in lambda through `btgrid_tf`, with **no
+>   SCETlib call**. Generalising that discovery so it accepts either model is the
+>   whole job. Today it raises when `indata.scetlib_np_param_model` is absent,
+>   which is why it does not work with the AD model.
+> * **Do not spend time on wall-free alternatives.** Luca: *"I got nothing to
+>   work except the wall. All other solutions had issues at fit time."* That
+>   includes the `tanh_6_abs` damping fold. Pinned for later thought, not for the
+>   next round.
+> * lambda equivalence between the two models is **settled, not a risk** -- Luca
+>   confirms they are the same NP model, so the wall's criterion transfers
+>   directly.
+
+
+> ### 2026-09-07 (LATEST): the fit's bottleneck is found, fixed and verified
+>
+> **The cause.** rabbit's postfit covariance does `tape.jacobian(grad, x)` over the
+> whole fit vector. `tf.py_function` has no pfor vectorization rule, so that
+> silently degrades from ONE vectorized pass to one Hessian-vector product per
+> fit parameter, at a point that never moves — and for every nuisance the model
+> does not depend on, the seed is identically zero. Measured: **92 % of the
+> sweeps computed zeros**, 98.5–99.6 % of the pass sat inside SCETlib. An Asimov
+> fit never runs the minimiser (`ifit = -1`), so 100 % of its runtime is this one
+> pass — which is why it "used to be much faster": with no `py_function` in the
+> graph the same pass is **0.75 s at any `len(x)`**.
+>
+> **The fix, and which half matters.** Two mechanisms, isolated
+> ([260907-genlevel-fit-speed](260907-genlevel-fit-speed/LOGBOOK.md)):
+>
+> | 210-bin gen Asimov, Hessian pass | time | heavy C++ calls | |
+> |---|---|---|---|
+> | unfixed | 136.5 s | 85 | — |
+> | **zero-seed skip only** | **10.4 s** | **7** | **13.2x** |
+> | skip + materialize (mode forced on) | 61.9 s | 1 | 2.2x |
+>
+> **The zero-skip does essentially all the work.** Materializing only pays when
+> the model has more than ~46 parameters (one Hessian build ≈ 46 sweeps); this
+> card has 6, so forcing the mode on is a 5.9x REGRESSION. Hence the shipped
+> design: rabbit *declares* the sweep unconditionally via a new
+> `ParamModel.second_order_sweep()` (a no-op by default, so no other model
+> changes), and `SCETlibADParamModel` acts on it only when `nparams > 46`.
+> No counter, no heuristic, no hand-built gradients in a param model.
+>
+> Exactness: postfit values and covariance **bitwise identical**, σ(α_s) to all
+> 16 digits. The two routes differ by 3.3e-14 per bin, which never reaches the
+> assembled Hessian's last bit. Toy (`-t 1`): `hessian()` calls during
+> minimisation = 0, minimiser work counters identical to the unfixed arm.
+>
+> **Branches, none committed yet:** `scetlib-cms` `hvp-fast-covariance`,
+> `rabbit` `param-model-second-order-sweep`, plus the override in the WRemnants
+> live tree. Also: rabbit's own 768 lines of uncommitted work are now safe on
+> `local-wip-260818` (`5bc7aad`).
+>
+> **DECISION WAITING.** The SCETlib branch `scale-derivatives-rge-refill`
+> (`e84f0b3`) is **adopt-with-changes**, not a fast-forward: `b66f8de` — the
+> library the whole 770-bin validation was produced against — is NOT an ancestor.
+> The cache survives (`sizeof(ad::GlobalData)` unchanged, 2424 B) and values are
+> bit-identical, but the transition-point derivatives **flip sign and shrink
+> 7–12x** and `scale_kappa_F` goes from an exact zero to finite. FD cannot
+> adjudicate — each library matches its own FD to ~0.03 %, so they differ in the
+> model. Adopting requires re-running the 770-bin validation, and our recorded
+> worst residual (2.125e-01 on `transition_points0.2_0.75_1.0`) must not be
+> requoted until it is settled.
+> ([260907-scetlib-branch-audit](260907-scetlib-branch-audit/LOGBOOK.md))
+>
+> **STILL OPEN:** the 770-bin validation write-up — it ran on 2026-08-28 and its
+> numbers (GRAIN > CALC 46/97, down from 72/97) are still only in logs.
+
+> ### 2026-08-27 (LATEST): the authoritative set is being REBUILT on the correction's gen grid
+>
+> Luca's call: the production grid is the theory correction's own (CorrZ) gen
+> binning up to qT 100 — **759 bins** (69 qT x 11 |Y| x 1 Q; the 748 figure is the
+> qT >= 1 shard, the [0,1] row is sharded off separately). The 803-bin extension
+> to qT 250 stays parked until the corrections are regenerated. So the 210-bin
+> authoritative set published earlier today is being **replaced**, not appended
+> to, in [260827-authoritative-validation](260827-authoritative-validation/LOGBOOK.md).
+>
+> Why the rebuild and not just a caveat: that set's own finding was that **the gen
+> grid, not the calculation, is the limiting term at reco** — grain beat calc in 72
+> of 97 directions and in **58 of 58 PDF eigenvectors**. So the headline accuracy
+> was a property of the binning. Re-measuring that split on 759 bins is the point
+> of the exercise.
+>
+> Cost model, from the 210-bin `pdf62_260826` build on disk: 26 qT-slice shards at
+> `--threads 128`, 10-23 min per 10-bin slice, and the qT **[0,1]** row alone 6h20m
+> (split 5 ways by |Y|) — which set the whole 6h20m wall. 759 bins is 68 slices
+> above 1 GeV plus that row, so 6-10 h with ~5 shards resident.
+>
+> In flight alongside it: PR #715, which must carry the whole response-grid path
+> ([260827-pr715-ci](260827-pr715-ci/LOGBOOK.md)). **`--responseGenBinning` now
+> defaults to `theoryCorr`** — Luca's call, and my objection to it was wrong.
+> `--theoryCorr` already defaults to three non-empty entries (`parsing.py:174`), so
+> that precondition never fires; the only real one was `--poiAsNoi` (default False),
+> because the reco x gen histogram exists only in the poi-as-noi path. Both `raise`s
+> become warn-and-skip, so a classic unfolding run silently gets no response
+> histograms instead of erroring. **The flip is inert by default**: the whole block
+> sits inside `if args.unfolding:` (`mz_dilepton.py:365`) and both `--unfolding` and
+> `--poiAsNoi` are `store_true`/False, so a default run never reaches the flag. The
+> only population that pays the two extra histograms is a Z dilepton *poi-as-noi
+> unfolding* run — in our tree `workflows/histmaker_unfolding.sh`, i.e. us, and the
+> run that wants a response anyway — at order +15 MB on a ~72 MB output
+> (`260826_Z_histmaker_corrgrid` 72 MB vs 87 MB for the extended-grid runs), opt-out
+> via `--responseGenBinning none`. `mz_dilepton` is Z-only, so no W histmaker is
+> touched (mW uses `mw_with_mu_eta_pt.py`).
+>
+> **No histmaker rerun.** The corr-grid outputs already exist on ceph from 25-26
+> Aug; this round is cards + cache + validation only.
+>
+> Plot convention changed today: **every study figure goes in its task directory**
+> via `save_plot`, never a flat `~/public_html/alphaS/YYMMDD_*` dir. AGENTS.md and
+> the `study` skill now state it as a rule; figures under `studies/` are gitignored
+> and published by the symlink.
+
+> ### 2026-08-27 (LATEST): ONE authoritative validation set exists, and it names the next limit
+>
+> Everything is now validated end to end on **one** cache (`pdf62_260826`) and
+> **one** library (`b66f8de`, MR !7+!8+!9): gen central, all 97 gen variations,
+> reco central with its CALC/MC split, all 97 reco variations, the backend gate.
+> Page: `~lavezzo/public_html/alphaS/260827_scetlib_ad_validation/` (read
+> `00_MANIFEST.txt` before quoting). Task:
+> [260827-authoritative-validation](260827-authoritative-validation/LOGBOOK.md).
+>
+> Two results that change what we do next:
+>
+> 1. **At reco the GEN GRID, not the calculation, is the limiting term** — grain
+>    beats calc in 72 of 97 directions and in **58 of 58** PDF eigenvectors,
+>    2.8x the calculation at the median. That is the independent argument for the
+>    finer 803-bin response-matrix grid; this whole set is on the shipped 210-bin
+>    grid and must be redone once the matching theory corrections land.
+> 2. **For the 28 directions a direct live SCETlib evaluation can reference, our
+>    error is <= 7.7e-05** — 20x below their residual against the production
+>    templates. So that ~1e-3 residual is the TEMPLATE's, not ours. First time
+>    that attribution has been made against a reference with no template floor.
+>
+> **NEXT:** the finer-grid redo, blocked on Luca's theory corrections. Meanwhile
+> PR #715 ([260827-pr715-ci](260827-pr715-ci/LOGBOOK.md)) and the arm-B toy rerun
+> against the scaled-PDF model.
+>
+> Two footnotes worth not forgetting: `resummed_only()` in any build carrying
+> `3a8db11` returns the MATCHED total, so `compare_to_scetlib_run.py --piece
+> resummed` is silently 34% wrong; and `backend_check.py`'s fixed FD step is a
+> defect, not a failing gradient (the one "FAIL" falls as 1/h to 7.9e-09).
 
 > ### 2026-08-25 (LATEST): the muF fix MATERIALLY changes the fit -- proven on Asimov
 >
@@ -309,6 +568,8 @@ injected truth AND the λ response matches the existing `scetlib_np` model.
 ---
 
 ## Log
+
+- **2026-09-08** Slide-material commands assembled for the three validations and two fits, with the current paths: [260908-slides-validation](260908-slides-validation/LOGBOOK.md). Two scripts had to be pushed for the recipes to be reproducible from a checkout (`validate_variations_reco.py` moved in, `compare_to_scetlib_run.py` Y-convention fix). Validation 1 ran against a theory correction for the first time: total ours/ref = 1.000089, per-bin median 7.2e-05, residual entirely at low qT.
 
 ### 2026-08-20 (fork, cont. 4) — binning/sampling non-additivity BOUNDED; provenance fully traced
 
@@ -6203,3 +6464,42 @@ Timing: FREE. ~1% on both value+jacobian and Hessian, inside the measurement own
 Invariants re-verified post-flip: central 0.000e+00, kappa_F at both knots
 0.000e+00, 36 of 39 directions exactly 0, sizeof(ad::GlobalData) 2424 B unmoved
 and the pre-MR cache still loads.
+
+### 2026-08-27 -- authoritative end-to-end validation set: PASSES; the gen grid is now the limit
+
+One cache, one library, 13 container runs. Verdict and every number in
+[260827-authoritative-validation/LOGBOOK.md](260827-authoritative-validation/LOGBOOK.md);
+page at `~lavezzo/public_html/alphaS/260827_scetlib_ad_validation/`. Headline:
+gate passes, gen variations worst 1.40e-02 (all in qT [0,1], the known
+nonsingular-cutoff convention) and 4.11e-03 above it, reco central 0.128% shape,
+reco variations median 1.27e-03. MR !9's flip confirmed as a one-variable change
+(94 of 97 directions bit-identical at reco, only the 3 transitions move).
+
+Acted on immediately: the set found that today's TNP-floating defaults do not
+construct, because `resumTNP_b_qqDS` is identically inert for the Z (response
+2.2e-16). Added to `params.DEFAULT_FROZEN` with the measurement cited, in the
+live tree and handed to the PR #715 worker. 47 of 53 float, alpha_s the sole POI,
+priors on 46 — Luca's requirement intact.
+
+### 2026-09-07 -- fit bottleneck: found, fixed, verified
+
+pfor-defeat by `tf.py_function` in rabbit's postfit Hessian; 92 % of sweeps
+computed zeros. Zero-seed skip gives 13.2x and does nearly all of it;
+materializing only pays above ~46 model parameters, so it is guarded. Verified
+bitwise-exact, no minimiser regression. Numbers and evidence in
+[260907-genlevel-fit-speed](260907-genlevel-fit-speed/LOGBOOK.md).
+
+### 2026-09-07 -- SCETlib `scale-derivatives-rge-refill` audit: ADOPT-WITH-CHANGES
+
+Cache survives, values bit-identical, but the transition-point response changes
+and `b66f8de` is not an ancestor. Adoption needs the 770-bin validation re-run.
+Verdict and evidence in
+[260907-scetlib-branch-audit](260907-scetlib-branch-audit/LOGBOOK.md).
+
+### 2026-09-07 -- configuration decisions for the first data fit; damping wall parked
+
+Adopt `e84f0b3`; lambdas free (no priors) to start; 770-bin grid; blinded via the
+absence of `--unblind`. The NP damping wall is to be ported to the AD model
+**after** the first data fit, not before -- the port is small (two model lookups;
+the criterion needs no SCETlib call) but wall-free alternatives are ruled out by
+experience, so it is the only route and can wait. See the START HERE block.
