@@ -42,3 +42,31 @@ General plot presentation conventions for collaborator-facing comparison plots.
 - `studies/scetlib-ad-param-model/` (wums 2D plotter)
 - `studies/z_bmass_uncertainty/runlog.md`
 - `studies/z_bb/plot_narf.py`
+
+## The CMS label: `Preliminary`, above the frame
+
+Standing choice (Luca, 2026-09-08) for every plot we make:
+
+```python
+plot_tools.makePlotWithRatioToRef(
+    ...,
+    cms_label="Preliminary",   # NOT "Work in progress"
+    logoPos=0,                 # above the axes, not inside the frame
+)
+```
+
+**The parameter is `logoPos`, not `titlePos`.** wums passes it straight through
+to `add_cms_decor` as mplhep's `loc`, so `0` puts "CMS *Preliminary*" above the
+axes and the wums default `2` puts it inside, top-left. There is no `titlePos`
+anywhere in `plot_tools.py` — passing one is silently swallowed by `**kwargs`
+on some entry points, so a typo here fails quietly rather than raising.
+
+Note the defaults are inconsistent inside wums itself: `makePlotWithRatioToRef`
+defaults to `cms_label="Work in progress"` with `logoPos=2`, while
+`makeHistPlot2D` already defaults to `cms_label="Preliminary"` with
+`logoPos=0`. So a 1D plot needs both arguments given explicitly and a 2D plot
+needs neither — always pass both rather than relying on which entry point you
+happened to call.
+
+Applied to the four `scripts/rabbit/scetlib_ad/` validation scripts. Anything
+new should pass both from the start.
