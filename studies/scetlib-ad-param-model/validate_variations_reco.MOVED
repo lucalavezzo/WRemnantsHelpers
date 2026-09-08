@@ -1,0 +1,5 @@
+validate_variations_reco.py moved into the framework on 2026-09-08:
+  WRemnants/scripts/rabbit/scetlib_ad/validate_variations_reco.py  (f479d015, PR #715)
+It was the one validation we quote most that could not be reproduced from a
+checkout.  260827-authoritative-validation/validate_variations_reco_wrap.py
+imports it by module name and already resolves the repo copy first.
