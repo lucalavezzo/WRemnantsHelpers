@@ -50,23 +50,41 @@ The residual is a monotonically falling function of qT and nothing else:
 1e-3 by qT ~ 6 GeV, under 3e-4 everywhere above 15 GeV, and rising only to
 3.0e-4 by qT 80.
 
-**Physics read.** This is the signature the reference is chosen to expose, not
-a defect. Our cache computes its own matched total with SCETlib's in-house
-analytic V+jet rather than DYTurbo's nonsingular, and takes the nonsingular to
-vanish below qT = 0.1 GeV; the correction file carries DYTurbo's. A difference
-of nonsingular treatment can only show up where the nonsingular is a
-significant fraction of the matched total relative to the resummed piece, and
-at qT << M it is power-suppressed -- so the disagreement is bounded to the
-lowest bins and dies as qT grows, which is what is measured. The
-`compare_to_scetlib_run.py` docstring states this in advance: this reference
-"measures the deliberate change of nonsingular as well as everything the
-resummed test covers". The total agreeing to 0.9e-4 says the change of
-nonsingular does not move the integrated cross section.
+**Physics read.** Two distinct causes, both now quantified in
+[260908-ptll-residual](../260908-ptll-residual/LOGBOOK.md), which chased the
+same effect at reco level:
 
-Not to be confused with the ptll shape residual under investigation in
-`260908-ptll-residual`: that one is at **reco** level after the response fold
-and is 1.6 % at its worst, two orders larger than anything here, and it is not
-concentrated at low qT.
+1. **Dominant, qT < 1 GeV: the nonsingular qT-cutoff convention.** We vanish
+   the nonsingular below 0.1 GeV; the production template was made with
+   `--qtCutoff 1.0`. Removing our nonsingular below the cut brings gen qT
+   [0, 0.5] to model/template = 1.000063 and [0.5, 1] to 1.000009. Two
+   independent routes agree on the reco bin-0 prediction to 9e-06.
+2. **Smaller, above the cut: nonsingular accuracy** -- the model is +0.91 %
+   high at gen qT [1, 1.5], DYTurbo's fixed order against SCETlib's analytic
+   V+jet. No cutoff change touches it.
+
+My first read of this run merged the two into "a different nonsingular", which
+is true but not actionable: the fix for (1) is a cutoff value and the fix for
+(2) is not. The total agreeing to 0.9e-4 says neither moves the integrated
+cross section.
+
+**The config cross-check does not cover this.** The run prints
+`settings cross-check: OK`, but the cutoff is recorded in *neither* config --
+ours is announced at runtime, the template's lives only in its production
+command line -- and the compared whitelist is 13 keys, none of them the cutoff.
+So the reassurance is real for what it covers and silent on the one setting
+that produced the residual. Worth remembering before quoting "settings OK" as
+evidence of a matched calculation.
+
+**This is the same effect as the ptll shape residual**, which I had written off
+as a different mechanism ("not concentrated at low qT") before
+`260908-ptll-residual` reported. It is: the reco residual is the three lowest
+`ptll` bins (-1.579e-02, -4.679e-03, -1.169e-03, then within 5.1e-04 above
+2 GeV), it is the same cutoff convention, and the 2.25e-04 absolute-closure
+deficit is the same gen-level effect integrated -- the low-`ptll` bins
+contribute 126 % of it, partly offset by the +0.91 % excess at `ptll` 2-9.
+So the two items Luca ranked first and second are one cause, and the gen-level
+number here is the cleanest place to see it.
 
 ### The pushed scripts could not do this before today
 

@@ -16,3 +16,13 @@ extend-exclude = '''
   | outputs
 )/
 '''
+
+# Byte-frozen copies. A study's `lib/` holds a patched library file and its
+# `ab/` the two arms of an A/B measurement; their md5 is recorded in the task's
+# incontainer.sh as provenance for numbers already published, so reformatting
+# them silently invalidates that record. force-exclude, NOT exclude: black
+# ignores exclude/extend-exclude for paths named explicitly on the command
+# line, which is exactly how the pre-commit hook passes them.
+force-exclude = '''
+/studies/.*/(lib|ab)/
+'''

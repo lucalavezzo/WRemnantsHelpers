@@ -78,11 +78,26 @@ silently 34 % wrong.
 
 The max is confined to the lowest qT bins and falls monotonically
 (5.2e-2, 3.1e-2, 2.8e-2, 1.2e-2, 7.0e-3, ... under 1e-3 by qT ~ 6 GeV, under
-3e-4 everywhere above 15 GeV). That is the expected place for it: our cache
-computes its own matched total with SCETlib's in-house analytic V+jet rather
-than DYTurbo's nonsingular, and takes the nonsingular to vanish below
-qT = 0.1 GeV. The script's docstring says so up front -- this comparison
-measures that deliberate change of nonsingular as well as the quadrature.
+3e-4 everywhere above 15 GeV).
+
+**Attribution, from `260908-ptll-residual` -- the same effect chased at reco
+level.** Two distinct causes, not one:
+
+1. **Dominant, qT < 1 GeV: the nonsingular qT-cutoff convention.** We vanish the
+   nonsingular below **0.1 GeV**; the production template was made with
+   `--qtCutoff 1.0`. Removing our nonsingular below the cut brings gen qT
+   [0, 0.5] to model/template = **1.000063** and [0.5, 1] to **1.000009**, and
+   two independent routes agree on the reco bin-0 prediction to **9e-06**.
+2. **Smaller, above the cut: nonsingular accuracy.** The model is **+0.91 %**
+   high at gen qT [1, 1.5] -- DYTurbo's fixed order vs SCETlib's analytic V+jet.
+   No cutoff change touches this one.
+
+The run prints `settings cross-check: OK`, and that does **not** cover this.
+The cutoff is recorded in neither config -- ours is announced at runtime
+("nonsingular to vanish below qT = 0.1 GeV"), the template's exists only in its
+production command line -- and the whitelist the cross-check compares is 13
+keys, none of them the cutoff. Do not read "OK" as "same nonsingular
+convention".
 
 ## Validation 2 -- sigma_reco vs the histmaker nominal carrying the correction
 
