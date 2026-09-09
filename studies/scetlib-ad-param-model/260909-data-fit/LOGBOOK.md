@@ -25,8 +25,11 @@ is not.
 `/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/study_scratch/260909-data-fit/fitresults_{DATA,DATANOH,DATAPC}.hdf5`.
 
 **Next step.** Read the postfit p-value off whichever run reaches the postfit
-block. Expectation set by Luca: old 2D fits reached postfit p close to **80%**;
-anything much below ~50% should be treated as not converged.
+block. For scale, not as a criterion: Luca recalls old 2D fits landing near
+80%, offered explicitly as a rule of thumb rather than a benchmark. The useful
+comparison is against the **26.6% prefit** on this same card -- a converged fit
+should be clearly above it, and a postfit p near 26% would mean the minimiser
+barely moved the likelihood.
 
 **Blocking.** Nothing.
 
