@@ -3,7 +3,7 @@ title: Fully differentiable SCETlib param model (scetlib_ad)
 slug: scetlib-ad-param-model
 status: active
 created: 2026-08-18
-updated: 2026-09-08
+updated: 2026-09-10
 ---
 
 # Fully differentiable SCETlib param model — logbook
@@ -568,6 +568,10 @@ injected truth AND the λ response matches the existing `scetlib_np` model.
 ---
 
 ## Log
+
+- **2026-09-10** The theory correction is now the AUTHORITY for the parameter central values, and a card that does not record them is refused: [260910-corr-anchor](260910-corr-anchor/LOGBOOK.md). All 9 in-model cases behave as designed; on the present cache/correction pair the anchor is bit-identical to the cache's and `sigma_gen` at theta = 0 is unchanged, so this is bookkeeping rather than a change of physics. Committed as `8f6af64f` (normalise every fitted parameter to a unit nuisance — rabbit now reports THETA, not physical lambda) and `068dfe75` (the anchor itself). The plan's Asimov verification was DROPPED on Luca's challenge, not skipped: it had nothing to add once the anchor came out bit-identical and the widths were shown to match the old `PRIOR_SIGMAS` exactly. Still unmeasured, and NOT claimed by either commit: whether the normalisation actually helps the minimiser — that needs a toy or data arm.
+
+- **2026-09-10** David's review of rabbit [PR #156](https://github.com/WMass/rabbit/pull/156) (the preconditioner work out of `260909-data-fit`) answered: [260910-pr156-review](260910-pr156-review/LOGBOOK.md). All eight comments verified independently and all eight answered. One filed as non-blocking was a bug on the **default** ridge path, not a doc matter. Per Luca, `--stallRelTol` was split out to [#157](https://github.com/WMass/rabbit/pull/157) (`b49c65c`, 89 tests) and #156 force-pushed as preconditioner-only (`7ae95f9`, 90 tests); old head `9315f24` is recoverable. Left open in the thread for David: `_cond_corr` is scale-invariant, so the conditioning numbers the PR added to the log cannot see the failure it exists to fix — [this study's own finding](260909-data-fit/LOGBOOK.md), now shown to hold on the PR's motivating block too.
 
 - **2026-09-08** Adopted Josh's head (`dce84b1`) + our MR !11 as `8e92c14`: [260908-adopt-joshhead](260908-adopt-joshhead/LOGBOOK.md). Cache survives (`GlobalData` byte-identical) and sigma_gen is bit-for-bit unchanged, so no rebuild and no central re-validation. MR !8/!9 superseded per Luca; the MR !7 scare was an ancestry artifact of a rebase. Variations pending; do not quote muF-direction uncertainties until Josh's `4179e76` kappa_F gradient note is worked through.
 
