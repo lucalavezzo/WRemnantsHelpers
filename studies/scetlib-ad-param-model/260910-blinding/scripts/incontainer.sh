@@ -30,19 +30,19 @@ source /opt/venv/bin/activate
 source /home/submit/lavezzo/alphaS/WRemnants/setup.sh > /dev/null
 export SCETLIB_BUILD=/work/submit/lavezzo/alphaS/scetlib-ad-authval-260827/scetlib_snapshot/build
 source /work/submit/lavezzo/alphaS/scetlib-ad-authval-260827/scetlib_snapshot/setup.sh > /dev/null
-# RABBIT OVERRIDE. The shared submodule checkout is on `combined-156-157`,
-# which does NOT contain the additive-POI blinding change; that change is
-# committed as 0f64bbb on `blinding-additive` and checked out in its own
-# worktree. Point at the worktree rather than cherry-picking into the shared
-# checkout, which a parallel session owns (single-babysitter rule).
+# NO RABBIT OVERRIDE ANY MORE (2026-09-11). The submodule checkout now sits on
+# branch `ours` = origin/main + the additive-blinding change (PR #159) + the
+# saturated-path blinding fix (PR #161), so it carries everything and
+# WRemnants/setup.sh alone is correct.
 #
-# This is not hypothetical hygiene: a 22-minute data fit was run against the
-# shared checkout on 2026-09-10 and silently tested the OLD multiplicative
-# blinding, because the model declares blind_additive and a rabbit without the
-# change reads it via getattr(..., False) and ignores it. Default-False means no
-# crash -- and no fix. Hence the hard assertion below.
-export RABBIT_BLINDING_WORKTREE=/work/submit/lavezzo/alphaS/rabbit-blinding
-export PYTHONPATH="$RABBIT_BLINDING_WORKTREE:$D/lib:$PYTHONPATH"
+# It used to point PYTHONPATH at /work/.../rabbit-blinding, because the
+# submodule was on `combined-156-157` which lacked the blinding change. That
+# arrangement is exactly how a 22-minute data fit came to be run silently
+# against the OLD multiplicative blinding on 2026-09-10: the model declares
+# blind_additive, and a rabbit without the change reads it via
+# getattr(..., False) and ignores it -- no crash, no fix. The assertion below
+# is kept and now validates the SUBMODULE.
+export PYTHONPATH="$D/lib:$PYTHONPATH"
 export PYTHONDONTWRITEBYTECODE=1
 # UNBUFFERED. run.sh pipes stdout through `grep --line-buffered`, which flushes
 # GREP but does nothing about python's own block buffering when stdout is a
@@ -66,7 +66,6 @@ print('[env] libscet-qT.so md5', hashlib.md5(open(lib,'rb').read()).hexdigest())
 # run.sh -> incontainer.sh -> WRemnants/setup.sh.  (Gap found by adversarial
 # review 2026-09-08; the runs already logged in this task predate this line, and
 # their rabbit is recorded in the logbook instead.)
-echo "[env] rabbit worktree $RABBIT_BLINDING_WORKTREE @ $(git -C $RABBIT_BLINDING_WORKTREE rev-parse --short HEAD 2>/dev/null) ($(git -C $RABBIT_BLINDING_WORKTREE rev-parse --abbrev-ref HEAD 2>/dev/null))"
 python3 -c "
 import inspect, sys
 from rabbit import fitter
