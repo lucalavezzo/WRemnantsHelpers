@@ -1,0 +1,113 @@
+--- /work/submit/lavezzo/alphaS/rabbit-blinding/bin/rabbit_fit.py	2026-09-10 14:33:43.393665000 -0400
++++ /home/submit/lavezzo/alphaS/WRemnantsHelpers/studies/scetlib-ad-param-model/260910-saturated-ptll/patched/rabbit_fit_satpatch.py	2026-09-10 17:48:16.895691000 -0400
+@@ -407,9 +407,33 @@
+             if saturated_indices is not None:
+                 # saturated likelihood test
+ 
++                # ===== STUDY PATCH 1 (260910-saturated-ptll) =============
++                # SaturatedProjectModel defaults to allowNegativeParam=False
++                # (its params are per-bin YIELD scales, which the fitter's
++                # squaring transform keeps positive).  SCETlibADParamModel
++                # declares True (its POI alphaS is a unit nuisance that must be
++                # allowed negative, and it is blinded ADDITIVELY, which rabbit
++                # refuses without True).  Both submodels carry POIs, and
++                # CompositeParamModel requires them to agree because ONE
++                # squaring transform is applied to the whole POI block -- so
++                # unpatched rabbit raises here.
++                #
++                # Passing the parent's flag through is safe FOR THIS FIT, and
++                # that is measured, not assumed: the closed-form single-bin
++                # optima of the 39 ptll scale factors at the main postfit are
++                # r_j = D_j/N_j in [0.9949, 1.0049] (both arms, see
++                # scripts/projected_deviance.py), so no bin is anywhere near
++                # the positivity boundary the squaring exists to protect.  It
++                # would NOT be safe in general: with allowNegativeParam=True a
++                # bin whose data wanted r_j <= 0 could drive the expected yield
++                # negative and the Poisson log() to NaN.
+                 saturated_model = param_model.SaturatedProjectModel(
+-                    fitter.indata, mapping.channel_info, saturated_indices
++                    fitter.indata,
++                    mapping.channel_info,
++                    saturated_indices,
++                    allowNegativeParam=fitter.param_model.allowNegativeParam,
+                 )
++                # =========================================================
+                 composite_model = param_model.CompositeParamModel(
+                     [fitter.param_model, saturated_model]
+                 )
+@@ -448,11 +472,70 @@
+                 fitter_saturated.tau.assign(saved_tau)
+ 
+                 fitter_saturated.xdefaultassign()
+-                # The composite re-init reordered and resized the parameter
+-                # vector (one POI per projected bin, inserted ahead of the
+-                # original model's block), so regularizers must be re-armed or
+-                # they read the wrong entries. xdefaultassign() above is
+-                # deliberate but does not arm them.
++
++                # ===== STUDY PATCH 2 (260910-saturated-ptll) =============
++                # (a) RE-ARM BLINDING.  init_fit_parms() above re-created the
++                #     offset Variables at the composite size, i.e. DISARMED
++                #     (offsets_poi=1, offsets_poi_add=0), and nothing arms them
++                #     again -- so unpatched rabbit runs the saturated fit in an
++                #     UNBLINDED frame and writes an unblinded POI into
++                #     results["mappings"][...]["saturated_fit"]["parms"].  That
++                #     is a leak for any blinded analysis, independent of this
++                #     model.  Arm before touching x: set_blinding_offsets holds
++                #     the physical point fixed by shifting x on the additive
++                #     POI slots.
++                # (b) WARM START.  rabbit's own path leaves the composite fit
++                #     at x0default, i.e. a COLD start from the model anchor.
++                #     This likelihood is multimodal (studies/np-wall-local-
++                #     minima) and a cold start is known to under-find its
++                #     minimum, which would make NLL(saturated) too HIGH and so
++                #     bias the test statistic LOW / the p-value HIGH.  Start
++                #     instead at the main fit's converged point with every bin
++                #     scale at r_j = 1, where the composite loss EQUALS the
++                #     main fit's loss -- so the statistic is exactly
++                #     "what do 39 free ptll scales buy from here", is
++                #     guaranteed >= 0, and cannot be inflated by the reference
++                #     fit having failed.
++                #     Layout: main [poi_o | pou_o | theta] ->
++                #             composite [poi_o | poi_sat | pou_o | theta].
++                #     x is the INTERNAL (blinded) coordinate in both, and the
++                #     per-name offsets are deterministic, so the original
++                #     model's and the theta block's entries copy verbatim.
++                if fitter_saturated.do_blinding:
++                    fitter_saturated.set_blinding_offsets(blind=True)
++                _x_main = fitter.x.numpy()
++                _xs = fitter_saturated.x.numpy()
++                _npoi_o, _npou_o = orig_model.npoi, orig_model.npou
++                _nsat = saturated_model.npoi
++                assert composite_model.npoi == _npoi_o + _nsat
++                assert composite_model.npou == _npou_o
++                _xs[:_npoi_o] = _x_main[:_npoi_o]
++                _xs[_npoi_o + _nsat : _npoi_o + _nsat + _npou_o] = _x_main[
++                    _npoi_o : orig_model.nparams
++                ]
++                _xs[composite_model.nparams :] = _x_main[orig_model.nparams :]
++                fitter_saturated.x.assign(_xs)
++                logger.info(
++                    "[satpatch] warm start: copied %d original params and %d "
++                    "thetas from the main postfit; %d bin scales left at their "
++                    "default; blinding re-armed = %s"
++                    % (
++                        orig_model.nparams,
++                        len(_x_main) - orig_model.nparams,
++                        _nsat,
++                        fitter_saturated.do_blinding,
++                    )
++                )
++                # arm BEFORE probing the loss: _compute_nll_components
++                # raises if a regularizer is attached but not armed.
++                fitter_saturated.arm_regularizers()
++                _l0 = float(fitter_saturated.reduced_nll().numpy())
++                logger.info(
++                    "[satpatch] 2*reduced_nll at the warm start = %.4f "
++                    "(main fit: %.4f -- these MUST agree)"
++                    % (2 * _l0, 2 * ws.results["nllvalreduced"])
++                )
++                # =========================================================
+                 fitter_saturated.arm_regularizers()
+                 cb = fitter_saturated.minimize()
+                 cov_saturated = None

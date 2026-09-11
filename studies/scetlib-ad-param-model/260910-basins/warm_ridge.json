@@ -1,0 +1,195 @@
+{
+  "cold": "/tmp/basins_warm/fitresults_DATAPC2.hdf5",
+  "warm": "/tmp/basins_warm/fitresults_WARMRIDGE.hdf5",
+  "nparams": 3720,
+  "max_abs_shift_in_sigma": 0.0006975502330635717,
+  "n_shifted_gt_0p1_sigma": 0,
+  "n_shifted_gt_0p5_sigma": 0,
+  "top_shifts": [
+    {
+      "param": "resumScaleMuF",
+      "shift_in_sigma": 0.0006975502330635717,
+      "sigma_cold": 0.10248572076908781,
+      "sigma_warm": 0.10251570073837711,
+      "sigma_ratio": 1.0002925282572472
+    },
+    {
+      "param": "resumTransition2",
+      "shift_in_sigma": -0.0006016897274834358,
+      "sigma_cold": 0.4106598449206181,
+      "sigma_warm": 0.4105648806394667,
+      "sigma_ratio": 0.9997687519675323
+    },
+    {
+      "param": "resumTNP_gamma_nu",
+      "shift_in_sigma": 0.0005429206824163212,
+      "sigma_cold": 1.0072231078157752,
+      "sigma_warm": 1.0072343799618715,
+      "sigma_ratio": 1.0000111913100571
+    },
+    {
+      "param": "pdfMSHT20mbrangeSymAvg",
+      "shift_in_sigma": -0.0005018906005957685,
+      "sigma_cold": 1.2536566864456486,
+      "sigma_warm": 1.2537735904581717,
+      "sigma_ratio": 1.000093250419981
+    },
+    {
+      "param": "pdfMSHT20mbrangeSymDiff",
+      "shift_in_sigma": 0.0004891934491828046,
+      "sigma_cold": 0.9260779530835794,
+      "sigma_warm": 0.9261645629783272,
+      "sigma_ratio": 1.0000935233307946
+    },
+    {
+      "param": "resumTNP_b_qqV",
+      "shift_in_sigma": 0.0004247226990891813,
+      "sigma_cold": 0.877474442847286,
+      "sigma_warm": 0.8775284044725027,
+      "sigma_ratio": 1.0000614965206753
+    },
+    {
+      "param": "QCDscaleZfine_PtV11_15helicity_0_SymAvg",
+      "shift_in_sigma": 0.0003671484829520385,
+      "sigma_cold": 1.0469464990949615,
+      "sigma_warm": 1.0469989021150536,
+      "sigma_ratio": 1.000050053197692
+    },
+    {
+      "param": "QCDscaleZfine_PtV20_27helicity_0_SymAvg",
+      "shift_in_sigma": -0.0003586840653177916,
+      "sigma_cold": 0.8268452105749443,
+      "sigma_warm": 0.8268653057909798,
+      "sigma_ratio": 1.0000243034799967
+    },
+    {
+      "param": "lambda2_nu",
+      "shift_in_sigma": -0.00035142777862352484,
+      "sigma_cold": 0.4222623241068642,
+      "sigma_warm": 0.4223115479068273,
+      "sigma_ratio": 1.0001165716123672
+    },
+    {
+      "param": "alphaS",
+      "shift_in_sigma": 0.00033946452779753597,
+      "sigma_cold": 0.43834228549873905,
+      "sigma_warm": 0.4383315549732875,
+      "sigma_ratio": 0.9999755202137541
+    },
+    {
+      "param": "lambda4_nu",
+      "shift_in_sigma": 0.0003237422362116717,
+      "sigma_cold": 0.0006206654584630259,
+      "sigma_warm": 0.0006207247746862123,
+      "sigma_ratio": 1.0000955687518576
+    },
+    {
+      "param": "resumTNP_b_qg",
+      "shift_in_sigma": 0.0002966378166815813,
+      "sigma_cold": 0.7259687648370332,
+      "sigma_warm": 0.7259470673157369,
+      "sigma_ratio": 0.9999701123211531
+    },
+    {
+      "param": "QCDscaleZfine_PtV27_40helicity_0_SymAvg",
+      "shift_in_sigma": -0.00027068205716670936,
+      "sigma_cold": 0.7504942372185688,
+      "sigma_warm": 0.7504771697135931,
+      "sigma_ratio": 0.9999772583130833
+    },
+    {
+      "param": "pdfEig12",
+      "shift_in_sigma": -0.0002493582807679631,
+      "sigma_cold": 0.8724102978002019,
+      "sigma_warm": 0.8723997453781063,
+      "sigma_ratio": 0.9999879042898483
+    },
+    {
+      "param": "resumScaleMuR",
+      "shift_in_sigma": 0.00022219797787392925,
+      "sigma_cold": 0.19812220304103267,
+      "sigma_warm": 0.19810512859353663,
+      "sigma_ratio": 0.9999138186067288
+    },
+    {
+      "param": "pdfEig10",
+      "shift_in_sigma": 0.00021637455012744552,
+      "sigma_cold": 0.9877405342185135,
+      "sigma_warm": 0.9877571306840255,
+      "sigma_ratio": 1.0000168024546296
+    },
+    {
+      "param": "resumTNP_h_qqV",
+      "shift_in_sigma": -0.00021210304949017677,
+      "sigma_cold": 0.985318396481399,
+      "sigma_warm": 0.9853175798076769,
+      "sigma_ratio": 0.9999991711575416
+    },
+    {
+      "param": "horacelophotosmecoffew_FSR_Corr0",
+      "shift_in_sigma": -0.00021049707371898068,
+      "sigma_cold": 0.9208027252222883,
+      "sigma_warm": 0.9208140306577501,
+      "sigma_ratio": 1.0000122778040856
+    },
+    {
+      "param": "pdfEig22",
+      "shift_in_sigma": 0.00020973434086257156,
+      "sigma_cold": 0.8882447859082463,
+      "sigma_warm": 0.8882494304507815,
+      "sigma_ratio": 1.0000052288992956
+    },
+    {
+      "param": "mb_up",
+      "shift_in_sigma": -0.0002049253465860114,
+      "sigma_cold": 0.485544108314222,
+      "sigma_warm": 0.4855551276647613,
+      "sigma_ratio": 1.0000226948496553
+    }
+  ],
+  "alphaS": {
+    "shift_in_sigma": 0.00033946452779753597,
+    "sigma_cold": 0.43834228549873905,
+    "sigma_warm": 0.4383315549732875
+  },
+  "lambda4_nu": {
+    "shift_in_sigma": 0.0003237422362116717,
+    "sigma_cold": 0.0006206654584630259,
+    "sigma_warm": 0.0006207247746862123
+  },
+  "lambda2_nu": {
+    "shift_in_sigma": -0.00035142777862352484,
+    "sigma_cold": 0.4222623241068642,
+    "sigma_warm": 0.4223115479068273
+  },
+  "lambda2": {
+    "shift_in_sigma": 0.0001404518329208494,
+    "sigma_cold": 0.1840831001439185,
+    "sigma_warm": 0.18410844033977938
+  },
+  "lambda4": {
+    "shift_in_sigma": -6.807249433548267e-05,
+    "sigma_cold": 0.0015851600553568482,
+    "sigma_warm": 0.0015851826009531794
+  },
+  "delta_lambda2": {
+    "shift_in_sigma": -0.0001092728451586518,
+    "sigma_cold": 0.018113087857326213,
+    "sigma_warm": 0.018114577151700763
+  },
+  "resumScaleMuR": {
+    "shift_in_sigma": 0.00022219797787392925,
+    "sigma_cold": 0.19812220304103267,
+    "sigma_warm": 0.19810512859353663
+  },
+  "resumScaleMuF": {
+    "shift_in_sigma": 0.0006975502330635717,
+    "sigma_cold": 0.10248572076908781,
+    "sigma_warm": 0.10251570073837711
+  },
+  "resumTransition2": {
+    "shift_in_sigma": -0.0006016897274834358,
+    "sigma_cold": 0.4106598449206181,
+    "sigma_warm": 0.4105648806394667
+  }
+}
