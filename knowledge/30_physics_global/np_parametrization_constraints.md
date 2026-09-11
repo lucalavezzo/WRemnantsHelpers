@@ -292,6 +292,16 @@ g₂ = 0.167 ± 0.015 in the CSS form g_K(b) = 2g₂²b² ⇒ 2g₂² = 0.056 Ge
 — consistent up to convention factors. **That CSS form is sign-definite by construction:** no
 determination anywhere, lattice or pheno, has an anti-damping NP CS kernel.
 
+> ⚠️ **2510.26489 IS NOT USABLE AS A PRIOR FOR US (2026-09-08).** Its abstract is explicit: a "Bayesian
+> reweighting of an existing fit of TMDs using lattice data" plus "a joint TMD fit to lattice and
+> experimental data" — lattice shifts the CSK central by ~10% and cuts its uncertainty by 40–50%. So its
+> kernel (and its Fig. 2 band) is **informed by the same Drell-Yan data we extract α_s from**. Using it as
+> a prior double-counts DY, shrinks σ(α_s) artificially, and is the kind of thing a referee catches. Same
+> caveat for every pheno extraction (SV19, ART23, MAPNN25, …). **What we need is a LATTICE-ONLY kernel with
+> covariance** — 2402.06725, 2511.22547, or an explicitly lattice-only posterior from a joint analysis.
+> This, not "there are no theory priors", is the correct argument for why lattice is the only usable
+> external input: it is the only *independent* one.
+
 **Lattice band on the FUNCTION** (propagated through eq. `npgamma` with the full covariance; bound the
 function, not the parameters — ρ(λ₂,λ₄) = −0.91 makes the parameters near-degenerate):
 
@@ -359,9 +369,9 @@ factors unresolved" level — **the g₂ ↔ λ₂_ν mapping is NOT 1:1**, do n
 2. **Freeze the CS λ; do not float them.** Take the α_s spread across a *scan of frozen values* as the
    NP-CS systematic. A frozen-variation systematic needs only centrals + a credible range — no
    covariance, no correlations — and cannot rail.
-3. **Check first whether it matters:** our own fit has ρ(λ₄, λ₂_ν) = −0.996, ρ(λ₄, λ₄_ν) = −0.953. The
-   wrong-sign CS pull may be a near-degenerate reshuffle against the TMD b⁴ term, not a CS-kernel
-   statement. If freezing moves θ(α_s) ≪ σ(α_s), the bound question is moot. Item 2 gives this free.
+3. ~~**Check first whether it matters:** our own fit has ρ(λ₄, λ₂_ν) = −0.996, ρ(λ₄, λ₄_ν) = −0.953.~~
+   **MEASURED 2026-09-11 — the answer is NO, and the ρ values above are from a different fit.** See
+   §20.
 4. **Build the frozen range from published FUNCTIONS, not covariances** (the piece of work still to do):
    fit our tanh_2 form to the published CS-kernel curves (SV19, ART23, MAPNN25, Nov-2025 lattice band)
    over b_T ≈ 0.5–3 GeV⁻¹ and read off the λ₂_ν spread. Expectation ~[0.05, 0.15] GeV², but **measure
@@ -920,10 +930,14 @@ massive quark corrections is however essential** [66]"; p. 21: "This **requires*
 quark flavor thresholds and quark mass effects as will be discussed in Ref. [66]." Why it bites: over the
 lattice window $b_T \approx 0.1$–1 fm the perturbative kernel lives at $\mu_b = b_0/b_T \approx$ 0.4–4 GeV,
 straddling $m_c$ and $m_b$; 2402.06725 matches with **massless fixed $n_f=4$** and (per its text) has no
-charm/bottom-mass or threshold discussion. The scale of the contamination is set by the same paper's own
-App. A.3: fitting mass-effect-inclusive Asimov data with a massless 5-flavor model biases
-$\alpha_s(m_Z)$ by **1.32×10⁻³**, "entirely driven by the bottom quark mass", because the α_s pull comes
-from $q_T\sim5$ GeV $\sim m_b$ — i.e. the same $b_T$ region where we want to trust a lattice→λ mapping.
+charm/bottom-mass or threshold discussion. ⚠️ **SCOPE FIX (2026-09-08).** An earlier version of this
+paragraph set the size of the contamination from the same paper's App. A.3 (fitting mass-inclusive Asimov
+data with a massless 5-flavor model biases $\alpha_s(m_Z)$ by **1.32×10⁻³**, "entirely driven by the
+bottom quark mass"). **That is a different effect.** A.3 is a *spectrum*-level b-mass bias at
+$q_T\sim m_b$ — a fitting systematic, not a contaminant of the lattice→λ map. What contaminates the map is
+the flavor scheme of the kernel's own $\alpha_s(\mu_b)$, $\mu_b = b_0/b^*$; and because $b^*$ FLOORS that
+scale at $b_0/b_{\max} = 1$ GeV, it is bounded and charm-dominated (see §19 for the $\mu_b$ table and
+the resulting recipe). Do not quote 1.32×10⁻³ as the translation error.
 This is why Eq. (3.34) is not a plain fit to a lattice curve: it is the output of **Ref. [66] = Dehnadi,
 Ploessl, Tackmann, "Flavor thresholds and quark-mass effects in the CS kernel" — still unpublished**.
 
@@ -947,3 +961,155 @@ plots), (2) add back our $\tilde\gamma_\zeta^{\rm pert}(b^*,\mu)$ and compare **
 b²/b⁴ OPE coefficients. Anything short of that is a shape/ballpark statement, not a constraint — which is
 consistent with the paper never calling Eq. (3.34) a prior ("representative values … for our model",
 for Asimov pseudodata) and with §10 ⚠️/§11 (bracket, don't prior).
+
+## 19. HOW to get λ from a lattice CS kernel — the concrete recipe (2026-09-08)
+
+§18 says the NP piece is not directly transferable. This is what to do instead. **All of it is
+implementable with the SCETlib install we have**, `/work/submit/lavezzo/alphaS/scetlib-cms-newnp-lambda4fix`
+(full source + headers + `prod/scetlib_run`).
+
+### What the code actually computes (verified, not inferred)
+
+`Gamma_nu::operator()(bT, mu0, mu)` — `src/qT/Gamma_nu.cpp:82-121`:
+
+```
+-4*etaGamma(mu0->mu)  +  sum_n as(mu0)^(n+1) * gamma_nu^(n)(Lb)  +  model_gammanu(bT)
+                         with Lb = 2*log(mu0 * bStar(bT))
+```
+
+i.e. **paper Eq. (3.27) in $\tilde\gamma_\nu$ units behind ONE entry point**, and the NP piece is added at
+the true $b_T$, not at $b^*$. `NP_model_gammanu::bStar` (`include/scetlib/qT/Gamma_nu.hpp:79`) returns
+$b^*/b_0 = (b_T/b_0)[1+(b_T/b_{\max})^6]^{-1/6}$, keyed on `b0_bmax_nu` in GeV — the paper's sextic $b^*$.
+Our production card sets `b0_over_bmax_nu = 1.` ⇒ $b_{\max} = 1.123$ GeV⁻¹, **$\mu_b$ floored at 1 GeV**.
+So the perturbative kernel standalone (what §13 item 2 called unavailable) is just this call with
+`lambda_inf_nu = 0`.
+
+| $b_T$ [fm] | $b_T$ [GeV⁻¹] | $b^*$ | $\mu_b = b_0/b^*$ |
+|---|---|---|---|
+| 0.05 | 0.25 | 0.25 | 4.4 GeV |
+| 0.10 | 0.51 | 0.51 | 2.2 |
+| 0.20 | 1.01 | 0.94 | 1.19 |
+| 0.30 | 1.52 | 1.10 | 1.03 |
+| ≥0.4 | ≥2.0 | →1.123 | →1.00 |
+
+### The mass problem is ONE INTEGER in this build
+
+`RunningCoupling(startValue, startScale, order, nf)` with `beta() = G::beta(_nf)`
+(`include/scetlib/core/RunningCoupling.hpp:44-82`) is **fixed-flavor** — no thresholds, no VFNS, no quark
+masses anywhere in this install. Our `base.conf`: `nf = 5`, $\alpha_s(91.1876)=0.118$, `lambda = 1.` GeV
+(Landau regulator), `muf_min = 1.40`. The lattice (2402.06725) is fixed **$n_f=4$ massless**.
+⇒ for the KERNEL the missing "massive-quark treatment" reduces to a **fixed-$n_f$=5 vs =4 massless scheme
+difference, computable today by flipping `nf`.** Ref. [66]'s non-decoupling mass corrections would shrink
+the resulting systematic; they are not needed to make the extraction defensible.
+
+### Recipe
+
+1. **Expose the kernel.** `Gamma_nu` is NOT in the Python module (only `set_gamma_nu_model_params` on
+   `DrellYan`; `core.RunningCoupling` IS exposed, `py/core/core.cpp:41`). Either add ~8 lines of pybind to
+   `py/qT/qT.cpp` (ctor + `__call__(bT,mu0,mu)` + NP setter) or write a standalone C++ driver modeled on
+   `testing/qT/test_Gamma_nu.cpp`, which already builds `RunningCoupling(0.118, 91.1876, order, nf)` +
+   `Gamma_nu(qqbar, order, alphas, nf)`.
+2. **Lattice side: points + covariance, never their fitted NP parameters.** 2402.06725 does its own
+   pert+NP split (their Eq. 6) in their conventions; inheriting it reintroduces the Eq. (3.27)
+   non-uniqueness. Use 2402.06725 (continuum, physical $m_\pi$, uNNLL+LRR), not the 2023 trio behind our
+   current λ (§18d).
+3. **Forward-fit the full kernel in OUR scheme.** For trial λ compute
+   $\tfrac12\tilde\gamma_\nu(b_T,\mu_0,\mu_{\rm latt})$ with `nf = 5`, our $b^*$, our Λ and order, and
+   χ² against the lattice points with their full covariance. Extract in the scheme the α_s fit will use —
+   do not "correct" the lattice into it. Do it at LOW $\mu$ ($\mu_{\rm latt}\sim2$ GeV, not $\sim Q$): both
+   pieces are then $O(0.1)$ instead of two large $\ln\mu$ terms whose difference amplifies any mismatch.
+4. **The $n_f$ scan REPLACES Ref. [66].** Re-fit at `nf = 4` (the lattice's scheme) and `nf = 3`, each time
+   starting `RunningCoupling` from a properly decoupled $\alpha_s^{(n_f)}(\mu_{\rm start})$ (not 0.118 at
+   $m_Z$ — fixed $n_f$=5 down to 1 GeV sits on its regulator). Also vary `lambda` and $\mu_0$.
+   **The spread in fitted λ IS the translation uncertainty** — reproducible, ours, and honest about what
+   is missing.
+5. **Two free diagnostics.** (i) $\tilde\gamma^{\rm np}$ must come out $\mu$-independent — redo at a second
+   $\mu$ (`operator()` takes both $\mu_0$ and $\mu$); residual drift $\propto \Delta\Gamma_{\rm cusp}\ln\mu$
+   measures the mismatch. (ii) λ₂ must be stable against shrinking the fit window — it is the b² OPE
+   coefficient, so range-dependence means you are outside the OPE window and the "translation" is an artifact.
+6. **Fit window.** Lower edge: lattice discretization ($\propto a/b_T$, $a^2/b_T^2$) — worst exactly in our
+   α_s window. Upper edge: where the lattice's own matching scale is still meaningful (theirs is NOT floored
+   at 1 GeV, ours is). λ_∞ stays extrapolation either way.
+7. **Use the output as §11 prescribes**: sign/monotonicity bound + frozen central + the step-4 spread as a
+   frozen-variation systematic. Not a Gaussian prior, and not a 3×3 covariance.
+
+### Doc bug found in passing
+
+`py/qT/DrellYan.hpp:173-174` documents $C_\nu$ as multiplying "$\gamma_\nu^{\rm NP}(b^*(b_T))$", but the
+C++ adds `model_gammanu(bT)` at the true $b_T$. Stale comment — and our param model is built on that
+$C_\nu$, so it can mislead (cf. the b̄ memory note).
+
+
+## 20. §11 item 3 measured: the bound question is NOT moot (2026-09-11)
+
+§11 item 3 asked whether the CS sector actually matters for α_s, or whether the wrong-sign pull is a
+near-degenerate reshuffle against the TMD b⁴ term. It was run on the 2D ptll×yll 780-bin card, blinded
+real data, SCETlib b66f8de, rabbit `0f64bbb`, freezing only λ₂_ν and λ₄_ν via `--freezeParameters` so
+the 47-parameter vector stays index-aligned with the unfrozen arms.
+Study: `studies/scetlib-ad-param-model/260911-freeze-cs/`.
+
+**Answer: NO.** Freezing the CS kernel at the correction's own values moves α_s by
+
+| frozen λ₂_ν | \|Δα_s\| / σ(α_s) |
+|---|---|
+| 0.15 (the correction's anchor) | **1.03** |
+| 0.087 (lattice central) | 0.66 |
+| 0 | 0.09 |
+
+A full σ at the anchor. §11's *mechanism* is confirmed — the TMD block does absorb the CS move, with
+slope −1.9, which is why a naive quadratic forecast overstates the shift 24× **and gets its sign
+wrong** — but the compensation is incomplete, so the CS sector genuinely drives α_s.
+
+**The ρ values §11 quoted are not this fit's.** Measured on this card: ρ(λ₄, λ₂_ν) = **+0.906**
+(opposite sign to the quoted −0.996) and ρ(λ₄, λ₄_ν) = **−0.423** (not −0.953). The quoted pair traces
+to `studies/np-wall-local-minima/LOGBOOK.md:2743`, a **1D-ptll `tanh_6_sigmoid` + `bT_cutoff` fit of the
+OLD `scetlib_np` model**, whose own entry records that the cutoff collapsed σ(λ₄) by 200×. Do not carry
+correlations across models, dimensionalities or NP forms.
+
+### The systematic, which is what item 2 wanted
+
+The response is **linear** — max residual 0.025 σ over the scanned range:
+
+> **dα_s / dλ₂_ν = +8.3e-03 GeV⁻²**
+
+so a credible λ₂_ν range converts straight to a systematic:
+
+| range | NP-CS systematic on α_s |
+|---|---|
+| lattice ±1σ (0.087 ± 0.033) | **±2.7e-04** |
+| lattice 3σ box | **±8.0e-04** |
+
+against σ(α_s) = 0.00115 on this card and the AN's **total** 0.00099. So this systematic is comparable
+to the entire quoted uncertainty. It needs no covariance and cannot rail, which is what §11 item 2 was
+after. §11 item 4 (the credible range from published CS-kernel FUNCTIONS) is still unmeasured, and now
+converts to a number by multiplying by 8.3e-03 GeV⁻².
+
+**Not yet done:** λ₄_ν was held at its anchor 0 and never scanned, though it is the MORE discrepant of
+the two (+7.0 σ_lat). The systematic above is therefore incomplete.
+
+### The CS↔TMD degeneracy IS the ill-conditioning
+
+Freezing the two CS λ drops the postfit covariance condition number from **2.98e+09 to 1.0e+05**. The
+preconditioner work (rabbit #150/#156/#157) was chasing this same degeneracy from the numerical side;
+it is one illness, not two. Consistent with §11's "the railing is physics, not a numerical problem".
+
+### Freezing does not make the NP function physical
+
+The violation relocates into the unconstrained TMD b.c. — Λ₂ = −0.036 at λ₂_ν = 0.087, −0.237 at 0.19.
+The same relocation an external CS prior produces
+(`studies/scetlib-ad-param-model/260911-lattice-constraints/`: CS made lattice-compatible, λ₂ → −0.138,
+3 of 8 damping conditions failing against 1 of 8 walled). Constraining one sector moves the problem to
+the other; only the TMD side has no external information at all.
+
+### METHOD: scan a frozen parameter by CONTINUATION, not cold restarts
+
+This generalises beyond the NP sector.
+
+* **Cold restarts cross branches.** Cold arms at λ₂_ν = 0.15 / 0.19 landed in minima up to Δχ² = 19.9
+  worse and **flipped the sign of the measured shift**.
+* **Continuation works and is reversible.** Stepping the frozen value from the previous solution
+  converged in 19–22 iterations at EDM 3e-16, and a backward step returns to the earlier point at
+  L2 = 0.001.
+* **A "warm start" from an unfrozen postfit is NOT warm.** λ₄_ν has σ(θ) = 0.024, so setting it to its
+  anchor lands at loss 1e3–2e6. Warm means *close in units of σ*, not *close in the parameter*.
+* A frozen parameter's reported σ is its **prefit width**, not a measurement — do not read it as one.
