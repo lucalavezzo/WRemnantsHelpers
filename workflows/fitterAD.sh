@@ -74,7 +74,7 @@ fi
 wall_arg=""
 if $do_wall; then
     wall=wremnants.postprocessing.scetlib_ad.np_damping_wall
-    wall_arg="--regularizationStrength 5 -r ${wall}.NPDampingWall ${wall}.NPDampingMapping"
+    wall_arg="--regularizationStrength 8 -r ${wall}.NPDampingWall ${wall}.NPDampingMapping margin=0"
 fi
 
 postfix_arg=""

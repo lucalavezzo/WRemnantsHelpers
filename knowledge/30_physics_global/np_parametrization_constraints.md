@@ -255,7 +255,7 @@ threshold to rail against, no `--regularizationStrength`, and the gradient stays
   card/denominator form: `--modelArgs np_model_fit=tanh_6_abs np_model_nu_fit=tanh_6_abs`.
 
 **Fold margin $\ne$ wall margin — different quantity, opposite sign convention.** The
-`NPDampingWall`'s `margin` (module default `NP_DAMPING_MARGIN` $=5\times10^{-3}$) is a cushion on
+`NPDampingWall`'s `margin` (module default `NP_DAMPING_MARGIN` $=0$ since 2026-10-01, paired with `--regularizationStrength 8`; it was $5\times10^{-3}$ at strength 5 before, see `studies/walled-multistart-census`) is a cushion on
 the **polynomial coefficients**, applied as `relu2(margin - coeff)`: **positive = STRICTER**
 than physical, negative = permit anti-damping. The fold's margin caps the **function value**:
 **positive = MORE permissive**. They coincide only at 0, where both mean "exactly damping" —
@@ -1113,3 +1113,79 @@ This generalises beyond the NP sector.
 * **A "warm start" from an unfrozen postfit is NOT warm.** λ₄_ν has σ(θ) = 0.024, so setting it to its
   anchor lands at loss 1e3–2e6. Warm means *close in units of σ*, not *close in the parameter*.
 * A frozen parameter's reported σ is its **prefit width**, not a measurement — do not read it as one.
+
+## 20. What the lattice authors actually told us — scheme, model, and what is translatable (2026-09-15)
+
+Direct from an author of 2402.06725 (email to Luca, 2026-09-15). **This supersedes guesswork in §18–19.**
+
+### Their scheme (now exact, not inferred)
+
+| | value |
+|---|---|
+| scheme / reference scale | MS-bar, **μ = 2 GeV** |
+| flavors | **n_f = 4**; ensembles 2+1+1 at physical quark masses (physical charm, **no bottom**) |
+| their coupling | **α_s(2 GeV) = 0.293** (used internally) |
+| normalization | $\gamma_q = 2\,\mathrm{d}\ln f/\mathrm{d}\ln\zeta$ = **SCETlib's $\tilde\gamma_\zeta$** = Collins' $\tilde K$ = $-2\mathcal D$ (ART23) |
+| data range | $b_T \approx$ **0.1–0.9 fm**; below ~0.2 fm the lattice adds nothing beyond PT; nothing above 0.9 fm |
+
+⇒ the §13/§18(a) convention chain is **confirmed by the author**: their kernel = $\tilde\gamma_\zeta$ = our
+code's $\tilde\gamma_\nu/2$. No factor-2 ambiguity remains.
+
+### SCETlib can be put in EXACTLY their scheme — this is the compatibility answer
+
+`RunningCoupling(startValue, startScale, order, nf)` and `Gamma_nu(color, order, alphas, nf)` take α_s(μ₀)
+and n_f as free constructor arguments (§19), so `RunningCoupling(0.293, 2.0, n3ll, nf=4)` +
+`Gamma_nu(qqbar, N3LL, alphas, 4)` evaluated at μ = 2 GeV **is** their setup — and their perturbative
+piece is also **N3LL**. The λ-extraction can therefore be done scheme-exact (same n_f, α_s, μ, order),
+with the only irreducible error the n_f=4 → n_f=5 transfer of λ into production.
+
+### α_s mismatch, computed (`scratchpad/asrun.py`, 4-loop fixed-n_f RGE)
+
+| μ | ours: fixed n_f=5 from α_s(m_Z)=0.118 | proper VFNS n_f=4 | theirs |
+|---|---|---|---|
+| 2.0 GeV | **0.290** | 0.301 | **0.293** |
+| 1.5 | 0.329 | 0.350 | |
+| 1.2 | 0.367 | 0.402 | |
+| 1.0 | 0.407 | 0.460 | |
+
+**At their reference scale our couplings agree to 1%** (coincidence: skipping the b threshold nearly
+cancels the smaller β₀^(5)). They diverge 9–13% at μ = 1.0–1.2 GeV — which is exactly where our $b^*$
+floors the boundary scale ($\mu_b = b_0/b^* \in [1.0, 1.19]$ GeV for all $b_T \gtrsim 0.2$ fm, §19 table).
+LL estimate of $\Delta(b_T) = \tilde\gamma_\zeta^{\rm pert,n_f4} - \tilde\gamma_\zeta^{\rm pert,n_f5}
+\approx 0.014$–$0.018$ ⇒ **~30% of $\tilde\gamma_\zeta^{\rm np}$ at $b_T = 0.2$ fm but only ~2% of the
+plateau.** So the flavor transfer hits **λ₂ hardest and λ_∞ least** — the opposite of the naive guess.
+(LL only, and excludes our `lambda = 1 GeV` regulator; replace with two `Gamma_nu` calls.)
+
+### Their continuum model (2402.06725 Eq. 6) — and why option A is a ONE-parameter band
+
+$$\gamma_q^{\rm param}(b_T,\mu,a) = -2\mathcal D_{\rm res}(b^*,\mu) - 2\mathcal D_{\rm NP}(b_T,B_{\rm NP},c_0,c_1) + k_1\frac{a}{b_T} + k_2\frac{a^2}{b_T^2}$$
+
+with $\mathcal D_{\rm res} = \tfrac12 K(\mu,\mu_{b^*}) + d[\alpha_s(\mu_{b^*})]$ at **N3LL**,
+$\mathcal D_{\rm NP} = b_T b^*[c_0 + c_1\ln(b^*/B_{\rm NP})]$, and **$b^* = b_T/\sqrt{1+b_T^2/B_{\rm NP}^2}$
+(quadratic!)**. AIC-selected best fit: **$c_0 = 0.032(12)$**, $k_1 = 0.22(8)$, with $c_1 = k_2 = 0$ and
+$B_{\rm NP} = 2$ GeV fixed, χ²/dof = 0.39. No parameter covariance or ancillary data published.
+
+Consequences:
+1. **The continuum kernel ($a\to0$) is a one-parameter family in $c_0$**, and because $c_0$ and $k_1$ were
+   fit *simultaneously*, $\sigma(c_0) = 0.012$ **already carries the discretization systematic**. So the
+   thing the author says does not exist ("continuum points with covariance") is replaced by something
+   simpler: a 1-parameter band we can propagate today. **Option A is not a stopgap.**
+2. **Their large-$b_T$ asymptotics CONTRADICT ours.** $\mathcal D_{\rm NP} \propto b_T b^* \to c_0 b_{\max} b_T$
+   is **linear in $b_T$** (SV19-style), while our tanh saturates at $-\lambda_\infty/2$ (the Collins-Rogers
+   limit 2506.13874 deliberately imposes). Over 0.2–0.9 fm they can be reconciled; beyond, they cannot.
+   ⇒ **a λ_∞ fitted to their band is a WINDOW ARTIFACT, not a measured asymptote.** This retro-explains
+   Cridge's $\lambda_\infty = 1.685 \pm 0.507$ (51%, and 99.9% of the largest eigendirection, §10): the
+   plateau was never in the data. **Corrects §19 item 6** ("λ_∞ stays extrapolation") — it is worse than
+   extrapolation, it is form-imposed. Our freezing λ_∞ = 2.0 (§12) is what makes this tolerable.
+3. **Parameter-level translation $c_0 \to \lambda_2$ FAILS, and now we know why.** Naively matching the
+   $b_T^2$ terms ($-2c_0 b_T^2$ vs $-\tfrac{\lambda_2}{2}b_T^2$) gives $\lambda_2 = 4c_0 = 0.128 \pm 0.048$
+   GeV² — tantalizingly between Cridge's 0.087 and our card's 0.15. **Do not quote it.** Their $b^*$ is
+   *quadratic*, so $b^* = b_T(1 - b_T^2/2B_{\rm NP}^2 + \dots)$ **alters the OPE at $O(b_T^2)$** — the very
+   order being matched — whereas our sextic $b^*$ was chosen not to (§18b). A crude LL estimate of that
+   shift is comparable to $4c_0$ itself. This is the cleanest possible demonstration that only the
+   **full-kernel forward fit** (§19) is valid.
+
+### Informative-window overlap
+
+Theirs 0.2–0.9 fm; our α_s sensitivity 0.1–0.6 fm (§10) ⇒ **overlap = 0.2–0.6 fm = 1.0–3.0 GeV⁻¹**, which
+is where λ₂/λ₄ live. Their 0.6–0.9 fm pins λ_∞ *outside* our sensitivity. Clean division of labour.
