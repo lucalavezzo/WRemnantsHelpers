@@ -5,7 +5,8 @@ usage() {
     echo "Usage: fitterAD.sh <card> -c <cache_dir> -o <output_dir>"
     echo "-f <extra arguments for rabbit_fit.py> -p <postfix>"
     echo "--asimov <Asimov instead of real data>"
-    echo "--wall <add the NP damping wall>"
+    echo "--wall <add the NP damping wall; runs a tau=5 stage, then tau=8 warm from it>"
+    echo "--no-tau-continuation <with --wall: go straight to tau=8 (fine for warm starts at the minimum)>"
     echo "-h, --help <show this help message>"
     exit 1
 }
@@ -19,8 +20,9 @@ shift
 
 do_asimov=false
 do_wall=false
+do_tau_continuation=true
 
-PARSED=$(getopt -o c:o:f:p:h --long cache:,output:,extra-fit:,postfix:,asimov,wall,help -- "$@")
+PARSED=$(getopt -o c:o:f:p:h --long cache:,output:,extra-fit:,postfix:,asimov,wall,no-tau-continuation,help -- "$@")
 if [[ $? -ne 0 ]]; then
     echo "Failed to parse arguments." >&2
     exit 1
@@ -35,6 +37,7 @@ while true; do
         -p|--postfix)    postfix="$2"; shift 2 ;;
         --asimov)        do_asimov=true; shift ;;
         --wall)          do_wall=true; shift ;;
+        --no-tau-continuation) do_tau_continuation=false; shift ;;
         -h|--help)       usage ;;
         --)              shift; break ;;
         *)               echo "Unexpected option: $1" >&2; exit 1 ;;
@@ -72,9 +75,11 @@ else
 fi
 
 wall_arg=""
+wall_reg=""
 if $do_wall; then
     wall=wremnants.postprocessing.scetlib_ad.np_damping_wall
-    wall_arg="--regularizationStrength 8 -r ${wall}.NPDampingWall ${wall}.NPDampingMapping margin=0"
+    wall_reg="-r ${wall}.NPDampingWall ${wall}.NPDampingMapping margin=0"
+    wall_arg="--regularizationStrength 8 $wall_reg"
 fi
 
 postfix_arg=""
@@ -106,10 +111,41 @@ fit_command="rabbit_fit.py $card --jitCompile off -o $output_dir $toys $postfix_
 --paramModel wremnants.postprocessing.scetlib_ad.SCETlibADParamModel \
 cache=$cache/cache.npz conf=$cache/cache.conf $extra_fit"
 
-echo "$fit_command"
+run_cmd() {
+    echo "$1"
+    if [ -t 1 ]; then
+        $1 2>&1 | tee /dev/tty
+        return ${PIPESTATUS[0]}
+    else
+        $1 2>&1
+    fi
+}
 
-if [ -t 1 ]; then
-    $fit_command 2>&1 | tee /dev/tty
-else
-    $fit_command 2>&1
+# tau-continuation (default with --wall). Started far from the minimum, trust-krylov
+# can lock in at a stiff (tau=8) relu^2 face: the step zig-zags across the face and
+# scipy's radius rule freezes the trust radius at ~1/k, so the fit crawls for hours
+# (CENS03, CMR1A). A tau=5 stage gets to the face region without locking in; the
+# tau=8 stage then starts on the face and only removes the ~1e-4 overshoot, so the
+# result IS the tau=8 answer. Costs one extra cache load.
+# See studies/constrained-fit-strategy/261006-diagnosis.
+if $do_wall && $do_tau_continuation; then
+    pf1="${postfix:+${postfix}_}tau5"
+    stage1_file="${output_dir}/fitresults_${pf1}.hdf5"
+    stage1_command="rabbit_fit.py $card --jitCompile off -o $output_dir $toys \
+--postfix $pf1 --noHessian --noEDM --regularizationStrength 5 $wall_reg \
+--snapshotFile ${output_dir}/snapshot_fitresults_${pf1}.hdf5 --snapshotInterval 0.25 \
+--paramModel wremnants.postprocessing.scetlib_ad.SCETlibADParamModel \
+cache=$cache/cache.npz conf=$cache/cache.conf $extra_fit"
+    echo "[fitterAD] tau-continuation, stage 1 of 2: tau=5"
+    run_cmd "$stage1_command"
+    rc=$?
+    if [ $rc -ne 0 ] || [ ! -s "$stage1_file" ]; then
+        echo "[fitterAD] stage 1 (tau=5) failed (exit $rc, output $stage1_file); not running stage 2" >&2
+        exit 1
+    fi
+    # appended last, so it overrides any --externalPostfit given in -f (argparse: last wins)
+    fit_command="$fit_command --externalPostfit $stage1_file"
+    echo "[fitterAD] tau-continuation, stage 2 of 2: tau=8, warm from $stage1_file"
 fi
+
+run_cmd "$fit_command"
