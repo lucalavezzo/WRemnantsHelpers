@@ -15,15 +15,15 @@ deliverable it produces. What would let you mark it `done`?>
 
 ## START HERE (status as of YYYY-MM-DD)
 
-> **<one line: the current state / latest resolution>**
-> <2–4 lines: where things stand, the key result so far, and any caveat a
-> returning agent must know before touching anything.>
-
+- **State:** <one line: where things stand>
 - **Next action:** <the single most important next step>
 - **Blocking on:** <what's needed to proceed, or "nothing">
+- **Running:** <PID + log path of anything live, or "nothing">
+- **Summary:** [SUMMARY.md](SUMMARY.md), covers through YYYY-MM-DD <or "not written yet">
 
-<!-- This block is the contract. Refresh it at the end of every session so the
-     logbook always opens with an accurate, skim-friendly current state. -->
+<!-- A resume block for the next session, refreshed at the end of every session. Keep it
+     to these lines: the study's story (why, findings, what changed, conclusions) belongs in
+     SUMMARY.md (template: _TEMPLATE/SUMMARY.md), written at major updates and at close. -->
 
 ---
 

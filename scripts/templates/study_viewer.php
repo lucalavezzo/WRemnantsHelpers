@@ -10,7 +10,8 @@
 // scripts/webpublish_study.sh). Edit it there, not here.
 
 function fm_parse($path) {
-    $out = ['title' => null, 'status' => null, 'updated' => null, 'study' => null, 'task' => null];
+    $out = ['title' => null, 'status' => null, 'updated' => null, 'study' => null, 'task' => null,
+            'covers' => null];
     $fh = @fopen($path, 'r');
     if (!$fh) return $out;
     $head = fread($fh, 4096);
@@ -20,7 +21,7 @@ function fm_parse($path) {
     if (strncmp($head, "---\n", 4) === 0) {
         $end = strpos($head, "\n---", 3);
         $block = $end === false ? $head : substr($head, 4, $end - 3);
-        foreach (['title', 'status', 'updated', 'study'] as $k) {
+        foreach (['title', 'status', 'updated', 'study', 'covers'] as $k) {
             if (preg_match('/^' . $k . ':[ \t]*(.*)$/m', $block, $m)) {
                 $v = trim(preg_replace('/\s+#.*$/', '', $m[1]));
                 if ($v !== '') $out[$k] = $v;
@@ -47,6 +48,14 @@ function status_norm($s) {
     return in_array($s, ['active', 'done', 'paused', 'abandoned'], true) ? $s : '';
 }
 
+// SUMMARY.md: the standalone digest of a study or task (studies/_TEMPLATE/SUMMARY.md)
+function summary_info($dir) {
+    if (!is_file("$dir/SUMMARY.md")) return null;
+    $fm = fm_parse("$dir/SUMMARY.md");
+    return ['updated' => $fm['updated'] ?: '', 'covers' => $fm['covers'] ?: ($fm['updated'] ?: ''),
+            'pdf' => is_file("$dir/SUMMARY.pdf")];
+}
+
 $RESERVED = ['scripts', 'logs', 'slides', 'docs', 'inputs', 'sessions', '__pycache__',
              '_TEMPLATE', 'vendor'];
 
@@ -60,6 +69,7 @@ foreach (glob('*/LOGBOOK.md') as $p) {
         'title'   => $fm['title'] ?: $slug,
         'status'  => status_norm($fm['status']),
         'updated' => $fm['updated'] ?: '',
+        'summary' => summary_info($slug),
         'tasks'   => [],
     ];
 }
@@ -76,6 +86,7 @@ foreach (glob('*/*/LOGBOOK.md') as $p) {
         'updated' => $fm['updated'] ?: '',
         'task'    => $fm['task'] ?: '',
         'plots'   => count(glob("$slug/$task/*.png")),
+        'summary' => summary_info("$slug/$task"),
     ];
 }
 foreach ($studies as &$s) {
@@ -185,6 +196,13 @@ $TREE = json_encode(array_values($studies), JSON_UNESCAPED_SLASHES | JSON_UNESCA
     background: none; border: none; cursor: pointer; padding: 0;
   }
   #tools a:hover, #tools button:hover { color: var(--accent); }
+  #views { margin: 2px 0 4px; font-size: 12.5px; }
+  #views a { display: inline-block; padding: 2px 10px; margin-right: 4px; border-radius: 5px;
+             color: var(--text-2); border: 1px solid var(--border); }
+  #views a.on { background: var(--chip-on); color: var(--text-1); border-color: var(--accent); }
+  #views a:hover { text-decoration: none; background: var(--hover-wash); }
+  #stale { font-size: 12.5px; color: var(--warn); margin: 6px 0 0; }
+  .sumtag { color: var(--accent); }
   #doc { word-wrap: break-word; }
   #doc h1 { font-size: 24px; margin: 6px 0 14px; line-height: 1.25; }
   #doc h2 {
@@ -235,11 +253,14 @@ $TREE = json_encode(array_values($studies), JSON_UNESCAPED_SLASHES | JSON_UNESCA
 </nav>
 <div id="main"><div id="wrap">
   <div id="tools">
+    <a id="pdf" href="#" title="the summary as a PDF" style="display:none">pdf</a>
     <a id="raw" href="#" title="the markdown source">raw</a>
     <a id="plots" href="#" title="the plot gallery for this directory">plots ↗</a>
     <button id="theme" title="light / dark">◐</button>
   </div>
   <div id="crumb"></div>
+  <div id="views"></div>
+  <div id="stale"></div>
   <div id="doc"></div>
 </div><div id="toc"></div></div>
 
@@ -277,17 +298,16 @@ function renderTree(q) {
   host.innerHTML = shown.map(s => `
     <div class="study">
       <a class="slink" data-h="${s.slug}" href="#${s.slug}">${esc(s.title)}${badge(s.status)}
-        <span class="smeta">${s.slug}${s.updated ? ' · ' + s.updated : ''}</span></a>
+        <span class="smeta">${s.slug}${s.updated ? ' · ' + s.updated : ''}${s.summary ? ' · <span class="sumtag">summary</span>' : ''}</span></a>
       <div class="tasks">${s.tasks.map(t => `
         <a data-h="${s.slug}/${t.slug}" href="#${s.slug}/${t.slug}"
            title="${esc(t.task || t.title)}">${esc(t.title)}${badge(t.status)}
-           ${t.plots ? `<span class="smeta">${t.slug} · ${t.plots} plot${t.plots > 1 ? 's' : ''}</span>`
-                     : `<span class="smeta">${t.slug}</span>`}</a>`).join('')}</div>
+           <span class="smeta">${t.slug}${t.plots ? ` · ${t.plots} plot${t.plots > 1 ? 's' : ''}` : ''}${t.summary ? ' · <span class="sumtag">summary</span>' : ''}</span></a>`).join('')}</div>
     </div>`).join('');
   markActive();
 }
 function markActive() {
-  const h = location.hash.slice(1);
+  const h = decodeURIComponent(location.hash.slice(1)).split(':')[0];
   document.querySelectorAll('#tree [data-h]').forEach(a => a.classList.toggle('on', a.dataset.h === h));
 }
 function esc(s) {
@@ -335,6 +355,9 @@ async function load() {
 
   if (!hash) {
     crumb.textContent = '';
+    document.getElementById('views').innerHTML = '';
+    document.getElementById('stale').textContent = '';
+    document.getElementById('pdf').style.display = 'none';
     toc.innerHTML = '';
     doc.innerHTML = `<h1>alphaS study logbooks</h1>
       <p>Pick a study on the left. A study's logbook is the orchestrator's record; the
@@ -348,10 +371,25 @@ async function load() {
     return;
   }
 
-  const parts = hash.split('/').filter(Boolean);
+  const [path, want] = hash.split(':');
+  const parts = path.split('/').filter(Boolean);
   const dir = parts.slice(0, 2).join('/');
-  const url = dir + '/LOGBOOK.md';
+  const study = TREE.find(s => s.slug === parts[0]);
+  const node = !study ? null : parts.length > 1 ? study.tasks.find(t => t.slug === parts[1]) : study;
+  const sum = node && node.summary;
+  const view = sum && want !== 'logbook' ? 'summary' : 'logbook';
+  const url = dir + (view === 'summary' ? '/SUMMARY.md' : '/LOGBOOK.md');
   document.getElementById('raw').href = url;
+  const pdf = document.getElementById('pdf');
+  pdf.style.display = sum && sum.pdf ? '' : 'none';
+  pdf.href = dir + '/SUMMARY.pdf';
+  document.getElementById('views').innerHTML = !sum ? '' :
+    `<a href="#${path}:summary" class="${view === 'summary' ? 'on' : ''}">Summary</a>` +
+    `<a href="#${path}:logbook" class="${view === 'logbook' ? 'on' : ''}">Logbook</a>`;
+  document.getElementById('stale').textContent =
+    view === 'summary' && sum.covers && node.updated && node.updated > sum.covers
+      ? `This summary covers the logbook through ${sum.covers}; the logbook has been updated since (${node.updated}).`
+      : '';
   document.getElementById('plots').href = dir + '/';
   crumb.innerHTML = parts.length > 1
     ? `<a href="#${parts[0]}">${esc(parts[0])}</a> / ${esc(parts[1])}`

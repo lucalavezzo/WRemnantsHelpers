@@ -19,12 +19,14 @@ owner: study-worker
 
 ## START HERE (status as of YYYY-MM-DD)
 
-> **<one line: the answer, or where it stands>**
-> <1–3 lines: the state, the key number with its caveat, anything a reader must know
-> before believing it.>
-
+- **Answer:** <one line: the answer, or where it stands>
 - **Next action:** <the next step, or "none — task closed">
 - **Blocking on:** <what's needed, or "nothing">
+- **Running:** <PID + log path of anything live, or "nothing">
+
+<!-- A resume block, not the write-up: the answer with its numbers and caveats goes in
+     ## Result. A task that grows into a sub-study (several sessions, several results) also
+     gets a SUMMARY.md, written by the study-summarizer when the orchestrator asks. -->
 
 ---
 

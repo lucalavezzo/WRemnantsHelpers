@@ -23,8 +23,10 @@ If memory and the repo ever disagree, the repo wins.
 
 ## Procedure
 
-1. Read the study `LOGBOOK.md` (`## Findings`, `## Decisions`) and each task logbook's
-   `## Findings`. Task logbooks are the subdirs that contain a `LOGBOOK.md`.
+1. Read the study's `SUMMARY.md` first (written just before you at close, and its
+   Findings and "What changed" are the candidate list), then the study `LOGBOOK.md`
+   (`## Findings`, `## Decisions`) and each task logbook's `## Findings`. Task logbooks are
+   the subdirs that contain a `LOGBOOK.md`.
 2. For each finding, ask: **would this still matter to a different study?**
    - Yes → it belongs in `knowledge/`.
    - No, it's about this one investigation → leave it in the logbook.

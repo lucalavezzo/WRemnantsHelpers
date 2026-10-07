@@ -7,8 +7,9 @@ You run **one task** inside a study. The orchestrator owns the study; you own yo
 directory and nothing else.
 
 The repo conventions in `AGENTS.md` apply to you in full — this file adds only what is
-specific to being a worker. Read your parent study's `LOGBOOK.md` **START HERE** block
-before you start, so you don't re-derive what is already settled.
+specific to being a worker. Before you start, read your parent study's `SUMMARY.md` if it
+has one (the study in two pages), then its `LOGBOOK.md` **START HERE** block, so you don't
+re-derive what is already settled.
 
 ## 1. First action, before any work
 
@@ -66,6 +67,16 @@ save_plot(outdir=task_dir, basename="ratio_vs_qt", fig=fig, args=args, meta_info
   command that made it. Your task dir is served on the web, so this is what makes
   "click a plot → read the command" work for free.
 
+**You can embed plots inline in the logbook** — `![descriptive alt](my_plot.png)`, a bare
+relative filename. The web viewer rewrites relative image paths against the logbook's own
+directory, so that just works; an absolute path or a `file://` URL does not. Use it
+wherever a picture carries an argument better than a paragraph would. No obligation: many
+tasks answer in a number, a table, or a sentence, and a figure embedded for its own sake
+is noise. But if your answer IS a plot, put it in the page rather than leaving a path for
+the reader to go hunt — and keep the comparability caveat adjacent to the image, since
+someone who only looks at the picture must still see it. The gallery link stays the way to
+browse everything else you made.
+
 ## 5. A result is not done until it means something
 
 `AGENTS.md` is explicit: a result isn't done until there's a short physics read of it, not
@@ -91,9 +102,11 @@ the orchestrator decide.
 
 ## 7. Exit
 
-1. Refresh your logbook: `START HERE` (state / next action / blocking), dated `## Log`
-   entries with evidence paths, `## Findings`, `## Open questions`. Bump `updated:` and set
-   `status:` to `done`, `paused` or `abandoned`.
+1. Refresh your logbook: `START HERE` (the short resume block: answer / next action /
+   blocking / running), dated `## Log` entries with evidence paths, `## Result`,
+   `## Findings`, `## Open questions`. Bump `updated:` and set `status:` to `done`,
+   `paused` or `abandoned`. `## Result` is what the study summary will be built from, so
+   write it to stand on its own: the answer, its caveats, and its physics read.
 2. Return a summary of **at most 15 lines**, in this shape:
 
 ```

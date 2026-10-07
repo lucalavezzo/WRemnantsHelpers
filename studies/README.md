@@ -6,6 +6,7 @@ One folder per investigation. A study folder holds **everything** for that study
 ```
 studies/<slug>/
 ├── LOGBOOK.md          # the study record (copied from _TEMPLATE/LOGBOOK.md)
+├── SUMMARY.md, .pdf    # the standalone write-up (from _TEMPLATE/SUMMARY.md)
 ├── <YYMMDD>-<task>/    # one folder per delegated task
 │   ├── LOGBOOK.md      # the task record (copied from _TEMPLATE/TASK_LOGBOOK.md)
 │   └── *.png, *.pdf    # its plots, via plot_output.save_plot
@@ -30,8 +31,18 @@ rest is optional detail.
    fill the frontmatter and `Goal`.
 3. **While working** → append dated bullets under `## Log`; promote durable
    conclusions to `## Findings` and choices to `## Decisions`.
-4. **Ending a session** → refresh **START HERE** and bump `updated:`. This is the
-   one non-optional step — it's what makes the next session cheap.
+4. **Ending a session** → refresh **START HERE** (a short resume block: state ·
+   next action · blocking · running) and bump `updated:`. This is the one
+   non-optional step — it's what makes the next session cheap.
+
+## The summary
+
+The logbook is the full record and reads like one. `SUMMARY.md` is the version for
+everyone else: one to two standalone pages for an analysis member who wasn't in the
+study, covering why it was opened, what was done, the findings (with figures and
+tables), what it changed, and the conclusions. It's written at close, at major updates,
+and on request, by the `study-summarizer` agent; `../scripts/summary_pdf.py <slug>` makes
+the PDF. Every number in it traces to a task logbook.
 
 A finding that generalizes beyond the study belongs in `../knowledge/`
 (*"what's true"*), not the logbook (*"what we're doing"*).

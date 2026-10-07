@@ -34,7 +34,7 @@ Common recipes for running the framework, such as running the full histmaker-fit
 ## `studies/`
 One folder per study, holding everything for that study in one place: its scripts, its outputs, and a `LOGBOOK.md`. Usually more specific, less of general interest, than what is found in `workflows/`.
 
-The `LOGBOOK.md` is the running record of a study. Start a new one by copying `studies/_TEMPLATE/LOGBOOK.md`; the "START HERE" block at the top is meant to be the first thing you read when you pick the study back up. See `studies/README.md` for the details.
+The `LOGBOOK.md` is the running record of a study. Start a new one by copying `studies/_TEMPLATE/LOGBOOK.md`; the "START HERE" block at the top is meant to be the first thing you read when you pick the study back up. The `SUMMARY.md` (and its PDF, from `scripts/summary_pdf.py <slug>`) is the one-to-two-page write-up for anyone who wasn't in the study. See `studies/README.md` for the details, and browse them all at https://submit.mit.edu/~lavezzo/alphaS/studies/.
 
 ## `knowledge/`
 Reference notes that aren't tied to a single study. When something we learn in a study turns out to hold generally, it gets written up here.
