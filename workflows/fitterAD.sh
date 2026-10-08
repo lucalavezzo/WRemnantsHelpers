@@ -5,8 +5,8 @@ usage() {
     echo "Usage: fitterAD.sh <card> -c <cache_dir> -o <output_dir>"
     echo "-f <extra arguments for rabbit_fit.py> -p <postfix>"
     echo "--asimov <Asimov instead of real data>"
-    echo "--wall <add the NP damping wall; runs a tau=5 stage, then tau=8 warm from it>"
-    echo "--no-tau-continuation <with --wall: go straight to tau=8 (fine for warm starts at the minimum)>"
+    echo "--wall <add the NP damping wall (C^2 ramp by default), tau=8>"
+    echo "--tau-continuation <with --wall: run a tau=5 stage first, then tau=8 warm from it (opt-in)>"
     echo "-h, --help <show this help message>"
     exit 1
 }
@@ -20,9 +20,9 @@ shift
 
 do_asimov=false
 do_wall=false
-do_tau_continuation=true
+do_tau_continuation=false
 
-PARSED=$(getopt -o c:o:f:p:h --long cache:,output:,extra-fit:,postfix:,asimov,wall,no-tau-continuation,help -- "$@")
+PARSED=$(getopt -o c:o:f:p:h --long cache:,output:,extra-fit:,postfix:,asimov,wall,tau-continuation,no-tau-continuation,help -- "$@")
 if [[ $? -ne 0 ]]; then
     echo "Failed to parse arguments." >&2
     exit 1
@@ -37,7 +37,8 @@ while true; do
         -p|--postfix)    postfix="$2"; shift 2 ;;
         --asimov)        do_asimov=true; shift ;;
         --wall)          do_wall=true; shift ;;
-        --no-tau-continuation) do_tau_continuation=false; shift ;;
+        --tau-continuation) do_tau_continuation=true; shift ;;
+        --no-tau-continuation) do_tau_continuation=false; shift ;;  # the default since 2026-10-08, kept for old commands
         -h|--help)       usage ;;
         --)              shift; break ;;
         *)               echo "Unexpected option: $1" >&2; exit 1 ;;
@@ -121,7 +122,10 @@ run_cmd() {
     fi
 }
 
-# tau-continuation (default with --wall). Started far from the minimum, trust-krylov
+# tau-continuation (OPT-IN since 2026-10-08, --tau-continuation). The wall is now C^2 by
+# default (np_damping_wall smooth=c2), which removes the crawl this stage was added for
+# (studies/constrained-fit-strategy/261008-c2-wall-test), so it only costs a cache load.
+# History: started far from the minimum, trust-krylov with the relu^2 wall
 # can lock in at a stiff (tau=8) relu^2 face: the step zig-zags across the face and
 # scipy's radius rule freezes the trust radius at ~1/k, so the fit crawls for hours
 # (CENS03, CMR1A). A tau=5 stage gets to the face region without locking in; the
