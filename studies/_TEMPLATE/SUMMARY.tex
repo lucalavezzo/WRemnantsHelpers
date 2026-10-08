@@ -1,0 +1,336 @@
+% title: <study name, plain text, no LaTeX; unicode Greek such as α is fine>
+% slug: <study slug, or <YYMMDD>-<task> for a task summary>
+% status: active
+% period: YYYY-MM-DD – YYYY-MM-DD
+% updated: YYYY-MM-DD
+% covers: YYYY-MM-DD
+%
+% ---- the lines above are the metadata -----------------------------------------------------
+% They are read by the web viewer and by scripts/summary_pdf.py, which typesets the title
+% block from them, so they are the ONLY place these values live. Keep them the first lines
+% of the file, one "% key: value" per line, no trailing remarks. The keys:
+%   title    the study name as plain text
+%   slug     the directory name; a task summary also adds a line "% study: <parent slug>"
+%   status   a copy of the logbook's status when you write (active / paused / done)
+%   period   first to last logbook entry covered ("YYYY-MM-DD – ongoing" if active)
+%   updated  the day this summary was written
+%   covers   the newest logbook entry this summary accounts for (drives the staleness warning)
+%
+% BUILD: scripts/summary_pdf.py <slug>[/<task>]   (never bare pdflatex: the title block
+% comes from the metadata above, which the script passes in). It runs pdflatex from this
+% directory, so figures are included by paths relative to it, e.g. 261008-task/plot.pdf.
+%
+% READ BEFORE WRITING (delete the guidance comments in the body of the real summary).
+%   Audience: a member of the analysis who knows the analysis, WRemnants/rabbit and the AN,
+%   but was not in this study and has not read its logbook.
+%   Length: 2-4 pages including figures. Complete sentences, no bullet dumps.
+%   Every number traces to a task logbook: cite it with \taskref{<YYMMDD>-<task>}.
+%   This file and its PDF are served on the web without authentication: no unblinded
+%   numbers (Delta alpha_s in sigma, never absolute), no credentials, no transcript paths.
+%   Rules in full: .claude/agents/study-summarizer.md.
+% --------------------------------------------------------------------------------------------
+\documentclass[10pt,a4paper]{article}
+
+% ---- page and fonts ----
+\usepackage[a4paper,top=16mm,bottom=20mm,left=18mm,right=18mm,footskip=9mm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage[table]{xcolor}
+\usepackage[font=small,labelfont={bf,sf},margin=6pt,skip=4pt]{caption}
+\usepackage{subcaption}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage[section,below]{placeins}   % a result's figure stays inside its section
+\usepackage{tikz}                      % for a schematic / pipeline figure (Section 2)
+\usetikzlibrary{arrows.meta,positioning}
+\usepackage{url}
+% siunitx is not installed on the submit host's TeX Live; these fallbacks cover the usual
+% \num{0.547}, \SI{2.3}{\GeV}, \SI{0.14}{\percent} (no e-notation: write 1.2\times10^{-3}).
+\IfFileExists{siunitx.sty}{\usepackage{siunitx}}{}
+\providecommand\num[1]{\ensuremath{#1}}
+\providecommand\si[1]{\ensuremath{\mathrm{#1}}}
+\providecommand\SI[2]{\ensuremath{#1\,\mathrm{#2}}}
+\providecommand\GeV{GeV}\providecommand\MeV{MeV}\providecommand\TeV{TeV}
+\providecommand\percent{\%}\providecommand\pb{pb}\providecommand\fb{fb}
+\definecolor{sumblue}{HTML}{1B5FAE}
+\definecolor{sumrule}{HTML}{2A78D6}
+\definecolor{sumbox}{HTML}{EEF4FB}
+\definecolor{sumgray}{HTML}{5A5A5A}
+\definecolor{sumwarn}{HTML}{8A5A00}
+\usepackage[colorlinks=true,linkcolor=sumblue,urlcolor=sumblue,citecolor=sumblue,
+            pdfborder={0 0 0}]{hyperref}
+
+% unicode copied from a logbook would otherwise stop pdflatex
+\DeclareUnicodeCharacter{03B1}{\ensuremath{\alpha}}
+\DeclareUnicodeCharacter{03B2}{\ensuremath{\beta}}
+\DeclareUnicodeCharacter{03B3}{\ensuremath{\gamma}}
+\DeclareUnicodeCharacter{03B4}{\ensuremath{\delta}}
+\DeclareUnicodeCharacter{03B5}{\ensuremath{\epsilon}}
+\DeclareUnicodeCharacter{03B7}{\ensuremath{\eta}}
+\DeclareUnicodeCharacter{03B8}{\ensuremath{\theta}}
+\DeclareUnicodeCharacter{03BA}{\ensuremath{\kappa}}
+\DeclareUnicodeCharacter{03BB}{\ensuremath{\lambda}}
+\DeclareUnicodeCharacter{03BC}{\ensuremath{\mu}}
+\DeclareUnicodeCharacter{03BD}{\ensuremath{\nu}}
+\DeclareUnicodeCharacter{03C0}{\ensuremath{\pi}}
+\DeclareUnicodeCharacter{03C1}{\ensuremath{\rho}}
+\DeclareUnicodeCharacter{03C3}{\ensuremath{\sigma}}
+\DeclareUnicodeCharacter{03C4}{\ensuremath{\tau}}
+\DeclareUnicodeCharacter{03C6}{\ensuremath{\phi}}
+\DeclareUnicodeCharacter{03C7}{\ensuremath{\chi}}
+\DeclareUnicodeCharacter{03C8}{\ensuremath{\psi}}
+\DeclareUnicodeCharacter{03C9}{\ensuremath{\omega}}
+\DeclareUnicodeCharacter{0393}{\ensuremath{\Gamma}}
+\DeclareUnicodeCharacter{0394}{\ensuremath{\Delta}}
+\DeclareUnicodeCharacter{039B}{\ensuremath{\Lambda}}
+\DeclareUnicodeCharacter{03A3}{\ensuremath{\Sigma}}
+\DeclareUnicodeCharacter{03A6}{\ensuremath{\Phi}}
+\DeclareUnicodeCharacter{03A9}{\ensuremath{\Omega}}
+\DeclareUnicodeCharacter{2212}{\ensuremath{-}}
+\DeclareUnicodeCharacter{2248}{\ensuremath{\approx}}
+\DeclareUnicodeCharacter{2264}{\ensuremath{\leq}}
+\DeclareUnicodeCharacter{2265}{\ensuremath{\geq}}
+\DeclareUnicodeCharacter{2260}{\ensuremath{\neq}}
+\DeclareUnicodeCharacter{226A}{\ensuremath{\ll}}
+\DeclareUnicodeCharacter{226B}{\ensuremath{\gg}}
+\DeclareUnicodeCharacter{223C}{\ensuremath{\sim}}
+\DeclareUnicodeCharacter{221D}{\ensuremath{\propto}}
+\DeclareUnicodeCharacter{221E}{\ensuremath{\infty}}
+\DeclareUnicodeCharacter{221A}{\ensuremath{\surd}}
+\DeclareUnicodeCharacter{2202}{\ensuremath{\partial}}
+\DeclareUnicodeCharacter{2192}{\ensuremath{\rightarrow}}
+\DeclareUnicodeCharacter{2190}{\ensuremath{\leftarrow}}
+\DeclareUnicodeCharacter{21D2}{\ensuremath{\Rightarrow}}
+\DeclareUnicodeCharacter{2194}{\ensuremath{\leftrightarrow}}
+\DeclareUnicodeCharacter{2208}{\ensuremath{\in}}
+\DeclareUnicodeCharacter{2026}{\ldots}
+\DeclareUnicodeCharacter{2713}{\ensuremath{\checkmark}}
+\DeclareUnicodeCharacter{2080}{\ensuremath{_0}}
+\DeclareUnicodeCharacter{2081}{\ensuremath{_1}}
+\DeclareUnicodeCharacter{2082}{\ensuremath{_2}}
+\DeclareUnicodeCharacter{2083}{\ensuremath{_3}}
+\DeclareUnicodeCharacter{2084}{\ensuremath{_4}}
+\DeclareUnicodeCharacter{2085}{\ensuremath{_5}}
+\DeclareUnicodeCharacter{2086}{\ensuremath{_6}}
+\DeclareUnicodeCharacter{2087}{\ensuremath{_7}}
+\DeclareUnicodeCharacter{2088}{\ensuremath{_8}}
+\DeclareUnicodeCharacter{2089}{\ensuremath{_9}}
+\DeclareUnicodeCharacter{2070}{\ensuremath{^{0}}}
+\DeclareUnicodeCharacter{2074}{\ensuremath{^{4}}}
+\DeclareUnicodeCharacter{2075}{\ensuremath{^{5}}}
+\DeclareUnicodeCharacter{2076}{\ensuremath{^{6}}}
+\DeclareUnicodeCharacter{2077}{\ensuremath{^{7}}}
+\DeclareUnicodeCharacter{2078}{\ensuremath{^{8}}}
+\DeclareUnicodeCharacter{2079}{\ensuremath{^{9}}}
+\DeclareUnicodeCharacter{207B}{\ensuremath{^{-}}}
+\DeclareUnicodeCharacter{207A}{\ensuremath{^{+}}}
+
+% ---- layout ----
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.55ex plus 0.2ex}
+\setlist{itemsep=1pt,topsep=2pt,parsep=0pt,leftmargin=1.4em}
+\titleformat{\section}{\sffamily\large\bfseries}{\thesection}{0.6em}{}
+\titleformat{\subsection}{\sffamily\normalsize\bfseries}{\thesubsection}{0.6em}{}
+\titlespacing*{\section}{0pt}{2.0ex plus 0.6ex minus 0.3ex}{0.7ex}
+\titlespacing*{\subsection}{0pt}{1.4ex plus 0.4ex minus 0.2ex}{0.4ex}
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.8}
+\renewcommand{\textfraction}{0.07}
+\renewcommand{\floatpagefraction}{0.75}
+\setlength{\textfloatsep}{10pt plus 3pt minus 3pt}
+\setlength{\floatsep}{8pt plus 2pt minus 2pt}
+\setlength{\intextsep}{8pt plus 2pt minus 2pt}
+
+% ---- metadata: passed in by scripts/summary_pdf.py from the "% key:" lines ----
+\makeatletter
+\providecommand\SumTitle{\textcolor{red}{(build with scripts/summary\_pdf.py)}}
+\providecommand\SumSlug{?}
+\providecommand\SumStudy{?}       % the study slug (the parent study, for a task summary)
+\providecommand\SumViewPath{?}    % <slug> or <study>/<task>: the viewer anchor
+\providecommand\SumStatus{?}
+\providecommand\SumPeriod{?}
+\providecommand\SumUpdated{?}
+\providecommand\SumCovers{?}
+\begingroup\catcode`\#=12 \catcode`\~=12
+\gdef\Sum@web{https://submit.mit.edu/~lavezzo/alphaS/studies/#}
+\endgroup
+
+% ---- macros for the body ----
+% \taskref{261008-task}: cite the task a number comes from; links to its viewer page.
+\newcommand\taskref[1]{{\small\sffamily[\href{\Sum@web\SumStudy/#1}{#1}]}}
+% \logref{2026-07-02}: cite a dated entry of a single-layer study (no task dirs).
+\newcommand\logref[1]{{\small\sffamily[\href{\Sum@web\SumViewPath:logbook}{log #1}]}}
+% \viewerlink{<study>/<task>}{text}: any other page of the viewer.
+\newcommand\viewerlink[2]{\href{\Sum@web#1}{#2}}
+\newcommand\logbooklink[1]{\href{\Sum@web\SumViewPath:logbook}{#1}}
+% \code{path/or_flag}: typewriter, breaks at / and _, underscores need no escaping.
+\newcommand\code{\nolinkurl}
+% \caveat{...}: a comparability caveat set off before the number it qualifies.
+\newcommand\caveat[1]{{\color{sumwarn}\small\sffamily\textbf{Caveat.}}~{\small\itshape #1}}
+% physics shorthands
+\newcommand\alphas{\ensuremath{\alpha_\mathrm{s}}}
+\newcommand\dalphas{\ensuremath{\Delta\alpha_\mathrm{s}}}
+\newcommand\pT{\ensuremath{p_\mathrm{T}}}
+\newcommand\ptll{\ensuremath{p_\mathrm{T}^{\ell\ell}}}
+\newcommand\qT{\ensuremath{q_\mathrm{T}}}
+\newcommand\yll{\ensuremath{y^{\ell\ell}}}
+
+% the answer box: \begin{answer} ... \end{answer}, one or two sentences with the key number
+\newsavebox\Sum@box
+\newenvironment{answer}
+  {\par\vspace{1.2ex}\noindent\begin{lrbox}{\Sum@box}%
+   \begin{minipage}{\dimexpr\linewidth-3pt-2\fboxsep\relax}\vspace{1pt}%
+   {\sffamily\small\bfseries\color{sumblue}Answer}\par\vspace{1pt}}
+  {\vspace{1pt}\end{minipage}\end{lrbox}%
+   \hbox{{\color{sumrule}\vrule width 3pt}\colorbox{sumbox}{\usebox{\Sum@box}}}%
+   \par\vspace{0.8ex}}
+
+\newcommand\SummaryTitleBlock{%
+  {\sffamily\footnotesize\color{sumgray}%
+   \alphas\ analysis\,\textperiodcentered\,study summary\hfill status: \SumStatus\par}%
+  \vspace{3pt}%
+  {\sffamily\LARGE\bfseries\SumTitle\par}%
+  \vspace{5pt}%
+  {\small\color{sumgray}%
+   \texttt{\SumViewPath}\enspace\textperiodcentered\enspace period \SumPeriod
+   \enspace\textperiodcentered\enspace written \SumUpdated
+   \enspace\textperiodcentered\enspace covers logbook through \textbf{\SumCovers}\par
+   Full record: \logbooklink{logbook}
+   \enspace\textperiodcentered\enspace web page: \href{\Sum@web\SumViewPath}{\nolinkurl{submit.mit.edu/~lavezzo/alphaS/studies}}%
+   \enspace\textperiodcentered\enspace plots in each task directory\par}%
+  \vspace{4pt}{\color{sumgray}\hrule height 0.4pt}\vspace{2pt}}
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[L]{\sffamily\scriptsize\color{sumgray}\alphas\ study summary\enspace\textperiodcentered\enspace\texttt{\SumViewPath}\enspace\textperiodcentered\enspace covers logbook through \SumCovers}
+\fancyfoot[R]{\sffamily\scriptsize\color{sumgray}\thepage}
+\makeatother
+
+\hypersetup{pdftitle={\SumTitle}}
+
+\begin{document}
+\thispagestyle{fancy}
+\SummaryTitleBlock
+
+\begin{answer}
+<The result in one or two sentences, with the key number and its unit / convention, and
+the one caveat it cannot be read without.>
+\end{answer}
+
+% ============================================================================================
+\section{Motivation and question}
+% 3-6 sentences. What prompted the study, and the driving question(s) as posed at the start.
+% If the question changed along the way, say what it became and why.
+
+<Prose.>
+
+% ============================================================================================
+\section{Setup and method}
+% The inputs: data or Asimov, the datacard, the PDF set and perturbative order, the AD cache,
+% the param model and its options, what is fitted and what is frozen, walled or not, warm
+% or cold seed. Explain every study-internal name the first time it appears.
+%
+% If the study BUILT a mechanism or an algorithm (a regularizer, a fast path, a new fit
+% mode, a validation chain), explain HOW it works with a schematic: what happens once
+% versus at every step, and where it lives in the code. Skeleton (uncomment and edit):
+%
+% \begin{figure}[htb]
+%   \centering\small\sffamily
+%   \begin{tikzpicture}[node distance=5mm and 7mm,
+%       box/.style={draw=sumrule,fill=sumbox,rounded corners=2pt,align=center,
+%                   inner sep=4pt,minimum height=9mm,text width=27mm},
+%       arr/.style={-{Stealth[length=2mm]},thick,sumgray}]
+%     \node[box] (a) {once: build\\ \code{module.py}};
+%     \node[box,right=of a] (b) {every step:\\ evaluate};
+%     \node[box,right=of b] (c) {output};
+%     \draw[arr] (a) -- (b); \draw[arr] (b) -- (c);
+%   \end{tikzpicture}
+%   \caption{What the mechanism does, once vs.\ per step, and where it lives in the code.}
+%   \label{fig:pipeline}
+% \end{figure}
+
+<Prose.>
+
+% ============================================================================================
+\section{Results}
+% One subsection per main result, most important first (not chronological). Each is
+% anchored on a figure or a table, and ends with the physics read: what it means for the
+% measurement. Put the comparability caveat BEFORE the number (\caveat{...}).
+
+\subsection{<First result, stated as a claim>}
+
+<Prose with the number, its unit, and the task it comes from \taskref{YYMMDD-task}.>
+
+% A figure: reuse the task's own plot, preferring its .pdf, by a path relative to this dir.
+% \begin{figure}[htb]
+%   \centering
+%   \includegraphics[width=0.75\linewidth]{YYMMDD-task/plot.pdf}
+%   \caption{What is plotted, in which configuration (card, Asimov/data, walled, seed),
+%     what to look at, and the caveat. \taskref{YYMMDD-task}}
+%   \label{fig:first}
+% \end{figure}
+%
+% Two panels side by side:
+% \begin{figure}[htb]
+%   \centering
+%   \begin{subfigure}[t]{0.49\linewidth}\centering
+%     \includegraphics[width=\linewidth]{YYMMDD-task/a.pdf}\caption{...}\end{subfigure}\hfill
+%   \begin{subfigure}[t]{0.49\linewidth}\centering
+%     \includegraphics[width=\linewidth]{YYMMDD-task/b.pdf}\caption{...}\end{subfigure}
+%   \caption{Self-contained caption.}\label{fig:pair}
+% \end{figure}
+
+\subsection{<Second result>}
+
+% A table: booktabs rules only, units in the header, blinded convention (Delta alpha_s in
+% sigma, never an absolute alpha_s from data).
+\begin{table}[htb]
+  \centering\small
+  \caption{<What the table compares and in which configuration; the caveat.>}
+  \label{tab:second}
+  \begin{tabular}{lrrl}
+    \toprule
+    Configuration & $\dalphas$ [$\sigma$] & $\sigma(\alphas)$ [$10^{-3}$] & Source \\
+    \midrule
+    <config A> & 0.00 & 0.00 & \taskref{YYMMDD-task} \\
+    <config B> & 0.00 & 0.00 & \taskref{YYMMDD-task} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+<Prose.>
+
+% ============================================================================================
+\section{Robustness, systematics and caveats}
+% What the result does and does not depend on; the checks that were done (closure, toys,
+% alternative cards, seeds); excluded points and failed configurations, stated not hidden.
+
+<Prose.>
+
+% ============================================================================================
+\section{What changed}
+% Whatever outlives the study, or "Nothing; the study was diagnostic." Code (repo, commit
+% hash, branch, PR/MR and whether it is pushed / merged), analysis defaults and cards,
+% knowledge/ notes written or corrected.
+
+<Prose, or a short list when the items really are a list.>
+
+% ============================================================================================
+\section{Conclusions and open items}
+% What this means for the alpha_s / m_W measurement. Then what is still open and whether
+% anyone is working on it. For an active study, the next step.
+
+<Prose.>
+
+\vfill
+{\footnotesize\color{sumgray} Full record: \logbooklink{the study logbook} and the task
+logbooks it links. Bulk outputs: \code{/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/...}.\par}
+
+\end{document}

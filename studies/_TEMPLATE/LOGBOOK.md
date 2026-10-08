@@ -19,11 +19,11 @@ deliverable it produces. What would let you mark it `done`?>
 - **Next action:** <the single most important next step>
 - **Blocking on:** <what's needed to proceed, or "nothing">
 - **Running:** <PID + log path of anything live, or "nothing">
-- **Summary:** [SUMMARY.md](SUMMARY.md), covers through YYYY-MM-DD <or "not written yet">
+- **Summary:** [SUMMARY.pdf](SUMMARY.pdf), covers through YYYY-MM-DD <or "not written yet">
 
 <!-- A resume block for the next session, refreshed at the end of every session. Keep it
      to these lines: the study's story (why, findings, what changed, conclusions) belongs in
-     SUMMARY.md (template: _TEMPLATE/SUMMARY.md), written at major updates and at close. -->
+     SUMMARY.tex (template: _TEMPLATE/SUMMARY.tex), written at major updates and at close. -->
 
 ---
 

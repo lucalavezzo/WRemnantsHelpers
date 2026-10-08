@@ -7,6 +7,10 @@ updated: YYYY-MM-DD           # when this summary was written
 covers: YYYY-MM-DD            # the newest logbook entry this summary accounts for
 ---
 
+<!-- DEPRECATED (2026-10-08): new summaries are LaTeX, studies/_TEMPLATE/SUMMARY.tex, built
+     with scripts/summary_pdf.py. This md template is kept only as a reference for the old
+     SUMMARY.md summaries, which still render; refreshing one converts it to SUMMARY.tex. -->
+
 # <study name>
 
 <!-- READ BEFORE WRITING (delete these comments in the real summary).

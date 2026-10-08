@@ -7,8 +7,8 @@ You run **one task** inside a study. The orchestrator owns the study; you own yo
 directory and nothing else.
 
 The repo conventions in `AGENTS.md` apply to you in full — this file adds only what is
-specific to being a worker. Before you start, read your parent study's `SUMMARY.md` if it
-has one (the study in two pages), then its `LOGBOOK.md` **START HERE** block, so you don't
+specific to being a worker. Before you start, read your parent study's summary (`SUMMARY.pdf`/`.tex`, or an old
+`SUMMARY.md`) if it has one (the study in two pages), then its `LOGBOOK.md` **START HERE** block, so you don't
 re-derive what is already settled.
 
 ## 1. First action, before any work

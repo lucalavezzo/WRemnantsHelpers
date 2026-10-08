@@ -38,7 +38,7 @@ The `bin` / `scripts` / `workflows` / `studies` / `knowledge` split is worth kee
 - `bin/`: executables on `PATH` (`run`, `wtree`).
 - `scripts/`: general-purpose tools; overlay and container helpers under `scripts/overlays/`.
 - `workflows/`: the standard recipe chains, like histmaker to fit to plots, or pulls and impacts.
-- `studies/<slug>/`: one folder per investigation, holding its `LOGBOOK.md`, its `SUMMARY.md`, its scripts, its outputs, and one subfolder per delegated task.
+- `studies/<slug>/`: one folder per investigation, holding its `LOGBOOK.md`, its `SUMMARY.tex` (+ `.pdf`), its scripts, its outputs, and one subfolder per delegated task.
 - `knowledge/`: reference notes that outlive any single study.
 - `.claude/`: the agent and skill definitions (`agents/`, `skills/`). Tracked, shared convention — `~/.claude/agents` and `~/.claude/skills` are symlinks to them, so a session finds them from any directory.
 
@@ -51,15 +51,15 @@ When you're doing a study, meaning anything past a quick one-off, keep a logbook
 ```
 studies/<study>/
 ├── LOGBOOK.md          # the orchestrator's record of the study
-├── SUMMARY.md (+ .pdf) # the standalone 1-2 page write-up, for people outside the study
+├── SUMMARY.tex (+.pdf) # the standalone 2-4 page write-up, for people outside the study
 ├── <YYMMDD>-<task>/    # one directory per delegated task
 │   └── LOGBOOK.md      # the worker's record of that task
 └── scripts/ QUEUE.md   # study-wide, as before
 ```
 
-Start a study by copying `studies/_TEMPLATE/LOGBOOK.md`, a task by copying `studies/_TEMPLATE/TASK_LOGBOOK.md`. When you come back to either, read the study's `SUMMARY.md` if it has one, then the "START HERE" block, a short resume block holding the current state, the next step, whatever is blocking, and what's running. As you work, add dated notes under the log, and move anything settled into Findings and Decisions. Before you stop, update "START HERE" and bump `updated:`. That last step is the one that matters, since it's what lets the next session pick up quickly.
+Start a study by copying `studies/_TEMPLATE/LOGBOOK.md`, a task by copying `studies/_TEMPLATE/TASK_LOGBOOK.md`. When you come back to either, read the study's summary (`SUMMARY.pdf`, or an older `SUMMARY.md`) if it has one, then the "START HERE" block, a short resume block holding the current state, the next step, whatever is blocking, and what's running. As you work, add dated notes under the log, and move anything settled into Findings and Decisions. Before you stop, update "START HERE" and bump `updated:`. That last step is the one that matters, since it's what lets the next session pick up quickly.
 
-**Summaries.** The logbook is the complete record, which makes it hard to read. So each study also gets a `SUMMARY.md`, from `studies/_TEMPLATE/SUMMARY.md`: a standalone one-to-two-page write-up for a member of the analysis who knows the analysis and the code but not this study. It covers why the study was opened and its driving questions, what was done, the findings with their figures and tables, what it changed (code, defaults, cards, `knowledge/`), and the conclusions and open items. It's written at the close of a study, at any major update (a finding that changes the answer, a decision that changes code or defaults, a result going to collaborators), and whenever Luca asks. Never after every task. The `study-summarizer` agent writes it (`/summarize <slug>` dispatches it) and `scripts/summary_pdf.py <slug>` renders `SUMMARY.pdf`; the web viewer opens a study on its summary. The logbook stays the superset: every number in a summary traces to a task logbook. A large task that is really a sub-study can get its own `SUMMARY.md` the same way.
+**Summaries.** The logbook is the complete record, which makes it hard to read. So each study also gets a summary, `SUMMARY.tex` built to `SUMMARY.pdf`, from `studies/_TEMPLATE/SUMMARY.tex`: a standalone two-to-four-page LaTeX write-up, a short scientific internal note, for a member of the analysis who knows the analysis and the code but not this study. It covers why the study was opened and its driving questions, what was done, the findings with their figures and tables, what it changed (code, defaults, cards, `knowledge/`), and the conclusions and open items. It's written at the close of a study, at any major update (a finding that changes the answer, a decision that changes code or defaults, a result going to collaborators), and whenever Luca asks. Never after every task. The `study-summarizer` agent writes it (`/summarize <slug>` dispatches it) and `scripts/summary_pdf.py <slug>` builds `SUMMARY.pdf` (pdflatex, on the host: it is not in the container); the web viewer opens a study on its summary. Older `SUMMARY.md` summaries still render, and are converted to tex when next refreshed. The logbook stays the superset: every number in a summary traces to a task logbook. A large task that is really a sub-study can get its own summary the same way.
 
 **A task directory is any subdirectory of a study that contains a `LOGBOOK.md`.** That's the rule tools use to find tasks, so never name a task `scripts`, `logs`, `slides`, `docs`, `inputs`, `sessions`, or `__pycache__` — those already exist in study folders for other things.
 
@@ -71,7 +71,7 @@ Nothing enforces this. It's on you, or on Luca telling you, to keep it up.
 
 ## Logbooks on the web
 
-Logbooks are browsable at **https://submit.mit.edu/~lavezzo/alphaS/studies/** — `#<study>` for a study, `#<study>/<task>` for a task, and each task page links to its own plot gallery. A study or task with a `SUMMARY.md` opens on the summary, with a Summary / Logbook toggle (`#<study>:logbook` links straight to the logbook), a `pdf` link, and a warning when the logbook has moved past the summary's `covers:` date.
+Logbooks are browsable at **https://submit.mit.edu/~lavezzo/alphaS/studies/** — `#<study>` for a study, `#<study>/<task>` for a task, and each task page links to its own plot gallery. A study or task with a summary opens on it (a `SUMMARY.tex` as its embedded `SUMMARY.pdf`, an old `SUMMARY.md` rendered), with a Summary / Logbook toggle (`#<study>:logbook` links straight to the logbook), a `pdf` link, and a warning when the logbook has moved past the summary's `covers:` date.
 
 Publish a study once with `scripts/webpublish_study.sh <slug>` (the `study` skill does this for you). It only makes a symlink: there is no build step, so a logbook edit is live on reload and a new task appears as soon as it is created.
 
@@ -81,7 +81,7 @@ Publish a study once with `scripts/webpublish_study.sh <slug>` (the `study` skil
 
 Images inside study directories are **not** tracked (see `.gitignore`) — the publish is a symlink to the working tree, so they are live on the web without going into git history. Which means they are not backed up by a push either: keep the script that made them in the task directory, and `save_plot`'s per-plot `.log` records the exact command, so anything lost is one rerun away.
 
-`~/public_html` has **no authentication**, and the symlink publishes everything in the study directory, now and later. So keep bulk outputs on ceph with a path in the logbook, and never put unblinded numbers, credentials, or session transcripts in a study folder. `webpublish_study.sh` refuses a study holding `sessions/`, any `*.jsonl`, or a file over 5 MB until you pass `--force`.
+`~/public_html` has **no authentication**, and the symlink publishes everything in the study directory, now and later. So keep bulk outputs on ceph with a path in the logbook, and never put unblinded numbers, credentials, or session transcripts in a study folder. `webpublish_study.sh` refuses a study holding `sessions/`, any `*.jsonl`, or a file over 5 MB (25 MB for a `SUMMARY.pdf`) until you pass `--force`.
 
 ## Logbooks vs. knowledge vs. memory
 
@@ -130,6 +130,9 @@ Most of the framework knowledge lives under `knowledge/`:
   3-copy stock loader and the uncommitted raw-rules fast path): `knowledge/10_environment/big_memory_jobs.md`
 - SCETlib-AD + xFitter, fitting PDFs and alpha_s together (feasibility handoff): `knowledge/20_frameworks/scetlib_ad_xfitter_pdf_fit.md`
 - NP parametrization constraints (CS and TMD tanh): `knowledge/30_physics_global/np_parametrization_constraints.md`
+- Constrained slope and multiplier at an active wall face, read from the walled covariance: `knowledge/20_frameworks/active_wall_face_sensitivity.md`
+- What rabbit's blinding hides (parameter values) and does NOT hide (every saved post-fit
+  histogram, including an unfolding's masked channel): `knowledge/20_frameworks/rabbit_blinding_scope.md`
 - Plotting style and labels: `knowledge/60_plotting_style/plotting_and_labels.md`
 - Slide workflow: `knowledge/70_slides/study_slides_workflow.md`
 - Glossary: `knowledge/90_glossary.md`

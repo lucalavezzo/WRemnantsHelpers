@@ -26,7 +26,7 @@ owner: study-worker
 
 <!-- A resume block, not the write-up: the answer with its numbers and caveats goes in
      ## Result. A task that grows into a sub-study (several sessions, several results) also
-     gets a SUMMARY.md, written by the study-summarizer when the orchestrator asks. -->
+     gets a SUMMARY.tex, written by the study-summarizer when the orchestrator asks. -->
 
 ---
 

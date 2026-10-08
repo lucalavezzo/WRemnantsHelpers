@@ -6,7 +6,7 @@ One folder per investigation. A study folder holds **everything** for that study
 ```
 studies/<slug>/
 ├── LOGBOOK.md          # the study record (copied from _TEMPLATE/LOGBOOK.md)
-├── SUMMARY.md, .pdf    # the standalone write-up (from _TEMPLATE/SUMMARY.md)
+├── SUMMARY.tex, .pdf   # the standalone write-up (from _TEMPLATE/SUMMARY.tex; old ones: .md)
 ├── <YYMMDD>-<task>/    # one folder per delegated task
 │   ├── LOGBOOK.md      # the task record (copied from _TEMPLATE/TASK_LOGBOOK.md)
 │   └── *.png, *.pdf    # its plots, via plot_output.save_plot
@@ -37,8 +37,8 @@ rest is optional detail.
 
 ## The summary
 
-The logbook is the full record and reads like one. `SUMMARY.md` is the version for
-everyone else: one to two standalone pages for an analysis member who wasn't in the
+The logbook is the full record and reads like one. `SUMMARY.tex` (built to `SUMMARY.pdf`)
+is the version for everyone else: two to four standalone LaTeX pages for an analysis member who wasn't in the
 study, covering why it was opened, what was done, the findings (with figures and
 tables), what it changed, and the conclusions. It's written at close, at major updates,
 and on request, by the `study-summarizer` agent; `../scripts/summary_pdf.py <slug>` makes

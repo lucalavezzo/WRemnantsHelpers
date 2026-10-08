@@ -23,3 +23,11 @@ studies/**/index.php
 studies/**/*.png
 studies/**/*.pdf
 studies/**/*.svg
+
+# LaTeX summaries: summary_pdf.py builds in a temp dir, but a bare pdflatex run or a failed
+# build (which keeps SUMMARY.log; *.log is ignored above) can leave these behind.
+studies/**/*.aux
+studies/**/*.toc
+studies/**/*.fls
+studies/**/*.fdb_latexmk
+studies/**/*.synctex.gz

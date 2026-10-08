@@ -27,6 +27,16 @@ function fm_parse($path) {
                 if ($v !== '') $out[$k] = $v;
             }
         }
+    } elseif ($head !== '' && $head[0] === '%') {
+        // SUMMARY.tex: the same keys as "% key: value" comment lines before \documentclass
+        $pre = strpos($head, '\\documentclass');
+        $block = $pre === false ? $head : substr($head, 0, $pre);
+        foreach (['title', 'status', 'updated', 'study', 'covers'] as $k) {
+            if (preg_match('/^%[ \t]*' . $k . ':[ \t]*(.*)$/m', $block, $m)) {
+                $v = trim(preg_replace('/\s+#.*$/', '', $m[1]));
+                if ($v !== '') $out[$k] = $v;
+            }
+        }
     }
     // no frontmatter title -> first markdown heading; no updated -> file mtime
     if ($out['title'] === null && preg_match('/^#\s+(.+)$/m', $head, $m)) {
@@ -48,12 +58,21 @@ function status_norm($s) {
     return in_array($s, ['active', 'done', 'paused', 'abandoned'], true) ? $s : '';
 }
 
-// SUMMARY.md: the standalone digest of a study or task (studies/_TEMPLATE/SUMMARY.md)
+// The standalone write-up of a study or task. SUMMARY.tex (studies/_TEMPLATE/SUMMARY.tex) is
+// shown as its built SUMMARY.pdf; an older SUMMARY.md is rendered as markdown. tex wins.
 function summary_info($dir) {
-    if (!is_file("$dir/SUMMARY.md")) return null;
-    $fm = fm_parse("$dir/SUMMARY.md");
-    return ['updated' => $fm['updated'] ?: '', 'covers' => $fm['covers'] ?: ($fm['updated'] ?: ''),
-            'pdf' => is_file("$dir/SUMMARY.pdf")];
+    foreach (['tex', 'md'] as $kind) {
+        $f = "$dir/SUMMARY.$kind";
+        if (!is_file($f)) continue;
+        $fm = fm_parse($f);
+        return ['kind' => $kind, 'updated' => $fm['updated'] ?: '',
+                'covers' => $fm['covers'] ?: ($fm['updated'] ?: ''),
+                'pdf' => is_file("$dir/SUMMARY.pdf"),
+                'pdfmtime' => is_file("$dir/SUMMARY.pdf") ? @filemtime("$dir/SUMMARY.pdf") : 0,
+                // the source was edited after the last build
+                'pdfold' => is_file("$dir/SUMMARY.pdf") && @filemtime($f) > @filemtime("$dir/SUMMARY.pdf")];
+    }
+    return null;
 }
 
 $RESERVED = ['scripts', 'logs', 'slides', 'docs', 'inputs', 'sessions', '__pycache__',
@@ -202,6 +221,10 @@ $TREE = json_encode(array_values($studies), JSON_UNESCAPED_SLASHES | JSON_UNESCA
   #views a.on { background: var(--chip-on); color: var(--text-1); border-color: var(--accent); }
   #views a:hover { text-decoration: none; background: var(--hover-wash); }
   #stale { font-size: 12.5px; color: var(--warn); margin: 6px 0 0; }
+  #wrap.wide { max-width: 1180px; }
+  #doc .pdfview { display: block; width: 100%; height: calc(100vh - 120px); min-height: 520px;
+                  border: 1px solid var(--border); border-radius: 6px; background: #fff; margin-top: 8px; }
+  #doc .pdfnote { font-size: 12.5px; color: var(--muted); margin: 6px 0 0; }
   .sumtag { color: var(--accent); }
   #doc { word-wrap: break-word; }
   #doc h1 { font-size: 24px; margin: 6px 0 14px; line-height: 1.25; }
@@ -254,7 +277,7 @@ $TREE = json_encode(array_values($studies), JSON_UNESCAPED_SLASHES | JSON_UNESCA
 <div id="main"><div id="wrap">
   <div id="tools">
     <a id="pdf" href="#" title="the summary as a PDF" style="display:none">pdf</a>
-    <a id="raw" href="#" title="the markdown source">raw</a>
+    <a id="raw" href="#" title="the source">raw</a>
     <a id="plots" href="#" title="the plot gallery for this directory">plots ↗</a>
     <button id="theme" title="light / dark">◐</button>
   </div>
@@ -378,7 +401,7 @@ async function load() {
   const node = !study ? null : parts.length > 1 ? study.tasks.find(t => t.slug === parts[1]) : study;
   const sum = node && node.summary;
   const view = sum && want !== 'logbook' ? 'summary' : 'logbook';
-  const url = dir + (view === 'summary' ? '/SUMMARY.md' : '/LOGBOOK.md');
+  const url = dir + (view === 'summary' ? '/SUMMARY.' + sum.kind : '/LOGBOOK.md');
   document.getElementById('raw').href = url;
   const pdf = document.getElementById('pdf');
   pdf.style.display = sum && sum.pdf ? '' : 'none';
@@ -394,6 +417,30 @@ async function load() {
   crumb.innerHTML = parts.length > 1
     ? `<a href="#${parts[0]}">${esc(parts[0])}</a> / ${esc(parts[1])}`
     : esc(parts[0]);
+
+  const wrap = document.getElementById('wrap');
+  wrap.classList.toggle('wide', view === 'summary' && sum.kind === 'tex');
+
+  // a LaTeX summary is shown as its PDF; the source is one click away under "raw"
+  if (view === 'summary' && sum.kind === 'tex') {
+    toc.innerHTML = '';
+    const pdfUrl = dir + '/SUMMARY.pdf';
+    doc.innerHTML = !sum.pdf
+      ? `<h1>summary not built</h1><p><code>SUMMARY.tex</code> exists but
+         <code>SUMMARY.pdf</code> has not been built yet. Build it with
+         <code>scripts/summary_pdf.py ${esc(path)}</code>, or read the
+         <a href="${esc(url)}" target="_blank">LaTeX source</a> or the
+         <a href="#${esc(path)}:logbook">logbook</a>.</p>`
+      : `<object class="pdfview" type="application/pdf"
+           data="${esc(pdfUrl)}?v=${sum.pdfmtime}#view=FitH&amp;navpanes=0">
+           <p>This browser does not display PDFs inline:
+           <a href="${esc(pdfUrl)}" target="_blank">open SUMMARY.pdf</a>.</p>
+         </object>
+         <p class="pdfnote">${sum.pdfold ? '<b style="color:var(--warn)">SUMMARY.tex is newer than this PDF: rebuild with <code>scripts/summary_pdf.py ' + esc(path) + '</code>.</b> ' : ''}<a href="${esc(pdfUrl)}" target="_blank">open the PDF in its own tab</a>
+         · source: <a href="${esc(url)}" target="_blank">SUMMARY.tex</a></p>`;
+    document.getElementById('main').scrollTop = 0;
+    return;
+  }
 
   doc.innerHTML = '<p class="empty">loading…</p>';
   let md;

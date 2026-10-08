@@ -12,7 +12,8 @@
 #
 # ~/public_html has NO authentication. The symlink publishes everything in the study
 # directory, now and later, so the exposure check below refuses studies holding session
-# transcripts, *.jsonl, or files over 5 MB until you pass --force.
+# transcripts, *.jsonl, or files over 5 MB until you pass --force. A SUMMARY.pdf is the
+# study's own write-up with its figures embedded, so it is allowed up to 25 MB.
 
 set -uo pipefail
 
@@ -21,6 +22,7 @@ REPO=$(dirname "$HERE")
 STUDIES="$REPO/studies"
 WEBROOT="$HOME/public_html/alphaS/studies"
 MAXMB=5
+MAXMB_SUMMARY=25   # SUMMARY.pdf, figures included
 
 FORCE=0
 UNPUB=0
@@ -79,7 +81,12 @@ exposure_report() {
         [[ -z $f ]] && continue
         echo "    ${f#"$dir/"}  ($(( $(stat -c%s "$f") / 1048576 )) MB)"
         found=1
-    done < <(find "$dir" -type f -size +${MAXMB}M -not -name '*.jsonl' 2>/dev/null | head -10)
+    done < <(find "$dir" -type f -size +${MAXMB}M -not -name '*.jsonl' -not -name SUMMARY.pdf 2>/dev/null | head -10)
+    while IFS= read -r f; do
+        [[ -z $f ]] && continue
+        echo "    ${f#"$dir/"}  ($(( $(stat -c%s "$f") / 1048576 )) MB; a SUMMARY.pdf may be up to ${MAXMB_SUMMARY} MB — shrink its figures)"
+        found=1
+    done < <(find "$dir" -type f -name SUMMARY.pdf -size +${MAXMB_SUMMARY}M 2>/dev/null | head -10)
     return $found
 }
 

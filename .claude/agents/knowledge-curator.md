@@ -23,7 +23,7 @@ If memory and the repo ever disagree, the repo wins.
 
 ## Procedure
 
-1. Read the study's `SUMMARY.md` first (written just before you at close, and its
+1. Read the study's summary (`SUMMARY.tex`, or an older `SUMMARY.md`) first (written just before you at close, and its
    Findings and "What changed" are the candidate list), then the study `LOGBOOK.md`
    (`## Findings`, `## Decisions`) and each task logbook's `## Findings`. Task logbooks are
    the subdirs that contain a `LOGBOOK.md`.

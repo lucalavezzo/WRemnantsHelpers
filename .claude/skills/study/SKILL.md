@@ -1,6 +1,6 @@
 ---
 name: study
-description: Run a study as an orchestrator — start or resume studies/<slug>, dispatch study-worker subagents onto scoped tasks, keep the study LOGBOOK.md as the campaign record, have its standalone SUMMARY.md written at major updates and at close, and publish it to the webdir. Use when starting or picking up a study, when delegating a piece of analysis, when asked "where are we on <study>", or when asked to summarize or close a study.
+description: Run a study as an orchestrator — start or resume studies/<slug>, dispatch study-worker subagents onto scoped tasks, keep the study LOGBOOK.md as the campaign record, have its standalone LaTeX summary (SUMMARY.tex/.pdf) written at major updates and at close, and publish it to the webdir. Use when starting or picking up a study, when delegating a piece of analysis, when asked "where are we on <study>", or when asked to summarize or close a study.
 ---
 
 # Orchestrating a study
@@ -15,12 +15,12 @@ split: don't copy state into here, don't copy process into the logbook. (Same sp
 
 A study has two documents with two audiences:
 
-| | `LOGBOOK.md` | `SUMMARY.md` (+ `SUMMARY.pdf`) |
+| | `LOGBOOK.md` | `SUMMARY.tex` (+ `SUMMARY.pdf`) |
 |---|---|---|
 | reader | the next session, and anyone auditing a number | a member of the analysis who was not in the study |
 | content | everything: attempts, numbers, commands, dead ends | why, what we did, findings, what changed, conclusions |
 | written | continuously, every session | at major updates and at close (§4) |
-| length | unbounded | one to two pages |
+| length | unbounded | two to four pages, figures included |
 
 The logbook is a superset of the summary. The summary never holds a number the logbook
 doesn't.
@@ -33,7 +33,7 @@ doesn't.
 | a piece of work | `study-worker`, one per task | owns `<YYMMDD>-<task>/`, returns a ≤15-line verdict |
 | a fit is launched or finishes | `fit-queue` skill | queue, warm starts, results views |
 | worker returns | you | one dated `## Log` line + link; promote to Findings/Decisions once settled |
-| major update, or asked (`/summarize`) | `study-summarizer` | writes/refreshes `SUMMARY.md` + PDF |
+| major update, or asked (`/summarize`) | `study-summarizer` | writes/refreshes `SUMMARY.tex` + PDF |
 | result leaves the room (collaborators, AN, meeting) | `physics-reviewer` (read-only) | checks the task logbook *and* the SUMMARY |
 | close | summarizer → reviewer → `knowledge-curator` → you | §6 |
 | end of every session | you | refresh START HERE, bump `updated:` |
@@ -50,7 +50,8 @@ studies/<slug>/
 
 **Resuming** — read in this order and stop:
 
-0. `studies/<slug>/SUMMARY.md`, if there is one: the whole study in two pages. Note its
+0. `studies/<slug>/SUMMARY.pdf` (source `SUMMARY.tex`; older studies: `SUMMARY.md`), if
+   there is one: the whole study in a few pages. Note its
    `covers:` date; anything in the log after it is not in the summary yet.
 1. `studies/<slug>/LOGBOOK.md` → the **START HERE** block. Current state, next action,
    what's blocking.
@@ -85,7 +86,7 @@ The spawn prompt must carry:
 - the **study slug** and the **task dir** to create (`studies/<slug>/<YYMMDD>-<task>`),
 - the **one question**, stated as a question,
 - the **evidence already established** — run dirs, numbers, the relevant `knowledge/` note,
-  the settled decisions it must not contradict (pointing it at `SUMMARY.md`, when one
+  the settled decisions it must not contradict (pointing it at the summary, when one
   exists, is the cheapest way to hand over the context),
 - explicitly **what not to redo**, and what's out of scope.
 
@@ -124,11 +125,13 @@ entry — don't silently overwrite the old conclusion.
 
 ## 4. The summary
 
-`studies/<slug>/SUMMARY.md` is the standalone write-up of the study: why it was opened,
+`studies/<slug>/SUMMARY.tex`, built to `SUMMARY.pdf`, is the standalone write-up of the study,
+a short scientific internal note: why it was opened,
 the driving questions, what was done, the findings with their figures and tables, what it
 changed (code, defaults, cards, `knowledge/`), and the conclusions and open items. Its
 audience is an analysis member who knows the analysis and the code but not this study.
-One to two pages. The template is `studies/_TEMPLATE/SUMMARY.md`, and the writing rules
+Two to four pages, results carried by figures. The template is `studies/_TEMPLATE/SUMMARY.tex`
+(older `SUMMARY.md` summaries still render, and are converted when refreshed), and the writing rules
 live in `.claude/agents/study-summarizer.md`.
 
 **When.** Not after every task. Write or refresh it:
@@ -150,7 +153,7 @@ your logbook or put them in front of Luca. Log one dated line ("summary refreshe
 through …"). If the summary is going out to collaborators, run `physics-reviewer` on it
 first.
 
-**A task gets its own `SUMMARY.md`** only when it is really a sub-study: several sessions,
+**A task gets its own summary** only when it is really a sub-study: several sessions,
 several results, or something that will be shown on its own. Dispatch the summarizer on
 `studies/<slug>/<YYMMDD>-<task>`. An ordinary task's `## Result` is its summary already.
 
@@ -168,7 +171,7 @@ several results, or something that will be shown on its own. Dispatch the summar
 
 ## 6. Closing a study
 
-1. `study-summarizer` writes the final `SUMMARY.md` + PDF.
+1. `study-summarizer` writes the final `SUMMARY.tex` + PDF.
 2. `physics-reviewer` reviews the summary, together with the task logbooks it cites. Fix
    whatever blocks, and refresh the summary if needed.
 3. `knowledge-curator` promotes what generalizes into `knowledge/` and the memory index.
@@ -179,7 +182,8 @@ several results, or something that will be shown on its own. Dispatch the summar
 
 `https://submit.mit.edu/~lavezzo/alphaS/studies/#<slug>` — the study rendered, with its
 tasks in the sidebar. `#<slug>/<YYMMDD>-<task>` for a task, and each task links to its own
-plot gallery. Where a `SUMMARY.md` exists the page opens on it, with a Summary / Logbook
+plot gallery. Where a summary exists the page opens on it (a `SUMMARY.tex` as its embedded PDF, an old
+`SUMMARY.md` rendered), with a Summary / Logbook
 toggle (`#<slug>:logbook` links straight to the logbook), a `pdf` link, and a warning when
 the logbook has moved past the summary's `covers:` date.
 

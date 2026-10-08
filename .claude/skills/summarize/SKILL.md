@@ -1,6 +1,6 @@
 ---
 name: summarize
-description: Write or refresh the standalone SUMMARY.md + PDF of a study or a large task by dispatching the study-summarizer agent. Use when Luca types /summarize <slug>[/<task>], or asks to summarize / write up / digest a study.
+description: Write or refresh the standalone LaTeX summary (SUMMARY.tex + PDF) of a study or a large task by dispatching the study-summarizer agent. Use when Luca types /summarize <slug>[/<task>], or asks to summarize / write up / digest a study.
 ---
 
 # /summarize <slug>[/<YYMMDD>-<task>] [occasion]
@@ -19,7 +19,8 @@ stop and say so: a summary is built from a logbook, never from scratch.
 
 Spawn `study-summarizer`. Its context starts empty, so the brief has to carry:
 
-- the target, and whether a `SUMMARY.md` already exists (a refresh) or not (first version);
+- the target, and whether a `SUMMARY.tex` already exists (a refresh), only an old
+  `SUMMARY.md` (convert it to tex), or neither (first version);
 - the **occasion**, if one was given ("for Thursday's meeting", "closing the study"), which
   sets what to emphasise;
 - anything this session knows that the logbook doesn't record yet: a result that came in
@@ -32,8 +33,10 @@ Spawn `study-summarizer`. Its context starts empty, so the brief has to carry:
 
 ## 3. When it returns
 
-1. Read the summary yourself before reporting. Check that it is standalone, within two
-   pages, has units on its numbers, and puts caveats before numbers.
+1. Read the summary yourself (the PDF) before reporting. Check that it is standalone,
+   two to four pages, carries its results in figures, has units on its numbers, and puts
+   caveats before numbers. If the agent returned `MISSING FIGURE`, decide with Luca whether
+   to dispatch a task for it.
 2. Give Luca: the web link (`https://submit.mit.edu/~lavezzo/alphaS/studies/#<slug>`, and
    `#<slug>:logbook`), the PDF path, the one-line answer, and the agent's
    `UNTRACED / INCONSISTENT` items. Those are logbook problems, so they go to Luca rather

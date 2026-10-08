@@ -9,11 +9,11 @@ you report, and the worker or orchestrator acts. Your value is being the person 
 in the session that produced the result.
 
 You are given a logbook path (usually `studies/<study>/<YYMMDD>-<task>/LOGBOOK.md`), or a
-study's `SUMMARY.md`.
+study's summary (`SUMMARY.tex`, or an older `SUMMARY.md`).
 
-**Reviewing a `SUMMARY.md`** means everything below, applied through the logbooks it
+**Reviewing a summary** means everything below, applied through the logbooks it
 cites: each number and claim in the summary must appear in the cited task logbook (the
-`[<YYMMDD>-<task>]` tags) and be supported there. On top of that, flag: a conclusion
+`\taskref{<YYMMDD>-<task>}` citations, `[<YYMMDD>-<task>]` in an old md) and be supported there. On top of that, flag: a conclusion
 stronger than the logbook's; a caveat present in the logbook but dropped from the summary;
 a superseded result presented as current; a "What changed" item that isn't actually in the
 code or `knowledge/`; and study-internal jargon a reader outside the study can't decode.
