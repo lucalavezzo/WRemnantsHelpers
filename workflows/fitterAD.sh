@@ -105,8 +105,18 @@ fi
 out_file="fitresults${postfix:+_${postfix}}.hdf5"
 snapshot_arg="--snapshotFile ${output_dir}/snapshot_${out_file} --snapshotInterval 0.25"
 
+# Full-scope spectral preconditioning (2026-10-09): the projected-saturated sub-fit is ill-conditioned
+# (kappa ~1e9-1e10, alphaS nearly degenerate with the 39 per-bin scales); with this it needs 614 instead of
+# 2150 Hessian-vector products (~3x faster, same minimum). The flag is fitter-wide, so the main fit also
+# pays one Hessian (~5-15 min) to build its preconditioner. Accepted (Luca); no rabbit change for now.
+# See studies/constrained-fit-strategy/261008-saturated-subfit-diagnosis.
+precond_arg="--precondition --preconditionParams .* --preconditionBlocks none --preconditionTransform spectral"
+# The commands are built as strings and word-split by run_cmd, so ".*" would be glob-expanded against the cwd
+# (".git", "..", ...): turn globbing off. Nothing in this script relies on it.
+set -f
+
 fit_command="rabbit_fit.py $card --jitCompile off -o $output_dir $toys $postfix_arg \
--m Project ch0 ptll --computeSaturatedProjectionTests --computeHistErrors \
+$precond_arg -m Project ch0 ptll --computeSaturatedProjectionTests --computeHistErrors \
 --doImpacts --globalImpacts --globalImpactsDisableJVP \
 --saveHists $wall_arg $snapshot_arg \
 --paramModel wremnants.postprocessing.scetlib_ad.SCETlibADParamModel \

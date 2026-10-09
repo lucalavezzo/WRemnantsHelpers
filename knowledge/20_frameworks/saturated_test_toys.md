@@ -31,11 +31,19 @@ One rabbit process per random seed, `-t N` toys in sequence after a single cache
 rabbit_fit.py <card> -t N --seed S --toysDataMode expected \
     --toysSystRandomize frequentist --toysDataRandomize poisson \
     -m Project ch0 ptll --computeSaturatedProjectionTests --saveHists --noChi2 --noHessian \
+    --precondition --preconditionParams '.*' --preconditionBlocks none --preconditionTransform spectral \
     <same -r / --regularizationStrength as the data fit> \
     --paramModel ... "xparam_default=<postfit ParamModel vector>" \
     --setConstraintMinimum <name> <value>   # once per card nuisance, all of them
 ```
 
+- **Precondition the saturated sub-fit (2026-10-09).** The projected-saturated problem is ill-conditioned
+  (κ ~ 1e9–1e10: α_s is nearly degenerate with the 39 per-bin scales, so the minimum lies along a long curved valley).
+  Full-scope spectral preconditioning cut SATB8's sub-fit from 2150 to 614 Hessian-vector products (~3× faster, same
+  minimum to 2e-10), measured on data, not yet on toys
+  (`studies/constrained-fit-strategy/261008-saturated-subfit-diagnosis`). The flag is fitter-wide, so each toy's main fit
+  also pays one Hessian to build its preconditioner (~5–15 min); accepted for now. Do NOT loosen `--minimizerGtol`
+  under it: stop errors of up to Δq 0.86 were seen.
 - **Generation point = the full postfit vector, set through two handles.**
   - The model token `xparam_default=` covers the ParamModel parameters
     (`scripts/make_xparam.py`).
