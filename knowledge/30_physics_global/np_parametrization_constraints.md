@@ -1,8 +1,10 @@
 # NP-model parameter constraints (CS kernel and TMD b.c.)
 
 Source: AN-25-085 `theory.tex` Eqs. \ref{eq:npgamma}, \ref{eq:npf} (lines 233–234), with our locally-added $\lambda_6,\Lambda_6$ extensions.
-Last updated: 2026-10-08 (§16d: Y² form re-checked at the lattice-χ² nominal)
-Status: provisional — algebra derived, not yet implemented in the fit.
+Last updated: 2026-10-09 (§21: the wall in use, its C² penalty default, and how exact it is)
+Status: the algebra below is implemented as `NPDampingWall` in WRemnants
+`wremnants/postprocessing/scetlib_ad/np_damping_wall.py` (§21; its module docstring is the reference for the
+conditions and options). §8 describes an earlier, superseded module.
 
 ## 1. Functional forms
 
@@ -164,6 +166,10 @@ AN alternative variation is $\Lambda_4{}_{-0.05}^{+0.1}$, so the (b) floor sits 
 
 ## 8. Implementation (provisional)
 
+> **Superseded.** `np_monotonicity.py` no longer exists on the `scetlib-ad-param-model` branch. The wall in use is
+> `NPDampingWall` (`wremnants/postprocessing/scetlib_ad/np_damping_wall.py`), with the DAMPING criterion, not the
+> monotonicity one below; see §21. Kept for the derivation history only.
+
 File: `WRemnants/wremnants/postprocessing/np_monotonicity.py`. Self-contained module.
 
 **Hard-coded `PARAM_MAP`.** Single source of truth: for each of the six NP nuisances (`scetlibNPgammaLambda2/4/Inf`, `scetlibNPLambda2`, `scetlibNPDelta_Lambda2`, `scetlibNPLambda4`), store the physical `{nominal, up_value, down_value}` plus the matching `{hist_up_label, hist_down_label}` from the histmaker syst axis. Values are the AN-25-085 centrals plus the lattice-uncertainty templates (`rabbit_theory_helper.py:686-711` for CS LatticeNoConstraints; `:827-882` for TMD Delta_Lambda).
@@ -256,7 +262,8 @@ threshold to rail against, no `--regularizationStrength`, and the gradient stays
 
 **Fold margin $\ne$ wall margin — different quantity, opposite sign convention.** The
 `NPDampingWall`'s `margin` (module default `NP_DAMPING_MARGIN` $=0$ since 2026-10-01, paired with `--regularizationStrength 8`; it was $5\times10^{-3}$ at strength 5 before, see `studies/walled-multistart-census`) is a cushion on
-the **polynomial coefficients**, applied as `relu2(margin - coeff)`: **positive = STRICTER**
+the **polynomial coefficients**, applied as `relu2(margin - coeff)` (the C² ramp of `margin - coeff` by default since
+2026-10-08, §21; same bound): **positive = STRICTER**
 than physical, negative = permit anti-damping. The fold's margin caps the **function value**:
 **positive = MORE permissive**. They coincide only at 0, where both mean "exactly damping" —
 verified: over a random $\lambda$ scan, every point the wall accepts at margin 0 has
@@ -1242,3 +1249,81 @@ Consequences:
 
 Theirs 0.2–0.9 fm; our α_s sensitivity 0.1–0.6 fm (§10) ⇒ **overlap = 0.2–0.6 fm = 1.0–3.0 GeV⁻¹**, which
 is where λ₂/λ₄ live. Their 0.6–0.9 fm pins λ_∞ *outside* our sensitivity. Clean division of labour.
+
+## 21. The wall in use: `NPDampingWall`'s penalty shape (C² by default since 2026-10-08) and how exact it is
+
+Code: WRemnants `wremnants/postprocessing/scetlib_ad/np_damping_wall.py`, branch `scetlib-ad-param-model`; its
+docstring lists every condition, option and default. Evidence: `studies/constrained-fit-strategy/` (SUMMARY.pdf;
+tasks `261006-diagnosis`, `261008-c2-wall-test`), real data, nominal configuration, τ = 8, margin 0.
+
+### The penalty shape
+
+The NLL gains k·Σᵢ P(xᵢ), k = e^{2τ}, xᵢ = bound − coeff the violation of condition i in its own units. Since
+WRemnants 692f9483 (2026-10-08, approved by Luca) P is a curvature-continuous ramp:
+
+    P(x) = 0 (x ≤ 0),   x³/(3d) (0 < x < d),   x² − d·x + d²/3 (x ≥ d)        [relu²: P = max(x, 0)²]
+
+**Why.** relu²'s curvature jumps from 0 to 2k at the face, and that jump locks scipy's trust-krylov into a limit
+cycle that crawls for hours (`../20_frameworks/rabbit_minimizer_tolerances.md`, "trust-krylov crawls at a relu²
+penalty face"). The ramp removes it and leaves the minimum where it was.
+
+**The width d is set per condition, in physical units:** d = δ̃/s, with δ̃ = 1e-3 (`delta=`, `NP_WALL_C2_DELTA`) in
+the NP exponent at b_max = 12.6 GeV⁻¹ (`bmax=`, `NP_WALL_BMAX`; the largest b_T the AD cache's rules reach, measured
+12.64 for both the 260827 and the y35 cache, `261006-diagnosis/cache_breach.json`) and s the exponent per unit of the
+condition there. A single raw d would be meaningless across units (1e-5 is harmless on L₂ in GeV² but ~0.05 in ln F
+at b_max on the cubic in GeV⁶).
+
+| condition | s at b_max | d | max extra overshoot d/2 |
+|---|---|---|---|
+| L₂(\|Y\| = 0, Y_max) ≥ 0 [GeV²] | 2b² = 318 | 3.15e-6 | 5e-4 in ln F at b_max |
+| λ₂^ν ≥ 0 [GeV²] | b² = 159 | 6.30e-6 | \|Δγ_ν\| ≤ 5e-4 at b_max |
+| 3λ_∞²λ₄ + L₂³ ≥ 0 [GeV⁶] | (2/3)b⁴ = 1.68e4 | 5.95e-8 | 5e-4 in ln F at b_max |
+| λ₄^ν ≥ 0 [GeV⁴] | b⁴ = 2.52e4 | 3.97e-8 | \|Δγ_ν\| ≤ 5e-4 at b_max |
+
+**Options on the `-r ... NPDampingMapping` line:**
+
+- `smooth` omitted (default): C² on every condition with a constant scale. The `tanh_6` interior discriminants have
+  none, so they **keep relu²** (one INFO line at arm time names them) and can still crawl. A tanh_2/tanh_2 fit is
+  pure C².
+- `smooth=c2` (explicit): C² everywhere; **refuses** a no-scale condition (NotImplementedError) rather than
+  silently mixing.
+- `smooth=relu2`: the pre-2026-10-08 wall, bitwise. `delta=`/`bmax=` are refused with it.
+
+**Old commands now get C².** A fit command from before 2026-10-08 with no `smooth=` ran relu²; rerun as is, it now
+runs C². Add `smooth=relu2` to reproduce it exactly. The two minima differ by ~1e-5 in loss (below), so a ΔNLL
+between a fit from before and one from after carries that offset.
+
+Commits: 2f1c3df4 (opt-in ramp), 692f9483 (default), both pushed. Test: `scripts/tests/test_np_damping_wall_c2.py`
+(78 checks: continuity at 0 and d, gradient and HVP against finite differences, `smooth=relu2` bitwise equal to the
+old sum).
+
+### The cost: a little more overshoot
+
+The equilibrium violation of an active face is g/(2k) + d/2 when the data force g exceeds k·d, and √(g·d/k) below
+it, i.e. at most ~d/2 more than relu². Measured at NOMSTIFF's face L₂(|Y| = 2.5) (g = 16.3, k·d = 28): C² holds it at
+−2.401e-6 GeV² against relu²'s −9.15e-7, i.e. 7.6e-4 of the NP exponent at b_max (relu²: 2.9e-4). Loss −1.86e-5
+below relu² (predicted −1.9e-5), Δα_s = +3.9e-6 σ, σ(α_s) ratio 0.9999998, full saturated χ² identical (C2A,
+`261008-c2-wall-test`). The multiplier read off a C² face is k·P′(|c*|), not 2k|c*|
+(`../20_frameworks/active_wall_face_sensitivity.md`).
+
+### How exact is the wall?
+
+Express each condition in the NP exponent at b_max, c̃ = s·c, and gate on max |min(c̃ᵢ, 0)| ≤ 1e-3 (proposed in
+`261006-diagnosis`, Diagnosis 1). Measured at τ = 8 with relu²:
+
+- **Ordinary faces: physically exact.** L₂ and λ₂^ν leak 1e-4 to 3e-4 (NOMSTIFF L₂(2.5): Δ ln F^NP ≤ 4.7e-6 at
+  b ≈ 1.9). The cubic B(|Y| = 2.5) at XWSTIFF leaked 2.0e-3 in ln F at b_max: harmless inside the cache, which stops
+  at b_max, but B < 0 makes direct SCETlib (b → ∞) diverge.
+- **The λ₄^ν notch: no penalty wall is exact there, in any units.** At CMR1B (no lattice term, λ₄^ν free) λ₄^ν sat
+  at −1.64e-4 GeV⁴, i.e. γ_ν(b_max) = +1.94 (anti-damped at every b; +0.21 at b = 6). The data curvature along λ₄^ν
+  there is 7.6e8, 40× the wall's 2k = 1.8e7 (and 10⁵× its value at XWSTIFF, 8.2e3), so the point sits at the
+  notch's own bottom and the wall is a small correction. Excluding it to 1e-3 would take τ ≈ 14 (κ ~ 1e12); at
+  τ = 12 the leak is still γ_ν(b_max) ≈ +0.06. The C² ramp does not help (it only adds ≤ d/2). Exact fixes were
+  costed and parked: a bound basis with squares (1–2 days of param-model work) or an active-set trust-krylov in
+  rabbit (3–5 days). The notch is in λ₄^ν < 0, where the AD cache is not validated anyway
+  (`../20_frameworks/scetlib_ad_cache_validity.md`). In the projected-ptll saturated sub-fit at LATB8, λ₄^ν also
+  ran onto its face (−1.09e-5 GeV⁴, |Δγ_ν| ~ 0.27 at b_max against γ_ν ~ −22); not chased.
+- **Do not make it exact by normalising with one common τ.** That multiplies every wall eigenvalue by s² (up to
+  6e8). The L₂(|Y| = 2.5) wall already adds an eigenvalue of 1.78e8 in θ (its gradient carries Y² = 6.25), against
+  a data-only Hessian spanning [0.459, 4.31e4]: the walled κ is 3.9e8.
+

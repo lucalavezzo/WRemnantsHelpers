@@ -2,11 +2,11 @@
 
 Source: `studies/tmd-rapidity-shape/261007-y-shape-first-look/` (`scripts/slope.py` → `slope.json`), measured
 2026-10-07 on LATB8 (NPDampingWall, τ = 8) against a dedicated wall-free Hessian pass (YNOWALL8).
-Last updated: 2026-10-08.
+Last updated: 2026-10-09 (the multiplier under the C² wall default).
 
 ## Question it answers
 
-A walled fit (`NPDampingWall` via `-r`, or any relu² regularizer) sits on an active face c(θ) = 0. Two things you want:
+A walled fit (`NPDampingWall` via `-r`, or any relu²/C²-ramp regularizer) sits on an active face c(θ) = 0. Two things you want:
 
 - the **constrained slope** dPOI/dc: how far the POI moves if the face is moved (floor raised/lowered by δ);
 - the **multiplier** μ = d(NLL_rest)/dc: how hard the data push on the face, i.e. what releasing it would buy.
@@ -31,7 +31,12 @@ and the vector C·g in shape to 4e-7.
 Multiplier, two independent ways:
 
 - from the wall: μ = 2k·|c*|, with c* the (slightly negative) face value at the walled minimum; a relu² wall settles
-  past the knee by μ/(2k), ~1e-7…1e-5 at τ = 8, so read c* at full precision;
+  past the knee by μ/(2k), ~1e-7…1e-5 at τ = 8, so read c* at full precision. **That formula is relu² only.** The
+  `NPDampingWall` is C² by default since 2026-10-08 (`../30_physics_global/np_parametrization_constraints.md` §21):
+  then μ = k·P′(|c*|) = k·c*²/d while |c*| < d, and k·(2|c*| − d) beyond, with d the face's ramp width (printed when
+  the wall arms). Check: C2A's L2(|Y|=2.5) face at −2.401e-6 GeV², d = 3.15e-6, k = e¹⁶ gives μ = 16.3, the data
+  force measured at the relu² fit NOMSTIFF (`studies/constrained-fit-strategy/261008-c2-wall-test`). The slope
+  identity above is unaffected: the C² spring is still rank one along g (k·P″·g gᵀ), so the ratio is k-independent;
 - from a wall-free pass at the same θ: if the rest's gradient is purely μ·g (single-face stationarity),
   edm_free = ½μ²V_f ⇒ μ = √(2·edm_free / V_f). At LATB8 both give 4.93 GeV⁻² to 1e-9, which is itself the check
   that only one face is active.

@@ -3,7 +3,7 @@ title: Lattice CS-kernel constraints (ASWZ 2024) in the alpha_s fit
 slug: lattice-cs-kernel
 status: active
 created: 2026-09-23
-updated: 2026-10-08
+updated: 2026-10-09
 ---
 
 # Lattice CS-kernel constraints (ASWZ 2024) — logbook
@@ -19,22 +19,19 @@ Done when we have (i) a convention map proving the lattice object == our SCETlib
 
 ---
 
-## START HERE (status as of 2026-10-08 18:00)
+## START HERE (status as of 2026-10-09)
 
-- **The lattice enters the fit as an exact χ² term** (`LatticeCSTerm`, kernel from SCETlib at every step). Proposed nominal
-  **LATFROZ_V3** ([261008-latfroz-nf-variants](261008-latfroz-nf-variants/LOGBOOK.md)):
-  - the lattice-side kernel is frozen at α_s(m_Z) = 0.1168 with TNPs = 0, so the lattice constrains only λ2_ν and λ4_ν;
-  - no b_T window systematic;
-  - one n_f row in the V3 convention (full n_f = 4 kernel, coupling identified at m_b).
-  It is pending Luca's confirmation of V3.
-- **Against the no-lattice reference XWSTIFF** (Z only, λ4_ν free, λ2_ν on its wall face): Δα_s +0.245σ, σ ×1.05.
-  Against XL4ZSTIFF (λ4_ν = 0): −0.013σ. NOMSTIFF is NOT a no-lattice fit (1D Gaussian card term, λ4_ν = 0).
-- **Z–lattice tension (PG):** 13.5 for 2 dof, p = 0.12 %, 3.2σ (V3, vs XWSTIFF). The lattice-only part is 9.2 (2.6σ).
-- **Review** (physics-reviewer, 10-08): APPROVE WITH FIXES. The window, α_s-dependence and n_f concerns are resolved by the
-  LATFROZ design. Still open: the blinding pair (same Newton row at two α_s frames), the knowledge §10 prior warning,
-  the λ∞_ν rows, and the `_find_fitter` mis-scale guard.
-- **Running:** nothing in this study. **Next:** the study SUMMARY (dispatched 10-08), then Luca's decisions on the open
-  items and the theorist email (Q1 n_f scheme and comparison scale; Q3a quick confirmation).
+> Summary: [SUMMARY.pdf](SUMMARY.pdf) (covers 2026-10-09).
+
+- **Nominal = LATFROZ_V3, the LatticeCSTerm default since WRemnants 3841ee42 (pushed).** The exact ASWZ χ² is fitted with
+  the Z data. The lattice-side kernel is frozen at α_s(m_Z) = 0.1168 with TNPs = 0, so the lattice constrains only λ2_ν and
+  λ4_ν. One n_f row (`Jnf`, V3 convention; the conservative choice), no b_T window. The table-based term is retired
+  (1b3732bb). The Gaussian-card producers survive only as study scripts; the cards stay on ceph for provenance.
+- **Results:** vs the no-lattice XWSTIFF Δα_s +0.245σ_XW (σ ×1.05); vs XL4ZSTIFF −0.013σ. n_f systematic ≈ 0.01σ.
+  Z–lattice tension PG 13.5/2 dof, 3.2σ, a shape tension (see the NP-function figures).
+- **Open:** toys for the PG and saturated p-values (on hold, Luca); the theorist email (Q1, Q3a; Luca sends); λ∞_ν rows
+  (deferred); the AN's lattice section.
+- **Running:** nothing.
 
 ## Earlier state (2026-09-24 → 2026-10-06, kept for history)
 
@@ -154,6 +151,21 @@ it by +0.031σ.
 - Net for the full treatment (LATLIVE8Y) is **−0.04σ_NOM**.
 
 ## Log
+
+### 2026-10-09
+- Luca: wait on toys. All commits pushed (WRemnants 3841ee42, WRemnantsHelpers 1c5d93a). Summary refresh dispatched.
+- WRemnants 1b3732bb retires the table-based term: lattice_cs_chi2, its lattice_aswz_inputs.npz/.json, and its test.
+  3841ee42 makes LATFROZ_V3 the LatticeCSTerm default (bitwise equal to the V3 fit's term, test 38/38) and adds a hard
+  error when tau is missing. Both pushed 2026-10-09. The Gaussian-card producers live only in study scripts; the cards on ceph
+  are kept, because existing fitresults reference them (paths in the session report: 260923_lattice_fits/cards/, MSHT20 and
+  260722/260723 card dirs).
+- Luca: estimate the n_f systematic's size and how much the row form matters with real fits: LATFROZ_V3D
+  (syst=direct_nf) and V3N (syst=none), delegated to [261008-latfroz-nf-variants](261008-latfroz-nf-variants/LOGBOOK.md).
+- n_f row fits DONE ([261008-latfroz-nf-variants](261008-latfroz-nf-variants/LOGBOOK.md) Result §6): the n_f systematic is
+  negligible for α_s in either form. Total impact V3 − V3N = +0.0096σ_NOM, row form V3D − V3 = −0.0028σ_NOM, and its
+  σ(α_s) contribution ≤ 0.05σ_NOM in quadrature. PG stays 3.2–3.3σ. The J-mapped default is kept.
+- Luca: preconditioning added to fitterAD.sh and to the toy recipe (WRemnantsHelpers 1c5d93a). No rabbit change; the main
+  fit pays the Hessian.
 
 ### 2026-10-08
 - NP-function figures DONE ([261008-np-function-figures](261008-np-function-figures/LOGBOOK.md)): γ_ζ vs lattice points
@@ -725,8 +737,12 @@ it by +0.031σ.
 ---
 
 ## Decisions
+- 2026-10-09 (Luca): take the conservative n_f row. By the α_s measures that is the current default `Jnf`: larger
+  total impact than `direct_nf` (+0.0096 vs +0.0068σ_NOM against no row) and the larger σ(α_s) contribution (0.051 vs
+  0.034σ_NOM). No code change. Only `direct_nf` is (marginally) more forgiving on the PG (13.41 vs 13.48).
 - 2026-10-09 (Luca): **V3 is the default** of LatticeCSTerm (pert=frozen, alphas_frozen=0.1168, syst=Jnf, nfmatch=4.18,
-  nfscheme=full). Retire the table-based term (lattice_cs_chi2), its inputs and the Gaussian 1D/2D lattice cards. λ∞_ν rows
+  nfscheme=full). Retire the table-based term (lattice_cs_chi2) and its inputs, and the Gaussian 1D/2D lattice cards (no longer
+  used or produced; the card files stay on ceph for provenance). λ∞_ν rows
   deferred. Lattice-derived priors are fine; TMD boundary-condition λ stay free (no Tackmann priors). knowledge §10 scope
   clarified.
 - 2026-10-08 (superseded 10-09: adopted): LATFROZ_V3 as the nominal lattice configuration (`pert=frozen alphas_frozen=0.1168

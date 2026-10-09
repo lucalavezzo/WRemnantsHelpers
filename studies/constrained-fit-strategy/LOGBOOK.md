@@ -1,9 +1,9 @@
 ---
 title: A reliable minimisation strategy for the walled NP fit
 slug: constrained-fit-strategy
-status: active        # active | paused | done | abandoned
+status: done          # active | paused | done | abandoned
 created: 2026-10-06
-updated: 2026-10-08
+updated: 2026-10-09
 ---
 
 # A reliable minimisation strategy for the walled NP fit — logbook
@@ -39,22 +39,25 @@ Suspected root causes, to be tested, not assumed:
 
 ---
 
-## START HERE (status as of 2026-10-08 17:30)
+## START HERE (status as of 2026-10-09): CLOSED
 
-> Summary: [SUMMARY.md](SUMMARY.md) (covers 2026-10-08).
+> Summary: [SUMMARY.pdf](SUMMARY.pdf) (final).
 
-- **Main-fit crawl: SOLVED.** The C² ramp on the NPDampingWall removes the trust-krylov lock-in and reaches the same
-  minimum ([261008-c2-wall-test](261008-c2-wall-test/LOGBOOK.md)). C² is now the default (WRemnants 692f9483, pushed);
-  τ-continuation is opt-in again (WRemnantsHelpers 3c0a9fb, not pushed).
-- **Saturated sub-fit: slow for a different reason.** The cause is the saturated model's conditioning, not the wall
-  ([261008-saturated-subfit-diagnosis](261008-saturated-subfit-diagnosis/LOGBOOK.md)).
-- **SATP done:** preconditioning makes the saturated sub-fit about 3× cheaper with the same answer. Nothing running.
-- **Next:** adopt the preconditioning flags for saturated runs and toys (pending Luca); a summary refresh adds SATP.
-- **Blocking on:** nothing.
+- **Closed by Luca on 2026-10-09; the goal is met.** The main-fit crawl is solved by the C² wall, now the default
+  (WRemnants 692f9483, pushed). The saturated sub-fit is about 3× faster with full-scope spectral preconditioning, which
+  is now in fitterAD.sh and the toy recipe (WRemnantsHelpers 1c5d93a, pushed). τ-continuation is opt-in (3c0a9fb).
+- **Parked (not pursued):** variable projection of the 39 saturated scales; a mid-fit preconditioner rebuild; an
+  EDM-style early stop; C² from a fully cold start; preconditioning on toys (to be measured in the toy campaign).
+- **Running:** nothing.
 
 ---
 
 ## Log
+
+### 2026-10-09
+- Luca: close the study. Final summary and knowledge-curator dispatched.
+- Luca: preconditioning goes into fitterAD.sh for every fit (the main fit pays the Hessian; no rabbit change), and into the
+  toy recipe (1c5d93a). All commits pushed.
 
 ### 2026-10-08
 - SATP PASSES ([261008-saturated-subfit-diagnosis](261008-saturated-subfit-diagnosis/LOGBOOK.md) Result §5). Full-scope
@@ -141,7 +144,8 @@ Suspected root causes, to be tested, not assumed:
 - The hours-long walled-fit crawl is scipy trust-krylov's radius rule locking up at the relu² wall's curvature jump. A C²
   ramp removes it and lands on the same minimum (Δα_s 4e-6σ, face overshoot 2.4e-6 GeV²)
   ([261008-c2-wall-test](261008-c2-wall-test/LOGBOOK.md); mechanism in [261006-diagnosis](261006-diagnosis/LOGBOOK.md)).
-- Restart-on-stall does not fix the crawl. τ-continuation does, but costs an extra cache load.
+- Restart-on-stall does not fix the crawl. τ-continuation does on the surrogate (never run on a real fit), at the cost of an
+  extra cache load.
 - The projected-saturated sub-fit's slowness is intrinsic to the saturated model (κ ~ 1e9–1e10, an α_s–shape valley, 89–91 %
   of the time in HVPs), and the wall plays no part
   ([261008-saturated-subfit-diagnosis](261008-saturated-subfit-diagnosis/LOGBOOK.md)).
@@ -149,6 +153,9 @@ Suspected root causes, to be tested, not assumed:
 ---
 
 ## Decisions
+- 2026-10-09 (Luca): full-scope spectral preconditioning in fitterAD.sh for all fits; study closed.
+  Caveat (curator): there is no real-fit evidence for preconditioning the MAIN fit. On the relu² surrogate a start-built
+  whitening hurt 3 of 5 cold starts (cold_000: 95 → 1181 iterations). Flagged to Luca.
 
 - 2026-10-06 (Luca): trust-krylov stays and trust-constr is out as a production minimiser (warm certifier only). No
   confirmation studies; conserve resources.

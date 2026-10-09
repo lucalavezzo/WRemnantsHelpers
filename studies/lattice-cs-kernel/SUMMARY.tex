@@ -2,11 +2,12 @@
 % slug: lattice-cs-kernel
 % status: active
 % period: 2026-09-23 – ongoing
-% updated: 2026-10-08
-% covers: 2026-10-08
+% updated: 2026-10-09
+% covers: 2026-10-09
 %
 % BUILD: scripts/summary_pdf.py lattice-cs-kernel  (pdflatex on the host, from this directory).
 % Converted from SUMMARY.md (first version, 2026-10-08) and refreshed the same day.
+% Refreshed 2026-10-09: V3 adopted as nominal and code default, n_f-row fits (V3D/V3N), open items pruned.
 % Public page: no absolute alpha_s from data; Delta alpha_s only in units of the reference fit's sigma.
 \documentclass[10pt,a4paper]{article}
 
@@ -211,10 +212,11 @@
 
 \begin{answer}
 The ASWZ lattice data for the Collins--Soper (CS) kernel now enter the \alphas\ fit as an exact $\chi^2$ term, with the
-kernel computed by SCETlib at every fit step. In the proposed nominal, \fit{LATFROZ\_V3}, the lattice constrains only
+kernel computed by SCETlib at every fit step. In the nominal, \fit{LATFROZ\_V3} (since 10-09 the code default), the lattice constrains only
 the CS non-perturbative (NP) parameters \lnu2, \lnu4. Against the Z-only fits it moves \alphas\ by $+0.245\,\sigma$ when
 \lnu4\ floats ($\sigma(\alphas)\times1.05$) and by $-0.013\,\sigma$ when $\lnu4=0$. The Z data fix the product of the CS
-and TMD damping, and the lattice decides how that product is split between the two.
+and TMD damping, and the lattice decides how that product is split between the two. The lattice's $n_f$-scheme systematic is negligible for
+\alphas\ (it moves it by $0.01\,\sigma$).
 \textbf{Caveat:} the Z data and the lattice disagree on the shape of $\gz(b_T)$ at $3.2\sigma$ (PG $=13.5$ for
 2\,dof). Quote it with any lattice-constrained \alphas. Real data; blinded shifts in units of
 the reference fit's $\sigma(\alphas)$.
@@ -243,7 +245,8 @@ eigenvectors (44 model priors; $\lambda_\infty^\nu=2$ frozen). The NP damping wa
 \lnu2, \lnu4. \fit{LATFROZ} is warm-started from \fit{LATB8}. \alphas\ is blinded throughout.
 \textbf{Fit names.} \fit{XWSTIFF}, \fit{XL4ZSTIFF}: Z only, \lnu4\ free or $=0$. \fit{NOMSTIFF}: old nominal, a 1D
 Gaussian on \lnu2\ from a lattice-only fit, $\lnu4=0$. \fit{LATB8}: exact term, \emph{live} kernel.
-\fit{LATFROZ\_V\{1,2,3\}}: exact term, \emph{frozen} kernel, $n_f$ row V1/V2/V3 (Table~\ref{tab:nf}).
+\fit{LATFROZ\_V\{1,2,3\}}: exact term, \emph{frozen} kernel, $n_f$ row V1/V2/V3 (Table~\ref{tab:nf}); \fit{V3D},
+\fit{V3N}: V3 with the $n_f$ row in its direct form or removed (Sec.~\ref{sec:robust}).
 
 \paragraph{The lattice data.} ASWZ give 21 points $y_i=\gamma_q(b_i,\mu=2\,\mathrm{GeV})$ in $\overline{\mathrm{MS}}$,
 $n_f=4$, on three ensembles ($a=0.15$, $0.12$, $0.09$\,fm) with a covariance each. $\gamma_q$ is exactly SCETlib's
@@ -312,14 +315,15 @@ to \alphas\ and every TNP is exactly zero, checked inside the fitter \taskref{26
 
 \paragraph{The $n_f$ systematic row.} The alternative kernel puts $n_f=4$ into $\beta$, the cusp and/or the boundary
 term, with $\alpha_s^{(4)}:=\alpha_s^{(5)}$ at an identification scale. Its point shift (NP part cancels exactly) is mapped
-onto $(\lnu2,\lnu4)$ by a lattice-only refit and enters $C$ as one row (Table~\ref{tab:nf}). V3 is the lattice's own
-perturbative theory: $n_f=4$ throughout, coupling from $m_b$. (A literal \code{nfmatch=4.18} would run up in $n_f=5$
+onto $(\lnu2,\lnu4)$ by a lattice-only refit and enters $C$ as one row (Table~\ref{tab:nf}). V3, the nominal and the
+code default (Luca, 10-09), is the lattice's own perturbative theory: $n_f=4$ throughout, coupling from $m_b$. (A literal \code{nfmatch=4.18} would run up in $n_f=5$
 and down in $n_f=4$, flipping the sign of the shift; not fitted.) \taskref{261008-latfroz-nf-variants}
 
 \begin{table}[htb]
   \centering\small
   \caption{The $n_f$ conventions: point shift $\delta_{n_f}$ at $\alphas(m_Z)=0.1168$, and the resulting move
-    $\Delta\lambda$ of the lattice-only $(\lnu2,\lnu4)$ in units of their stat.\ $\sigma$ (0.039, 0.0034); $m_b(m_b)=4.18$\,GeV. \taskref{261008-latfroz-nf-variants}}
+    $\Delta\lambda$ of the lattice-only $(\lnu2,\lnu4)$ in units of their stat.\ $\sigma$ (0.039, 0.0034); $m_b(m_b)=4.18$\,GeV.
+    V3 is the nominal and, since WRemnants \code{3841ee42}, the default of \code{LatticeCSTerm}. \taskref{261008-latfroz-nf-variants}}
   \label{tab:nf}
     \setlength{\tabcolsep}{4pt}
   \begin{tabular}{lllll}
@@ -351,7 +355,7 @@ The first version of this summary and the task logbooks quote shifts against it.
     \filelink{scripts/orch_dalpha_vs_nolattice.out}, \filelink{scripts/orch_lambda_precision.out} \logref{2026-10-08};
     vs \fit{NOMSTIFF}: \taskref{261008-latfroz-nf-variants}; lattice only: \taskref{261008-np-function-figures}. V3:
     $\rho(\lnu2,\lnu4)=-0.75$ (lattice only $-0.88$; stat-only $\sigma$ 0.039, 0.0034). On a wall face the walled $\sigma$
-    is the wall; \fit{XWSTIFF}'s \lnu4\ includes its registry prior. Bold: proposed nominal.}
+    is the wall; \fit{XWSTIFF}'s \lnu4\ includes its registry prior. Bold: nominal.}
   \label{tab:dalpha}
   \setlength{\tabcolsep}{3.5pt}
   \begin{tabular}{lrrrrll}
@@ -423,8 +427,9 @@ $\Delta\chi^2_\mathrm{lat}=9.2$ above the lattice-only minimum \taskref{261008-n
 The parameter goodness of fit (PG) quantifies it (Fig.~\ref{fig:plane}):
 $\mathrm{PG}=2[\mathrm{NLL}_\mathrm{joint}-F_Z(\text{Z-only min})]=\Delta\chi^2_Z+\Delta\chi^2_\mathrm{lat}=4.29+9.19=13.5$
 for 2\,dof, $p=0.12\,\%$, $3.2\sigma$, for V3 against \fit{XWSTIFF}. V1 and V2 give 13.75 and 13.58. The lattice data are
-fine on their own ($\chi^2_\mathrm{lat}=15.9/18$ at the joint minimum), and the $n_f$ row does not absorb the tension: the
-stat-only $\Delta\chi^2_\mathrm{lat}$ is 9.5--9.6 \taskref{261008-latfroz-nf-variants}. Caveats: (i)~the second Z-only minimum \fit{CMR1B} gives 12.1 ($3.0\sigma$); (ii)~the Z-only minimum is on the
+fine on their own ($\chi^2_\mathrm{lat}=15.9/18$ at the joint minimum), and the $n_f$ systematic neither absorbs nor
+creates the tension: refitted without the row (\fit{V3N}) or with its direct form (\fit{V3D}), PG is 13.76 and 13.41
+(Table~\ref{tab:nfrow}) \taskref{261008-latfroz-nf-variants}. Caveats: (i)~the second Z-only minimum \fit{CMR1B} gives 12.1 ($3.0\sigma$); (ii)~the Z-only minimum is on the
 wall, so 2-dof Wilks is untested (toys would calibrate it); (iii)~keeping \fit{XWSTIFF}'s registry \lnu{} priors gives
 11.2 ($2.9\sigma$). The
 lattice-only optimum has $\lnu4<0$ ($1.7\sigma$ outside the physical quadrant) and anti-damps beyond $b_T=1.10$\,fm
@@ -459,57 +464,106 @@ The decomposition matters wherever the Z tune is carried to other $Q$, $Y$, or t
 
 % ============================================================================================
 \section{Robustness, systematics and caveats}
+\label{sec:robust}
 
-\alphas\ barely depends on how the lattice is applied. All exact-term variants lie within $-0.15\ldots-0.04\,\snom$ of
-\fit{NOMSTIFF} \taskref{261006-lattice-chi2-in-fit}\,\taskref{261007-lattice-term-native}. Freezing the kernel moves
-\alphas\ by $-0.026\,\snom$ relative to the live \fit{LATB8} ($\sigma$ $+0.9\,\%$). The $n_f$ conventions span
-$0.009\,\snom$ (V2 vs V3: $0.0014\,\snom$), and Newton steps predicted every \fit{LATFROZ} fit to $\le0.0005\,\snom$
-\taskref{261008-latfroz-nf-variants}. The dropped $b_T$ window moved \alphas\ by $\le0.0004\,\sigma$; replacing the old exact-RGE table by SCETlib's
-analytic-RGE kernel, by $-0.027\,\snom$ \taskref{261007-lattice-term-native}.
- The fits used the relu$^2$ wall; the WRemnants
-default is now a $C^2$ ramp (\code{692f9483}), so reruns need \code{smooth=relu2}. \fit{LATB8}'s full saturated test is
-753.35/777 ($p=72\,\%$); the projected-\ptll\ test is poor, as in every fit of this lineage: 78.4/39 ($p=0.019\,\%$), and
-80.7/39 without the exact term \taskref{261007-lattice-term-native}. Not covered: $\lambda_\infty^\nu$ (held at 2), the
-$n_f$ $4\to3$ step below $m_c$, and the authors' matching order (assumed inside their errors). 
+\alphas\ barely depends on how the lattice is applied. Below, \snom\ is the $\sigma(\alphas)$ of \fit{NOMSTIFF}. All
+exact-term variants lie within $-0.15\ldots-0.04\,\snom$ of \fit{NOMSTIFF}
+\taskref{261006-lattice-chi2-in-fit}\,\taskref{261007-lattice-term-native}. Freezing the kernel moves \alphas\ by
+$-0.026\,\snom$ relative to the live \fit{LATB8} ($\sigma$ $+0.9\,\%$). The $n_f$ conventions span $0.009\,\snom$ (V2 vs
+V3: $0.0014\,\snom$), and Newton steps predicted every \fit{LATFROZ} fit to $\le0.0005\,\snom$
+\taskref{261008-latfroz-nf-variants}. The dropped $b_T$ window moved \alphas\ by $\le0.0004\,\sigma$; replacing the old
+exact-RGE table by SCETlib's analytic-RGE kernel, by $-0.027\,\snom$ \taskref{261007-lattice-term-native}.
+
+\paragraph{The size of the $n_f$ systematic and the form of its row.} Two refits of \fit{LATFROZ\_V3} change only the
+lattice term's \code{syst=} option (Table~\ref{tab:nfrow}). The whole $n_f$ systematic, V3 against the stat-only V3N,
+moves \alphas\ by $+0.0096\,\snom$ ($+0.0068$ in the direct form). Mapping the point shift onto $(\lnu2,\lnu4)$ instead of
+using it raw is worth $-0.0028\,\snom$. Its contribution to $\sigma(\alphas)$ in quadrature,
+$\sqrt{\sigma_\mathrm{V3}^2-\sigma_\mathrm{V3N}^2}=0.051\,\snom$ (direct form 0.034), is a $0.14\,\%$ change of $\sigma$,
+at the resolution of two separately converged Hessians; read it as $\le0.05\,\snom$. Newton steps from V3 predicted V3D
+to $0.0001\,\sigma$ and V3N to $0.0011\,\sigma$ \taskref{261008-latfroz-nf-variants}. The systematic is negligible for
+\alphas\ in either form and shows up only in the NP sector (\lnu4\ $0.0117\to0.0106$). The J-mapped row (\code{syst=Jnf})
+is kept as the conservative choice: it has the larger effect on both the central value and the width
+\logref{2026-10-09}.
+
+\begin{table}[htb]
+  \centering\small
+  \caption{The $n_f$ systematic row, on top of \fit{LATFROZ\_V3} (card~A, real data, $\tau=8$, warm from V3, code
+    \code{3841ee42}, wall \code{smooth=relu2}). \dalphas\ blinded, in \snom; Newton-step predictions in parentheses.
+    \lnu{} in physical units ($\lambda_\infty^\nu=2$). $\Delta\chi^2_\mathrm{lat}$ is above the lattice-only minimum with
+    each fit's own covariance; PG is against the Z-only \fit{XWSTIFF} (2\,dof, Wilks untested on the wall).
+    \taskref{261008-latfroz-nf-variants}}
+  \label{tab:nfrow}
+  \setlength{\tabcolsep}{3.5pt}
+  \begin{tabular}{llrrllrr}
+    \toprule
+    Fit & $n_f$ row (\code{syst=}) & \dalphas\ vs V3 [\snom] & $\sigma/\sigma_\mathrm{V3}$ & \lnu2\ [GeV$^2$] &
+      \lnu4\ [GeV$^4$] & $\Delta\chi^2_\mathrm{lat}$ & PG \\
+    \midrule
+    \textbf{V3} & J-mapped (\code{Jnf}) & 0 & 1 & $0.0383\pm0.0303$ & $0.0106\pm0.0057$ & 9.19 & 13.48 ($3.24\sigma$) \\
+    V3D & direct (\code{direct_nf}) & $-0.0028$ ($-0.0029$) & 0.9992 & $0.0372\pm0.0305$ & $0.0109\pm0.0056$ & 9.24 & 13.41 ($3.23\sigma$) \\
+    V3N & none, stat.\ only & $-0.0096$ ($-0.0085$) & 0.9986 & $0.0382\pm0.0304$ & $0.0117\pm0.0056$ & 9.52 & 13.76 ($3.28\sigma$) \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\paragraph{Other caveats.} The fits used the relu$^2$ wall; the WRemnants default is now a $C^2$ ramp (\code{692f9483}),
+so reruns need \code{smooth=relu2}. \fit{LATB8}'s full saturated test is 753.35/777 ($p=72\,\%$); the projected-\ptll\
+test is poor, as in every fit of this lineage: 78.4/39 ($p=0.019\,\%$), and 80.7/39 without the exact term
+\taskref{261007-lattice-term-native}. Both p-values, and the PG, assume asymptotic distributions; toys are not run.
+Not covered: $\lambda_\infty^\nu$ (held at 2), the $n_f$ $4\to3$ step below $m_c$, and the authors' matching order
+(assumed inside their errors).
 
 % ============================================================================================
 \section{What changed}
 
+The previous version of this summary listed V3 as proposed and the code defaults as unchanged; both moved on 10-09.
 \begin{itemize}
-  \item \textbf{WRemnants} \code{scetlib-ad-param-model} on \code{origin}, all pushed (checked with \code{git} on 10-08;
-    the first version of this summary had \code{2ee7d998} as local only): \code{44f8a5c0} table-based plugin
-    \code{lattice_cs_chi2}; \code{3ef3efb9} its \code{pert=live}; \code{b14f84f4} native \code{LatticeCSTerm};
-    \code{4e7e481e} \code{CompositeParamModel} support; \code{2ee7d998} \code{pert=frozen}, \code{nfswitch}, \code{nfscheme}.
+  \item \textbf{WRemnants} \code{scetlib-ad-param-model} on \code{origin}, all pushed (checked with \code{git} on 10-09):
+    \code{44f8a5c0} table-based plugin \code{lattice_cs_chi2}; \code{3ef3efb9} its \code{pert=live}; \code{b14f84f4} native
+    \code{LatticeCSTerm}; \code{4e7e481e} \code{CompositeParamModel} support; \code{2ee7d998} \code{pert=frozen},
+    \code{nfswitch}, \code{nfscheme}. New: \code{1b3732bb} retires the table-based term, its inputs
+    (\code{lattice_aswz_inputs.npz/.json}) and its test; \code{3841ee42} makes V3 the \code{LatticeCSTerm} default
+    (\code{pert=frozen}\ \code{alphas_frozen=0.1168}\ \code{syst=Jnf}\ \code{nfmatch=4.18}\ \code{nfscheme=full}; bitwise
+    equal to the V3 fit's term, tests 38/38) and makes a missing \code{tau=} an error when no rabbit fitter is found,
+    where the penalty used to be applied unscaled (off by $e^{2\tau}$). Reproducing an older fit now needs its options on
+    the \code{-r} line; the module docstring lists them.
   \item \textbf{scetlib-cms} \code{gamma-nu-points} (\code{069c326}, \code{6ab371a}), pushed, draft
     \href{https://gitlab.cern.ch/scetlib/contrib/scetlib-cms/-/merge_requests/17}{MR\,!17}. Draft
     \href{https://gitlab.cern.ch/scetlib/contrib/scetlib-cms/-/merge_requests/18}{MR\,!18} (\code{tf_native} NP-model
     ids) is a side fix, unused here. \textbf{rabbit} \code{9bfe73f} (\code{--saturatedSeed}, halves the saturated
-    sub-fit), branch \code{saturated-subfit-seed} on Luca's fork, no PR.
-  \item \textbf{Defaults and cards}: unchanged. The nominal is set on the \code{-r} line (\code{syst=Jnf}\
-    \code{pert=frozen}\ \code{alphas_frozen=0.1168}\ \code{nfmatch=4.18}\ \code{nfscheme=full}); the code defaults are
-    still \code{syst=Jnf+Jbt}\ \code{pert=live}\ \code{nfmatch=1}. \textbf{knowledge/}: nothing yet. Luca's decisions:
-    no $k$-form; kernel from SCETlib at every step (analytic RGE, native $n_f$ row, no $\mu_0$ variation); no $b_T$
-    window; keep the simultaneous fit rather than fixing the CS $\lambda$s.
+    sub-fit), branch \code{saturated-subfit-seed} on Luca's fork, no PR. \textbf{WRemnantsHelpers} \code{1c5d93a}
+    (pushed): spectral preconditioning in \code{fitterAD.sh} and the toy recipe.
+  \item \textbf{Defaults and cards}: the V3 lattice term is the default (above). The Gaussian 1D/2D lattice cards of the
+    old nominal \fit{NOMSTIFF} are retired: their producers survive only as study scripts, and the cards stay on ceph
+    because existing fitresults reference them.
+  \item \textbf{knowledge/} (\code{af6a838}): a scope note in \S10 of the NP-constraints note
+    \code{np_parametrization_constraints.md} (in \code{30_physics_global/}). Its warning against lattice covariances concerns
+    the $\lambda$-space covariance of the Tackmann translation, not the exact $\chi^2$ of the ASWZ points used here.
+    Lattice-derived priors are fine; the TMD boundary-condition $\lambda$ stay free (no Tackmann priors).
+  \item \textbf{Luca's decisions}: no $k$-form; kernel from SCETlib at every step (analytic RGE, native $n_f$ row, no
+    $\mu_0$ variation); no $b_T$ window; keep the simultaneous fit rather than fixing the CS $\lambda$s; V3 nominal with the
+    conservative \code{Jnf} row; $\lambda_\infty^\nu$ rows deferred.
 \end{itemize}
 
 % ============================================================================================
 \section{Conclusions and open items}
 
 The lattice enters the \alphas\ fit exactly and cheaply, constrains only the CS NP sector, and is close to neutral for
-\alphas\ once \lnu4\ is treated alike. The price is a $3.2\sigma$ shape disagreement with the Z data, which goes with the
-result.
+\alphas\ once \lnu4\ is treated alike. Its own $n_f$-scheme systematic is negligible for \alphas. The price is a
+$3.2\sigma$ shape disagreement with the Z data, independent of the $n_f$ treatment, which goes with the result. The
+figures of Sec.~3 are of \fit{LATFROZ\_V3} itself, which the new default reproduces bitwise, so they stand.
 
-\textbf{Physics review} (10-08): approve with fixes; \fit{LATFROZ} resolves the $b_T$-window, data-\alphas\ and
-$n_f$-sizing points. The ``blinding pair'' (one Newton row quoted at two \alphas\ frames) was \emph{accepted by Luca} as
-harmless. Open: (1)~the \S10 warning in \code{knowledge/30_physics_global/np_parametrization_constraints.md} against
-lattice covariances (it concerns the Tackmann translation, not the ASWZ data); (2)~no $\lambda_\infty^\nu$ rows;
-(3)~a guard in \code{_find_fitter}, which with no fitter and no \code{tau=} silently uses scale 1 (off by $e^{2\tau}$).
-\textbf{Also open} (Luca): V2 or V3; new code defaults and retiring the Gaussian cards; toys for the PG and saturated
-p-values; the AN's lattice section (still the Tackmann numbers). \textbf{Theorist email} (not sent): \emph{Q1}, is V3 the
-right $n_f=5\leftrightarrow4$ comparison of the $\overline{\mathrm{MS}}$ kernel at 2\,GeV, and is the residual inside
-their errors? \emph{Q3a}, are the points $\gamma_q^{\overline{\mathrm{MS}}}(b_T,2\,\mathrm{GeV})$ in $n_f=4$, matched at
-$\alpha_s^{(4)}(2\,\mathrm{GeV})=0.293$, and independent of $D_\mathrm{res}$, $B_\mathrm{NP}$? (Q3b is moot after
-freezing, Q2 without the window.)
+\textbf{Physics review} (10-08): approve with fixes. \fit{LATFROZ} resolved the $b_T$-window, data-\alphas\ and
+$n_f$-sizing points; the remaining ones are now closed: the \S10 scope note, the $\tau$ guard, and the ``blinding pair''
+(one Newton row quoted at two \alphas\ frames), accepted by Luca as harmless. $\lambda_\infty^\nu$ rows are deferred.
+
+\textbf{Open.} (1)~Toys for the PG and the saturated p-values, which would also calibrate 2-dof Wilks at the walled
+Z-only minimum: waiting, per Luca. (2)~The theorist email (not sent): \emph{Q1}, is V3 the right
+$n_f=5\leftrightarrow4$ comparison of the $\overline{\mathrm{MS}}$ kernel at 2\,GeV, and is the residual inside their
+errors? \emph{Q3a}, are the points $\gamma_q^{\overline{\mathrm{MS}}}(b_T,2\,\mathrm{GeV})$ in $n_f=4$, matched at
+$\alpha_s^{(4)}(2\,\mathrm{GeV})=0.293$, and independent of $D_\mathrm{res}$, $B_\mathrm{NP}$? (3)~$\lambda_\infty^\nu$
+(held at 2), deferred. (4)~The AN's lattice section, which still has the Tackmann numbers. Nothing of this study is
+running.
 
 {\footnotesize\color{sumgray} Full record: \logbooklink{the study logbook} and its task logbooks. Fitresults: \code{/ceph/.../lavezzo/alphaS/2610{06,07,08}_*}, \code{260930_stiff_wall_fits}.\par}
 

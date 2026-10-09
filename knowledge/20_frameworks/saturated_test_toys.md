@@ -4,7 +4,8 @@ Use this when a Wilks p-value from `--computeSaturatedProjectionTests` is in dou
 happens when a one-sided regulariser (the NP damping wall) is active, parameters sit
 against it, or the fit is strongly non-linear. The recipe and the result both come from
 `studies/alphas-scan-discontinuity/260925-wall-sat-toys/` (2026-09-25 .. 27; card A, old
-260827 AD cache, `NPDampingWall` at tau = 5).
+260827 AD cache, `NPDampingWall` at tau = 5, then a relu² wall: the wall is C² by default since 2026-10-08, add
+`smooth=relu2` to its `-r` line to replay those toys exactly).
 
 ## Result: at the walled minimum, Wilks holds
 
@@ -43,7 +44,9 @@ rabbit_fit.py <card> -t N --seed S --toysDataMode expected \
   minimum to 2e-10), measured on data, not yet on toys
   (`studies/constrained-fit-strategy/261008-saturated-subfit-diagnosis`). The flag is fitter-wide, so each toy's main fit
   also pays one Hessian to build its preconditioner (~5–15 min); accepted for now. Do NOT loosen `--minimizerGtol`
-  under it: stop errors of up to Δq 0.86 were seen.
+  under it: a model of the stop error puts a gtol = 0.03 stop anywhere up to Δq 0.86 (modelled, not observed; a
+  guaranteed Δq ≤ 0.01 needs gtol ≲ 3e-3). Its effect on the toy *main* fit is unmeasured. Details and the
+  why: `rabbit_minimizer_tolerances.md`, "Ill-conditioned sub-fits".
 - **Generation point = the full postfit vector, set through two handles.**
   - The model token `xparam_default=` covers the ParamModel parameters
     (`scripts/make_xparam.py`).
