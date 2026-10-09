@@ -1,0 +1,37 @@
+u_e / sigma (how coherent the per-ensemble shift is):
+  L32: [1.119, 1.204, 1.168, 1.277, 1.211, 1.048]
+  L48: [1.058, 1.136, 0.525, 1.201, 1.001, 1.028, 1.03]
+  L64: [1.262, 1.348, 1.479, 1.647, 1.821, 2.382, 1.707, 1.18]
+
+['c0', 'k1'] B_NP=2.0: chi2=7.319/19  theta=[0.03242, 0.21305]
+  c0 : GLS 0.0060 | notebook rule analytic 0.0115 | MC(200, CI) median 0.0114 [16-84% over seeds 0.0108-0.0121] | proper full-cov bootstrap 0.0060
+  k1 : GLS 0.0663 | notebook rule analytic 0.0703 | MC(200, CI) median 0.0698 [16-84% over seeds 0.0656-0.0742] | proper full-cov bootstrap 0.0660
+  rho(p0,p1): GLS +0.434, notebook rule -0.939
+
+['c0', 'k2'] B_NP=2.0: chi2=8.276/19  theta=[0.02716, 0.21974]
+  c0 : GLS 0.0055 | notebook rule analytic 0.0131 | MC(200, CI) median 0.0130 [16-84% over seeds 0.0123-0.0139] | proper full-cov bootstrap 0.0055
+  k2 : GLS 0.0718 | notebook rule analytic 0.0754 | MC(200, CI) median 0.0749 [16-84% over seeds 0.0704-0.0794] | proper full-cov bootstrap 0.0723
+  rho(p0,p1): GLS +0.185, notebook rule -0.956
+
+['c0', 'k1', 'k2'] B_NP=2.0: chi2=7.276/18  theta=[0.03367, 0.2665, -0.05977]
+  c0 : GLS 0.0085 | notebook rule analytic 0.0124 | MC(200, CI) median 0.0122 [16-84% over seeds 0.0115-0.0130] | proper full-cov bootstrap 0.0085
+  k1 : GLS 0.2664 | notebook rule analytic 0.1135 | MC(200, CI) median 0.1116 [16-84% over seeds 0.1042-0.1193] | proper full-cov bootstrap 0.2638
+  k2 : GLS 0.2885 | notebook rule analytic 0.1156 | MC(200, CI) median 0.1144 [16-84% over seeds 0.1062-0.1220] | proper full-cov bootstrap 0.2856
+  rho(p0,p1): GLS +0.762, notebook rule -0.161
+
+['c0', 'c1', 'k1'] B_NP=2.0: chi2=7.314/18  theta=[0.03314, 0.0039, 0.20788]
+  c0 : GLS 0.0121 | notebook rule analytic 0.0149 | MC(200, CI) median 0.0147 [16-84% over seeds 0.0139-0.0158] | proper full-cov bootstrap 0.0120
+  c1 : GLS 0.0568 | notebook rule analytic 0.0482 | MC(200, CI) median 0.0476 [16-84% over seeds 0.0440-0.0511] | proper full-cov bootstrap 0.0569
+  k1 : GLS 0.1004 | notebook rule analytic 0.0974 | MC(200, CI) median 0.0965 [16-84% over seeds 0.0902-0.1028] | proper full-cov bootstrap 0.1009
+  rho(p0,p1): GLS +0.867, notebook rule +0.640
+
+['c0'] B_NP=2.0: chi2=17.635/20  theta=[0.02403]
+  c0 : GLS 0.0054 | notebook rule analytic 0.0141 | MC(200, CI) median 0.0140 [16-84% over seeds 0.0132-0.0149] | proper full-cov bootstrap 0.0054
+
+['g2', 'k1'] B_NP=1.5: chi2=10.945/19  theta=[0.04246, 0.14872]
+  g2 : GLS 0.0065 | notebook rule analytic 0.0124 | MC(200, CI) median 0.0123 [16-84% over seeds 0.0115-0.0131] | proper full-cov bootstrap 0.0064
+  k1 : GLS 0.0638 | notebook rule analytic 0.0822 | MC(200, CI) median 0.0819 [16-84% over seeds 0.0769-0.0866] | proper full-cov bootstrap 0.0635
+  rho(p0,p1): GLS +0.348, notebook rule -0.949
+  vector-draw control ['c0', 'k1']: sigma = [0.0074, 0.0758]
+  vector-draw control ['c0', 'k2']: sigma = [0.0067, 0.0811]
+  vector-draw control ['g2', 'k1']: sigma = [0.0078, 0.0721]

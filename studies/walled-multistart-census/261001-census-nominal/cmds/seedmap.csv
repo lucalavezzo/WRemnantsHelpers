@@ -1,0 +1,11 @@
+postfix,seed
+CENS01,/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261001_census_nominal/seeds/pert_000.hdf5
+CENS02,/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261001_census_nominal/seeds/pert_001.hdf5
+CENS03,/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261001_census_nominal/seeds/pert_002.hdf5
+CENS04,/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261001_census_nominal/seeds/pert_003.hdf5
+CENS05,/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261001_census_nominal/seeds/pert_004.hdf5
+CENS06,/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261001_census_nominal/seeds/pert_005.hdf5
+CENS07,/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261001_census_nominal/seeds/pert_006.hdf5
+CENS08,/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261001_census_nominal/seeds/pert_007.hdf5
+CENS09,/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261001_census_nominal/seeds/cold_000.hdf5
+CENS10,/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261001_census_nominal/seeds/cold_001.hdf5

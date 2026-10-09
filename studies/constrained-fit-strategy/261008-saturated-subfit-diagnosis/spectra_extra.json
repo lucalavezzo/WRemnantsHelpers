@@ -1,0 +1,286 @@
+{
+ "full_from_H_s": {
+  "kappa": 12145276.371156776,
+  "n_outside_0p1_10": 10,
+  "outliers": [
+   {
+    "lam": 12726.053684994682,
+    "comp_theta": [
+     [
+      "alphaS",
+      -0.835
+     ],
+     [
+      "resumTNP_b_qqV",
+      0.393
+     ],
+     [
+      "resumTNP_s",
+      -0.177
+     ],
+     [
+      "resumTNP_gamma_nu",
+      -0.143
+     ]
+    ]
+   },
+   {
+    "lam": 1297.290403790303,
+    "comp_theta": [
+     [
+      "alphaS",
+      -0.742
+     ],
+     [
+      "lambda2_nu",
+      0.562
+     ],
+     [
+      "lambda4",
+      -0.155
+     ],
+     [
+      "pdfEig25",
+      0.152
+     ]
+    ]
+   },
+   {
+    "lam": 0.001047819192918258,
+    "comp_theta": [
+     [
+      "alphaS",
+      -0.971
+     ],
+     [
+      "resumTNP_b_qqV",
+      0.113
+     ],
+     [
+      "pdfEig18",
+      -0.08
+     ],
+     [
+      "lambda2",
+      0.06
+     ]
+    ]
+   },
+   {
+    "lam": 0.002334469450632841,
+    "comp_theta": [
+     [
+      "alphaS",
+      0.615
+     ],
+     [
+      "resumTNP_b_qqV",
+      0.511
+     ],
+     [
+      "resumTNP_b_qg",
+      0.278
+     ],
+     [
+      "resumTNP_s",
+      -0.206
+     ]
+    ]
+   },
+   {
+    "lam": 332.90577744666285,
+    "comp_theta": [
+     [
+      "alphaS",
+      0.706
+     ],
+     [
+      "resumTNP_b_qg",
+      0.411
+     ],
+     [
+      "pdfEig28",
+      -0.271
+     ],
+     [
+      "pdfEig17",
+      0.225
+     ]
+    ]
+   },
+   {
+    "lam": 0.03554426628787043,
+    "comp_theta": [
+     [
+      "alphaS",
+      -0.522
+     ],
+     [
+      "resumTNP_b_qg",
+      0.516
+     ],
+     [
+      "resumTNP_b_qqV",
+      -0.313
+     ],
+     [
+      "resumTNP_gamma_nu",
+      0.3
+     ]
+    ]
+   }
+  ],
+  "cg_late": {
+   "iters": {
+    "0.1": 5,
+    "0.01": 28,
+    "0.001": 66,
+    "0.0001": 68,
+    "1e-06": 77
+   },
+   "negative_curvature_at": null
+  }
+ },
+ "full_from_H_s_plus_l4nu_wall": {
+  "kappa": 12719389.979430208,
+  "n_outside_0p1_10": 9,
+  "outliers": [
+   {
+    "lam": 13333.471953140033,
+    "comp_theta": [
+     [
+      "alphaS",
+      -0.629
+     ],
+     [
+      "resumTNP_b_qqV",
+      0.566
+     ],
+     [
+      "resumTNP_s",
+      -0.254
+     ],
+     [
+      "resumTNP_gamma_nu",
+      -0.179
+     ]
+    ]
+   },
+   {
+    "lam": 0.001048279200079793,
+    "comp_theta": [
+     [
+      "alphaS",
+      -0.971
+     ],
+     [
+      "resumTNP_b_qqV",
+      0.113
+     ],
+     [
+      "pdfEig18",
+      -0.08
+     ],
+     [
+      "lambda2",
+      0.06
+     ]
+    ]
+   },
+   {
+    "lam": 454.1746203549235,
+    "comp_theta": [
+     [
+      "alphaS",
+      -0.877
+     ],
+     [
+      "resumTNP_b_qqV",
+      -0.192
+     ],
+     [
+      "pdfEig25",
+      0.147
+     ],
+     [
+      "pdfEig17",
+      -0.139
+     ]
+    ]
+   },
+   {
+    "lam": 0.002336771511147845,
+    "comp_theta": [
+     [
+      "alphaS",
+      0.616
+     ],
+     [
+      "resumTNP_b_qqV",
+      0.509
+     ],
+     [
+      "resumTNP_b_qg",
+      0.278
+     ],
+     [
+      "resumTNP_s",
+      -0.206
+     ]
+    ]
+   },
+   {
+    "lam": 36.98059353869252,
+    "comp_theta": [
+     [
+      "resumTNP_b_qg",
+      0.53
+     ],
+     [
+      "alphaS",
+      -0.475
+     ],
+     [
+      "resumTNP_b_qqV",
+      -0.272
+     ],
+     [
+      "pdfEig25",
+      0.22
+     ]
+    ]
+   },
+   {
+    "lam": 0.036176322941507265,
+    "comp_theta": [
+     [
+      "alphaS",
+      -0.521
+     ],
+     [
+      "resumTNP_b_qg",
+      0.514
+     ],
+     [
+      "resumTNP_b_qqV",
+      -0.311
+     ],
+     [
+      "resumTNP_gamma_nu",
+      0.3
+     ]
+    ]
+   }
+  ],
+  "cg_late": {
+   "iters": {
+    "0.1": 5,
+    "0.01": 55,
+    "0.001": 59,
+    "0.0001": 63,
+    "1e-06": 68
+   },
+   "negative_curvature_at": null
+  }
+ }
+}

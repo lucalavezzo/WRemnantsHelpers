@@ -1,0 +1,516 @@
+% title: Lattice CS-kernel constraints (ASWZ 2024) in the αs fit
+% slug: lattice-cs-kernel
+% status: active
+% period: 2026-09-23 – ongoing
+% updated: 2026-10-08
+% covers: 2026-10-08
+%
+% BUILD: scripts/summary_pdf.py lattice-cs-kernel  (pdflatex on the host, from this directory).
+% Converted from SUMMARY.md (first version, 2026-10-08) and refreshed the same day.
+% Public page: no absolute alpha_s from data; Delta alpha_s only in units of the reference fit's sigma.
+\documentclass[10pt,a4paper]{article}
+
+% ---- page and fonts ----
+\usepackage[a4paper,top=16mm,bottom=20mm,left=18mm,right=18mm,footskip=9mm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage[table]{xcolor}
+\usepackage[font=small,labelfont={bf,sf},margin=6pt,skip=4pt]{caption}
+\usepackage{subcaption}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage[section,below]{placeins}   % a result's figure stays inside its section
+\usepackage{tikz}                      % for a schematic / pipeline figure (Section 2)
+\usetikzlibrary{arrows.meta,positioning}
+\usepackage{url}
+% siunitx is not installed on the submit host's TeX Live; these fallbacks cover the usual
+% \num{0.547}, \SI{2.3}{\GeV}, \SI{0.14}{\percent} (no e-notation: write 1.2\times10^{-3}).
+\IfFileExists{siunitx.sty}{\usepackage{siunitx}}{}
+\providecommand\num[1]{\ensuremath{#1}}
+\providecommand\si[1]{\ensuremath{\mathrm{#1}}}
+\providecommand\SI[2]{\ensuremath{#1\,\mathrm{#2}}}
+\providecommand\GeV{GeV}\providecommand\MeV{MeV}\providecommand\TeV{TeV}
+\providecommand\percent{\%}\providecommand\pb{pb}\providecommand\fb{fb}
+\definecolor{sumblue}{HTML}{1B5FAE}
+\definecolor{sumrule}{HTML}{2A78D6}
+\definecolor{sumbox}{HTML}{EEF4FB}
+\definecolor{sumgray}{HTML}{5A5A5A}
+\definecolor{sumwarn}{HTML}{8A5A00}
+\usepackage[colorlinks=true,linkcolor=sumblue,urlcolor=sumblue,citecolor=sumblue,
+            pdfborder={0 0 0}]{hyperref}
+
+% unicode copied from a logbook would otherwise stop pdflatex
+\DeclareUnicodeCharacter{03B1}{\ensuremath{\alpha}}
+\DeclareUnicodeCharacter{03B2}{\ensuremath{\beta}}
+\DeclareUnicodeCharacter{03B3}{\ensuremath{\gamma}}
+\DeclareUnicodeCharacter{03B4}{\ensuremath{\delta}}
+\DeclareUnicodeCharacter{03B5}{\ensuremath{\epsilon}}
+\DeclareUnicodeCharacter{03B7}{\ensuremath{\eta}}
+\DeclareUnicodeCharacter{03B8}{\ensuremath{\theta}}
+\DeclareUnicodeCharacter{03BA}{\ensuremath{\kappa}}
+\DeclareUnicodeCharacter{03BB}{\ensuremath{\lambda}}
+\DeclareUnicodeCharacter{03BC}{\ensuremath{\mu}}
+\DeclareUnicodeCharacter{03BD}{\ensuremath{\nu}}
+\DeclareUnicodeCharacter{03C0}{\ensuremath{\pi}}
+\DeclareUnicodeCharacter{03C1}{\ensuremath{\rho}}
+\DeclareUnicodeCharacter{03C3}{\ensuremath{\sigma}}
+\DeclareUnicodeCharacter{03C4}{\ensuremath{\tau}}
+\DeclareUnicodeCharacter{03C6}{\ensuremath{\phi}}
+\DeclareUnicodeCharacter{03C7}{\ensuremath{\chi}}
+\DeclareUnicodeCharacter{03C8}{\ensuremath{\psi}}
+\DeclareUnicodeCharacter{03C9}{\ensuremath{\omega}}
+\DeclareUnicodeCharacter{0393}{\ensuremath{\Gamma}}
+\DeclareUnicodeCharacter{0394}{\ensuremath{\Delta}}
+\DeclareUnicodeCharacter{039B}{\ensuremath{\Lambda}}
+\DeclareUnicodeCharacter{03A3}{\ensuremath{\Sigma}}
+\DeclareUnicodeCharacter{03A6}{\ensuremath{\Phi}}
+\DeclareUnicodeCharacter{03A9}{\ensuremath{\Omega}}
+\DeclareUnicodeCharacter{2212}{\ensuremath{-}}
+\DeclareUnicodeCharacter{2248}{\ensuremath{\approx}}
+\DeclareUnicodeCharacter{2264}{\ensuremath{\leq}}
+\DeclareUnicodeCharacter{2265}{\ensuremath{\geq}}
+\DeclareUnicodeCharacter{2260}{\ensuremath{\neq}}
+\DeclareUnicodeCharacter{226A}{\ensuremath{\ll}}
+\DeclareUnicodeCharacter{226B}{\ensuremath{\gg}}
+\DeclareUnicodeCharacter{223C}{\ensuremath{\sim}}
+\DeclareUnicodeCharacter{221D}{\ensuremath{\propto}}
+\DeclareUnicodeCharacter{221E}{\ensuremath{\infty}}
+\DeclareUnicodeCharacter{221A}{\ensuremath{\surd}}
+\DeclareUnicodeCharacter{2202}{\ensuremath{\partial}}
+\DeclareUnicodeCharacter{2192}{\ensuremath{\rightarrow}}
+\DeclareUnicodeCharacter{2190}{\ensuremath{\leftarrow}}
+\DeclareUnicodeCharacter{21D2}{\ensuremath{\Rightarrow}}
+\DeclareUnicodeCharacter{2194}{\ensuremath{\leftrightarrow}}
+\DeclareUnicodeCharacter{2208}{\ensuremath{\in}}
+\DeclareUnicodeCharacter{2026}{\ldots}
+\DeclareUnicodeCharacter{2713}{\ensuremath{\checkmark}}
+\DeclareUnicodeCharacter{2080}{\ensuremath{_0}}
+\DeclareUnicodeCharacter{2081}{\ensuremath{_1}}
+\DeclareUnicodeCharacter{2082}{\ensuremath{_2}}
+\DeclareUnicodeCharacter{2083}{\ensuremath{_3}}
+\DeclareUnicodeCharacter{2084}{\ensuremath{_4}}
+\DeclareUnicodeCharacter{2085}{\ensuremath{_5}}
+\DeclareUnicodeCharacter{2086}{\ensuremath{_6}}
+\DeclareUnicodeCharacter{2087}{\ensuremath{_7}}
+\DeclareUnicodeCharacter{2088}{\ensuremath{_8}}
+\DeclareUnicodeCharacter{2089}{\ensuremath{_9}}
+\DeclareUnicodeCharacter{2070}{\ensuremath{^{0}}}
+\DeclareUnicodeCharacter{2074}{\ensuremath{^{4}}}
+\DeclareUnicodeCharacter{2075}{\ensuremath{^{5}}}
+\DeclareUnicodeCharacter{2076}{\ensuremath{^{6}}}
+\DeclareUnicodeCharacter{2077}{\ensuremath{^{7}}}
+\DeclareUnicodeCharacter{2078}{\ensuremath{^{8}}}
+\DeclareUnicodeCharacter{2079}{\ensuremath{^{9}}}
+\DeclareUnicodeCharacter{207B}{\ensuremath{^{-}}}
+\DeclareUnicodeCharacter{207A}{\ensuremath{^{+}}}
+
+% ---- layout ----
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.55ex plus 0.2ex}
+\setlist{itemsep=1pt,topsep=2pt,parsep=0pt,leftmargin=1.4em}
+\titleformat{\section}{\sffamily\large\bfseries}{\thesection}{0.6em}{}
+\titleformat{\subsection}{\sffamily\normalsize\bfseries}{\thesubsection}{0.6em}{}
+\titlespacing*{\section}{0pt}{2.0ex plus 0.6ex minus 0.3ex}{0.7ex}
+\titlespacing*{\subsection}{0pt}{1.4ex plus 0.4ex minus 0.2ex}{0.4ex}
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.8}
+\renewcommand{\textfraction}{0.07}
+\renewcommand{\floatpagefraction}{0.75}
+\setlength{\textfloatsep}{10pt plus 3pt minus 3pt}
+\setlength{\floatsep}{8pt plus 2pt minus 2pt}
+\setlength{\intextsep}{8pt plus 2pt minus 2pt}
+
+% ---- metadata: passed in by scripts/summary_pdf.py from the "% key:" lines ----
+\makeatletter
+\providecommand\SumTitle{\textcolor{red}{(build with scripts/summary\_pdf.py)}}
+\providecommand\SumSlug{?}
+\providecommand\SumStudy{?}       % the study slug (the parent study, for a task summary)
+\providecommand\SumViewPath{?}    % <slug> or <study>/<task>: the viewer anchor
+\providecommand\SumStatus{?}
+\providecommand\SumPeriod{?}
+\providecommand\SumUpdated{?}
+\providecommand\SumCovers{?}
+\begingroup\catcode`\#=12 \catcode`\~=12
+\gdef\Sum@web{https://submit.mit.edu/~lavezzo/alphaS/studies/#}
+\endgroup
+
+% ---- macros for the body ----
+% \taskref{261008-task}: cite the task a number comes from; links to its viewer page.
+\newcommand\taskref[1]{{\small\sffamily[\href{\Sum@web\SumStudy/#1}{#1}]}}
+% \logref{2026-07-02}: cite a dated entry of a single-layer study (no task dirs).
+\newcommand\logref[1]{{\small\sffamily[\href{\Sum@web\SumViewPath:logbook}{log #1}]}}
+% \viewerlink{<study>/<task>}{text}: any other page of the viewer.
+\newcommand\viewerlink[2]{\href{\Sum@web#1}{#2}}
+\newcommand\logbooklink[1]{\href{\Sum@web\SumViewPath:logbook}{#1}}
+% \code{path/or_flag}: typewriter, breaks at / and _, underscores need no escaping.
+\newcommand\code{\nolinkurl}
+% \caveat{...}: a comparability caveat set off before the number it qualifies.
+\newcommand\caveat[1]{{\color{sumwarn}\small\sffamily\textbf{Caveat.}}~{\small\itshape #1}}
+% physics shorthands
+\newcommand\alphas{\ensuremath{\alpha_\mathrm{s}}}
+\newcommand\dalphas{\ensuremath{\Delta\alpha_\mathrm{s}}}
+\newcommand\pT{\ensuremath{p_\mathrm{T}}}
+\newcommand\ptll{\ensuremath{p_\mathrm{T}^{\ell\ell}}}
+\newcommand\qT{\ensuremath{q_\mathrm{T}}}
+\newcommand\yll{\ensuremath{y^{\ell\ell}}}
+
+% the answer box: \begin{answer} ... \end{answer}, one or two sentences with the key number
+\newsavebox\Sum@box
+\newenvironment{answer}
+  {\par\vspace{1.2ex}\noindent\begin{lrbox}{\Sum@box}%
+   \begin{minipage}{\dimexpr\linewidth-3pt-2\fboxsep\relax}\vspace{1pt}%
+   {\sffamily\small\bfseries\color{sumblue}Answer}\par\vspace{1pt}}
+  {\vspace{1pt}\end{minipage}\end{lrbox}%
+   \hbox{{\color{sumrule}\vrule width 3pt}\colorbox{sumbox}{\usebox{\Sum@box}}}%
+   \par\vspace{0.8ex}}
+
+\newcommand\SummaryTitleBlock{%
+  {\sffamily\footnotesize\color{sumgray}%
+   \alphas\ analysis\,\textperiodcentered\,study summary\hfill status: \SumStatus\par}%
+  \vspace{3pt}%
+  {\sffamily\LARGE\bfseries\SumTitle\par}%
+  \vspace{5pt}%
+  {\small\color{sumgray}%
+   \texttt{\SumViewPath}\enspace\textperiodcentered\enspace period \SumPeriod
+   \enspace\textperiodcentered\enspace written \SumUpdated
+   \enspace\textperiodcentered\enspace covers logbook through \textbf{\SumCovers}\par
+   Full record: \logbooklink{logbook}
+   \enspace\textperiodcentered\enspace web page: \href{\Sum@web\SumViewPath}{\nolinkurl{submit.mit.edu/~lavezzo/alphaS/studies}}%
+   \enspace\textperiodcentered\enspace plots in each task directory\par}%
+  \vspace{4pt}{\color{sumgray}\hrule height 0.4pt}\vspace{2pt}}
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[L]{\sffamily\scriptsize\color{sumgray}\alphas\ study summary\enspace\textperiodcentered\enspace\texttt{\SumViewPath}\enspace\textperiodcentered\enspace covers logbook through \SumCovers}
+\fancyfoot[R]{\sffamily\scriptsize\color{sumgray}\thepage}
+\makeatother
+
+\hypersetup{pdftitle={\SumTitle}}
+
+
+% ---- study-local macros ----
+\begingroup\catcode`\~=12
+\gdef\StudyFiles{https://submit.mit.edu/~lavezzo/alphaS/studies/lattice-cs-kernel/}
+\endgroup
+\newcommand\filelink[1]{\href{\StudyFiles#1}{\code{#1}}}
+\newcommand\lnu[1]{\ensuremath{\lambda_{#1}^{\nu}}}
+\newcommand\fit[1]{\textsf{#1}}
+\newcommand\gz{\ensuremath{\tilde\gamma_\zeta}}
+\newcommand\snom{\ensuremath{\sigma_\mathrm{NOM}}}
+
+\begin{document}
+\thispagestyle{fancy}
+\SummaryTitleBlock
+
+\begin{answer}
+The ASWZ lattice data for the Collins--Soper (CS) kernel now enter the \alphas\ fit as an exact $\chi^2$ term, with the
+kernel computed by SCETlib at every fit step. In the proposed nominal, \fit{LATFROZ\_V3}, the lattice constrains only
+the CS non-perturbative (NP) parameters \lnu2, \lnu4. Against the Z-only fits it moves \alphas\ by $+0.245\,\sigma$ when
+\lnu4\ floats ($\sigma(\alphas)\times1.05$) and by $-0.013\,\sigma$ when $\lnu4=0$. The Z data fix the product of the CS
+and TMD damping, and the lattice decides how that product is split between the two.
+\textbf{Caveat:} the Z data and the lattice disagree on the shape of $\gz(b_T)$ at $3.2\sigma$ (PG $=13.5$ for
+2\,dof). Quote it with any lattice-constrained \alphas. Real data; blinded shifts in units of
+the reference fit's $\sigma(\alphas)$.
+\end{answer}
+
+% ============================================================================================
+\section{Motivation and question}
+
+At small \qT\ the Z spectrum depends on the CS kernel $\gz(b_T)$ and on the TMD boundary condition $F^\mathrm{NP}(b_T,Y)$.
+At $Q=m_Z$ the data see essentially one combination of the two. A gen-level Fisher forecast at the physical point gives
+$\rho(\lnu2,\Lambda_2)\approx-0.985$ and $\sigma(\lnu2)=0.25\,\mathrm{GeV}^2$ with the NP parameters free, and splitting
+$m_{\ell\ell}$ into windows does not break the degeneracy \taskref{260923-qsplit-fisher}. Avkhadiev, Shanahan, Wagman and
+Zhao (ASWZ, \href{https://arxiv.org/abs/2402.06725}{arXiv:2402.06725}) compute $\gz$ on the lattice at
+$0.1\lesssim b_T\lesssim0.9$\,fm. Can they constrain SCETlib's CS kernel in the \alphas\ fit, and what
+do they do to \alphas? A 1D Gaussian prior on \lnu2\ became an exact $\chi^2$ term, compared with lattice-free fits.
+
+% ============================================================================================
+\section{Setup and method}
+
+\paragraph{Fits.} All fits use real data and card~A, the 2D $\ptll\times\yll$ Z$\to\mu\mu$ fit
+(\code{260916_Z_2D_card_adcorr}); the prediction is the SCETlib-AD param model (CT18ZNNLO, N$^3$LL+NNLO, cache
+\code{pdf62_y35_260921}, its $|Y|\le2.5$ subset, which is bitwise identical for card~A). The fits float \alphas, the TMD
+$\Lambda_2,\Lambda_4,\Delta\Lambda_2$, the CS \lnu2, \lnu4, nine resummation TNPs, \code{resumTransition2} and 29 PDF
+eigenvectors (44 model priors; $\lambda_\infty^\nu=2$ frozen). The NP damping wall (relu$^2$, margin 0) runs at $\tau=8$
+(``STIFF''). A lattice term replaces the registry priors on
+\lnu2, \lnu4. \fit{LATFROZ} is warm-started from \fit{LATB8}. \alphas\ is blinded throughout.
+\textbf{Fit names.} \fit{XWSTIFF}, \fit{XL4ZSTIFF}: Z only, \lnu4\ free or $=0$. \fit{NOMSTIFF}: old nominal, a 1D
+Gaussian on \lnu2\ from a lattice-only fit, $\lnu4=0$. \fit{LATB8}: exact term, \emph{live} kernel.
+\fit{LATFROZ\_V\{1,2,3\}}: exact term, \emph{frozen} kernel, $n_f$ row V1/V2/V3 (Table~\ref{tab:nf}).
+
+\paragraph{The lattice data.} ASWZ give 21 points $y_i=\gamma_q(b_i,\mu=2\,\mathrm{GeV})$ in $\overline{\mathrm{MS}}$,
+$n_f=4$, on three ensembles ($a=0.15$, $0.12$, $0.09$\,fm) with a covariance each. $\gamma_q$ is exactly SCETlib's
+$\gz=\tfrac12\tilde\gamma_\nu$; the only scheme mismatch is $n_f=4$ against our $n_f=5$ \taskref{260923-conventions-map}.
+We use the per-ensemble points with the authors' artefact term $k_1a/b_T$, which reproduces their fit
+\taskref{260923-lattice-data-refit}. Cross-ensemble correlations are negligible (authors), so $C$ is
+block-diagonal \logref{2026-09-29}. Our NP form
+$\gz^\mathrm{NP}=-\tfrac{\lambda_\infty^\nu}{2}\tanh[(\lnu2 b_T^2+\lnu4 b_T^4)/\lambda_\infty^\nu]$ describes the lattice
+alone with $\chi^2=6.7/18$ \taskref{260923-scetlib-kernel-fit}.
+
+\paragraph{The lattice term and how it works.} The term is a rabbit regularizer (\code{-r}) on the Z fit's own parameters
+$p$. It introduces no new parameter. It adds to the NLL
+\begin{equation}
+  \tfrac12\big[\chi^2_\mathrm{lat}(p)-\chi^2_\mathrm{min}\big],\qquad
+  \chi^2_\mathrm{lat}=\min_{k_1} r^\mathsf{T}C^{-1}r,\qquad
+  r_i=\gz^\mathrm{SCETlib}(b_i,2\,\mathrm{GeV};p)+k_1\,a_i/b_i-y_i ,
+\end{equation}
+with $k_1$ profiled analytically. Everything that depends on a convention is fixed when
+rabbit arms the term (Fig.~\ref{fig:pipeline}). At each step only the kernel (21 points with exact clad gradient and
+Hessian, 3.4\,ms) and a $21\times21$ quadratic form are recomputed. The kernel is the same C++ function that the cross
+section's AD kernel calls, and a load-time check verifies that its coefficients are bitwise those of the loaded cache
+\taskref{261007-lattice-term-native}. In \emph{frozen} mode (\fit{LATFROZ}) the perturbative part is evaluated at
+$\alphas(m_Z)=0.1168$ and CS TNPs $=0$. That coupling corresponds to the lattice's own
+$\alpha_s^{(4)}(2\,\mathrm{GeV})=0.293$. Only \lnu2\ and \lnu4\ reach the kernel, and the term's derivative with respect
+to \alphas\ and every TNP is exactly zero, checked inside the fitter \taskref{261008-latfroz-nf-variants}. The live mode
+(\fit{LATB8}) would need the points' own \alphas\ dependence, which is not published.
+
+\begin{figure}[tb]
+  \centering\scriptsize\sffamily
+  \begin{tikzpicture}[node distance=1.2mm,
+      box/.style={draw=sumrule,fill=sumbox,rounded corners=2pt,align=left,inner sep=2.5pt,text width=74mm},
+      cd/.style={text=sumgray,font=\tiny\ttfamily},
+      hdr/.style={font=\small\sffamily\bfseries,text=sumblue},
+      arr/.style={-{Stealth[length=1.5mm]},semithick,sumgray}]
+    \node[hdr] (hl) at (0,0) {Load time (once, when rabbit arms the regularizer)};
+    \node[hdr] (hr) at (84mm,0) {Every likelihood evaluation (TF graph)};
+    \node[box,below=1mm of hl] (l2) {ASWZ $y_i,b_i,a_i$, block-diagonal $C_\mathrm{stat}$; reference $p_\mathrm{ref}$ = anchor
+      with $\alphas(m_Z){:=}0.1168$, CS TNPs${:=}0$\\
+      \textcolor{sumgray}{\tiny\ttfamily LatticeCSNativeCore.\_\_init\_\_, frozen\_reference}};
+    \node[box,below=of l2] (l3) {kernel at $p_\mathrm{ref}$ and its $n_f{=}4$ alternative $\to$ point shift $\delta_{n_f}$\\
+      \textcolor{sumgray}{\tiny\ttfamily \_nf\_shift $\to$ C++ gamma\_nu\_points(nf=4, mu\_match)}};
+    \node[box,below=of l3] (l4) {lattice-only refits of $(\lnu2,\lnu4)$ without/with $\delta_{n_f}$; row $\delta=J_\mathrm{NP}\Delta\lambda$\\
+      \textcolor{sumgray}{\tiny\ttfamily LatticeCSNativeCore.refit}};
+    \node[box,below=of l4] (l5) {$C=C_\mathrm{stat}+\delta\delta^\mathsf{T}$, $k_1$-profile matrix $M$, offset $\chi^2_\mathrm{min}$\\
+      \textcolor{sumgray}{\tiny\ttfamily \_profile\_matrix}};
+    \node[box,below=1mm of hr] (r2) {rabbit $x\to p_\mathrm{full}$ (the tensor the cross section uses);
+      frozen: $p_\mathrm{kernel}=p_\mathrm{ref}$ except \lnu2, \lnu4\ (live: $p_\mathrm{full}$)\\
+      \textcolor{sumgray}{\tiny\ttfamily scetlib\_full\_vector\_tf, LatticeCSTerm.p\_kernel\_tf}};
+    \node[box,below=of r2] (r3) {$\gz(b_i)=\tfrac12\gamma_\nu(b_i,2\,\mathrm{GeV};p_\mathrm{kernel})$, value + gradient + Hessian\\
+      \textcolor{sumgray}{\tiny\ttfamily ScetlibGammaNuTF $\to$ C++ DrellYan::gamma\_nu\_points}};
+    \node[box,below=of r3] (r4) {$\chi^2=r_0^\mathsf{T}Mr_0$, $r_0=\gz-y$ ($k_1$ profiled, $M$ fixed)\\
+      \textcolor{sumgray}{\tiny\ttfamily LatticeCSTerm.chi2\_tf}};
+    \node[box,below=of r4] (r5) {NLL $\mathrel{+}=\tfrac12(\chi^2-\chi^2_\mathrm{min})\,e^{-2\tau}$ (rabbit scales regularizers by $e^{2\tau}$)\\
+      \textcolor{sumgray}{\tiny\ttfamily LatticeCSTerm.compute\_nll\_penalty}};
+    \foreach \a/\b in {l2/l3,l3/l4,l4/l5,r2/r3,r3/r4,r4/r5} \draw[arr] (\a) -- (\b);
+    \draw[arr,dashed] (l2.east) -- (r2.west);
+    \draw[arr,dashed] (l5.east) -- (r4.west);
+  \end{tikzpicture}
+  \caption{How the lattice term works, for the frozen mode (\texttt{pert=frozen}). Left: computed once. Right: recomputed at
+    every likelihood evaluation; dashed arrows carry the load-time constants. Python: WRemnants
+    \texttt{wremnants/postprocessing/scetlib\_ad/lattice\_cs\_term.py}; C++: scetlib-cms \texttt{py/qT/DrellYanAD.cpp},
+    which calls \texttt{ad::gamma\_nu\_resummed}, as the cross section does. In live mode $p_\mathrm{kernel}=p_\mathrm{full}$,
+    so the lattice also pulls on \alphas\ and the CS TNPs. \taskref{261008-latfroz-nf-variants}}
+  \label{fig:pipeline}
+\end{figure}
+
+\paragraph{The $n_f$ systematic row.} The alternative kernel puts $n_f=4$ into $\beta$, the cusp and/or the boundary
+term, with $\alpha_s^{(4)}:=\alpha_s^{(5)}$ at an identification scale. Its point shift (NP part cancels exactly) is mapped
+onto $(\lnu2,\lnu4)$ by a lattice-only refit and enters $C$ as one row (Table~\ref{tab:nf}). V3 is the lattice's own
+perturbative theory: $n_f=4$ throughout, coupling from $m_b$. (A literal \code{nfmatch=4.18} would run up in $n_f=5$
+and down in $n_f=4$, flipping the sign of the shift; not fitted.) \taskref{261008-latfroz-nf-variants}
+
+\begin{table}[htb]
+  \centering\small
+  \caption{The $n_f$ conventions: point shift $\delta_{n_f}$ at $\alphas(m_Z)=0.1168$, and the resulting move
+    $\Delta\lambda$ of the lattice-only $(\lnu2,\lnu4)$ in units of their stat.\ $\sigma$ (0.039, 0.0034); $m_b(m_b)=4.18$\,GeV. \taskref{261008-latfroz-nf-variants}}
+  \label{tab:nf}
+    \setlength{\tabcolsep}{4pt}
+  \begin{tabular}{lllll}
+    \toprule
+    & \code{-r} options & $n_f=4$ in; couplings identified at & $\delta_{n_f}$ & $\Delta\lambda$ [$\sigma_\mathrm{stat}$] \\
+    \midrule
+    V1 & \code{nfmatch=1} & evolution $1\to2$\,GeV; at 1\,GeV & $-0.0083$, flat & $(-0.09,+0.04)$ \\
+    V2 & \code{nfmatch=4.18}\ \code{nfswitch=1} & evolution $1\to2$\,GeV; at $m_b(m_b)$ & $-0.0364$, flat & $(-0.40,+0.19)$ \\
+    \textbf{V3} & \code{nfmatch=4.18}\ \code{nfscheme=full} & boundary and evolution; at $m_b(m_b)$ & $-0.0275\ldots+0.0025$ & $(-0.42,+0.23)$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+% ============================================================================================
+\section{Results}
+
+\subsection[alpha-s moves by +0.25 sigma against the free-lambda4 Z-only fit, and not at all at fixed lambda4]%
+  {\alphas\ moves by $+\frac14\sigma$ against the free-\lnu4\ Z-only fit, and not at all at fixed \lnu4}
+
+\caveat{\fit{NOMSTIFF}, the old nominal, is not a no-lattice fit: it carries the 1D Gaussian lattice prior, with $\lnu4=0$.
+The first version of this summary and the task logbooks quote shifts against it. The lattice-free references are
+\fit{XWSTIFF} and \fit{XL4ZSTIFF}, both with \lnu2\ on its wall face; \fit{XWSTIFF} has a second walled minimum
+(\fit{CMR1B}, 0.67 higher). Each \dalphas\ column is in its own reference's $\sigma(\alphas)$.}
+
+\begin{table}[htb]
+  \centering\small
+  \caption{Blinded \alphas\ shifts and the CS NP parameters (physical units, $\lambda_\infty^\nu=2$) on card~A, real data,
+    $\tau=8$ wall. \dalphas\ vs the Z-only fits, the width ratio and the Z-only/V3 parameters:
+    \filelink{scripts/orch_dalpha_vs_nolattice.out}, \filelink{scripts/orch_lambda_precision.out} \logref{2026-10-08};
+    vs \fit{NOMSTIFF}: \taskref{261008-latfroz-nf-variants}; lattice only: \taskref{261008-np-function-figures}. V3:
+    $\rho(\lnu2,\lnu4)=-0.75$ (lattice only $-0.88$; stat-only $\sigma$ 0.039, 0.0034). On a wall face the walled $\sigma$
+    is the wall; \fit{XWSTIFF}'s \lnu4\ includes its registry prior. Bold: proposed nominal.}
+  \label{tab:dalpha}
+  \setlength{\tabcolsep}{3.5pt}
+  \begin{tabular}{lrrrrll}
+    \toprule
+    Fit & \multicolumn{3}{c}{\dalphas\ vs \ldots} & $\sigma(\alphas)/\sigma_\mathrm{XW}$ & \lnu2\ [GeV$^2$] & \lnu4\ [GeV$^4$] \\
+    \cmidrule(lr){2-4}
+      & \fit{XWSTIFF} & \fit{XL4ZSTIFF} & \fit{NOMSTIFF} & & & \\
+     & [$\sigma_\mathrm{XW}$] & [$\sigma_\mathrm{XL4Z}$] & [\snom] & & & \\
+    \midrule
+    lattice only (V3) & -- & -- & -- & -- & $0.188\pm0.043$ & $-0.0061\pm0.0035$ \\
+    \midrule
+    \fit{XWSTIFF}   & 0 & $-0.240$ & -- & 1 & 0 (wall) & $0.044\pm0.011$ \\
+    \fit{XL4ZSTIFF} & $+0.259$ & 0 & -- & 1.083 & 0 (wall) & 0 (fixed) \\
+    \fit{NOMSTIFF}  & $+0.394$ & $+0.124$ & 0 & 1.072 & $0.064\pm0.023$ & 0 (fixed) \\
+    \fit{LATB8}     & $+0.273$ & $+0.012$ & $-0.113$ & 1.041 & $0.036\pm0.030$ & $0.0111\pm0.0054$ \\
+    \fit{LATFROZ\_V1} & $+0.235$ & $-0.022$ & $-0.148$ & 1.049 & $0.038\pm0.030$ & $0.0117\pm0.0056$ \\
+    \fit{LATFROZ\_V2} & $+0.244$ & $-0.014$ & $-0.140$ & 1.051 & $0.038\pm0.030$ & $0.0108\pm0.0058$ \\
+    \textbf{\fit{LATFROZ\_V3}} & $\mathbf{+0.245}$ & $\mathbf{-0.013}$ & $-0.138$ & 1.051 & $0.038\pm0.030$ & $0.0106\pm0.0057$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Against the matched $\lnu4=0$ Z-only fit the lattice leaves \alphas\ in place ($-0.013\,\sigma$, width $\times0.97$).
+Against the free-\lnu4\ fit it moves \alphas\ by $+0.245\,\sigma$, and the width grows $\times1.05$ as \lnu2\ leaves the
+wall face for an interior, measured point; alone, the lattice fixes \lnu2\ six times tighter than the Z-only forecast
+\taskref{260923-qsplit-fisher}. For the measurement: neutral for the central value once \lnu4\ is treated alike, a few
+per cent on $\sigma(\alphas)$.
+
+\begin{figure}[tb]
+  \centering
+  \includegraphics[width=0.62\linewidth]{261008-np-function-figures/cs_kernel_vs_lattice.pdf}
+  \caption{$\gz(b_T,\mu=2\,\mathrm{GeV})$ against the 21 ASWZ points, shown with $\hat k_1a/b_T$ subtracted at the
+    lattice-only optimum ($\hat k_1=0.241$; stat-only error bars). Curves: lattice only (blue), Z\,+\,lattice
+    \fit{LATFROZ\_V3} (red), \fit{NOMSTIFF} (purple), Z-only \fit{XWSTIFF} (orange, central only); 68\,\% bands.
+    $\chi^2_\mathrm{lat}$ (21 points, each curve with its own $\hat k_1$) is 6.7, 15.9, 20.9 and 36.5. Lower panel:
+    diagonal pulls; the points are correlated within an ensemble. The joint curve lies above the lattice band (weaker
+    damping) below 0.54\,fm and below it beyond 0.63\,fm. Perturbative part frozen in all curves.
+    \taskref{261008-np-function-figures}}
+  \label{fig:kernel}
+\end{figure}
+
+\subsection[The Z data and the lattice disagree on the shape of the CS kernel (3.2 sigma)]%
+  {The Z data and the lattice disagree on the shape of the CS kernel ($3.2\sigma$)}
+
+
+
+
+
+\caveat{The curves in Figs.~\ref{fig:kernel}--\ref{fig:npf} share the frozen perturbative part ($\alphas(m_Z)=0.1168$,
+TNPs $=0$) and differ only in $(\lnu2,\lnu4)$; no fitted \alphas\ enters.} The joint kernel damps less than the
+lattice-only band at small $b_T$, by 0.07--0.16 at $b_T=0.2$--$0.4$\,fm. It crosses
+the band at 0.54--0.63\,fm and then saturates faster (Fig.~\ref{fig:kernel}). The largest joint pull is only 1.7, but the sum is
+$\Delta\chi^2_\mathrm{lat}=9.2$ above the lattice-only minimum \taskref{261008-np-function-figures}: a shape tension, small
+\lnu2\ and large \lnu4. The Z-only fit goes further ($\lnu2=0$, $\lnu4=0.044\,\mathrm{GeV}^4$; $\chi^2_\mathrm{lat}=36.5$).
+
+\begin{figure}[tb]
+  \centering
+  \includegraphics[width=0.7\linewidth]{261008-np-function-figures/lambda_nu_plane.pdf}
+  \caption{The $(\lnu2,\lnu4)$ plane at $\lambda_\infty^\nu=2$. Blue: lattice-only exact $\Delta\chi^2$ contours (68.3 and
+    95.4\,\%, 2D; V3 $n_f$ row) and their Gaussian approximation (dotted). Red: \fit{LATFROZ\_V3} Hessian ellipses.
+    Orange: Z-only \fit{XWSTIFF} on the $\lnu2=0$ wall face; its dashed sliver is the wall, not a data constraint. Purple:
+    \fit{NOMSTIFF} ($\lnu4$ frozen at 0, 1D interval). Hatched: unphysical. The PG is against \fit{XWSTIFF} with its
+    \lnu{} priors removed; Wilks is untested at a walled minimum. \taskref{261008-np-function-figures}}
+  \label{fig:plane}
+\end{figure}
+
+
+
+The parameter goodness of fit (PG) quantifies it (Fig.~\ref{fig:plane}):
+$\mathrm{PG}=2[\mathrm{NLL}_\mathrm{joint}-F_Z(\text{Z-only min})]=\Delta\chi^2_Z+\Delta\chi^2_\mathrm{lat}=4.29+9.19=13.5$
+for 2\,dof, $p=0.12\,\%$, $3.2\sigma$, for V3 against \fit{XWSTIFF}. V1 and V2 give 13.75 and 13.58. The lattice data are
+fine on their own ($\chi^2_\mathrm{lat}=15.9/18$ at the joint minimum), and the $n_f$ row does not absorb the tension: the
+stat-only $\Delta\chi^2_\mathrm{lat}$ is 9.5--9.6 \taskref{261008-latfroz-nf-variants}. Caveats: (i)~the second Z-only minimum \fit{CMR1B} gives 12.1 ($3.0\sigma$); (ii)~the Z-only minimum is on the
+wall, so 2-dof Wilks is untested (toys would calibrate it); (iii)~keeping \fit{XWSTIFF}'s registry \lnu{} priors gives
+11.2 ($2.9\sigma$). The
+lattice-only optimum has $\lnu4<0$ ($1.7\sigma$ outside the physical quadrant) and anti-damps beyond $b_T=1.10$\,fm
+(Fig.~\ref{fig:npf}, top left); in the Z fit the wall forbids this \taskref{261008-np-function-figures}.
+
+\subsection{The Z data fix the product of CS and TMD damping; the lattice moves it to the CS side}
+
+
+
+
+At $m_Z$, $Y=0$ the total NP damping (CS factor $\times F^\mathrm{NP}$) of the Z-only and joint fits agree to
+$\le2.6\,\%$ wherever the product exceeds 0.2 ($b_T\lesssim1.5\,\mathrm{GeV}^{-1}$). Yet the two factors separately differ
+by a factor 5--10 at $b_T=2\,\mathrm{GeV}^{-1}$ (Fig.~\ref{fig:npf}) \taskref{261008-np-function-figures}. This is the
+$\rho(\lnu2,\Lambda_2)\approx-0.985$ degeneracy made visible: the lattice moves damping from the TMD boundary condition
+to the CS kernel at no cost to the Z shape. The joint $F^\mathrm{NP}(Y=0)$ falls to 0.1 already at
+$b_T\approx2.0\,\mathrm{GeV}^{-1}$, against $b_T\approx3.1\,\mathrm{GeV}^{-1}$ for Z only and $3.4\,\mathrm{GeV}^{-1}$ for MAP22. The lattice changes the NP
+\emph{decomposition} while the measured \qT\ shape, and with it \alphas, stays put: hence the neutrality at fixed \lnu4.
+The decomposition matters wherever the Z tune is carried to other $Q$, $Y$, or to the W.
+
+\par\medskip\noindent\begin{minipage}{\linewidth}
+  \centering\includegraphics[width=\linewidth]{261008-np-function-figures/np_functions.pdf}
+  \captionsetup{hypcap=false}\captionof{figure}{NP functions vs $b_T$ [GeV$^{-1}$] for lattice only (blue), Z\,+\,lattice \fit{LATFROZ\_V3} (red) and Z only
+    \fit{XWSTIFF} (orange). Top left: the CS NP part $\gz^\mathrm{NP}$ (lattice range shaded). Top right: the CS NP factor
+    $\exp[\tilde\gamma_\nu^\mathrm{NP}\ln(m_Zb_T/b_0)]$ with the canonical rapidity log, an illustration and not SCETlib's
+    profile scales. Bottom left: TMD factor $F^\mathrm{NP}$ at $|Y|=0$ and 2.5, with MAP22 (N$^3$LL central replica,
+    evolution factor stripped, different $b^*$) as a shape reference only. Bottom right: the total
+    CS\,$\times$\,$F^\mathrm{NP}$ at $Q=m_Z$, $Y=0$. The $|Y|=2.5$ bands are pinched by the active TMD wall face.
+    \taskref{261008-np-function-figures}}
+  \label{fig:npf}
+\end{minipage}\par\medskip
+
+
+% ============================================================================================
+\section{Robustness, systematics and caveats}
+
+\alphas\ barely depends on how the lattice is applied. All exact-term variants lie within $-0.15\ldots-0.04\,\snom$ of
+\fit{NOMSTIFF} \taskref{261006-lattice-chi2-in-fit}\,\taskref{261007-lattice-term-native}. Freezing the kernel moves
+\alphas\ by $-0.026\,\snom$ relative to the live \fit{LATB8} ($\sigma$ $+0.9\,\%$). The $n_f$ conventions span
+$0.009\,\snom$ (V2 vs V3: $0.0014\,\snom$), and Newton steps predicted every \fit{LATFROZ} fit to $\le0.0005\,\snom$
+\taskref{261008-latfroz-nf-variants}. The dropped $b_T$ window moved \alphas\ by $\le0.0004\,\sigma$; replacing the old exact-RGE table by SCETlib's
+analytic-RGE kernel, by $-0.027\,\snom$ \taskref{261007-lattice-term-native}.
+ The fits used the relu$^2$ wall; the WRemnants
+default is now a $C^2$ ramp (\code{692f9483}), so reruns need \code{smooth=relu2}. \fit{LATB8}'s full saturated test is
+753.35/777 ($p=72\,\%$); the projected-\ptll\ test is poor, as in every fit of this lineage: 78.4/39 ($p=0.019\,\%$), and
+80.7/39 without the exact term \taskref{261007-lattice-term-native}. Not covered: $\lambda_\infty^\nu$ (held at 2), the
+$n_f$ $4\to3$ step below $m_c$, and the authors' matching order (assumed inside their errors). 
+
+% ============================================================================================
+\section{What changed}
+
+\begin{itemize}
+  \item \textbf{WRemnants} \code{scetlib-ad-param-model} on \code{origin}, all pushed (checked with \code{git} on 10-08;
+    the first version of this summary had \code{2ee7d998} as local only): \code{44f8a5c0} table-based plugin
+    \code{lattice_cs_chi2}; \code{3ef3efb9} its \code{pert=live}; \code{b14f84f4} native \code{LatticeCSTerm};
+    \code{4e7e481e} \code{CompositeParamModel} support; \code{2ee7d998} \code{pert=frozen}, \code{nfswitch}, \code{nfscheme}.
+  \item \textbf{scetlib-cms} \code{gamma-nu-points} (\code{069c326}, \code{6ab371a}), pushed, draft
+    \href{https://gitlab.cern.ch/scetlib/contrib/scetlib-cms/-/merge_requests/17}{MR\,!17}. Draft
+    \href{https://gitlab.cern.ch/scetlib/contrib/scetlib-cms/-/merge_requests/18}{MR\,!18} (\code{tf_native} NP-model
+    ids) is a side fix, unused here. \textbf{rabbit} \code{9bfe73f} (\code{--saturatedSeed}, halves the saturated
+    sub-fit), branch \code{saturated-subfit-seed} on Luca's fork, no PR.
+  \item \textbf{Defaults and cards}: unchanged. The nominal is set on the \code{-r} line (\code{syst=Jnf}\
+    \code{pert=frozen}\ \code{alphas_frozen=0.1168}\ \code{nfmatch=4.18}\ \code{nfscheme=full}); the code defaults are
+    still \code{syst=Jnf+Jbt}\ \code{pert=live}\ \code{nfmatch=1}. \textbf{knowledge/}: nothing yet. Luca's decisions:
+    no $k$-form; kernel from SCETlib at every step (analytic RGE, native $n_f$ row, no $\mu_0$ variation); no $b_T$
+    window; keep the simultaneous fit rather than fixing the CS $\lambda$s.
+\end{itemize}
+
+% ============================================================================================
+\section{Conclusions and open items}
+
+The lattice enters the \alphas\ fit exactly and cheaply, constrains only the CS NP sector, and is close to neutral for
+\alphas\ once \lnu4\ is treated alike. The price is a $3.2\sigma$ shape disagreement with the Z data, which goes with the
+result.
+
+\textbf{Physics review} (10-08): approve with fixes; \fit{LATFROZ} resolves the $b_T$-window, data-\alphas\ and
+$n_f$-sizing points. The ``blinding pair'' (one Newton row quoted at two \alphas\ frames) was \emph{accepted by Luca} as
+harmless. Open: (1)~the \S10 warning in \code{knowledge/30_physics_global/np_parametrization_constraints.md} against
+lattice covariances (it concerns the Tackmann translation, not the ASWZ data); (2)~no $\lambda_\infty^\nu$ rows;
+(3)~a guard in \code{_find_fitter}, which with no fitter and no \code{tau=} silently uses scale 1 (off by $e^{2\tau}$).
+\textbf{Also open} (Luca): V2 or V3; new code defaults and retiring the Gaussian cards; toys for the PG and saturated
+p-values; the AN's lattice section (still the Tackmann numbers). \textbf{Theorist email} (not sent): \emph{Q1}, is V3 the
+right $n_f=5\leftrightarrow4$ comparison of the $\overline{\mathrm{MS}}$ kernel at 2\,GeV, and is the residual inside
+their errors? \emph{Q3a}, are the points $\gamma_q^{\overline{\mathrm{MS}}}(b_T,2\,\mathrm{GeV})$ in $n_f=4$, matched at
+$\alpha_s^{(4)}(2\,\mathrm{GeV})=0.293$, and independent of $D_\mathrm{res}$, $B_\mathrm{NP}$? (Q3b is moot after
+freezing, Q2 without the window.)
+
+{\footnotesize\color{sumgray} Full record: \logbooklink{the study logbook} and its task logbooks. Fitresults: \code{/ceph/.../lavezzo/alphaS/2610{06,07,08}_*}, \code{260930_stiff_wall_fits}.\par}
+
+\end{document}

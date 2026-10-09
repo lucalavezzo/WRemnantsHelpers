@@ -1,0 +1,346 @@
+{
+ "NOMSTIFF": {
+  "path": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260930_stiff_wall_fits/fitresults_NOMSTIFF.hdf5",
+  "tau": 8.0,
+  "lattice_kind": "1d",
+  "nll": 376.6146329237086,
+  "wall": 7.444292768114144e-06,
+  "lattice": 2.5248755535802907,
+  "priors": 19.18203488218649,
+  "priors_card": 14.990752841716192,
+  "priors_model": 4.191282040470297,
+  "n_model_priors": 44,
+  "data_bb": 354.9077150436491,
+  "edm": 3.004579117754218e-14,
+  "lambdas": {
+   "lambda2": 0.025581284102796142,
+   "lambda4": 0.08758284351213724,
+   "delta_lambda2": -0.004093151901886217,
+   "lambda2_nu": 0.06426999671529844,
+   "lambda4_nu": 0.0
+  },
+  "sigma_lambdas_phys": {
+   "lambda2": 0.04272088997628132,
+   "lambda4": 0.02716435417398683,
+   "delta_lambda2": 0.006835291447830541,
+   "lambda2_nu": 0.022931336111338352
+  },
+  "k1hat_J": 0.1899939476510616,
+  "k1hat_stat": 0.10054746082332064,
+  "lat_chi2_exact_J": 7.173140006867253,
+  "lat_chi2_exact_stat": 17.09830148273972,
+  "lat_chi2_frozen_JnfJbt": 12.241130129173285,
+  "lat_chi2_frozen_JnfJbtpert": 8.721007032439907,
+  "faces": {
+   "lambda2_nu >= 0 (CS small-b turn-on)": 0.06426999671529844,
+   "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=0 (TMD small-b turn-on)": 0.025581284102796142,
+   "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=0 (TMD large-b)": 0.26276527098235586,
+   "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=2.5 (TMD small-b turn-on)": -9.152839927153988e-07,
+   "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=2.5 (TMD large-b)": 0.26274853053641173
+  },
+  "active": [
+   "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=2.5 (TMD small-b turn-on)"
+  ],
+  "tnps": {
+   "resumTNP_gamma_nu": {
+    "theta": 0.6923507962312608,
+    "sigma": 1.0071183809032958
+   },
+   "resumTNP_gamma_cusp": {
+    "theta": -0.15026679135205567,
+    "sigma": 1.0000416308105238
+   },
+   "resumTNP_gamma_mu_q": {
+    "theta": 0.14085676953410733,
+    "sigma": 0.9996725513381428
+   },
+   "resumTNP_s": {
+    "theta": 0.3571334180869167,
+    "sigma": 0.9543999815135146
+   }
+  },
+  "dalphaS_over_sigNOM": 0.0,
+  "sigma_ratio": 1.0
+ },
+ "LATCHI8": {
+  "path": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261006_lattice_chi2_in_fit/fitresults_LATCHI8.hdf5",
+  "tau": 8.0,
+  "lattice_kind": "exact",
+  "nll": 375.454571379493,
+  "wall": 1.9624323857755652e-07,
+  "lattice": 3.4384827715022976,
+  "priors": 18.541977238436782,
+  "priors_card": 14.920299791413857,
+  "priors_model": 3.6216774470229263,
+  "n_model_priors": 44,
+  "data_bb": 353.47411117331063,
+  "edm": 3.0946051259161016e-17,
+  "lambdas": {
+   "lambda2": 0.053606985705344945,
+   "lambda4": 0.08659654047304938,
+   "delta_lambda2": -0.008577141490097227,
+   "lambda2_nu": 0.029517367298477773,
+   "lambda4_nu": 0.007280950988909276
+  },
+  "sigma_lambdas_phys": {
+   "lambda2": 0.04555830198590311,
+   "lambda4": 0.0284425373877436,
+   "delta_lambda2": 0.007289255464675002,
+   "lambda2_nu": 0.02984364696023888,
+   "lambda4_nu": 0.004450824009121191
+  },
+  "k1hat_J": 0.1731333382212131,
+  "k1hat_stat": 0.10254125847241809,
+  "lat_chi2_exact_J": 6.876965543004599,
+  "lat_chi2_exact_stat": 13.07210899866612,
+  "lat_chi2_frozen_JnfJbt": 10.750395481891776,
+  "lat_chi2_frozen_JnfJbtpert": 8.876086164218737,
+  "faces": {
+   "lambda4_nu >= 0 (CS large-b leading)": 0.007280950988909276,
+   "lambda2_nu >= 0 (CS small-b turn-on)": 0.029517367298477773,
+   "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=0 (TMD small-b turn-on)": 0.053606985705344945,
+   "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=0 (TMD large-b)": 0.2599436722919516,
+   "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=2.5 (TMD small-b turn-on)": -1.4860776272052068e-07,
+   "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=2.5 (TMD large-b)": 0.25978962141914813
+  },
+  "active": [
+   "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=2.5 (TMD small-b turn-on)"
+  ],
+  "tnps": {
+   "resumTNP_gamma_nu": {
+    "theta": 0.38104986278954606,
+    "sigma": 1.0121120759549644
+   },
+   "resumTNP_gamma_cusp": {
+    "theta": -0.07392080882221919,
+    "sigma": 1.0004645168432287
+   },
+   "resumTNP_gamma_mu_q": {
+    "theta": 0.12115504209219448,
+    "sigma": 0.9993950525722498
+   },
+   "resumTNP_s": {
+    "theta": 0.2242757224140453,
+    "sigma": 0.9592130297997076
+   }
+  },
+  "dalphaS_over_sigNOM": -0.11096285756619442,
+  "sigma_ratio": 0.9809608536058532,
+  "d_nll": -1.16006154421558,
+  "d_wall": -7.248049529536587e-06,
+  "d_lattice": 0.9136072179220069,
+  "d_priors": -0.6400576437497065,
+  "d_data_bb": -1.4336038703384588
+ },
+ "LATLIVE8Y": {
+  "path": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261006_lattice_chi2_in_fit/fitresults_LATLIVE8Y.hdf5",
+  "tau": 8.0,
+  "lattice_kind": "none",
+  "nll": 376.0792683337117,
+  "wall": 5.226653177976253e-07,
+  "lattice": 0.0,
+  "priors": 18.625827680045784,
+  "priors_card": 14.924360484655187,
+  "priors_model": 3.7014671953905975,
+  "n_model_priors": 44,
+  "data_bb": 357.45344013100055,
+  "edm": 2.1415242150632596e-17,
+  "lambdas": {
+   "lambda2": 0.050191740511634775,
+   "lambda4": 0.08377431743001335,
+   "delta_lambda2": -0.00803071728581447,
+   "lambda2_nu": 0.03393754309673111,
+   "lambda4_nu": 0.007969009757270504
+  },
+  "sigma_lambdas_phys": {
+   "lambda2": 0.045821112627898224,
+   "lambda4": 0.028715662519901014,
+   "delta_lambda2": 0.007331303218782218,
+   "lambda2_nu": 0.030288895057741256,
+   "lambda4_nu": 0.005331921829861165
+  },
+  "k1hat_J": 0.17427782068687844,
+  "k1hat_stat": 0.11417143425518983,
+  "lat_chi2_exact_J": 6.66010033874536,
+  "lat_chi2_exact_stat": 11.181959925554334,
+  "lat_chi2_frozen_JnfJbt": 9.615895076134375,
+  "lat_chi2_frozen_JnfJbtpert": 8.307799406987808,
+  "faces": {
+   "lambda4_nu >= 0 (CS large-b leading)": 0.007969009757270504,
+   "lambda2_nu >= 0 (CS small-b turn-on)": 0.03393754309673111,
+   "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=0 (TMD small-b turn-on)": 0.050191740511634775,
+   "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=0 (TMD large-b)": 0.2514493958655901,
+   "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=2.5 (TMD small-b turn-on)": -2.425247056653257e-07,
+   "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=2.5 (TMD large-b)": 0.25132295229004004
+  },
+  "active": [
+   "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=2.5 (TMD small-b turn-on)"
+  ],
+  "tnps": {
+   "resumTNP_gamma_nu": {
+    "theta": 0.4350306246051687,
+    "sigma": 1.013692365565535
+   },
+   "resumTNP_gamma_cusp": {
+    "theta": -0.08619720409319621,
+    "sigma": 1.0005540465906335
+   },
+   "resumTNP_gamma_mu_q": {
+    "theta": 0.12888542204859932,
+    "sigma": 0.9994278934438292
+   },
+   "resumTNP_s": {
+    "theta": 0.24900753425594085,
+    "sigma": 0.9590350554773637
+   }
+  },
+  "dalphaS_over_sigNOM": -0.042010905933825254,
+  "sigma_ratio": 0.9849874042507303,
+  "d_nll": -0.5353645899969024,
+  "d_wall": -6.921627450316519e-06,
+  "d_lattice": -2.5248755535802907,
+  "d_priors": -0.5562072021407047,
+  "d_data_bb": 2.5457250873514568
+ },
+ "LATFULL8": {
+  "path": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261006_lattice_chi2_in_fit/fitresults_LATFULL8.hdf5",
+  "tau": 8.0,
+  "lattice_kind": "none",
+  "nll": 376.48121199178365,
+  "wall": 7.50769896313614e-07,
+  "lattice": 0.0,
+  "priors": 18.53495917713967,
+  "priors_card": 14.886571360370713,
+  "priors_model": 3.648387816768957,
+  "n_model_priors": 44,
+  "data_bb": 357.94625206387406,
+  "edm": 1.2420524969701262e-17,
+  "lambdas": {
+   "lambda2": 0.04849562772109117,
+   "lambda4": 0.07759549260548448,
+   "delta_lambda2": -0.007759346942291807,
+   "lambda2_nu": 0.03569263536868482,
+   "lambda4_nu": 0.009808483617542137
+  },
+  "sigma_lambdas_phys": {
+   "lambda2": 0.04592679712445317,
+   "lambda4": 0.02801217900307208,
+   "delta_lambda2": 0.0073482116225047946,
+   "lambda2_nu": 0.030356871533056575,
+   "lambda4_nu": 0.0055817663148481295
+  },
+  "k1hat_J": 0.17345168321991786,
+  "k1hat_stat": 0.129133105716716,
+  "lat_chi2_exact_J": 7.198722700908514,
+  "lat_chi2_exact_stat": 9.725486095390142,
+  "lat_chi2_frozen_JnfJbt": 9.01291944978032,
+  "lat_chi2_frozen_JnfJbtpert": 8.347382484629954,
+  "faces": {
+   "lambda4_nu >= 0 (CS large-b leading)": 0.009808483617542137,
+   "lambda2_nu >= 0 (CS small-b turn-on)": 0.03569263536868482,
+   "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=0 (TMD small-b turn-on)": 0.04849562772109117,
+   "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=0 (TMD large-b)": 0.23290053109015568,
+   "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=2.5 (TMD small-b turn-on)": -2.906682326220267e-07,
+   "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=2.5 (TMD large-b)": 0.23278647781645345
+  },
+  "active": [
+   "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=2.5 (TMD small-b turn-on)"
+  ],
+  "tnps": {
+   "resumTNP_gamma_nu": {
+    "theta": 0.31484131331814297,
+    "sigma": 1.0130289265314598
+   },
+   "resumTNP_gamma_cusp": {
+    "theta": -0.0674860192364965,
+    "sigma": 1.0005798273892041
+   },
+   "resumTNP_gamma_mu_q": {
+    "theta": 0.12984653721144138,
+    "sigma": 0.999444748895961
+   },
+   "resumTNP_s": {
+    "theta": 0.25658986565557035,
+    "sigma": 0.9591775104351309
+   }
+  },
+  "dalphaS_over_sigNOM": -0.08547425770336584,
+  "sigma_ratio": 0.9788715350300072,
+  "d_nll": -0.1334209319249453,
+  "d_wall": -6.69352287180053e-06,
+  "d_lattice": -2.5248755535802907,
+  "d_priors": -0.6470757050468201,
+  "d_data_bb": 3.0385370202249646
+ },
+ "XWSTIFF": {
+  "path": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260930_stiff_wall_fits/fitresults_XWSTIFF.hdf5",
+  "tau": 8.0,
+  "lattice_kind": "none",
+  "nll": 371.32836518957,
+  "wall": 1.1544443588890273e-05,
+  "lattice": 0.0,
+  "priors": 18.759952214707077,
+  "priors_card": 14.232336714041928,
+  "priors_model": 4.527615500665148,
+  "n_model_priors": 46,
+  "data_bb": 352.5684014304193,
+  "edm": 7.405069621731706e-18,
+  "lambdas": {
+   "lambda2": 0.11882566722836224,
+   "lambda4": -7.21173554438792e-05,
+   "delta_lambda2": -0.009409894210770734,
+   "lambda2_nu": -1.1216393087931653e-06,
+   "lambda4_nu": 0.044408086224080615
+  },
+  "sigma_lambdas_phys": {
+   "lambda2": 0.059425927848227394,
+   "lambda4": 0.0002787228825324491,
+   "delta_lambda2": 0.007734021463257303,
+   "lambda2_nu": 0.0002372068732396336,
+   "lambda4_nu": 0.011045014132349209
+  },
+  "k1hat_J": 0.15476895912201025,
+  "k1hat_stat": 0.24007654946837273,
+  "lat_chi2_exact_J": 24.976141128972746,
+  "lat_chi2_exact_stat": 34.37558017235581,
+  "lat_chi2_frozen_JnfJbt": 28.543699001552284,
+  "lat_chi2_frozen_JnfJbtpert": 25.8704399886421,
+  "faces": {
+   "lambda4_nu >= 0 (CS large-b leading)": 0.044408086224080615,
+   "lambda2_nu >= 0 (CS small-b turn-on)": -1.1216393087931653e-06,
+   "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=0 (TMD small-b turn-on)": 0.11882566722836224,
+   "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=0 (TMD large-b)": 0.001461411599146319,
+   "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=2.5 (TMD small-b turn-on)": 0.060013828411045154,
+   "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=2.5 (TMD large-b)": -2.026850692142567e-07
+  },
+  "active": [
+   "lambda2_nu >= 0 (CS small-b turn-on)",
+   "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=2.5 (TMD large-b)"
+  ],
+  "tnps": {
+   "resumTNP_gamma_nu": {
+    "theta": 0.29175647845527636,
+    "sigma": 1.0096914052973565
+   },
+   "resumTNP_gamma_cusp": {
+    "theta": -0.05073175823731485,
+    "sigma": 1.00040442615138
+   },
+   "resumTNP_gamma_mu_q": {
+    "theta": 0.11702286784459635,
+    "sigma": 0.9993567022287402
+   },
+   "resumTNP_s": {
+    "theta": 0.16787602060482576,
+    "sigma": 0.9583041023691092
+   }
+  },
+  "dalphaS_over_sigNOM": -0.36730875196729623,
+  "sigma_ratio": 0.9331543906544838,
+  "d_nll": -5.286267734138619,
+  "d_wall": 4.1001508207761296e-06,
+  "d_lattice": -2.5248755535802907,
+  "d_priors": -0.4220826674794118,
+  "d_data_bb": -2.3393136132297627
+ }
+}

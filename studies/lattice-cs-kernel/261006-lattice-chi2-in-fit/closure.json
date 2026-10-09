@@ -1,0 +1,213 @@
+{
+ "closure": {
+  "none": {
+   "chi2": 6.712728055519186,
+   "l2": 0.18443326945728356,
+   "l4": -0.005920451405373586,
+   "sigma": [
+    0.03913160009572307,
+    0.003414691034946556
+   ],
+   "rho": -0.8882973222728603,
+   "cov": [
+    [
+     0.001531282126051594,
+     -0.00011869635263170715
+    ],
+    [
+     -0.00011869635263170715,
+     1.1660114864144384e-05
+    ]
+   ],
+   "k1": 0.2412481308512061,
+   "nit": 9,
+   "grad": 2.5300453927457056e-06,
+   "gauss_newton": {
+    "sigma": [
+     0.03828129180726897,
+     0.0032519363113183196
+    ],
+    "rho": -0.8825234666021471
+   }
+  },
+  "J": {
+   "chi2": 6.7127280555191895,
+   "l2": 0.1844332688438251,
+   "l4": -0.005920451375809257,
+   "sigma": [
+    0.05748530863358988,
+    0.004188601054737289
+   ],
+   "rho": -0.914120388772213,
+   "cov": [
+    [
+     0.003304560708699083,
+     -0.00022010467185101576
+    ],
+    [
+     -0.0002201046718510158,
+     1.7544378795746326e-05
+    ]
+   ],
+   "k1": 0.24124813086989158,
+   "nit": 10,
+   "grad": 2.788880237858393e-13,
+   "gauss_newton": {
+    "sigma": [
+     0.056662810852507406,
+     0.003997651534076991
+    ],
+    "rho": -0.9109547235538171
+   }
+  },
+  "direct_nf": {
+   "chi2": 6.695614032773426,
+   "l2": 0.18673483401946941,
+   "l4": -0.006015378333449096,
+   "sigma": [
+    0.057766812298188495,
+    0.004201636188302828
+   ],
+   "rho": -0.9131753767977301,
+   "cov": [
+    [
+     0.0033370046030941412,
+     -0.00022164147941101443
+    ],
+    [
+     -0.0002216414794110144,
+     1.7653746658855917e-05
+    ]
+   ],
+   "k1": 0.23567087373261225,
+   "nit": 10,
+   "grad": 2.5153212845907547e-12,
+   "gauss_newton": {
+    "sigma": [
+     0.05695314710036607,
+     0.0040116963856297715
+    ],
+    "rho": -0.9099898400071883
+   }
+  }
+ },
+ "points": {
+  "NOMSTIFF (1D card, l4nu = 0)": {
+   "exact_none": 17.09829983904485,
+   "k1hat_none": 0.1005474662063551,
+   "exact_J": 7.173139246606441,
+   "k1hat_J": 0.18999394908038839,
+   "exact_direct_nf": 7.456223207578075,
+   "k1hat_direct_nf": 0.22837593974622897,
+   "gauss2d_statsyst (card)": 5.691820253998686,
+   "gauss2d_stat": 13.930577860866062,
+   "gauss1d_l4zero (NOMSTIFF card)": 5.04975063513229,
+   "minus_NOMSTIFF": {
+    "exact_none": 0.0,
+    "k1hat_none": null,
+    "exact_J": 0.0,
+    "k1hat_J": null,
+    "exact_direct_nf": 0.0,
+    "k1hat_direct_nf": null,
+    "gauss2d_statsyst (card)": 0.0,
+    "gauss2d_stat": 0.0,
+    "gauss1d_l4zero (NOMSTIFF card)": 0.0
+   }
+  },
+  "XWSTIFF = W (no lattice)": {
+   "exact_none": 34.37550117945783,
+   "k1hat_none": 0.24007626279883595,
+   "exact_J": 24.976112748751586,
+   "k1hat_J": 0.1547689118077019,
+   "exact_direct_nf": 25.74856155075308,
+   "k1hat_direct_nf": 0.10890014027360709,
+   "gauss2d_statsyst (card)": 554.9562387529687,
+   "gauss2d_stat": 592.9162656792172,
+   "gauss1d_l4zero (NOMSTIFF card)": null,
+   "minus_NOMSTIFF": {
+    "exact_none": 17.27720134041298,
+    "k1hat_none": null,
+    "exact_J": 17.802973502145143,
+    "k1hat_J": null,
+    "exact_direct_nf": 18.292338343175004,
+    "k1hat_direct_nf": null,
+    "gauss2d_statsyst (card)": 549.26441849897,
+    "gauss2d_stat": 578.9856878183512,
+    "gauss1d_l4zero (NOMSTIFF card)": null
+   }
+  },
+  "T8 Newton point (2D card)": {
+   "exact_none": 18.45321304830076,
+   "k1hat_none": 0.08393608342061745,
+   "exact_J": 7.579117834767695,
+   "k1hat_J": 0.17772819480043106,
+   "exact_direct_nf": 7.823322154962314,
+   "k1hat_direct_nf": 0.21200195764821889,
+   "gauss2d_statsyst (card)": 6.9459155305690805,
+   "gauss2d_stat": 16.277964518102003,
+   "gauss1d_l4zero (NOMSTIFF card)": null,
+   "minus_NOMSTIFF": {
+    "exact_none": 1.354913209255912,
+    "k1hat_none": null,
+    "exact_J": 0.4059785881612541,
+    "k1hat_J": null,
+    "exact_direct_nf": 0.367098947384239,
+    "k1hat_direct_nf": null,
+    "gauss2d_statsyst (card)": 1.2540952765703945,
+    "gauss2d_stat": 2.3473866572359405,
+    "gauss1d_l4zero (NOMSTIFF card)": null
+   }
+  },
+  "card anchor": {
+   "exact_none": 2.3716536772696077,
+   "k1hat_none": 0.2314379010970672,
+   "exact_J": 2.2794372758373704,
+   "k1hat_J": 0.22681123924361501,
+   "exact_direct_nf": 2.2282641310536455,
+   "k1hat_direct_nf": 0.2107154658855102,
+   "gauss2d_statsyst (card)": 5.423821523348254,
+   "gauss2d_stat": 5.576291423119924,
+   "gauss1d_l4zero (NOMSTIFF card)": 0.24406582972472687,
+   "minus_NOMSTIFF": {
+    "exact_none": -14.72664616177524,
+    "k1hat_none": null,
+    "exact_J": -4.8937019707690705,
+    "k1hat_J": null,
+    "exact_direct_nf": -5.22795907652443,
+    "k1hat_direct_nf": null,
+    "gauss2d_statsyst (card)": -0.2679987306504321,
+    "gauss2d_stat": -8.354286437746138,
+    "gauss1d_l4zero (NOMSTIFF card)": -4.805684805407563
+   }
+  }
+ },
+ "sensitivity": {
+  "alphaS_reparam": "('unit', (0.002,))",
+  "NOMSTIFF (1D card, l4nu = 0)": {
+   "dchi2_dalphas": -196.21780375842798,
+   "d2chi2_dalphas2": 5737.7598859341715,
+   "sigma_alphaS_mZ_NOMSTIFF": 0.0011646088421002482,
+   "dchi2_per_sigma_alphaS": -0.22851698923455652,
+   "nll_pull_on_alphaS_in_sigma": 0.11425849461727826,
+   "tnp_thetas_NOMSTIFF": {
+    "resumTNP_gamma_nu": 0.6923507962312608,
+    "resumTNP_gamma_cusp": -0.15026679135205567
+   },
+   "dchi2_from_postfit_tnps": 0.24061872732485057,
+   "max_abs_point_shift_tnps": 0.004422440897038024
+  },
+  "T8 Newton point (2D card)": {
+   "dchi2_dalphas": -193.4451319985024,
+   "d2chi2_dalphas2": 5737.7598859341715,
+   "sigma_alphaS_mZ_NOMSTIFF": 0.0011646088421002482,
+   "dchi2_per_sigma_alphaS": -0.22528791118670555,
+   "nll_pull_on_alphaS_in_sigma": 0.11264395559335277,
+   "tnp_thetas_NOMSTIFF": {
+    "resumTNP_gamma_nu": 0.6923507962312608,
+    "resumTNP_gamma_cusp": -0.15026679135205567
+   },
+   "dchi2_from_postfit_tnps": 0.22079275349829608,
+   "max_abs_point_shift_tnps": 0.004422440897038024
+  }
+ }
+}

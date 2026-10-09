@@ -1,0 +1,39 @@
+{
+ "label": "NCG_R0",
+ "start": "cold000",
+ "N": 20,
+ "r": 0.0,
+ "stages": [
+  {
+   "restarts": 1,
+   "iters": 1945,
+   "stops": [
+    "stall",
+    "pred<=0"
+   ],
+   "capped": false,
+   "conv": [
+    1912,
+    4430
+   ],
+   "cfg": {},
+   "n_f": 1921,
+   "n_hvp": 5677,
+   "fstar": -7.447328229736393e-06,
+   "overshoot_star": 9.154675144262779e-07
+  }
+ ],
+ "E_conv": {
+  "n_f": 1912,
+  "n_hvp": 4430
+ },
+ "E_total": {
+  "n_f": 1921,
+  "n_hvp": 5677
+ },
+ "f_end_minus_fstar": -1.0241929523039748e-08,
+ "face_end": -9.154675102256149e-07,
+ "failed": false,
+ "restarts": 1,
+ "seconds": 3.54610276222229
+}

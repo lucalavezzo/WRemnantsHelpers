@@ -1,0 +1,13 @@
+postfix,seed
+PROFM1W,/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261002_multistart_profile/seeds/PROFM1W.hdf5
+PROFM1R,/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261002_multistart_profile/seeds/PROFM1R.hdf5
+PROFM1K,/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261002_multistart_profile/seeds/PROFM1K.hdf5
+PROFP1W,/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261002_multistart_profile/seeds/PROFP1W.hdf5
+PROFP1R,/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261002_multistart_profile/seeds/PROFP1R.hdf5
+PROFP1K,/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261002_multistart_profile/seeds/PROFP1K.hdf5
+PROFM2W,/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261002_multistart_profile/seeds/PROFM2W.hdf5
+PROFM2R,/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261002_multistart_profile/seeds/PROFM2R.hdf5
+PROFM2K,/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261002_multistart_profile/seeds/PROFM2K.hdf5
+PROFP2W,/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261002_multistart_profile/seeds/PROFP2W.hdf5
+PROFP2R,/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261002_multistart_profile/seeds/PROFP2R.hdf5
+PROFP2K,/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261002_multistart_profile/seeds/PROFP2K.hdf5

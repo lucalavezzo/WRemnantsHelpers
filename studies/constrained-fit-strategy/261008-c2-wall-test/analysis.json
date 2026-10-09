@@ -1,0 +1,220 @@
+{
+ "C2A": {
+  "log": "/home/submit/lavezzo/alphaS/WRemnantsHelpers/studies/constrained-fit-strategy/261008-c2-wall-test/logs/C2A.log",
+  "finished": true,
+  "n_rows": 60,
+  "restarts": 0,
+  "start_loss": 806.5778129128407,
+  "final_loss": 376.6146143296775,
+  "min_loss": 376.6146143296775,
+  "wall_s": 6142.820000000001,
+  "timing": {
+   "fitter.minimize()": 6467.2,
+   "_profile_beta()": 2.5,
+   "loss_val_grad_hess() (postfit cov)": 367.9,
+   "edmval_cov()": 0.6
+  },
+  "n_dt_ge_300": 4,
+  "above_nomstiff_end": -1.8594031075735984e-05,
+  "cpu_s_total": 857249.0,
+  "cpu_per_wall": 122.46287699586044,
+  "to_own_final_0.001": {
+   "iter_index": 43,
+   "iters": 43,
+   "wall_s": 3420.0299999999993,
+   "cpu_s": 437918.0,
+   "cpu_s_rel": 409007.9
+  },
+  "to_own_final_1e-06": {
+   "iter_index": 47,
+   "iters": 47,
+   "wall_s": 4669.349999999999,
+   "cpu_s": 593161.0,
+   "cpu_s_rel": 564250.9
+  },
+  "to_NOMSTIFF_0.001": {
+   "iter_index": 43,
+   "iters": 43,
+   "wall_s": 3420.0299999999993,
+   "cpu_s": 437918.0,
+   "cpu_s_rel": 409007.9
+  },
+  "to_NOMSTIFF_1e-06": {
+   "iter_index": 46,
+   "iters": 46,
+   "wall_s": 3995.2999999999997,
+   "cpu_s": 507655.0,
+   "cpu_s_rel": 478744.9
+  },
+  "crawl_sig": {
+   "n": 60,
+   "accepted": 42,
+   "rejected": 17,
+   "longest_rej_run": 10,
+   "gain_ratio_frac_near2": 0.475,
+   "gain_ratio_frac_near1": 0.075,
+   "n_ratios": 40,
+   "crawl": []
+  }
+ },
+ "R2A": {
+  "log": "/home/submit/lavezzo/alphaS/WRemnantsHelpers/studies/constrained-fit-strategy/261008-c2-wall-test/logs/R2A.log",
+  "finished": false,
+  "n_rows": 220,
+  "restarts": 0,
+  "start_loss": 806.5778129128407,
+  "final_loss": 806.5536725704638,
+  "min_loss": 806.5536725704638,
+  "wall_s": 6093.919999999995,
+  "timing": {},
+  "n_dt_ge_300": 0,
+  "above_nomstiff_end": 429.93903964675525,
+  "cpu_s_total": 768230.0,
+  "cpu_per_wall": 122.90814901047729,
+  "to_own_final_0.001": {
+   "iter_index": 211,
+   "iters": 211,
+   "wall_s": 5813.399999999995,
+   "cpu_s": 734451.0,
+   "cpu_s_rel": 705267.7
+  },
+  "to_own_final_1e-06": {
+   "iter_index": 219,
+   "iters": 219,
+   "wall_s": 6093.919999999995,
+   "cpu_s": 768230.0,
+   "cpu_s_rel": 739046.7
+  },
+  "to_NOMSTIFF_0.001": null,
+  "to_NOMSTIFF_1e-06": null,
+  "crawl_sig": {
+   "n": 220,
+   "accepted": 211,
+   "rejected": 8,
+   "longest_rej_run": 8,
+   "gain_ratio_frac_near2": 0.0,
+   "gain_ratio_frac_near1": 0.780952380952381,
+   "n_ratios": 210,
+   "crawl": []
+  }
+ },
+ "CENS03R": {
+  "log": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261001_census_nominal/CENS03R.log",
+  "finished": false,
+  "n_rows": 261,
+  "restarts": 0,
+  "start_loss": 806.7043222186584,
+  "final_loss": 806.5778129128407,
+  "min_loss": 806.5778129128407,
+  "wall_s": 16211.650000000007,
+  "timing": {},
+  "n_dt_ge_300": 0,
+  "above_nomstiff_end": 429.96317998913213,
+  "to_own_final_0.001": {
+   "iter_index": 252,
+   "iters": 252,
+   "wall_s": 15941.930000000008,
+   "cpu_s": null,
+   "cpu_s_rel": null
+  },
+  "to_own_final_1e-06": {
+   "iter_index": 260,
+   "iters": 260,
+   "wall_s": 16211.650000000007,
+   "cpu_s": null,
+   "cpu_s_rel": null
+  },
+  "to_NOMSTIFF_0.001": null,
+  "to_NOMSTIFF_1e-06": null,
+  "crawl_sig": {
+   "n": 261,
+   "accepted": 214,
+   "rejected": 46,
+   "longest_rej_run": 7,
+   "gain_ratio_frac_near2": 0.44919786096256686,
+   "gain_ratio_frac_near1": 0.13368983957219252,
+   "n_ratios": 187,
+   "crawl": []
+  }
+ },
+ "SATC2": {
+  "log": "/home/submit/lavezzo/alphaS/WRemnantsHelpers/studies/constrained-fit-strategy/261008-c2-wall-test/logs/SATC2.log",
+  "finished": true,
+  "n_rows": 161,
+  "restarts": 0,
+  "start_loss": 354.3125501833915,
+  "final_loss": 337.47615720660195,
+  "min_loss": 337.47615720660195,
+  "wall_s": 14700.91,
+  "timing": {
+   "save_hists() (postfit, incl. saturated tests)": 14789.1
+  },
+  "n_dt_ge_300": 11,
+  "above_nomstiff_end": null,
+  "cpu_s_total": 1818820.0,
+  "cpu_per_wall": 121.8953012375901,
+  "to_own_final_0.001": {
+   "iter_index": 152,
+   "iters": 152,
+   "wall_s": 11304.68,
+   "cpu_s": 1403390.0,
+   "cpu_s_rel": 1377162.3
+  },
+  "to_own_final_1e-06": {
+   "iter_index": 157,
+   "iters": 157,
+   "wall_s": 12546.09,
+   "cpu_s": 1555620.0,
+   "cpu_s_rel": 1529392.3
+  },
+  "crawl_sig": {
+   "n": 161,
+   "accepted": 139,
+   "rejected": 21,
+   "longest_rej_run": 7,
+   "gain_ratio_frac_near2": 0.128,
+   "gain_ratio_frac_near1": 0.008,
+   "n_ratios": 125,
+   "crawl": []
+  }
+ },
+ "SATB8": {
+  "log": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261007_lattice_term_native/SATB8.log",
+  "finished": true,
+  "n_rows": 158,
+  "restarts": 0,
+  "start_loss": 354.2772249220433,
+  "final_loss": 337.47616205811795,
+  "min_loss": 337.47616205811795,
+  "wall_s": 20941.129999999994,
+  "timing": {
+   "save_hists() (postfit, incl. saturated tests)": 21332.6
+  },
+  "n_dt_ge_300": 16,
+  "above_nomstiff_end": null,
+  "to_own_final_0.001": {
+   "iter_index": 147,
+   "iters": 147,
+   "wall_s": 15374.839999999991,
+   "cpu_s": null,
+   "cpu_s_rel": null
+  },
+  "to_own_final_1e-06": {
+   "iter_index": 153,
+   "iters": 153,
+   "wall_s": 17511.35999999999,
+   "cpu_s": null,
+   "cpu_s_rel": null
+  },
+  "crawl_sig": {
+   "n": 158,
+   "accepted": 136,
+   "rejected": 21,
+   "longest_rej_run": 7,
+   "gain_ratio_frac_near2": 0.11475409836065574,
+   "gain_ratio_frac_near1": 0.01639344262295082,
+   "n_ratios": 122,
+   "crawl": []
+  }
+ }
+}

@@ -1,0 +1,22 @@
+{
+ "delta": {
+  "nll": 0.6696809765226135,
+  "lc_syst": 0.7058444850723777,
+  "lc_pm": 0.20835479016483482,
+  "wall": 0.23973063826638533,
+  "data_plus_bb": -0.48424893698098437
+ },
+ "wall": {
+  "CMR1B": 0.23974218270997422,
+  "XWSTIFF": 1.1544443588890273e-05
+ },
+ "lc_pm": {
+  "XWSTIFF": 4.527615500665148,
+  "CMR1B": 4.735970290829983
+ },
+ "lc_syst": {
+  "XWSTIFF": 14.232336714041928,
+  "CMR1B": 14.938181199114306
+ },
+ "note": "vector-only estimate; prior = 0.5*sum theta^2 (card constraints, theta0=0) + param-model priors; data+BB = remainder"
+}

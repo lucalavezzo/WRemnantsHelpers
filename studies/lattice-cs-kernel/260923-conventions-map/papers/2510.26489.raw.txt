@@ -1,0 +1,806 @@
+DESY-25-145; FERMILAB-PUB-25-0784-T; INT-PUB-25-026; MIT-CTP/5946
+
+An extraction of the Collins–Soper kernel
+from a joint analysis of experimental and lattice data
+Artur Avkhadiev,1, 2, ∗ Valerio Bertone,3, † Chiara Bissolotti,4, ‡ Matteo Cerutti,3, § Yang Fu,1, ¶
+Simone Rodini,5, 6, ∗∗ Phiala Shanahan,1, †† Michael Wagman,7, ‡‡ and Yong Zhao2, §§
+1
+
+arXiv:2510.26489v1 [hep-ph] 30 Oct 2025
+
+Center for Theoretical Physics – A Leinweber Institute,
+Massachusetts Institute of Technology, Cambridge, MA, USA 02139
+2
+Physics Division, Argonne National Laboratory, Lemont, IL 60439, USA
+3
+IRFU, CEA, Université Paris-Saclay, F-91191 Gif-sur-Yvette, France
+4
+Argonne National Laboratory, PHY Division, Lemont, IL, USA
+5
+Deutsches Elektronen-Synchrotron DESY, Notkestr. 85, 22607 Hamburg, Germany
+6
+Dipartimento di Fisica “Alessandro Volta”, Università degli Studi di Pavia, 27100 Pavia, Italy
+7
+Fermi National Accelerator Laboratory, Batavia, IL 60510, USA
+We present a first joint extraction of the Collins–Soper kernel (CSK) combining experimental and
+lattice QCD data in the context of an analysis of transverse-momentum-dependent distributions
+(TMDs). Based on a neural-network parametrization, we perform a Bayesian reweighting of an
+existing fits of TMDs using lattice data, as well as a joint TMD fit to lattice and experimental data.
+We consistently find that the inclusion of lattice information shifts the central value of the CSK
+by approximately 10% and reduces its uncertainty by 40-50%, highlighting the potential of lattice
+inputs to improve TMD extractions.
+
+INTRODUCTION
+
+This work presents the first effort to incorporate lattice QCD data into a phenomenological extraction of
+transverse-momentum-dependent distributions (TMDs),
+to better constrain the Collins-Soper kernel (CSK). This
+shares the same idea as past combined analyses of lattice and experimental data towards a better understanding of the hadronic structure through the extraction of
+collinear distributions. These include analyses of unpolarized, longitudinally-polarized, and transversity parton distribution functions (PDFs) [1–13], and generalized
+parton distributions [14–16]. However, this is the first
+time that a similar strategy is employed in the context of
+a TMD extraction (see also Ref. [17] for a similar effort in
+this direction). In this context, the CSK plays a special
+role in that it encodes information on the QCD vacuum
+rather than on the actual structure of hadrons. In fact,
+there is no experimental observable directly sensitive to
+CSK, so lattice is the only source of direct information.
+Improved determinations of the CSK are important to
+further sharpen control and reduce model-dependence in
+TMD evolution, enhance the precision of QCD predictions of multiple processes, and test the validity of factorization in the nonperturbative regime.
+Formally, the CSK K is the expectation value of a
+Wilson loop running along the light-front directions and
+characterized by a transverse displacement bT . When
+b ≡ |bT | is small enough, the CSK can be computed in
+perturbation theory. As customary, radiative corrections
+introduce ultraviolet divergences, which, upon renormalization, lead to the introduction of the renormalization
+scale µ. The dependence of K on µ is governed by the
+
+renormalization-group equation:
+∂K(b, µ)
+= −γK (αs (µ)) ,
+∂ ln µ
+
+(1)
+
+where γK , a.k.a. cusp anomalous dimension, is computable in perturbation theory and is currently fully
+known to four loops [18, 19]. Introducing the scale
+µb = 2e−γE /b, where γE is the Euler-Mascheroni constant, the solution to Eq. (1) reads:
+Z µ ′
+dµ
+K(b, µ) = K(b, µb ) −
+γ (αs (µ′ )) ,
+(2)
+′ K
+µb µ
+where K(b, µb ) is also known to four loops [18, 19]. When
+b grows, such that µb ≲ ΛQCD , nonperturbative effects
+dominate and Eq. (2) becomes unreliable. Nonperturbative affects are accounted for by modifying Eq. (2) as
+follows:
+Z µ
+dµ′
+K(b, µ) = K(b∗ , µb∗ ) −
+γ (αs (µ′ )) − gK (b) , (3)
+′ K
+µb∗ µ
+with µb∗ = 2e−γE /b∗ . Here, b∗ ≡ b∗ (b) behaves linearly
+for small values of b (b∗ ∼ b) and saturates to some
+bmax ≪ Λ−1
+QCD for large b. The purpose of b∗ is to guarantee that the first two terms in the r.h.s. of Eq. (3)
+are evaluated in the perturbative regime where αs ≪ 1.
+The role of the functions gK is to encode nonperturbative effects that arise from the large-b region. A typical
+parametrization is:
+gK (b) = 2g22 b2 ,
+
+(4)
+
+with the parameter g2 to be determined from observables
+sensitive to the CSK. Other models for gK , with at most
+two free parameters, have been used in recent TMD fits
+
+2
+(see e.g. Refs. [20–22]). However, in this context, we
+found no evidence for the need of a more complicated
+functional form. The purpose of this work is therefore
+to determine the parameter g2 from a joint analysis of
+experimental and lattice data.
+
+of g2 . This gives us direct control over the modeling of
+the b dependence of the CSK required to carry out the
+extrapolation.
+The CSK determinations in Ref. [54] used different parameterizations of gK than the one employed here. For
+reference, an analogous fit to the lattice QCD data of
+Ref. [54] using the parameterization of Eq. (4) gives:
+
+BASELINE TMD FIT
+
+g2Lattice = 0.152 ± 0.027.
+A determination of g2 from experimental data implies
+an extraction of TMDs. TMD analyses have achieved a
+remarkable level of sophistication: they are often based
+on broad, multiprocess data sets, they achieve high perturbative accuracy, and employ advanced methodological
+frameworks (see, e.g., Refs. [20, 23–31]). In this work,
+we rely on the TMD extraction presented in Ref. [32]. In
+that analysis, TMD parton distribution functions (PDFs)
+were extracted from a comprehensive set of Drell-Yan
+data using next-to-next-to-next-to-leading logarithmic
+(N3 LL) accurate predictions. The nonperturbative part
+of TMD PDFs, which also involves g2 , was parametrized
+through a neural network (NN). The flexibility of the NN
+enabled a solid estimate of the nonperturbative parameters and their uncertainties. That analysis obtained:
+g2Baseline = 0.186 ± 0.033 .
+
+(5)
+
+In this Letter, we will use the numerical framework and
+the determination of Ref. [32] as a baseline to quantify the
+impact on g2 of lattice data for the CSK in the context
+of a TMD phenomenological extraction.
+LATTICE DATA
+
+Over the last five years, several efforts have been
+made to extract the CSK from lattice QCD following
+the original proposals in Refs. [33–38] and follow-up
+works in Refs. [39–42]. Exploratory calculations based
+on quasi-TMD beam functions have been performed
+in quenched [43] and dynamical [44, 45] lattice QCD.
+Analogous calculations based on quasi-TMD wave functions [36, 38] were also carried out [45–50]. Recent lattice
+QCD calculations of the quark CSK using quasi-TMDs in
+Coulomb gauge [51, 52] have also shown promise for significant reduction in statistical uncertainty. However, at
+present there is only a single lattice QCD determination
+of the CSK with full systematic control, including, for the
+first time, the continuum a → 0 extrapolation [53, 54].
+The analysis described in this Letter is thus based on
+the quark CSK from Refs. [53, 54], which includes three
+ensembles of gauge-field configurations with lattice spacings a ∈ {a1 = 0.15 fm, a2 = 0.12 fm, a3 = 0.09 fm}.
+This data can be used at two levels of analysis: either extrapolated to the continuum or at finite lattice spacing.
+The latter level allows us to perform the extrapolation
+to the physical point simultaneously with the extraction
+
+(6)
+
+JOINT EXTRACTION OF THE CSK
+
+In this section, we studied the impact on g2 of including
+the CSK lattice data of Refs. [53, 54] into the extraction
+of Ref. [32] following two different strategies: reweighting
+and simultaneous fit.
+
+Reweighting
+
+The impact of incorporating new data into an existing fit can be effectively estimated using the Bayesian
+reweighting procedure [55]. This method consists of assigning a weight to each of the N = 250 Monte Carlo
+(MC) replicas of the fit of Ref. [32] according to its likelihood with respect to lattice data, which in turn is estimated through χ2 .
+We performed the reweighting both on the continuumextrapolated and on the finite-lattice-spacing data. In
+the former approach, data for the CSK is provided as a
+set of n = 21 points {Kj ± σj }, j = 1, . . . , n, corresponding to as many values of b ∈ {bj }. Since this data set
+comes without correlations between points, the χ2 of the
+α-th replica, with α = 1, . . . , N is computed as:
+χ2α =
+
+2
+n 
+X
+Kj − K (α) (bj )
+,
+σj
+j=1
+
+(7)
+(α)
+
+where K (α) (bj ) is evaluated using Eq. (3) with g2 = g2
+extracted from the α-th MC replica. The weight to be
+associated with this replica is [55]:
+wα = N χ2α
+
+n/2−1
+
+2
+
+e−χα /2 ,
+
+(8)
+P
+
+where N normalizes the weights so that
+α wα = N .
+Weighted average and variance of g2 over the MC ensemble are then computed respectively as:
+⟨g2 ⟩ =
+
+N
+X
+
+(α)
+
+wα g2 ,
+
+α=1
+
+σg22 =
+
+N
+X
+
+(α)
+
+wα (g2
+
+− ⟨g2 ⟩)2 . (9)
+
+α=1
+
+The result is:
+g2Rew−cont ≡ ⟨g2 ⟩ ± σg2 = 0.164 ± 0.020 .
+
+(10)
+
+3
+The associated number of effective replicas [55], Neff ≃
+150, indicates that the reweighting was successful. Indeed, Neff is significantly lower than N but still large
+enough to produce a statistically sound ensemble after
+reweighting. Comparing the purely phenomenological
+determination in Eq. (5) with the lattice-reweighted one
+in Eq. (10), we observe a shift in central value of around
+10% and a reduction in uncertainty of 40%.
+Next, we consider the finite-lattice-spacing data set.
+This is subdivided into three subsets corresponding to the
+lattice spacings discussed above, and counting n1 = 6,
+n2 = 7, and n3 = 8 points. Each subset {Kji }, with i =
+1, 2, 3 and ji = 1, . . . , ni , comes with its own covariance
+matrix Σi estimated in the lattice analysis of Ref. [54].
+Therefore, the χ2 of the α-the replica is evaluated as:
+χ2α =
+
+ni 
+3
+X
+X
+
+Kji − K
+
+(α)
+
+
+(bji )
+
+i=1 ji ,li =1
+
+(11)
+
+
+
+(α)
+× (Σ−1
+(bli ) ,
+i )ji ,li Kli − K
+and the corresponding weight computed as in Eq. (8).
+However, each prediction for the CSK K must now correspond to the appropriate lattice spacing a. This is done
+by replacing gK in Eq. (3) with:
+
+Simultaneous fit
+
+Following the promising outcome of the reweighting
+analysis, we explore for the first time the impact of CSK
+lattice data in a TMD fit. Specifically, we performed a
+fit using the exact same setup of Ref. [32], but including
+the three sets of finite-lattice-spacing data for the CSK
+of Refs. [53, 54]. Accordingly, predictions are computed
+using Eq. (3) with gK given in Eq. (12). We treat these
+sets by accounting for correlations as encoded in the covariance matrices Σi . In total, we included 503 points
+in the fit: 482 Drell-Yan (DY) experimental points and
+21 lattice points. In the fit we used a training-validation
+split of 50%-50% for experimental data. However, due to
+its limited amount, lattice data is fully included in the
+training set.
+In Tab. I, we compare the quality of the baseline fit of
+Ref. [32] with the reweighted results and the combined
+fit of experimental and lattice data. For each data subset (fixed-target, RHIC, Tevatron, LHCb, CMS, ATLAS,
+and lattice) we list the number of points included in the
+fit (Ndat ), and the χ2 averaged over the MC ensemble,
+⟨χ2 ⟩.2
+Experiment
+
+⟨χ2 ⟩
+
+Ndat
+
+Baseline Reweighting
+
+a
+a2
+gK (b) = 2g22 b2 − k1 − k2 2 .
+b
+b
+
+Fixed-target 233
+
+(12)
+
+Since the parameters k1 and k2 were not available from
+the fit of Ref. [32], we generated a MC ensemble for each
+of them using as priors the values obtained in Ref. [54]:
+k1 = 0.22±0.08 and k2 = 0±0.1.1 To consistently include
+these parameters in the reweighting, we first sampled 104
+replicas of g2 uniformly from the original MC ensemble
+and then generated a pair (k1 , k2 ) for each replica according to k1 ∼ Normal(0.22, 0.08) and k2 ∼ Normal(0, 0.1).
+After reweighting, we find:
+g2Rew−fin = 0.165 ± 0.020 .
+
+(13)
+
+The reweighted value of g2 is in perfect agreement, both
+in terms of central value and uncertainty, with Eq. (10).
+We also find that the reweighted values of k1 and k2
+agree with their respective priors. This proves the consistency of performing the reweighting using continuumextrapolated and finite-lattice-spacing lattice data, and
+provides further evidence of the impact of this data on the
+CSK. For definiteness, we will take the value in Eq. (13)
+as our best estimate of g2 by reweighting.
+
+Note that k2 was estimated to be negligible in Ref. [54] based on
+the Akaike information criterion (AIC) [56]. To generate a MC
+ensemble, we assigned an uncertainty of 0.1 to it.
+
+239.67
+
+234.09
+
+242.29
+
+RHIC
+
+7
+
+7.06
+
+7.11
+
+7.62
+
+Tevatron
+
+71
+
+61.33
+
+59.91
+
+65.31
+
+LHCb
+
+21
+
+22.94
+
+21.88
+
+22.77
+
+CMS
+
+78
+
+30.74
+
+29.85
+
+29.48
+
+ATLAS
+
+72
+
+95.35
+
+95.60
+
+95.71
+
+Lattice a1
+
+6
+
+31.13
+
+11.5
+
+12.56
+
+Lattice a2
+
+7
+
+6.30
+
+4.67
+
+1.77
+
+Lattice a3
+
+8
+
+8.50
+
+3.88
+
+6.01
+
+TABLE I: Values of the ⟨χ2 ⟩’s for each data subset, along with
+the respective numbers of points Ndat , obtained with baseline
+fit in Ref. [32], reweighting, and simultaneous fit. The ⟨χ2 ⟩’s
+of lattice data obtained using the baseline fit, which does not
+include this data, are shown in italic.
+
+We observe that the average ⟨χ2 ⟩ values for the DY
+data are stable across the three configurations. This indicates that there is no tension between experimental and
+lattice data in that the inclusion of the latter does not
+
+2
+1
+
+Fit
+
+Differently from Ref. [32] where we quoted the reduced χ2 ’s of
+the central replica, here we report ⟨χ2 ⟩ because no central replica
+can be defined in the case of reweighting. The ⟨χ2 ⟩’s in the
+reweighting case are to be understood as weighted averages.
+
+4
+
+40
+
+0.0
+−0.5
+−1.0
+−1.5
+
+20
+
+1.75
+Ratio to Baseline
+
+60
+
+Baseline
+Reweighting
+Fit
+Lattice
+
+0.5
+
+K(b, µ = 2 GeV)
+
+80
+
+Counts
+
+1.0
+
+Baseline
+Reweighting
+Fit
+
+100
+
+1.50
+1.25
+1.00
+0.75
+0.50
+0.25
+
+0
+
+0.10
+
+0.15
+
+0.20
+
+0.25
+
+−2.0
+
+0.30
+
+g2
+
+FIG. 1: MC replica distribution of g2 from the baseline fit
+(red), after reweighting (green), and from the simultaneous
+fit (blue). The points above the distributions display the respective central values and one-σ uncertainties.
+
+cause any deterioration in the description of the former.
+It may be argued that the reduced number of lattice
+points can hardly affect the description of the much more
+abundant experimental data set. Although this is true,
+the marked improvement in the description of lattice data
+upon inclusion in the fit (or by reweighting) demonstrates
+their constraining power.
+The value of g2 obtained from the simultaneous fit is:
+g2Fit = 0.167 ± 0.015 .
+
+(14)
+
+This result is in very good agreement with the value obtained through reweighting in Eq. (13), both in terms of
+central value and uncertainty. A quantitative comparison is given in Fig. 1, where the distributions of g2 over
+the respective MC ensembles for baseline fit, reweighting, and simultaneous fit are compared. This plot shows
+the consistency of reweighting and simultaneous-fit determinations, with the latter having a slightly smaller
+uncertainty. Moreover, shift and uncertainty reduction
+on g2 caused by the inclusion of lattice data are evident
+when comparing reweighting and simultaneous-fit determinations to the baseline one.
+Fig. 2 displays the CSK computed as in Eq. (3),
+with gK given in Eq. (4), as a function of b at the
+scale µ = 2 GeV. Curves corresponding to baseline fit,
+reweighting, and simultaneous fit are shown, along with
+the continuum-extrapolated lattice data shown as black
+points. This plot confirms the consistency of reweighting
+and simultaneous fit, as well as the significant impact of
+lattice data on the CSK. This is made particularly clear
+by the bottom inset of Fig. 2, where the ratio to the baseline predictions at large values of b is shown. Indeed, the
+CSK in this region is maximally sensitive to the nonperturbative parameter g2 , while the small-b region is mostly
+determined by the perturbative components.
+
+2.5
+
+0
+
+3.0
+
+1
+
+3.5
+
+4.0
+
+2
+
+4.5
+
+3
+
+b [GeV−1]
+
+4
+
+5
+
+FIG. 2: The CSK as a function of b at µ = 2 GeV as obtained from the baseline of fit of Ref. [32] (red band), from
+reweighting (green band), and from the simultaneous fit of
+experimental and lattice data (blue band). Bands correspond
+to one-σ uncertainties. Data points correspond to the extraction of Ref. [54]. The bottom inset shows the ratio to the
+baseline predictions at large values of b.
+
+We conclude this section by noting that, although lattice data for the CSK has a strong impact on g2 when
+included in a TMD determination, the resulting TMD
+PDFs remain very stable.
+
+CONCLUSION
+
+We presented the first successful joint extraction of the
+nonperturbative Collins-Soper kernel (CSK) by combining experimental Drell-Yan data with lattice QCD calculations in the context of a TMD analysis based on
+a neural-network paratrization. The inclusion of lattice
+data consistently shifts the central value of the parameter
+g2 , which governs the behavior of the CSK in the nonperturbative region, by approximately 10% and reduces its
+uncertainty by 50%, leading to a significantly more precise determination. Two independent methodologies —
+Bayesian reweighting of an existing fit and a simultaneous
+fit — yield remarkably consistent results, demonstrating
+the robustness of the approach. The analysis finds no
+tension between experimental and lattice data, and the
+description of the Drell-Yan data remains stable. This
+study highlights the significant potential of lattice QCD
+inputs to substantially improve precision in the extraction of transverse-momentum-dependent distributions.
+
+ACKNOWLEDGMENTS
+
+The work of S.R. is supported by the German Science Foundation (DFG), grant number 409651613 (Research Unit FOR 2926), subproject 430915355. The
+
+5
+work of V.B. has been supported by l’Agence Nationale
+de la Recherche (ANR), project ANR-24-CE31-7061-01.
+This material is based upon work supported by the U.S.
+Department of Energy (DOE), Office of Science, Office of Nuclear Physics through Contract No. DE-AC0206CH11357. Argonne National Laboratory’s contribution is based upon work supported by Laboratory Directed Research and Development (LDRD) funding from
+Argonne National Laboratory, provided by the Director, Office of Science, of the U.S. DOE under Contract
+No. DE-AC02-06CH11357. This manuscript has been
+authored by FermiForward Discovery Group, LLC under
+Contract No. 89243024CSC000002 with the U.S. Department of Energy, Office of Science, Office of High Energy
+Physics. A.A., Y.F., and P.E.S. were supported in part
+by the U.S. Department of Energy, Office of Science, Office of Nuclear Physics, under grant Contract Number
+DE-SC0011090, by Early Career Award DE-SC0021006,
+by Simons Foundation grant 994314 (Simons Collaboration on Confinement and QCD Strings), by the U.S.
+Department of Energy SciDAC5 award DE-SC0023116,
+and have benefited from the QGT Topical Collaboration DE-SC0023646. V.B., A.A., and P.E.S thank the
+Department of U.S. DOE Institute for Nuclear Theory
+(INT) at the University of Washington for its hospitality
+and the Department of Energy for partial support during
+the completion of this work; this research was supported
+in part by the INT’s U.S. DOE grant No. DE-FG0200ER41132.
+
+[6]
+[7]
+[8]
+
+[9]
+[10]
+[11]
+[12]
+
+[13]
+[14]
+[15]
+[16]
+[17]
+[18]
+[19]
+[20]
+[21]
+
+[22]
+∗
+
+†
+
+‡
+
+§
+
+¶
+∗∗
+
+††
+‡‡
+
+§§
+
+[1]
+[2]
+[3]
+[4]
+
+[5]
+
+Email: aavkhadi@anl.gov – ORCID: 0000-0003-34938649
+E-mail: valerio.bertone@cea.fr – ORCID: 0000-00030148-0272
+E-mail: cbissolotti@anl.gov – ORCID: 0000-0003-30610144
+E-mail: matteo.cerutti@cea.fr – ORCID: 0000-00017238-5657
+E-mail: yangfu@mit.edu – ORCID: 0000-0002-8965-1402
+E-mail: simone.rodini@unipv.it – ORCID: 0000-00028057-5597
+E-mail: phiala@mit.edu – ORCID: 0000-0002-0916-7603
+E-mail: mwagman@fnal.gov – ORCID: 0000-0001-76701880
+Email: yong.zhao@anl.gov – ORCID: 0000-0002-26886415
+H.-W. Lin, W. Melnitchouk, A. Prokudin, N. Sato, and
+H. Shows, Phys. Rev. Lett. 120, 152502 (2018).
+K. Cichy, L. Del Debbio, and T. Giani, JHEP 10, 137
+(2019).
+L. Del Debbio, T. Giani, and C. J. Monahan, JHEP 09,
+021 (2020).
+L. Del Debbio, T. Giani, J. Karpie, K. Orginos,
+A. Radyushkin, and S. Zafeiropoulos, JHEP 02, 138
+(2021).
+J. Bringewatt, N. Sato, W. Melnitchouk, J.-W. Qiu,
+
+[23]
+
+[24]
+
+[25]
+[26]
+[27]
+[28]
+[29]
+[30]
+[31]
+[32]
+
+[33]
+
+F. Steffens, and M. Constantinou, Phys. Rev. D 103,
+016003 (2021).
+P. C. Barry et al. (Jefferson Lab Angular Momentum
+(JAM), HadStruc), Phys. Rev. D 105, 114051 (2022).
+T.-J. Hou, H.-W. Lin, M. Yan, and C. P. Yuan, Phys.
+Rev. D 107, 076018 (2023).
+J. Karpie, R. M. Whitehill, W. Melnitchouk, C. Monahan, K. Orginos, J. W. Qiu, D. G. Richards, N. Sato,
+and S. Zafeiropoulos (Jefferson Lab Angular Momentum,
+HadStruc), Phys. Rev. D 109, 036031 (2024).
+A. Ablat et al., Eur. Phys. J. Plus 139, 1063 (2024).
+C. Cocuzza, N. T. Hunt-Smith, W. Melnitchouk, N. Sato,
+and A. W. Thomas (2025), arXiv:2506.13616 [hep-ph].
+A. Ablat, S. Dulat, T.-J. Hou, H.-W. Lin, K. Xie, and
+C. P. Yuan (2025), arXiv:2502.10630 [hep-ph].
+W. Good, P. C. Barry, H.-W. Lin, W. Melnitchouk,
+A. NieMiera, and N. Sato (2025), arXiv:2507.22730 [hepph].
+P. C. Barry, C.-R. Ji, W. Melnitchouk, N. Sato, and
+F. Steffens (JAM) (2025), arXiv:2510.11979 [hep-ph].
+Y. Guo, X. Ji, M. G. Santiago, K. Shiells, and J. Yang,
+JHEP 05, 150 (2023).
+K. Cichy, M. Constantinou, P. Sznajder, and J. Wagner,
+Phys. Rev. D 110, 114025 (2024).
+Y. Guo, F. P. Aslan, X. Ji, and M. G. Santiago (2025),
+arXiv:2509.08037 [hep-ph].
+T. Cridge, G. Marinelli, and F. J. Tackmann (2025),
+arXiv:2506.13874 [hep-ph].
+I. Moult, H. X. Zhu, and Y. J. Zhu, JHEP 08, 280 (2022).
+C. Duhr, B. Mistlberger, and G. Vita, Phys. Rev. Lett.
+129, 162001 (2022).
+V. Moos, I. Scimemi, A. Vladimirov, and P. Zurita
+(2025), arXiv:2503.11201 [hep-ph].
+F. Aslan, M. Boglione, J. O. Gonzalez-Hernandez,
+T. Rainaldi, T. C. Rogers, and A. Simonelli, Phys. Rev.
+D 110, 074016 (2024).
+A. Bacchetta, V. Bertone, C. Bissolotti, G. Bozzi, F. Delcarro, F. Piacenza, and M. Radici, JHEP 07, 117 (2020).
+A. Bacchetta, V. Bertone, C. Bissolotti, G. Bozzi,
+M. Cerutti, F. Delcarro, M. Radici, L. Rossi, and A. Signori (MAP (Multi-dimensional Analyses of Partonic distributions)), JHEP 08, 232 (2024).
+A. Bacchetta, V. Bertone, C. Bissolotti, G. Bozzi,
+M. Cerutti, F. Piacenza, M. Radici, and A. Signori (MAP
+(Multi-dimensional Analyses of Partonic distributions)),
+JHEP 10, 127 (2022).
+V. Moos, I. Scimemi, A. Vladimirov, and P. Zurita, JHEP
+05, 036 (2024).
+S. Camarda, G. Ferrera, and M. Schott, Eur. Phys. J. C
+84, 39 (2024).
+P. C. Barry et al. (2025), arXiv:2510.13771 [hep-ph].
+A. B. Cuerpo, I. Scimemi, and A. Vladimirov (2025),
+arXiv:2507.17478 [hep-ph].
+Z.-B. Kang, J. Penttala, and C. Zhang (2024),
+arXiv:2410.21435 [hep-ph].
+D. de Florian and M. Grazzini, Nucl. Phys. B 704, 387
+(2005).
+S. Camarda, G. Ferrera, and L. Rossi (2025),
+arXiv:2508.06201 [hep-ph].
+A. Bacchetta, V. Bertone, C. Bissolotti, M. Cerutti,
+M. Radici, S. Rodini, and L. Rossi (MAP (Multidimensional Analyses of Partonic distributions)), Phys.
+Rev. Lett. 135, 021904 (2025).
+X. Ji, P. Sun, X. Xiong, and F. Yuan, Phys. Rev. D 91,
+
+6
+074009 (2015).
+[34] M. A. Ebert, I. W. Stewart, and Y. Zhao, Phys. Rev. D
+99, 034505 (2019).
+[35] M. A. Ebert, I. W. Stewart, and Y. Zhao, JHEP 09, 037
+(2019).
+[36] X. Ji, Y. Liu, and Y.-S. Liu, Nucl. Phys. B 955, 115054
+(2020).
+[37] X. Ji, Y. Liu, and Y.-S. Liu, Phys. Lett. B 811, 135946
+(2020).
+[38] X. Ji and Y. Liu, Phys. Rev. D 105, 076014 (2022).
+[39] A. A. Vladimirov and A. Schäfer, Phys. Rev. D 101,
+074517 (2020).
+[40] S. Rodini and A. Vladimirov, JHEP 09, 117 (2023).
+[41] Z.-F. Deng, W. Wang, and J. Zeng, JHEP 09, 046 (2022).
+[42] Y. Zhao, Phys. Rev. Lett. 133, 241904 (2024).
+[43] P. Shanahan, M. Wagman, and Y. Zhao, Phys. Rev. D
+102, 014511 (2020).
+[44] P. Shanahan, M. Wagman, and Y. Zhao, Phys. Rev. D
+104, 114502 (2021).
+[45] H.-T. Shu, M. Schlemmer, T. Sizmann, A. Vladimirov,
+L. Walter, M. Engelhardt, A. Schäfer, and Y.-B. Yang,
+Phys. Rev. D 108, 074519 (2023).
+[46] Q.-A. Zhang et al. (Lattice Parton), Phys. Rev. Lett.
+125, 192001 (2020).
+
+[47] M.-H. Chu et al. (Lattice Parton (LPC)), Phys. Rev. D
+106, 034509 (2022).
+[48] Y. Li et al., Phys. Rev. Lett. 128, 062002 (2022).
+[49] M. Schlemmer, A. Vladimirov, C. Zimmermann, M. Engelhardt, and A. Schäfer, JHEP 08, 004 (2021).
+[50] C. Alexandrou, S. Bacchio, K. Cichy, M. Constantinou,
+A. Sen, G. Spanoudes, F. Steffens, and J. Tarello (2025),
+arXiv:2509.26316 [hep-lat].
+[51] D. Bollweg, X. Gao, S. Mukherjee, and Y. Zhao, Phys.
+Lett. B 852, 138617 (2024).
+[52] D. Bollweg, X. Gao, J. He, S. Mukherjee, and Y. Zhao,
+Phys. Rev. D 112, 034501 (2025).
+[53] A. Avkhadiev, P. E. Shanahan, M. L. Wagman, and
+Y. Zhao, Phys. Rev. D 108, 114505 (2023).
+[54] A. Avkhadiev, P. E. Shanahan, M. L. Wagman, and
+Y. Zhao, Phys. Rev. Lett. 132, 231901 (2024).
+[55] R. D. Ball, V. Bertone, F. Cerutti, L. Del Debbio,
+S. Forte, A. Guffanti, J. I. Latorre, J. Rojo, and M. Ubiali
+(NNPDF), Nucl. Phys. B 849, 112 (2011), [Erratum:
+Nucl.Phys.B 854, 926–927 (2012), Erratum: Nucl.Phys.B
+855, 927–928 (2012)].
+[56] H. Akaike, IEEE Transactions on Automatic Control 19,
+716 (1974).
+
+

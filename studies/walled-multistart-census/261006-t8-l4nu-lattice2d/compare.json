@@ -1,0 +1,73 @@
+{
+ "NOMSTIFF": {
+  "source": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260930_stiff_wall_fits/fitresults_NOMSTIFF.hdf5",
+  "nll_nopen": 376.61462547941585,
+  "penalty": 7.444292768114144e-06,
+  "lat_term": 2.5248755535802907,
+  "z_part": 374.0897499258356,
+  "dalphaS_over_sigNOM": 0.0,
+  "lambdas": {
+   "lambda_inf": 1.0,
+   "lambda_inf_nu": 2.0,
+   "lambda2": 0.025581284102796142,
+   "lambda4": 0.08758284351213724,
+   "delta_lambda2": -0.004093151901886217,
+   "lambda2_nu": 0.06426999671529844,
+   "lambda4_nu": 0.0
+  },
+  "c_minus_lb": {
+   "\u03bb4_\u03bd": 0.0,
+   "\u03bb2_\u03bd": 0.06426999671529844,
+   "L2(0)": 0.025581284102796142,
+   "B(0)": 0.26276527098235586,
+   "L2(2.5)": -9.152839927153988e-07,
+   "B(2.5)": 0.26274853053641173
+  },
+  "active": [
+   "\u03bb4_\u03bd",
+   "L2(2.5)"
+  ],
+  "lat_chi2_card2D": 5.691820779699502,
+  "lat_chi2_exact_stat": 17.098301482739487,
+  "note": "1D lattice card, lambda4_nu held 0",
+  "sigma_alphaS_over_sigNOM": {
+   "stored(stiff)": 1.0
+  }
+ },
+ "XWSTIFF": {
+  "source": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260930_stiff_wall_fits/fitresults_XWSTIFF.hdf5",
+  "nll_nopen": 371.3283536451264,
+  "penalty": 1.1544443588890273e-05,
+  "lat_term": 277.47933928154686,
+  "z_part": null,
+  "dalphaS_over_sigNOM": -0.36730875196729623,
+  "lambdas": {
+   "lambda_inf": 1.0,
+   "lambda_inf_nu": 2.0,
+   "lambda2": 0.11882566722836224,
+   "lambda4": -7.21173554438792e-05,
+   "delta_lambda2": -0.009409894210770734,
+   "lambda2_nu": -1.1216393087931653e-06,
+   "lambda4_nu": 0.044408086224080615
+  },
+  "c_minus_lb": {
+   "\u03bb4_\u03bd": 0.044408086224080615,
+   "\u03bb2_\u03bd": -1.1216393087931653e-06,
+   "L2(0)": 0.11882566722836224,
+   "B(0)": 0.001461411599146319,
+   "L2(2.5)": 0.060013828411045154,
+   "B(2.5)": -2.026850692142567e-07
+  },
+  "active": [
+   "\u03bb2_\u03bd",
+   "B(2.5)"
+  ],
+  "lat_chi2_card2D": 554.9586785630937,
+  "lat_chi2_exact_stat": 34.37558017235548,
+  "note": "NO lattice card (CS priors on); its lat_term/z_part are what the 2D term WOULD be (not in its NLL)"
+ },
+ "_meta": {
+  "NOMSTIFF_point_on_2D_card": 376.9356603156853,
+  "lat_exact_best_chi2": 6.712728055519473
+ }
+}

@@ -1,0 +1,27 @@
+{
+ "NOMSTIFF": {
+  "nll_diff": 0.0,
+  "nll_rel": 0.0,
+  "nll_bit_identical": true,
+  "edm_rel": 3.990542506981275e-09,
+  "parms_bit_identical": true,
+  "cov_diag_max_rel": 4.2916685904908e-13,
+  "cov_max_abs_rel_to_diag": 1.1548320332441117e-12,
+  "sigma_max_rel": 2.146736258713455e-13
+ },
+ "MEMNOM": {
+  "nll_diff": 0.0,
+  "nll_rel": 0.0,
+  "nll_bit_identical": true,
+  "edm_rel": 3.990573593242574e-09,
+  "parms_bit_identical": true,
+  "cov_diag_max_rel": 5.651630456238449e-13,
+  "cov_max_abs_rel_to_diag": 1.1415846129826996e-12,
+  "sigma_max_rel": 2.8256067509171875e-13
+ },
+ "edm": {
+  "SUBY25": 3.004579129744119e-14,
+  "NOMSTIFF": 3.004579117754218e-14,
+  "MEMNOM": 3.0045791177541246e-14
+ }
+}

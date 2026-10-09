@@ -1,0 +1,517 @@
+[
+ {
+  "name": "unwalled, main min (warm) CCKRYLOVWARM",
+  "file": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260917_cc_fits_hvpfix/fitresults_CCKRYLOVWARM.hdf5",
+  "freeze": [],
+  "paramModel": [
+   [
+    "wremnants.postprocessing.scetlib_ad.SCETlibADParamModel",
+    "cache=/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/scetlib_ad_caches/pdf62_corrgrid_260827/merged_full/cache.npz",
+    "conf=/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/scetlib_ad_caches/pdf62_corrgrid_260827/merged_full/cache.conf",
+    "threads=128"
+   ]
+  ],
+  "regularization": [],
+  "regStrength": 0.0,
+  "externalPostfit": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260915_pr174_blinding/fitresults_PR174.hdf5",
+  "has_cov": true,
+  "params": {
+   "lambda2_nu": {
+    "theta": -2.407299272387827,
+    "theta_sigma": 0.0557854981442547,
+    "width": 0.1,
+    "physical": -0.09072992723878273,
+    "physical_sigma": 0.00557854981442547
+   },
+   "lambda4_nu": {
+    "theta": 0.002143690664927701,
+    "theta_sigma": 0.00023786522219268672,
+    "width": 0.5,
+    "physical": 0.0010718453324638506,
+    "physical_sigma": 0.00011893261109634336
+   },
+   "lambda_inf_nu": "absent (frozen at anchor)",
+   "lambda6_nu": "absent",
+   "lambda2": {
+    "theta": -0.2543752330707053,
+    "theta_sigma": 0.11699402201230594,
+    "width": 0.5,
+    "physical": 0.27281238346464737,
+    "physical_sigma": 0.05849701100615297
+   },
+   "lambda4": {
+    "theta": -0.39468733992135563,
+    "theta_sigma": 0.1029678339311463,
+    "width": 0.5,
+    "physical": 0.2026563300393222,
+    "physical_sigma": 0.05148391696557315
+   },
+   "delta_lambda2": {
+    "theta": -0.014093279814678422,
+    "theta_sigma": 0.0166632241091212,
+    "width": 0.5,
+    "physical": -0.007046639907339211,
+    "physical_sigma": 0.0083316120545606
+   }
+  },
+  "cov_names": [
+   "lambda2_nu",
+   "lambda4_nu",
+   "lambda2",
+   "lambda4",
+   "delta_lambda2"
+  ],
+  "cov_physical": [
+   [
+    3.1120218032026455e-05,
+    -5.844727315498602e-07,
+    -9.089090048358777e-05,
+    -1.5825633948063815e-05,
+    -1.1193293730424054e-06
+   ],
+   [
+    -5.844727315498602e-07,
+    1.4144965982194057e-08,
+    1.860947100922061e-06,
+    -7.532300259301204e-07,
+    -1.8268859661571127e-08
+   ],
+   [
+    -9.089090048358777e-05,
+    1.860947100922061e-06,
+    0.003421900296653981,
+    -0.0011796197434473573,
+    -4.1993630532196614e-05
+   ],
+   [
+    -1.5825633948063815e-05,
+    -7.532300259301204e-07,
+    -0.0011796197434473573,
+    0.0026505937061180305,
+    5.713276894593799e-05
+   ],
+   [
+    -1.1193293730424054e-06,
+    -1.8268859661571127e-08,
+    -4.1993630532196614e-05,
+    5.713276894593799e-05,
+    6.94157594276995e-05
+   ]
+  ]
+ },
+ {
+  "name": "unwalled, second min (cold) CCCOLDSELF",
+  "file": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260917_cc_selfrestart/fitresults_CCCOLDSELF.hdf5",
+  "freeze": [],
+  "paramModel": [
+   [
+    "wremnants.postprocessing.scetlib_ad.SCETlibADParamModel",
+    "cache=/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/scetlib_ad_caches/pdf62_corrgrid_260827/merged_full/cache.npz",
+    "conf=/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/scetlib_ad_caches/pdf62_corrgrid_260827/merged_full/cache.conf",
+    "threads=128"
+   ]
+  ],
+  "regularization": [],
+  "regStrength": 0.0,
+  "externalPostfit": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260917_cc_fits_hvpfix/fitresults_CCKRYLOV.hdf5",
+  "has_cov": true,
+  "params": {
+   "lambda2_nu": {
+    "theta": -2.329775564304638,
+    "theta_sigma": 0.10311807378166211,
+    "width": 0.1,
+    "physical": -0.08297755643046381,
+    "physical_sigma": 0.010311807378166213
+   },
+   "lambda4_nu": {
+    "theta": 0.001820107764000514,
+    "theta_sigma": 0.0004200702483013732,
+    "width": 0.5,
+    "physical": 0.000910053882000257,
+    "physical_sigma": 0.0002100351241506866
+   },
+   "lambda_inf_nu": "absent (frozen at anchor)",
+   "lambda6_nu": "absent",
+   "lambda2": {
+    "theta": -0.05298429087291609,
+    "theta_sigma": 0.12012772458355317,
+    "width": 0.5,
+    "physical": 0.37350785456354196,
+    "physical_sigma": 0.060063862291776585
+   },
+   "lambda4": {
+    "theta": -0.8359535841128042,
+    "theta_sigma": 0.016977171696022704,
+    "width": 0.5,
+    "physical": -0.01797679205640207,
+    "physical_sigma": 0.008488585848011352
+   },
+   "delta_lambda2": {
+    "theta": -0.00621930022691633,
+    "theta_sigma": 0.0011775380645503018,
+    "width": 0.5,
+    "physical": -0.003109650113458165,
+    "physical_sigma": 0.0005887690322751509
+   }
+  },
+  "cov_names": [
+   "lambda2_nu",
+   "lambda4_nu",
+   "lambda2",
+   "lambda4",
+   "delta_lambda2"
+  ],
+  "cov_physical": [
+   [
+    0.00010633337140440314,
+    -2.0216412961883066e-06,
+    -0.0005338716549711811,
+    7.517629238783913e-05,
+    -3.938573770806258e-06
+   ],
+   [
+    -2.0216412961883066e-06,
+    4.411475337699433e-08,
+    9.457778848181078e-06,
+    -1.3293768782310548e-06,
+    6.301415290019209e-08
+   ],
+   [
+    -0.0005338716549711811,
+    9.457778848181078e-06,
+    0.0036076675534055013,
+    -0.0005096582946472534,
+    3.0144674318212282e-05
+   ],
+   [
+    7.517629238783913e-05,
+    -1.3293768782310548e-06,
+    -0.0005096582946472534,
+    7.205608969905861e-05,
+    -4.329936929816695e-06
+   ],
+   [
+    -3.938573770806258e-06,
+    6.301415290019209e-08,
+    3.0144674318212282e-05,
+    -4.329936929816695e-06,
+    3.466489733662177e-07
+   ]
+  ]
+ },
+ {
+  "name": "walled, main (warm) CCWALLWARMPF",
+  "file": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260917_cc_fits_wall/fitresults_CCWALLWARMPF.hdf5",
+  "freeze": [],
+  "paramModel": [
+   [
+    "wremnants.postprocessing.scetlib_ad.SCETlibADParamModel",
+    "cache=/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/scetlib_ad_caches/pdf62_corrgrid_260827/merged_full/cache.npz",
+    "conf=/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/scetlib_ad_caches/pdf62_corrgrid_260827/merged_full/cache.conf",
+    "threads=128"
+   ]
+  ],
+  "regularization": [
+   [
+    "wremnants.postprocessing.scetlib_ad.np_damping_wall.NPDampingWall",
+    "wremnants.postprocessing.scetlib_ad.np_damping_wall.NPDampingMapping"
+   ]
+  ],
+  "regStrength": 5.0,
+  "externalPostfit": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260917_cc_fits_wall/snapshot_fitresults_CCWALLWARM.hdf5",
+  "has_cov": true,
+  "params": {
+   "lambda2_nu": {
+    "theta": -1.4547773605561527,
+    "theta_sigma": 0.04755986847950533,
+    "width": 0.1,
+    "physical": 0.004522263944384708,
+    "physical_sigma": 0.004755986847950533
+   },
+   "lambda4_nu": {
+    "theta": 0.08680856844402896,
+    "theta_sigma": 0.022020335471057393,
+    "width": 0.5,
+    "physical": 0.04340428422201448,
+    "physical_sigma": 0.011010167735528697
+   },
+   "lambda_inf_nu": "absent (frozen at anchor)",
+   "lambda6_nu": "absent",
+   "lambda2": {
+    "theta": -0.5838782410039509,
+    "theta_sigma": 0.12062778666510873,
+    "width": 0.5,
+    "physical": 0.10806087949802456,
+    "physical_sigma": 0.060313893332554366
+   },
+   "lambda4": {
+    "theta": -0.796804657168239,
+    "theta_sigma": 0.0031996041381167906,
+    "width": 0.5,
+    "physical": 0.0015976714158805194,
+    "physical_sigma": 0.0015998020690583953
+   },
+   "delta_lambda2": {
+    "theta": -0.01858256499890142,
+    "theta_sigma": 0.015639404657283064,
+    "width": 0.5,
+    "physical": -0.00929128249945071,
+    "physical_sigma": 0.007819702328641532
+   }
+  },
+  "cov_names": [
+   "lambda2_nu",
+   "lambda4_nu",
+   "lambda2",
+   "lambda4",
+   "delta_lambda2"
+  ],
+  "cov_physical": [
+   [
+    2.261941089787845e-05,
+    -1.0338871351417382e-06,
+    -4.9527584085723366e-05,
+    1.240371036766637e-07,
+    -4.0838289680550105e-08
+   ],
+   [
+    -1.0338871351417382e-06,
+    0.0001212237935644771,
+    -0.00035054494965703394,
+    -1.5752078110388552e-07,
+    2.8600794510829136e-06
+   ],
+   [
+    -4.9527584085723366e-05,
+    -0.00035054494965703394,
+    0.003637765728930746,
+    -8.92969562321948e-06,
+    -3.3191594189659675e-05
+   ],
+   [
+    1.240371036766637e-07,
+    -1.5752078110388552e-07,
+    -8.92969562321948e-06,
+    2.559366660163523e-06,
+    -8.72051674086658e-07
+   ],
+   [
+    -4.0838289680550105e-08,
+    2.8600794510829136e-06,
+    -3.3191594189659675e-05,
+    -8.72051674086658e-07,
+    6.11477445085618e-05
+   ]
+  ]
+ },
+ {
+  "name": "walled, cold-resumed CCWALLCOLDR",
+  "file": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260917_cc_fits_wall/fitresults_CCWALLCOLDR.hdf5",
+  "freeze": [],
+  "paramModel": [
+   [
+    "wremnants.postprocessing.scetlib_ad.SCETlibADParamModel",
+    "cache=/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/scetlib_ad_caches/pdf62_corrgrid_260827/merged_full/cache.npz",
+    "conf=/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/scetlib_ad_caches/pdf62_corrgrid_260827/merged_full/cache.conf",
+    "threads=128"
+   ]
+  ],
+  "regularization": [
+   [
+    "wremnants.postprocessing.scetlib_ad.np_damping_wall.NPDampingWall",
+    "wremnants.postprocessing.scetlib_ad.np_damping_wall.NPDampingMapping"
+   ]
+  ],
+  "regStrength": 5.0,
+  "externalPostfit": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260917_cc_fits_wall/seed_CCWALLCOLD_resume.hdf5",
+  "has_cov": true,
+  "params": {
+   "lambda2_nu": {
+    "theta": -1.4273313994628745,
+    "theta_sigma": 0.49801294341086977,
+    "width": 0.1,
+    "physical": 0.007266860053712548,
+    "physical_sigma": 0.04980129434108698
+   },
+   "lambda4_nu": {
+    "theta": -0.0003701424982023513,
+    "theta_sigma": 0.0007600900058843062,
+    "width": 0.5,
+    "physical": -0.00018507124910117564,
+    "physical_sigma": 0.0003800450029421531
+   },
+   "lambda_inf_nu": "absent (frozen at anchor)",
+   "lambda6_nu": "absent",
+   "lambda2": {
+    "theta": -0.6434727765196335,
+    "theta_sigma": 0.20859056049991148,
+    "width": 0.5,
+    "physical": 0.07826361174018326,
+    "physical_sigma": 0.10429528024995574
+   },
+   "lambda4": {
+    "theta": -0.5628075019825314,
+    "theta_sigma": 0.06453759237639863,
+    "width": 0.5,
+    "physical": 0.11859624900873433,
+    "physical_sigma": 0.03226879618819931
+   },
+   "delta_lambda2": {
+    "theta": -0.018067435112858313,
+    "theta_sigma": 0.015883256551058333,
+    "width": 0.5,
+    "physical": -0.009033717556429156,
+    "physical_sigma": 0.007941628275529166
+   }
+  },
+  "cov_names": [
+   "lambda2_nu",
+   "lambda4_nu",
+   "lambda2",
+   "lambda4",
+   "delta_lambda2"
+  ],
+  "cov_physical": [
+   [
+    0.0024801689180475824,
+    -1.8761646579654173e-05,
+    -0.0042632671144580405,
+    -0.0006863065378819151,
+    2.7018833821205703e-05
+   ],
+   [
+    -1.8761646579654173e-05,
+    1.4443420426130117e-07,
+    3.221638639061027e-05,
+    5.2155026916068745e-06,
+    -1.9400359895384255e-07
+   ],
+   [
+    -0.0042632671144580405,
+    3.221638639061027e-05,
+    0.010877505482416807,
+    0.0003033026410920042,
+    -9.024725104230727e-05
+   ],
+   [
+    -0.0006863065378819151,
+    5.2155026916068745e-06,
+    0.0003033026410920042,
+    0.0010412752074355465,
+    6.022498896439095e-06
+   ],
+   [
+    2.7018833821205703e-05,
+    -1.9400359895384255e-07,
+    -9.024725104230727e-05,
+    6.022498896439095e-06,
+    6.306945966668437e-05
+   ]
+  ]
+ },
+ {
+  "name": "walled, warm from unwalled 2nd CCWALLSHIFT",
+  "file": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260917_cc_fits_wall/fitresults_CCWALLSHIFT.hdf5",
+  "freeze": [],
+  "paramModel": [
+   [
+    "wremnants.postprocessing.scetlib_ad.SCETlibADParamModel",
+    "cache=/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/scetlib_ad_caches/pdf62_corrgrid_260827/merged_full/cache.npz",
+    "conf=/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/scetlib_ad_caches/pdf62_corrgrid_260827/merged_full/cache.conf",
+    "threads=128"
+   ]
+  ],
+  "regularization": [
+   [
+    "wremnants.postprocessing.scetlib_ad.np_damping_wall.NPDampingWall",
+    "wremnants.postprocessing.scetlib_ad.np_damping_wall.NPDampingMapping"
+   ]
+  ],
+  "regStrength": 5.0,
+  "externalPostfit": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260917_cc_selfrestart/fitresults_CCCOLDSELF.hdf5",
+  "has_cov": true,
+  "params": {
+   "lambda2_nu": {
+    "theta": -1.4755197719021362,
+    "theta_sigma": 0.04294780516824861,
+    "width": 0.1,
+    "physical": 0.002448022809786371,
+    "physical_sigma": 0.004294780516824861
+   },
+   "lambda4_nu": {
+    "theta": -0.0011397730550485726,
+    "theta_sigma": 0.0002793694731078811,
+    "width": 0.5,
+    "physical": -0.0005698865275242863,
+    "physical_sigma": 0.00013968473655394056
+   },
+   "lambda_inf_nu": "absent (frozen at anchor)",
+   "lambda6_nu": "absent",
+   "lambda2": {
+    "theta": -0.5399563880172691,
+    "theta_sigma": 0.07896259889442597,
+    "width": 0.5,
+    "physical": 0.13002180599136548,
+    "physical_sigma": 0.039481299447212986
+   },
+   "lambda4": {
+    "theta": -0.7962181471504136,
+    "theta_sigma": 0.00036894560028395977,
+    "width": 0.5,
+    "physical": 0.0018909264247932156,
+    "physical_sigma": 0.00018447280014197989
+   },
+   "delta_lambda2": {
+    "theta": -0.0401486014998563,
+    "theta_sigma": 0.012553504488037019,
+    "width": 0.5,
+    "physical": -0.02007430074992815,
+    "physical_sigma": 0.006276752244018509
+   }
+  },
+  "cov_names": [
+   "lambda2_nu",
+   "lambda4_nu",
+   "lambda2",
+   "lambda4",
+   "delta_lambda2"
+  ],
+  "cov_physical": [
+   [
+    1.844513968769842e-05,
+    -3.8171920240030806e-07,
+    1.612832192879005e-05,
+    4.2250659232861825e-07,
+    -2.7254444402249843e-06
+   ],
+   [
+    -3.8171920240030806e-07,
+    1.9511825626143775e-08,
+    -2.6382835201367168e-06,
+    -1.412078072765476e-08,
+    4.1792879546758475e-07
+   ],
+   [
+    1.612832192879005e-05,
+    -2.6382835201367168e-06,
+    0.0015587730060405006,
+    -1.3002983691880546e-07,
+    -0.00024602239696211084
+   ],
+   [
+    4.2250659232861825e-07,
+    -1.412078072765476e-08,
+    -1.3002983691880546e-07,
+    3.403021399222286e-08,
+    -7.3741903052161114e-09
+   ],
+   [
+    -2.7254444402249843e-06,
+    4.1792879546758475e-07,
+    -0.00024602239696211084,
+    -7.3741903052161114e-09,
+    3.93976187327914e-05
+   ]
+  ]
+ }
+]

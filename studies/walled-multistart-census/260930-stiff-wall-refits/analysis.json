@@ -1,0 +1,1088 @@
+{
+ "NOM": {
+  "label": "NOM",
+  "postfix": "NOMSTIFF",
+  "new_source": "fitresult",
+  "ref": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260928_lattice_y35_fits/fitresults_LATL4ZY35WALLWARM.hdf5",
+  "forms": [
+   "tanh_2",
+   "tanh_2"
+  ],
+  "fitted": [
+   "lambda2",
+   "lambda4",
+   "delta_lambda2",
+   "lambda2_nu"
+  ],
+  "held": {
+   "lambda_inf": 1.0,
+   "lambda_inf_nu": 2.0,
+   "lambda4_nu": 0.0
+  },
+  "nll_new": 376.6146329237086,
+  "nll_ref": 376.6942441689123,
+  "base_ref": 376.69103432608273,
+  "base_new": 376.61462547941585,
+  "ref_under_new": 376.69103432608273,
+  "new_under_ref": 377.16548874745416,
+  "dnll_newobj": -0.07640140237413107,
+  "dnll_refobj": 0.47124457854187085,
+  "dbase": -0.07640884666687953,
+  "pen_ref": {
+   "m5e-3": 1.4572663901120996e-07,
+   "m0": 0.0
+  },
+  "pen_new": {
+   "m5e-3": 2.500915367767194e-05,
+   "m0": 8.377447873210423e-13
+  },
+  "wall_new_obj_contrib": 7.444292768114144e-06,
+  "wall_ref_obj_contrib": 0.003209842829572562,
+  "edm_new": 3.004579117754218e-14,
+  "edm_ref": 4.545059789693535e-15,
+  "dalphaS_over_sig_ref": 0.01189145711005871,
+  "sig_ratio": 0.9990641554964965,
+  "lambdas": [
+   {
+    "name": "lambda_inf",
+    "how": "held",
+    "ref": 1.0,
+    "new": 1.0,
+    "d_over_sig": null
+   },
+   {
+    "name": "lambda2",
+    "how": "fitted",
+    "ref": 0.029005836116668515,
+    "new": 0.025581284102796142,
+    "d_over_sig": -0.07989582809982587
+   },
+   {
+    "name": "lambda4",
+    "how": "fitted",
+    "ref": 0.08732390257694078,
+    "new": 0.08758284351213724,
+    "d_over_sig": 0.00952684373492487
+   },
+   {
+    "name": "delta_lambda2",
+    "how": "fitted",
+    "ref": -0.00390201243253791,
+    "new": -0.004093151901886217,
+    "d_over_sig": -0.027954017026044022
+   },
+   {
+    "name": "lambda_inf_nu",
+    "how": "held",
+    "ref": 2.0,
+    "new": 2.0,
+    "d_over_sig": null
+   },
+   {
+    "name": "lambda2_nu",
+    "how": "fitted",
+    "ref": 0.0633850323384078,
+    "new": 0.06426999671529844,
+    "d_over_sig": 0.03858152293174932
+   },
+   {
+    "name": "lambda4_nu",
+    "how": "held",
+    "ref": 0.0,
+    "new": 0.0,
+    "d_over_sig": null
+   }
+  ],
+  "faces": {
+   "ref_m5e-3": [
+    {
+     "label": "lambda2_nu >= 0 (CS small-b turn-on)",
+     "coeff": 0.0633850323384078,
+     "bound": 0.005,
+     "pen": 0.0,
+     "active": false
+    },
+    {
+     "label": "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=0 (TMD small-b turn-on)",
+     "coeff": 0.029005836116668515,
+     "bound": 0.005,
+     "pen": 0.0,
+     "active": false
+    },
+    {
+     "label": "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=0 (TMD large-b)",
+     "coeff": 0.26199611145830815,
+     "bound": 0.005,
+     "pen": 0.0,
+     "active": false
+    },
+    {
+     "label": "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=2.5 (TMD small-b turn-on)",
+     "coeff": 0.00461825841330658,
+     "bound": 0.005,
+     "pen": 1.4572663901120996e-07,
+     "active": true
+    },
+    {
+     "label": "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=2.5 (TMD large-b)",
+     "coeff": 0.261971806230473,
+     "bound": 0.005,
+     "pen": 0.0,
+     "active": false
+    }
+   ],
+   "ref_m0": [
+    {
+     "label": "lambda2_nu >= 0 (CS small-b turn-on)",
+     "coeff": 0.0633850323384078,
+     "bound": 0.0,
+     "pen": 0.0,
+     "active": false
+    },
+    {
+     "label": "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=0 (TMD small-b turn-on)",
+     "coeff": 0.029005836116668515,
+     "bound": 0.0,
+     "pen": 0.0,
+     "active": false
+    },
+    {
+     "label": "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=0 (TMD large-b)",
+     "coeff": 0.26199611145830815,
+     "bound": 0.0,
+     "pen": 0.0,
+     "active": false
+    },
+    {
+     "label": "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=2.5 (TMD small-b turn-on)",
+     "coeff": 0.00461825841330658,
+     "bound": 0.0,
+     "pen": 0.0,
+     "active": false
+    },
+    {
+     "label": "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=2.5 (TMD large-b)",
+     "coeff": 0.261971806230473,
+     "bound": 0.0,
+     "pen": 0.0,
+     "active": false
+    }
+   ],
+   "new_m5e-3": [
+    {
+     "label": "lambda2_nu >= 0 (CS small-b turn-on)",
+     "coeff": 0.06426999671529844,
+     "bound": 0.005,
+     "pen": 0.0,
+     "active": false
+    },
+    {
+     "label": "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=0 (TMD small-b turn-on)",
+     "coeff": 0.025581284102796142,
+     "bound": 0.005,
+     "pen": 0.0,
+     "active": false
+    },
+    {
+     "label": "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=0 (TMD large-b)",
+     "coeff": 0.26276527098235586,
+     "bound": 0.005,
+     "pen": 0.0,
+     "active": false
+    },
+    {
+     "label": "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=2.5 (TMD small-b turn-on)",
+     "coeff": -9.152839927153988e-07,
+     "bound": 0.005,
+     "pen": 2.500915367767194e-05,
+     "active": true
+    },
+    {
+     "label": "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=2.5 (TMD large-b)",
+     "coeff": 0.26274853053641173,
+     "bound": 0.005,
+     "pen": 0.0,
+     "active": false
+    }
+   ],
+   "new_m0": [
+    {
+     "label": "lambda2_nu >= 0 (CS small-b turn-on)",
+     "coeff": 0.06426999671529844,
+     "bound": 0.0,
+     "pen": 0.0,
+     "active": false
+    },
+    {
+     "label": "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=0 (TMD small-b turn-on)",
+     "coeff": 0.025581284102796142,
+     "bound": 0.0,
+     "pen": 0.0,
+     "active": false
+    },
+    {
+     "label": "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=0 (TMD large-b)",
+     "coeff": 0.26276527098235586,
+     "bound": 0.0,
+     "pen": 0.0,
+     "active": false
+    },
+    {
+     "label": "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=2.5 (TMD small-b turn-on)",
+     "coeff": -9.152839927153988e-07,
+     "bound": 0.0,
+     "pen": 8.377447873210423e-13,
+     "active": true
+    },
+    {
+     "label": "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=2.5 (TMD large-b)",
+     "coeff": 0.26274853053641173,
+     "bound": 0.0,
+     "pen": 0.0,
+     "active": false
+    }
+   ]
+  },
+  "top_shifts": [
+   [
+    "lambda2",
+    -0.07989582809982587
+   ],
+   [
+    "lambda2_nu",
+    0.03858152293174932
+   ],
+   [
+    "delta_lambda2",
+    -0.027954017026044022
+   ],
+   [
+    "resumTNP_b_qg",
+    -0.023636211090125446
+   ],
+   [
+    "alphaS",
+    0.01189145711005871
+   ],
+   [
+    "lambda4",
+    0.00952684373492487
+   ],
+   [
+    "pdfEig28",
+    0.009232810205241145
+   ],
+   [
+    "resumTNP_b_qqV",
+    0.008712115744551214
+   ]
+  ],
+  "max_abs_shift": 0.07989582809982587,
+  "minimiser_new": {
+   "n_iter": 41,
+   "restarts": [],
+   "result": {
+    "message": "A bad approximation caused failure to predict improvement.",
+    "success": "False",
+    "status": "2",
+    "fun": "376.6146329237086",
+    "nit": "41",
+    "nfev": "40",
+    "njev": "40",
+    "nhev": "245"
+   },
+   "timing": {
+    "fitter.minimize()": 4152.2,
+    "loss_val_grad_hess() (postfit cov)": 561.8
+   },
+   "edm_log": 3.004579117754218e-14,
+   "armed": "[NPDampingWall] armed on 5 of 8 condition(s) at margin=0; fitted lambdas ['delta_lambda2', 'lambda2', 'lambda2_nu', 'lambda4'], held at the correction's anchor {'lambda_inf': 1.0, 'lambda_inf_nu': 2.0, 'lambda4_nu': 0.0}.",
+   "wall_info": "[NPDampingWall] forms from the theory correction 'scetlib_dyturbo_LatticeNPLambda4Bugfix_FranksValsVars_CT18Z_N3p0LL_N2LO_adcorrAV': np_model=tanh_2, np_model_nu=tanh_2. Binding |Y| = 2.5 from {'auxiliary[scetlib_np].absYVGen': 2.5}. smallb=1, margin=0, lambda_inf floor=0.001. 8 condition(s).",
+   "n_rejected": 13,
+   "longest_rejected_run": 4,
+   "n_increase": 0,
+   "max_increase": 0.0,
+   "n_small_steps": 9,
+   "longest_plateau": 11,
+   "dt_median": 55.39,
+   "dt_max": 713.94,
+   "total_elapsed": 3609.31,
+   "loss_first": 376.69103432608273,
+   "loss_last": 376.6146329237086
+  },
+  "minimiser_ref": [
+   {
+    "n_iter": 28,
+    "restarts": [],
+    "result": {
+     "message": "A bad approximation caused failure to predict improvement.",
+     "success": "False",
+     "status": "2",
+     "fun": "376.6942441689123",
+     "nit": "28",
+     "nfev": "30",
+     "njev": "30",
+     "nhev": "265"
+    },
+    "timing": {
+     "fitter.minimize()": 5697.8,
+     "loss_val_grad_hess() (postfit cov)": 1468.6
+    },
+    "edm_log": 4.545059789693535e-15,
+    "armed": "[NPDampingWall] armed on 5 of 8 condition(s); fitted lambdas ['delta_lambda2', 'lambda2', 'lambda2_nu', 'lambda4'], held at the correction's anchor {'lambda_inf': 1.0, 'lambda_inf_nu': 2.0, 'lambda4_nu': 0.0}.",
+    "wall_info": "[NPDampingWall] forms from the theory correction 'scetlib_dyturbo_LatticeNPLambda4Bugfix_FranksValsVars_CT18Z_N3p0LL_N2LO_adcorrAV': np_model=tanh_2, np_model_nu=tanh_2. Binding |Y| = 2.5 from {'auxiliary[scetlib_np].absYVGen': 2.5}. smallb=1, margin=0.005, lambda_inf floor=0.001. 8 condition(s).",
+    "n_rejected": 2,
+    "longest_rejected_run": 2,
+    "n_increase": 0,
+    "max_increase": 0.0,
+    "n_small_steps": 5,
+    "longest_plateau": 5,
+    "dt_median": 90.28999999999999,
+    "dt_max": 1345.95,
+    "total_elapsed": 5162.030000000001,
+    "loss_first": 529.3267624773653,
+    "loss_last": 376.6942441689123
+   }
+  ]
+ },
+ "XW": {
+  "label": "XW",
+  "postfix": "XWSTIFF",
+  "new_source": "fitresult",
+  "ref": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260924_y35_bin0xzero_fits/fitresults_Y35ZWALLWARM.hdf5",
+  "forms": [
+   "tanh_2",
+   "tanh_2"
+  ],
+  "fitted": [
+   "lambda2",
+   "lambda4",
+   "delta_lambda2",
+   "lambda2_nu",
+   "lambda4_nu"
+  ],
+  "held": {
+   "lambda_inf": 1.0,
+   "lambda_inf_nu": 2.0
+  },
+  "nll_new": 371.32836518957,
+  "nll_ref": 371.44296416614185,
+  "base_ref": 371.4379809686363,
+  "base_new": 371.3283536451264,
+  "ref_under_new": 371.4379809686363,
+  "new_under_ref": 372.7057754327977,
+  "dnll_newobj": -0.10961577906630282,
+  "dnll_refobj": 1.2628112666558309,
+  "dbase": -0.10962732350986926,
+  "pen_ref": {
+   "m5e-3": 2.262368167464334e-07,
+   "m0": 0.0
+  },
+  "pen_new": {
+   "m5e-3": 6.253485241359226e-05,
+   "m0": 1.2991559763123978e-12
+  },
+  "wall_new_obj_contrib": 1.1544443588890273e-05,
+  "wall_ref_obj_contrib": 0.004983197505591271,
+  "edm_new": 7.405069621731706e-18,
+  "edm_ref": 2.779774950693484e-17,
+  "dalphaS_over_sig_ref": -0.03831095366433156,
+  "sig_ratio": 0.9990291111177773,
+  "lambdas": [
+   {
+    "name": "lambda_inf",
+    "how": "held",
+    "ref": 1.0,
+    "new": 1.0,
+    "d_over_sig": null
+   },
+   {
+    "name": "lambda2",
+    "how": "fitted",
+    "ref": 0.10865669492770547,
+    "new": 0.11882566722836224,
+    "d_over_sig": 0.16838345766713655
+   },
+   {
+    "name": "lambda4",
+    "how": "fitted",
+    "ref": 0.0015983932040142812,
+    "new": -7.21173554438792e-05,
+    "d_over_sig": -1.0443125670015285
+   },
+   {
+    "name": "delta_lambda2",
+    "how": "fitted",
+    "ref": -0.0094173805642562,
+    "new": -0.009409894210770734,
+    "d_over_sig": 0.0009679472038465991
+   },
+   {
+    "name": "lambda_inf_nu",
+    "how": "held",
+    "ref": 2.0,
+    "new": 2.0,
+    "d_over_sig": null
+   },
+   {
+    "name": "lambda2_nu",
+    "how": "fitted",
+    "ref": 0.004531361070728379,
+    "new": -1.1216393087931653e-06,
+    "d_over_sig": -0.9529922755585104
+   },
+   {
+    "name": "lambda4_nu",
+    "how": "fitted",
+    "ref": 0.04356265106887252,
+    "new": 0.044408086224080615,
+    "d_over_sig": 0.07637150423504407
+   }
+  ],
+  "faces": {
+   "ref_m5e-3": [
+    {
+     "label": "lambda4_nu >= 0 (CS large-b leading)",
+     "coeff": 0.04356265106887252,
+     "bound": 0.005,
+     "pen": 0.0,
+     "active": false
+    },
+    {
+     "label": "lambda2_nu >= 0 (CS small-b turn-on)",
+     "coeff": 0.004531361070728379,
+     "bound": 0.005,
+     "pen": 2.1962244602885138e-07,
+     "active": true
+    },
+    {
+     "label": "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=0 (TMD small-b turn-on)",
+     "coeff": 0.10865669492770547,
+     "bound": 0.005,
+     "pen": 0.0,
+     "active": false
+    },
+    {
+     "label": "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=0 (TMD large-b)",
+     "coeff": 0.0060780106885775335,
+     "bound": 0.005,
+     "pen": 0.0,
+     "active": false
+    },
+    {
+     "label": "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=2.5 (TMD small-b turn-on)",
+     "coeff": 0.049798066401104214,
+     "bound": 0.005,
+     "pen": 0.0,
+     "active": false
+    },
+    {
+     "label": "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=2.5 (TMD large-b)",
+     "coeff": 0.004918671218393597,
+     "bound": 0.005,
+     "pen": 6.614370717582022e-09,
+     "active": true
+    }
+   ],
+   "ref_m0": [
+    {
+     "label": "lambda4_nu >= 0 (CS large-b leading)",
+     "coeff": 0.04356265106887252,
+     "bound": 0.0,
+     "pen": 0.0,
+     "active": false
+    },
+    {
+     "label": "lambda2_nu >= 0 (CS small-b turn-on)",
+     "coeff": 0.004531361070728379,
+     "bound": 0.0,
+     "pen": 0.0,
+     "active": false
+    },
+    {
+     "label": "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=0 (TMD small-b turn-on)",
+     "coeff": 0.10865669492770547,
+     "bound": 0.0,
+     "pen": 0.0,
+     "active": false
+    },
+    {
+     "label": "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=0 (TMD large-b)",
+     "coeff": 0.0060780106885775335,
+     "bound": 0.0,
+     "pen": 0.0,
+     "active": false
+    },
+    {
+     "label": "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=2.5 (TMD small-b turn-on)",
+     "coeff": 0.049798066401104214,
+     "bound": 0.0,
+     "pen": 0.0,
+     "active": false
+    },
+    {
+     "label": "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=2.5 (TMD large-b)",
+     "coeff": 0.004918671218393597,
+     "bound": 0.0,
+     "pen": 0.0,
+     "active": false
+    }
+   ],
+   "new_m5e-3": [
+    {
+     "label": "lambda4_nu >= 0 (CS large-b leading)",
+     "coeff": 0.044408086224080615,
+     "bound": 0.005,
+     "pen": 0.0,
+     "active": false
+    },
+    {
+     "label": "lambda2_nu >= 0 (CS small-b turn-on)",
+     "coeff": -1.1216393087931653e-06,
+     "bound": 0.005,
+     "pen": 2.5011217651162672e-05,
+     "active": true
+    },
+    {
+     "label": "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=0 (TMD small-b turn-on)",
+     "coeff": 0.11882566722836224,
+     "bound": 0.005,
+     "pen": 0.0,
+     "active": false
+    },
+    {
+     "label": "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=0 (TMD large-b)",
+     "coeff": 0.001461411599146319,
+     "bound": 0.005,
+     "pen": 1.2521607870656211e-05,
+     "active": true
+    },
+    {
+     "label": "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=2.5 (TMD small-b turn-on)",
+     "coeff": 0.060013828411045154,
+     "bound": 0.005,
+     "pen": 0.0,
+     "active": false
+    },
+    {
+     "label": "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=2.5 (TMD large-b)",
+     "coeff": -2.026850692142567e-07,
+     "bound": 0.005,
+     "pen": 2.5002026891773383e-05,
+     "active": true
+    }
+   ],
+   "new_m0": [
+    {
+     "label": "lambda4_nu >= 0 (CS large-b leading)",
+     "coeff": 0.044408086224080615,
+     "bound": 0.0,
+     "pen": 0.0,
+     "active": false
+    },
+    {
+     "label": "lambda2_nu >= 0 (CS small-b turn-on)",
+     "coeff": -1.1216393087931653e-06,
+     "bound": 0.0,
+     "pen": 1.2580747390300097e-12,
+     "active": true
+    },
+    {
+     "label": "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=0 (TMD small-b turn-on)",
+     "coeff": 0.11882566722836224,
+     "bound": 0.0,
+     "pen": 0.0,
+     "active": false
+    },
+    {
+     "label": "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=0 (TMD large-b)",
+     "coeff": 0.001461411599146319,
+     "bound": 0.0,
+     "pen": 0.0,
+     "active": false
+    },
+    {
+     "label": "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=2.5 (TMD small-b turn-on)",
+     "coeff": 0.060013828411045154,
+     "bound": 0.0,
+     "pen": 0.0,
+     "active": false
+    },
+    {
+     "label": "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=2.5 (TMD large-b)",
+     "coeff": -2.026850692142567e-07,
+     "bound": 0.0,
+     "pen": 4.1081237282388025e-14,
+     "active": true
+    }
+   ]
+  },
+  "top_shifts": [
+   [
+    "lambda4",
+    -1.0443125670015285
+   ],
+   [
+    "lambda2_nu",
+    -0.9529922755585104
+   ],
+   [
+    "lambda2",
+    0.16838345766713655
+   ],
+   [
+    "lambda4_nu",
+    0.07637150423504407
+   ],
+   [
+    "alphaS",
+    -0.03831095366433156
+   ],
+   [
+    "lumi",
+    0.012598150014852224
+   ],
+   [
+    "resumTNP_b_qqV",
+    0.010108196642089461
+   ],
+   [
+    "weak_default",
+    0.009039287408120607
+   ]
+  ],
+  "max_abs_shift": 1.0443125670015285,
+  "minimiser_new": {
+   "n_iter": 128,
+   "restarts": [],
+   "result": {
+    "message": "A bad approximation caused failure to predict improvement.",
+    "success": "False",
+    "status": "2",
+    "fun": "371.32836518957",
+    "nit": "128",
+    "nfev": "130",
+    "njev": "130",
+    "nhev": "522"
+   },
+   "timing": {
+    "fitter.minimize()": 7880.4,
+    "loss_val_grad_hess() (postfit cov)": 816.8
+   },
+   "edm_log": 7.405069621731706e-18,
+   "armed": "[NPDampingWall] armed on 6 of 8 condition(s) at margin=0; fitted lambdas ['delta_lambda2', 'lambda2', 'lambda2_nu', 'lambda4', 'lambda4_nu'], held at the correction's anchor {'lambda_inf': 1.0, 'lambda_inf_nu': 2.0}.",
+   "wall_info": "[NPDampingWall] forms from the theory correction 'scetlib_dyturbo_LatticeNPLambda4Bugfix_FranksValsVars_CT18Z_N3p0LL_N2LO_adcorrAV': np_model=tanh_2, np_model_nu=tanh_2. Binding |Y| = 2.5 from {'auxiliary[scetlib_np].absYVGen': 2.5}. smallb=1, margin=0, lambda_inf floor=0.001. 8 condition(s).",
+   "n_rejected": 40,
+   "longest_rejected_run": 8,
+   "n_increase": 0,
+   "max_increase": 0.0,
+   "n_small_steps": 45,
+   "longest_plateau": 17,
+   "dt_median": 37.78,
+   "dt_max": 1415.43,
+   "total_elapsed": 7782.089999999999,
+   "loss_first": 371.4379809686363,
+   "loss_last": 371.32836518957
+  },
+  "minimiser_ref": [
+   {
+    "n_iter": 10,
+    "restarts": [],
+    "result": {
+     "message": "A bad approximation caused failure to predict improvement.",
+     "success": "False",
+     "status": "2",
+     "fun": "371.44296416614185",
+     "nit": "10",
+     "nfev": "12",
+     "njev": "12",
+     "nhev": "195"
+    },
+    "timing": {
+     "fitter.minimize()": 4032.1,
+     "loss_val_grad_hess() (postfit cov)": 841.3
+    },
+    "edm_log": 2.779774950693484e-17,
+    "armed": "[NPDampingWall] armed on 6 of 8 condition(s); fitted lambdas ['delta_lambda2', 'lambda2', 'lambda2_nu', 'lambda4', 'lambda4_nu'], held at the correction's anchor {'lambda_inf': 1.0, 'lambda_inf_nu': 2.0}.",
+    "wall_info": "[NPDampingWall] forms from the theory correction 'scetlib_dyturbo_LatticeNPLambda4Bugfix_FranksValsVars_CT18Z_N3p0LL_N2LO_adcorrAV': np_model=tanh_2, np_model_nu=tanh_2. Binding |Y| = 2.5 from {'auxiliary[scetlib_np].absYVGen': 2.5}. smallb=1, margin=0.005, lambda_inf floor=0.001. 8 condition(s).",
+    "n_rejected": 0,
+    "longest_rejected_run": 0,
+    "n_increase": 0,
+    "max_increase": 0.0,
+    "n_small_steps": 5,
+    "longest_plateau": 4,
+    "dt_median": 355.84000000000003,
+    "dt_max": 939.6,
+    "total_elapsed": 3953.27,
+    "loss_first": 371.4581832242835,
+    "loss_last": 371.44296416614185
+   }
+  ]
+ },
+ "XL4Z": {
+  "label": "XL4Z",
+  "postfix": "XL4ZSTIFF",
+  "new_source": "fitresult",
+  "ref": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260929_l4zero_fits/fitresults_Y35ZWALLL4ZR.hdf5",
+  "forms": [
+   "tanh_2",
+   "tanh_2"
+  ],
+  "fitted": [
+   "lambda2",
+   "lambda4",
+   "delta_lambda2",
+   "lambda2_nu"
+  ],
+  "held": {
+   "lambda_inf": 1.0,
+   "lambda_inf_nu": 2.0,
+   "lambda4_nu": 0.0
+  },
+  "nll_new": 372.28322172529784,
+  "nll_ref": 372.35008176715894,
+  "base_ref": 372.3477099374083,
+  "base_new": 372.2832168368882,
+  "ref_under_new": 372.3477099374083,
+  "new_under_ref": 372.8340418640456,
+  "dnll_newobj": -0.06448821211046152,
+  "dnll_refobj": 0.4839600968866762,
+  "dbase": -0.06449310052011015,
+  "pen_ref": {
+   "m5e-3": 1.0768090408815356e-07,
+   "m0": 0.0
+  },
+  "pen_new": {
+   "m5e-3": 2.5007417544367093e-05,
+   "m0": 5.501180369050437e-13
+  },
+  "wall_new_obj_contrib": 4.888409675263047e-06,
+  "wall_ref_obj_contrib": 0.002371829750651577,
+  "edm_new": 3.3624845471441675e-17,
+  "edm_ref": 6.737042514051534e-17,
+  "dalphaS_over_sig_ref": -0.02399028079640807,
+  "sig_ratio": 1.0002226291961398,
+  "lambdas": [
+   {
+    "name": "lambda_inf",
+    "how": "held",
+    "ref": 1.0,
+    "new": 1.0,
+    "d_over_sig": null
+   },
+   {
+    "name": "lambda2",
+    "how": "fitted",
+    "ref": 0.08237797006507941,
+    "new": 0.0905553329903051,
+    "d_over_sig": 0.136262551380633
+   },
+   {
+    "name": "lambda4",
+    "how": "fitted",
+    "ref": 0.11877963510512063,
+    "new": 0.12049734654879124,
+    "d_over_sig": 0.05851632282084995
+   },
+   {
+    "name": "delta_lambda2",
+    "how": "fitted",
+    "ref": -0.00937167936545843,
+    "new": -0.009357987538050767,
+    "d_over_sig": 0.001747996626059686
+   },
+   {
+    "name": "lambda_inf_nu",
+    "how": "held",
+    "ref": 2.0,
+    "new": 2.0,
+    "d_over_sig": null
+   },
+   {
+    "name": "lambda2_nu",
+    "how": "fitted",
+    "ref": 0.004671852313602315,
+    "new": -7.416994249054287e-07,
+    "d_over_sig": -0.9839622959960995
+   },
+   {
+    "name": "lambda4_nu",
+    "how": "held",
+    "ref": 0.0,
+    "new": 0.0,
+    "d_over_sig": null
+   }
+  ],
+  "faces": {
+   "ref_m5e-3": [
+    {
+     "label": "lambda2_nu >= 0 (CS small-b turn-on)",
+     "coeff": 0.004671852313602315,
+     "bound": 0.005,
+     "pen": 1.0768090408815356e-07,
+     "active": true
+    },
+    {
+     "label": "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=0 (TMD small-b turn-on)",
+     "coeff": 0.08237797006507941,
+     "bound": 0.005,
+     "pen": 0.0,
+     "active": false
+    },
+    {
+     "label": "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=0 (TMD large-b)",
+     "coeff": 0.35689793292540906,
+     "bound": 0.005,
+     "pen": 0.0,
+     "active": false
+    },
+    {
+     "label": "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=2.5 (TMD small-b turn-on)",
+     "coeff": 0.023804974030964224,
+     "bound": 0.005,
+     "pen": 0.0,
+     "active": false
+    },
+    {
+     "label": "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=2.5 (TMD large-b)",
+     "coeff": 0.3563523950415988,
+     "bound": 0.005,
+     "pen": 0.0,
+     "active": false
+    }
+   ],
+   "ref_m0": [
+    {
+     "label": "lambda2_nu >= 0 (CS small-b turn-on)",
+     "coeff": 0.004671852313602315,
+     "bound": 0.0,
+     "pen": 0.0,
+     "active": false
+    },
+    {
+     "label": "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=0 (TMD small-b turn-on)",
+     "coeff": 0.08237797006507941,
+     "bound": 0.0,
+     "pen": 0.0,
+     "active": false
+    },
+    {
+     "label": "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=0 (TMD large-b)",
+     "coeff": 0.35689793292540906,
+     "bound": 0.0,
+     "pen": 0.0,
+     "active": false
+    },
+    {
+     "label": "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=2.5 (TMD small-b turn-on)",
+     "coeff": 0.023804974030964224,
+     "bound": 0.0,
+     "pen": 0.0,
+     "active": false
+    },
+    {
+     "label": "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=2.5 (TMD large-b)",
+     "coeff": 0.3563523950415988,
+     "bound": 0.0,
+     "pen": 0.0,
+     "active": false
+    }
+   ],
+   "new_m5e-3": [
+    {
+     "label": "lambda2_nu >= 0 (CS small-b turn-on)",
+     "coeff": -7.416994249054287e-07,
+     "bound": 0.005,
+     "pen": 2.5007417544367093e-05,
+     "active": true
+    },
+    {
+     "label": "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=0 (TMD small-b turn-on)",
+     "coeff": 0.0905553329903051,
+     "bound": 0.005,
+     "pen": 0.0,
+     "active": false
+    },
+    {
+     "label": "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=0 (TMD large-b)",
+     "coeff": 0.36223461767587706,
+     "bound": 0.005,
+     "pen": 0.0,
+     "active": false
+    },
+    {
+     "label": "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=2.5 (TMD small-b turn-on)",
+     "coeff": 0.03206791087748781,
+     "bound": 0.005,
+     "pen": 0.0,
+     "active": false
+    },
+    {
+     "label": "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=2.5 (TMD large-b)",
+     "coeff": 0.3615250167116437,
+     "bound": 0.005,
+     "pen": 0.0,
+     "active": false
+    }
+   ],
+   "new_m0": [
+    {
+     "label": "lambda2_nu >= 0 (CS small-b turn-on)",
+     "coeff": -7.416994249054287e-07,
+     "bound": 0.0,
+     "pen": 5.501180369050437e-13,
+     "active": true
+    },
+    {
+     "label": "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=0 (TMD small-b turn-on)",
+     "coeff": 0.0905553329903051,
+     "bound": 0.0,
+     "pen": 0.0,
+     "active": false
+    },
+    {
+     "label": "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=0 (TMD large-b)",
+     "coeff": 0.36223461767587706,
+     "bound": 0.0,
+     "pen": 0.0,
+     "active": false
+    },
+    {
+     "label": "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=2.5 (TMD small-b turn-on)",
+     "coeff": 0.03206791087748781,
+     "bound": 0.0,
+     "pen": 0.0,
+     "active": false
+    },
+    {
+     "label": "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=2.5 (TMD large-b)",
+     "coeff": 0.3615250167116437,
+     "bound": 0.0,
+     "pen": 0.0,
+     "active": false
+    }
+   ]
+  },
+  "top_shifts": [
+   [
+    "lambda2_nu",
+    -0.9839622959960995
+   ],
+   [
+    "lambda2",
+    0.136262551380633
+   ],
+   [
+    "lambda4",
+    0.05851632282084995
+   ],
+   [
+    "alphaS",
+    -0.02399028079640807
+   ],
+   [
+    "resumTNP_b_qg",
+    -0.020884048159804585
+   ],
+   [
+    "resumTNP_b_qqV",
+    0.012886906555000747
+   ],
+   [
+    "QCDscaleZfine_PtV0_3helicity_2_SymAvg",
+    -0.01127072932762117
+   ],
+   [
+    "resumTNP_gamma_nu",
+    -0.0112695505283807
+   ]
+  ],
+  "max_abs_shift": 0.9839622959960995,
+  "minimiser_new": {
+   "n_iter": 43,
+   "restarts": [],
+   "result": {
+    "message": "A bad approximation caused failure to predict improvement.",
+    "success": "False",
+    "status": "2",
+    "fun": "372.28322172529784",
+    "nit": "43",
+    "nfev": "36",
+    "njev": "36",
+    "nhev": "270"
+   },
+   "timing": {
+    "fitter.minimize()": 5909.0,
+    "loss_val_grad_hess() (postfit cov)": 859.1
+   },
+   "edm_log": 3.3624845471441675e-17,
+   "armed": "[NPDampingWall] armed on 5 of 8 condition(s) at margin=0; fitted lambdas ['delta_lambda2', 'lambda2', 'lambda2_nu', 'lambda4'], held at the correction's anchor {'lambda_inf': 1.0, 'lambda_inf_nu': 2.0, 'lambda4_nu': 0.0}.",
+   "wall_info": "[NPDampingWall] forms from the theory correction 'scetlib_dyturbo_LatticeNPLambda4Bugfix_FranksValsVars_CT18Z_N3p0LL_N2LO_adcorrAV': np_model=tanh_2, np_model_nu=tanh_2. Binding |Y| = 2.5 from {'auxiliary[scetlib_np].absYVGen': 2.5}. smallb=1, margin=0, lambda_inf floor=0.001. 8 condition(s).",
+   "n_rejected": 21,
+   "longest_rejected_run": 11,
+   "n_increase": 0,
+   "max_increase": 0.0,
+   "n_small_steps": 8,
+   "longest_plateau": 15,
+   "dt_median": 25.55,
+   "dt_max": 1871.73,
+   "total_elapsed": 5592.740000000001,
+   "loss_first": 372.3477099374083,
+   "loss_last": 372.28322172529784
+  },
+  "minimiser_ref": [
+   {
+    "n_iter": 17,
+    "restarts": [],
+    "result": {},
+    "timing": {},
+    "edm_log": null,
+    "armed": "[NPDampingWall] armed on 5 of 8 condition(s); fitted lambdas ['delta_lambda2', 'lambda2', 'lambda2_nu', 'lambda4'], held at the correction's anchor {'lambda_inf': 1.0, 'lambda_inf_nu': 2.0, 'lambda4_nu': 0.0}.",
+    "wall_info": "[NPDampingWall] forms from the theory correction 'scetlib_dyturbo_LatticeNPLambda4Bugfix_FranksValsVars_CT18Z_N3p0LL_N2LO_adcorrAV': np_model=tanh_2, np_model_nu=tanh_2. Binding |Y| = 2.5 from {'auxiliary[scetlib_np].absYVGen': 2.5}. smallb=1, margin=0.005, lambda_inf floor=0.001. 8 condition(s).",
+    "n_rejected": 0,
+    "longest_rejected_run": 0,
+    "n_increase": 0,
+    "max_increase": 0.0,
+    "n_small_steps": 4,
+    "longest_plateau": 2,
+    "dt_median": 121.36,
+    "dt_max": 1136.7,
+    "total_elapsed": 4655.5599999999995,
+    "loss_first": 521.7886545392536,
+    "loss_last": 372.35008176770475
+   },
+   {
+    "n_iter": 1,
+    "restarts": [],
+    "result": {
+     "message": "A bad approximation caused failure to predict improvement.",
+     "success": "False",
+     "status": "2",
+     "fun": "372.35008176715894",
+     "nit": "1",
+     "nfev": "3",
+     "njev": "3",
+     "nhev": "62"
+    },
+    "timing": {
+     "fitter.minimize()": 1789.7,
+     "loss_val_grad_hess() (postfit cov)": 1318.6
+    },
+    "edm_log": 6.737042514051534e-17,
+    "armed": "[NPDampingWall] armed on 5 of 8 condition(s); fitted lambdas ['delta_lambda2', 'lambda2', 'lambda2_nu', 'lambda4'], held at the correction's anchor {'lambda_inf': 1.0, 'lambda_inf_nu': 2.0, 'lambda4_nu': 0.0}.",
+    "wall_info": "[NPDampingWall] forms from the theory correction 'scetlib_dyturbo_LatticeNPLambda4Bugfix_FranksValsVars_CT18Z_N3p0LL_N2LO_adcorrAV': np_model=tanh_2, np_model_nu=tanh_2. Binding |Y| = 2.5 from {'auxiliary[scetlib_np].absYVGen': 2.5}. smallb=1, margin=0.005, lambda_inf floor=0.001. 8 condition(s).",
+    "n_rejected": 0,
+    "longest_rejected_run": 0,
+    "n_increase": 0,
+    "max_increase": 0.0,
+    "n_small_steps": 0,
+    "longest_plateau": 0,
+    "dt_median": 1432.6,
+    "dt_max": 1432.6,
+    "total_elapsed": 1432.6,
+    "loss_first": 372.35008176715894,
+    "loss_last": 372.35008176715894
+   }
+  ]
+ }
+}

@@ -1,0 +1,26 @@
+alpha_s(mZ)^(5) = 0.118   [4-loop running, m_b(m_b) = 4.18 GeV, 3-loop decoupling]
+  mu =  1.00 GeV   alpha_s^(5) = 0.4065   alpha_s^(4) = 0.4611
+  mu =  1.25 GeV   alpha_s^(5) = 0.3591   alpha_s^(4) = 0.3916
+  mu =  2.00 GeV   alpha_s^(5) = 0.2901   alpha_s^(4) = 0.3015
+  mu =  4.18 GeV   alpha_s^(5) = 0.2246   alpha_s^(4) = 0.2248
+alpha_s^(4)(2 GeV) = 0.293 (lattice input)  <=>  alpha_s^(5)(mZ) = 0.1168
+  (threshold at 4.0 GeV instead: alpha_s^(4)(2) = 0.3008)
+  (threshold at 4.78 GeV instead: alpha_s^(4)(2) = 0.3035)
+
+gamma_zeta [lattice normalisation] at mu = 2 GeV, N3LL (N3+0LL, TNPs = 0), AN/Cridge NP tune
+ bT[fm]  mu0[GeV] as5(mu0)  pert(nf5,fit) pert(nf4,latt) nf5-nf4 |(nf5-nf4)@mu=1  NP(AN)   full(fit) full(latt) dpert/das(mZ)[fit,latt]  d/dth_gnu d/dth_cusp  N4LL-N3LL NNLL-N3LL
+  0.10    2.238  0.2776    0.0578       0.0588     -0.0010   -0.0433        -0.0114   0.0464    0.0474      2.14   2.29            0.0020   0.0001    0.0022   -0.0078
+  0.15    1.549  0.3236   -0.0495      -0.0596      0.0101   -0.0323        -0.0264  -0.0759   -0.0859     -0.20  -0.67            0.0031  -0.0002    0.0049   -0.0117
+  0.20    1.258  0.3579   -0.1217      -0.1423      0.0207   -0.0217        -0.0485  -0.1702   -0.1909     -1.92  -3.05            0.0042  -0.0004    0.0087   -0.0159
+  0.30    1.067  0.3913   -0.1712      -0.2007      0.0294   -0.0129        -0.1195  -0.2907   -0.3202     -3.00  -4.59            0.0055  -0.0007    0.0132   -0.0215
+  0.45    1.014  0.4031   -0.1778      -0.2080      0.0302   -0.0121        -0.3109  -0.4887   -0.5189     -2.98  -4.46            0.0061  -0.0008    0.0141   -0.0239
+  0.60    1.005  0.4054   -0.1780      -0.2081      0.0301   -0.0123        -0.5835  -0.7615   -0.7916     -2.94  -4.36            0.0062  -0.0009    0.0141   -0.0244
+  0.75    1.002  0.4061   -0.1780      -0.2081      0.0300   -0.0123        -0.7841  -0.9621   -0.9922     -2.93  -4.33            0.0062  -0.0009    0.0141   -0.0245
+  0.90    1.001  0.4063   -0.1780      -0.2080      0.0300   -0.0123        -0.8383  -1.0163   -1.0463     -2.92  -4.32            0.0062  -0.0009    0.0141   -0.0246
+
+delta(alpha_s(mZ)) = 0.001: shift of pert kernel over bT in [0.2, 0.9] fm = 0.0030 .. 0.0046 (lattice scheme)
+delta(alpha_s(mZ)) = 0.0015: shift of pert kernel over bT in [0.2, 0.9] fm = 0.0046 .. 0.0069 (lattice scheme)
+
+AN tune vs continuum csv, DIAGONAL chi2 [full, lattice scheme (nf=4)]: all 21 pts 11.1;  bT>=0.2 fm (17 pts) 8.8   (csv has NO correlations; points share the k1 shift -> chi2 is indicative only)
+AN tune vs continuum csv, DIAGONAL chi2 [full, fit scheme (nf=5)]: all 21 pts 10.9;  bT>=0.2 fm (17 pts) 8.7   (csv has NO correlations; points share the k1 shift -> chi2 is indicative only)
+AN tune vs continuum csv, DIAGONAL chi2 [pert only, nf=4]: all 21 pts 88.3;  bT>=0.2 fm (17 pts) 86.2   (csv has NO correlations; points share the k1 shift -> chi2 is indicative only)

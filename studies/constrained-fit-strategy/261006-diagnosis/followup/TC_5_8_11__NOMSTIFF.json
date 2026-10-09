@@ -1,0 +1,81 @@
+{
+ "label": "TC_5_8_11",
+ "start": "NOMSTIFF",
+ "N": 20,
+ "r": 0.0,
+ "stages": [
+  {
+   "restarts": 1,
+   "iters": 45,
+   "stops": [
+    "stall",
+    "pred<=0"
+   ],
+   "capped": false,
+   "conv": [
+    6,
+    58
+   ],
+   "cfg": {
+    "tau": 5.0
+   },
+   "n_f": 20,
+   "n_hvp": 161,
+   "fstar": -0.0029963898739402426,
+   "overshoot_star": 0.00036833311296131075
+  },
+  {
+   "restarts": 1,
+   "iters": 48,
+   "stops": [
+    "stall",
+    "stall",
+    "restart-bought-nothing"
+   ],
+   "capped": false,
+   "conv": [
+    26,
+    226
+   ],
+   "cfg": {
+    "tau": 8.0
+   },
+   "n_f": 24,
+   "n_hvp": 211,
+   "fstar": -7.447328229736393e-06,
+   "overshoot_star": 9.154675144262779e-07
+  },
+  {
+   "restarts": 0,
+   "iters": 3,
+   "stops": [
+    "pred<=0"
+   ],
+   "capped": false,
+   "conv": [
+    46,
+    374
+   ],
+   "cfg": {
+    "tau": 11.0
+   },
+   "n_f": 5,
+   "n_hvp": 74,
+   "fstar": -1.8460204195917675e-08,
+   "overshoot_star": 2.2692322558728317e-09
+  }
+ ],
+ "E_conv": {
+  "n_f": 46,
+  "n_hvp": 374
+ },
+ "E_total": {
+  "n_f": 49,
+  "n_hvp": 446
+ },
+ "f_end_minus_fstar": -1.024199800226479e-08,
+ "face_end": -2.269232246554509e-09,
+ "failed": false,
+ "restarts": 2,
+ "seconds": 1.9743683338165283
+}

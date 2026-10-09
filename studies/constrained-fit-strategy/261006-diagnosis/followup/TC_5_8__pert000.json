@@ -1,0 +1,61 @@
+{
+ "label": "TC_5_8",
+ "start": "pert000",
+ "N": 20,
+ "r": 0.0,
+ "stages": [
+  {
+   "restarts": 0,
+   "iters": 35,
+   "stops": [
+    "pred<=0"
+   ],
+   "capped": false,
+   "conv": [
+    34,
+    230
+   ],
+   "cfg": {
+    "tau": 5.0
+   },
+   "n_f": 37,
+   "n_hvp": 275,
+   "fstar": -0.0029963898739402426,
+   "overshoot_star": 0.00036833311296131075
+  },
+  {
+   "restarts": 1,
+   "iters": 48,
+   "stops": [
+    "stall",
+    "stall",
+    "restart-bought-nothing"
+   ],
+   "capped": false,
+   "conv": [
+    43,
+    339
+   ],
+   "cfg": {
+    "tau": 8.0
+   },
+   "n_f": 18,
+   "n_hvp": 172,
+   "fstar": -7.447328229736393e-06,
+   "overshoot_star": 9.154675144262779e-07
+  }
+ ],
+ "E_conv": {
+  "n_f": 43,
+  "n_hvp": 339
+ },
+ "E_total": {
+  "n_f": 55,
+  "n_hvp": 447
+ },
+ "f_end_minus_fstar": -1.0241929492360215e-08,
+ "face_end": -9.154675106003152e-07,
+ "failed": false,
+ "restarts": 1,
+ "seconds": 2.1570370197296143
+}

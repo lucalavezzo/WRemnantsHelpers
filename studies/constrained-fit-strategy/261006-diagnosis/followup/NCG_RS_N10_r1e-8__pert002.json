@@ -1,0 +1,40 @@
+{
+ "label": "NCG_RS_N10_r1e-8",
+ "start": "pert002",
+ "N": 10,
+ "r": 1e-08,
+ "stages": [
+  {
+   "restarts": 3,
+   "iters": 1140,
+   "stops": [
+    "stall",
+    "stall",
+    "pred<=0"
+   ],
+   "capped": false,
+   "conv": [
+    1083,
+    3175
+   ],
+   "cfg": {},
+   "n_f": 1086,
+   "n_hvp": 3378,
+   "fstar": -7.447328229736393e-06,
+   "overshoot_star": 9.154675144262779e-07
+  }
+ ],
+ "E_conv": {
+  "n_f": 1083,
+  "n_hvp": 3175
+ },
+ "E_total": {
+  "n_f": 1086,
+  "n_hvp": 3378
+ },
+ "f_end_minus_fstar": -1.0241929512456919e-08,
+ "face_end": -9.154675102047982e-07,
+ "failed": false,
+ "restarts": 3,
+ "seconds": 2.3343820571899414
+}

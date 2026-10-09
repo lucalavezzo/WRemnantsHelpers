@@ -1,0 +1,17 @@
+{
+ "S1_term_sat_minus_main": 0.0,
+ "S2_loss_sat_minus_main": 0.0,
+ "A_pfull_term_minus_compute_recorded": 0.0,
+ "A_pfull_sat_minus_main": 0.0,
+ "B_armed_differs": true,
+ "C_rel_AD_vs_FD": {
+  "alphaS": 4.146155153682798e-10,
+  "lambda2_nu": 6.9222323922936665e-09,
+  "lambda4_nu": 0.00032133177589692137,
+  "resumTNP_gamma_nu": 1.005443077093999e-11,
+  "resumTNP_gamma_cusp": 4.933804922184652e-10
+ },
+ "D_nonzero_outside_block": [],
+ "E_snapshot_status": 1,
+ "B_disarmed_equal": true
+}

@@ -1,0 +1,43 @@
+{
+ "label": "C2_relu3_matched",
+ "start": "cold000",
+ "N": 20,
+ "r": 0.0,
+ "stages": [
+  {
+   "restarts": 1,
+   "iters": 192,
+   "stops": [
+    "stall",
+    "stall",
+    "restart-bought-nothing"
+   ],
+   "capped": false,
+   "conv": [
+    149,
+    455
+   ],
+   "cfg": {
+    "pen": "relu3",
+    "K3": 6477748912578.26
+   },
+   "n_f": 159,
+   "n_hvp": 612,
+   "fstar": -9.924650168034648e-06,
+   "overshoot_star": 9.149969371988636e-07
+  }
+ ],
+ "E_conv": {
+  "n_f": 149,
+  "n_hvp": 455
+ },
+ "E_total": {
+  "n_f": 159,
+  "n_hvp": 612
+ },
+ "f_end_minus_fstar": -1.0241929704342916e-08,
+ "face_end": -9.149969351224252e-07,
+ "failed": false,
+ "restarts": 1,
+ "seconds": 1.0227642059326172
+}

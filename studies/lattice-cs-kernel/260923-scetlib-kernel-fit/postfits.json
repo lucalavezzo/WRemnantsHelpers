@@ -1,0 +1,743 @@
+[
+ {
+  "name": "MSHT20 2D lat-cov+TMD prior, wall |Y|<5 (keeper)",
+  "dir": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260722_Z_2D_MSHT20/ZMassDilepton_ptll_yll_realdata/latticeCovCond_priors",
+  "freeze": [
+   "lambda_inf",
+   "lambda_inf_nu",
+   "^scetlibNP.*"
+  ],
+  "spec": {
+   "np_model_nu_fit": "tanh_2",
+   "np_model_fit": "tanh_2",
+   "xparam_default": "lambda2=0.09754,delta_lambda2=-0.00785,lambda4=0.00029,lambda_inf=1.0,lambda2_nu=0.0870,lambda4_nu=0.0074,lambda_inf_nu=1.6853",
+   "priors": "1",
+   "prior_sigmas": "lambda2=0.0195,delta_lambda2=0.0036,lambda4=0.0006,lambda2_nu=nan,lambda4_nu=nan",
+   "btgrid_dir": "/scratch/submit/cms/wmass/scetlib_np/Z_COM13_MSHT20_N3p0LL_btgrid_fineall/",
+   "nonsingular_fo_sing": "/work/submit/lavezzo/alphaS/TheoryCorrections/SCETlib/com13_msht20_newnps_n3+0ll_lattice_lambda4bugfix_franksvalsvars_fine_nnlo_sing/inclusive_Z_COM13_MSHT20_N3+0LL_lattice_lambda4bugfix_franksvalsvars_fine_nnlo_sing_combined.pkl"
+  },
+  "np_model_nu": "tanh_2",
+  "params": {
+   "lambda2_nu": {
+    "postfit": 0.04420739325974585,
+    "prefit": 0.087,
+    "frozen": false,
+    "sigma_fitfile": NaN
+   },
+   "lambda4_nu": {
+    "postfit": 0.015390985989469254,
+    "prefit": 0.0074,
+    "frozen": false,
+    "sigma_fitfile": NaN
+   },
+   "lambda_inf_nu": {
+    "postfit": 1.6853,
+    "prefit": 1.6853,
+    "frozen": true,
+    "sigma_fitfile": NaN
+   }
+  },
+  "cov_names": [
+   "lambda2_nu",
+   "lambda4_nu"
+  ],
+  "cov_mean": [
+   0.04420739325974585,
+   0.015390985989469254
+  ],
+  "cov": [
+   [
+    0.000129130123777699,
+    -2.2445431837239886e-05
+   ],
+   [
+    -2.2445431837239886e-05,
+    7.053417780251665e-06
+   ]
+  ],
+  "cov_file": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260722_Z_2D_MSHT20/ZMassDilepton_ptll_yll_realdata/latticeCovCond_priors/cov/fitresults.hdf5",
+  "blind": {
+   "unblind": []
+  },
+  "regularizer": [
+   [
+    "wremnants.postprocessing.scetlib_np.np_damping_wall.NPDampingWall",
+    "wremnants.postprocessing.scetlib_np.np_damping_wall.NPDampingMapping"
+   ]
+  ],
+  "externalPostfit": null
+ },
+ {
+  "name": "MSHT20 2D lat-cov+TMD prior, wall |Y|<2.5",
+  "dir": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260722_Z_2D_MSHT20/ZMassDilepton_ptll_yll_realdata/latticeCovCond_priors_ymax2p5",
+  "freeze": [
+   "lambda_inf",
+   "lambda_inf_nu",
+   "^scetlibNP.*"
+  ],
+  "spec": {
+   "np_model_nu_fit": "tanh_2",
+   "np_model_fit": "tanh_2",
+   "xparam_default": "lambda2=0.09754,delta_lambda2=-0.00785,lambda4=0.00029,lambda_inf=1.0,lambda2_nu=0.0870,lambda4_nu=0.0074,lambda_inf_nu=1.6853",
+   "btgrid_dir": "/scratch/submit/cms/wmass/scetlib_np/Z_COM13_MSHT20_N3p0LL_btgrid_fineall/",
+   "nonsingular_fo_sing": "/work/submit/lavezzo/alphaS/TheoryCorrections/SCETlib/com13_msht20_newnps_n3+0ll_lattice_lambda4bugfix_franksvalsvars_fine_nnlo_sing/inclusive_Z_COM13_MSHT20_N3+0LL_lattice_lambda4bugfix_franksvalsvars_fine_nnlo_sing_combined.pkl",
+   "priors": "1",
+   "prior_sigmas": "lambda2=0.0195,delta_lambda2=0.0036,lambda4=0.0006,lambda2_nu=nan,lambda4_nu=nan"
+  },
+  "np_model_nu": "tanh_2",
+  "params": {
+   "lambda2_nu": {
+    "postfit": 0.043947002936733356,
+    "prefit": 0.087,
+    "frozen": false,
+    "sigma_fitfile": NaN
+   },
+   "lambda4_nu": {
+    "postfit": 0.015425455444532131,
+    "prefit": 0.0074,
+    "frozen": false,
+    "sigma_fitfile": NaN
+   },
+   "lambda_inf_nu": {
+    "postfit": 1.6853,
+    "prefit": 1.6853,
+    "frozen": true,
+    "sigma_fitfile": NaN
+   }
+  },
+  "cov_names": [
+   "lambda2_nu",
+   "lambda4_nu"
+  ],
+  "cov_mean": [
+   0.043947002936733356,
+   0.015425455444532131
+  ],
+  "cov": [
+   [
+    0.00013599601149346925,
+    -2.3397094046375742e-05
+   ],
+   [
+    -2.3397094046375742e-05,
+    7.185499730029586e-06
+   ]
+  ],
+  "cov_file": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260722_Z_2D_MSHT20/ZMassDilepton_ptll_yll_realdata/latticeCovCond_priors_ymax2p5/cov/fitresults.hdf5",
+  "blind": {
+   "unblind": []
+  },
+  "regularizer": [
+   [
+    "wremnants.postprocessing.scetlib_np.np_damping_wall.NPDampingWall",
+    "wremnants.postprocessing.scetlib_np.np_damping_wall.NPDampingMapping",
+    "ymax=2.5"
+   ]
+  ],
+  "externalPostfit": null
+ },
+ {
+  "name": "MSHT20 2D lat-cov+TMD prior, no wall, warm (keeper)",
+  "dir": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260722_Z_2D_MSHT20/ZMassDilepton_ptll_yll_realdata/latticeCovCond_nowall_seedWalledFull",
+  "freeze": [
+   "lambda_inf",
+   "lambda_inf_nu",
+   "^scetlibNP.*"
+  ],
+  "spec": {
+   "np_model_nu_fit": "tanh_2",
+   "np_model_fit": "tanh_2",
+   "xparam_default": "lambda2=0.09754,delta_lambda2=-0.00785,lambda4=0.00029,lambda_inf=1.0,lambda2_nu=0.0870,lambda4_nu=0.0074,lambda_inf_nu=1.6853",
+   "priors": "1",
+   "prior_sigmas": "lambda2=0.0195,delta_lambda2=0.0036,lambda4=0.0006,lambda2_nu=nan,lambda4_nu=nan",
+   "btgrid_dir": "/scratch/submit/cms/wmass/scetlib_np/Z_COM13_MSHT20_N3p0LL_btgrid_fineall/",
+   "nonsingular_fo_sing": "/work/submit/lavezzo/alphaS/TheoryCorrections/SCETlib/com13_msht20_newnps_n3+0ll_lattice_lambda4bugfix_franksvalsvars_fine_nnlo_sing/inclusive_Z_COM13_MSHT20_N3+0LL_lattice_lambda4bugfix_franksvalsvars_fine_nnlo_sing_combined.pkl"
+  },
+  "np_model_nu": "tanh_2",
+  "params": {
+   "lambda2_nu": {
+    "postfit": 0.043783179575111374,
+    "prefit": 0.087,
+    "frozen": false,
+    "sigma_fitfile": NaN
+   },
+   "lambda4_nu": {
+    "postfit": 0.015448630858018819,
+    "prefit": 0.0074,
+    "frozen": false,
+    "sigma_fitfile": NaN
+   },
+   "lambda_inf_nu": {
+    "postfit": 1.6853,
+    "prefit": 1.6853,
+    "frozen": true,
+    "sigma_fitfile": NaN
+   }
+  },
+  "cov_names": [
+   "lambda2_nu",
+   "lambda4_nu"
+  ],
+  "cov_mean": [
+   0.043783179575111374,
+   0.015448630858018819
+  ],
+  "cov": [
+   [
+    0.00013525613393585486,
+    -2.3288171603837614e-05
+   ],
+   [
+    -2.3288171603837614e-05,
+    7.169725165628125e-06
+   ]
+  ],
+  "cov_file": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260722_Z_2D_MSHT20/ZMassDilepton_ptll_yll_realdata/latticeCovCond_nowall_seedWalledFull/cov/fitresults.hdf5",
+  "blind": {
+   "unblind": []
+  },
+  "regularizer": null,
+  "externalPostfit": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260722_Z_2D_MSHT20/ZMassDilepton_ptll_yll_realdata/latticeCovCond_priors/fitresults.hdf5"
+ },
+ {
+  "name": "MSHT20 2D CS lat-cov only, wall",
+  "dir": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260722_Z_2D_MSHT20/ZMassDilepton_ptll_yll_realdata/cs3_tmdA_wall_restart",
+  "freeze": [
+   "lambda_inf",
+   "lambda_inf_nu",
+   "^scetlibNP.*"
+  ],
+  "spec": {
+   "np_model_nu_fit": "tanh_2",
+   "np_model_fit": "tanh_2",
+   "xparam_default": "lambda2=0.09754,delta_lambda2=-0.00785,lambda4=0.00029,lambda_inf=1.0,lambda2_nu=0.0870,lambda4_nu=0.0074,lambda_inf_nu=1.6853",
+   "btgrid_dir": "/scratch/submit/cms/wmass/scetlib_np/Z_COM13_MSHT20_N3p0LL_btgrid_fineall/",
+   "nonsingular_fo_sing": "/work/submit/lavezzo/alphaS/TheoryCorrections/SCETlib/com13_msht20_newnps_n3+0ll_lattice_lambda4bugfix_franksvalsvars_fine_nnlo_sing/inclusive_Z_COM13_MSHT20_N3+0LL_lattice_lambda4bugfix_franksvalsvars_fine_nnlo_sing_combined.pkl"
+  },
+  "np_model_nu": "tanh_2",
+  "params": {
+   "lambda2_nu": {
+    "postfit": 0.047967334651397894,
+    "prefit": 0.087,
+    "frozen": false,
+    "sigma_fitfile": NaN
+   },
+   "lambda4_nu": {
+    "postfit": 0.013230890816656344,
+    "prefit": 0.0074,
+    "frozen": false,
+    "sigma_fitfile": NaN
+   },
+   "lambda_inf_nu": {
+    "postfit": 1.6853,
+    "prefit": 1.6853,
+    "frozen": true,
+    "sigma_fitfile": NaN
+   }
+  },
+  "cov_names": [
+   "lambda2_nu",
+   "lambda4_nu"
+  ],
+  "cov_mean": [
+   0.047967334651397894,
+   0.013230890816656344
+  ],
+  "cov": [
+   [
+    0.000306928798008947,
+    -4.4401098447110954e-05
+   ],
+   [
+    -4.4401098447110954e-05,
+    9.92832450380424e-06
+   ]
+  ],
+  "cov_file": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260722_Z_2D_MSHT20/ZMassDilepton_ptll_yll_realdata/cs3_tmdA_wall_restart/cov/fitresults.hdf5",
+  "blind": {
+   "unblind": []
+  },
+  "regularizer": [
+   [
+    "wremnants.postprocessing.scetlib_np.np_damping_wall.NPDampingWall",
+    "wremnants.postprocessing.scetlib_np.np_damping_wall.NPDampingMapping",
+    "ymax=2.5"
+   ]
+  ],
+  "externalPostfit": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260722_Z_2D_MSHT20/ZMassDilepton_ptll_yll_realdata/cs3_tmdA_wall/fitresults.hdf5"
+ },
+ {
+  "name": "MSHT20 2D no priors, wall |Y|<2.5",
+  "dir": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260722_Z_2D_MSHT20/ZMassDilepton_ptll_yll_realdata/seedExt_noprior_wall_ymax2p5_restart",
+  "freeze": [
+   "lambda_inf",
+   "lambda_inf_nu",
+   "^scetlibNP.*"
+  ],
+  "spec": {
+   "np_model_nu_fit": "tanh_2",
+   "np_model_fit": "tanh_2",
+   "xparam_default": "lambda2=0.09754,delta_lambda2=-0.00785,lambda4=0.00029,lambda_inf=1.0,lambda2_nu=0.0870,lambda4_nu=0.0074,lambda_inf_nu=1.6853",
+   "btgrid_dir": "/scratch/submit/cms/wmass/scetlib_np/Z_COM13_MSHT20_N3p0LL_btgrid_fineall/",
+   "nonsingular_fo_sing": "/work/submit/lavezzo/alphaS/TheoryCorrections/SCETlib/com13_msht20_newnps_n3+0ll_lattice_lambda4bugfix_franksvalsvars_fine_nnlo_sing/inclusive_Z_COM13_MSHT20_N3+0LL_lattice_lambda4bugfix_franksvalsvars_fine_nnlo_sing_combined.pkl"
+  },
+  "np_model_nu": "tanh_2",
+  "params": {
+   "lambda2_nu": {
+    "postfit": 0.004558191950740449,
+    "prefit": 0.087,
+    "frozen": false,
+    "sigma_fitfile": NaN
+   },
+   "lambda4_nu": {
+    "postfit": 0.05208719045649952,
+    "prefit": 0.0074,
+    "frozen": false,
+    "sigma_fitfile": NaN
+   },
+   "lambda_inf_nu": {
+    "postfit": 1.6853,
+    "prefit": 1.6853,
+    "frozen": true,
+    "sigma_fitfile": NaN
+   }
+  },
+  "cov_names": [
+   "lambda2_nu",
+   "lambda4_nu"
+  ],
+  "cov_mean": [
+   0.004558191950740449,
+   0.05208719045649952
+  ],
+  "cov": [
+   [
+    2.2690405694562567e-05,
+    6.38676214965143e-08
+   ],
+   [
+    6.38676214965143e-08,
+    0.008798995672008616
+   ]
+  ],
+  "cov_file": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260722_Z_2D_MSHT20/ZMassDilepton_ptll_yll_realdata/seedExt_noprior_wall_ymax2p5_restart/cov/fitresults.hdf5",
+  "blind": {
+   "unblind": []
+  },
+  "regularizer": [
+   [
+    "wremnants.postprocessing.scetlib_np.np_damping_wall.NPDampingWall",
+    "wremnants.postprocessing.scetlib_np.np_damping_wall.NPDampingMapping",
+    "ymax=2.5"
+   ]
+  ],
+  "externalPostfit": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260722_Z_2D_MSHT20/ZMassDilepton_ptll_yll_realdata/seedExt_noprior_wall_ymax2p5/fitresults.hdf5"
+ },
+ {
+  "name": "MSHT20 2D no priors, no wall, cold",
+  "dir": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260722_Z_2D_MSHT20/ZMassDilepton_ptll_yll_realdata/seedExt_noprior_nowall",
+  "freeze": [
+   "lambda_inf",
+   "lambda_inf_nu",
+   "^scetlibNP.*"
+  ],
+  "spec": {
+   "np_model_nu_fit": "tanh_2",
+   "np_model_fit": "tanh_2",
+   "xparam_default": "lambda2=0.09754,delta_lambda2=-0.00785,lambda4=0.00029,lambda_inf=1.0,lambda2_nu=0.0870,lambda4_nu=0.0074,lambda_inf_nu=1.6853",
+   "btgrid_dir": "/scratch/submit/cms/wmass/scetlib_np/Z_COM13_MSHT20_N3p0LL_btgrid_fineall/",
+   "nonsingular_fo_sing": "/work/submit/lavezzo/alphaS/TheoryCorrections/SCETlib/com13_msht20_newnps_n3+0ll_lattice_lambda4bugfix_franksvalsvars_fine_nnlo_sing/inclusive_Z_COM13_MSHT20_N3+0LL_lattice_lambda4bugfix_franksvalsvars_fine_nnlo_sing_combined.pkl"
+  },
+  "np_model_nu": "tanh_2",
+  "params": {
+   "lambda2_nu": {
+    "postfit": -0.27655053660671947,
+    "prefit": 0.087,
+    "frozen": false,
+    "sigma_fitfile": NaN
+   },
+   "lambda4_nu": {
+    "postfit": 0.09355823208164184,
+    "prefit": 0.0074,
+    "frozen": false,
+    "sigma_fitfile": NaN
+   },
+   "lambda_inf_nu": {
+    "postfit": 1.6853,
+    "prefit": 1.6853,
+    "frozen": true,
+    "sigma_fitfile": NaN
+   }
+  },
+  "cov_names": [
+   "lambda2_nu",
+   "lambda4_nu"
+  ],
+  "cov_mean": [
+   -0.27655053660671947,
+   0.09355823208164184
+  ],
+  "cov": [
+   [
+    0.2464405852214272,
+    -0.0679782567166092
+   ],
+   [
+    -0.0679782567166092,
+    0.01898865447537735
+   ]
+  ],
+  "cov_file": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260722_Z_2D_MSHT20/ZMassDilepton_ptll_yll_realdata/seedExt_noprior_nowall/cov/fitresults.hdf5",
+  "blind": {
+   "unblind": []
+  },
+  "regularizer": null,
+  "externalPostfit": null
+ },
+ {
+  "name": "CT18Z 2D no priors, wall",
+  "dir": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260806_Z_2D_CT18Z_noprior_wall/ct18z_noprior_wall_restart",
+  "freeze": [
+   "lambda_inf",
+   "lambda_inf_nu",
+   "^scetlibNP.*"
+  ],
+  "spec": {
+   "np_model_nu_fit": "tanh_2",
+   "np_model_fit": "tanh_2",
+   "xparam_default": "lambda2=0.09754,delta_lambda2=-0.00785,lambda4=0.00029,lambda_inf=1.0,lambda2_nu=0.0870,lambda4_nu=0.0074,lambda_inf_nu=1.6853"
+  },
+  "np_model_nu": "tanh_2",
+  "params": {
+   "lambda2_nu": {
+    "postfit": 0.004602569277525511,
+    "prefit": 0.087,
+    "frozen": false,
+    "sigma_fitfile": NaN
+   },
+   "lambda4_nu": {
+    "postfit": 0.05430849465489733,
+    "prefit": 0.0074,
+    "frozen": false,
+    "sigma_fitfile": NaN
+   },
+   "lambda_inf_nu": {
+    "postfit": 1.6853,
+    "prefit": 1.6853,
+    "frozen": true,
+    "sigma_fitfile": NaN
+   }
+  },
+  "cov_names": [
+   "lambda2_nu",
+   "lambda4_nu"
+  ],
+  "cov_mean": [
+   0.004602569277525511,
+   0.05430849465489733
+  ],
+  "cov": [
+   [
+    2.2691018879306193e-05,
+    5.62019190092028e-07
+   ],
+   [
+    5.62019190092028e-07,
+    0.009492185438255061
+   ]
+  ],
+  "cov_file": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260806_Z_2D_CT18Z_noprior_wall/ct18z_noprior_wall_restart/cov/fitresults.hdf5",
+  "blind": {
+   "unblind": []
+  },
+  "regularizer": [
+   [
+    "wremnants.postprocessing.scetlib_np.np_damping_wall.NPDampingWall",
+    "wremnants.postprocessing.scetlib_np.np_damping_wall.NPDampingMapping",
+    "ymax=2.5"
+   ]
+  ],
+  "externalPostfit": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260806_Z_2D_CT18Z_noprior_wall/ct18z_noprior_wall/fitresults.hdf5"
+ },
+ {
+  "name": "CT18Z 2D CS lat-cov, wall",
+  "dir": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260806_Z_2D_CT18Z_noprior_wall/ct18z_latticeCS_wall_restart",
+  "freeze": [
+   "lambda_inf",
+   "lambda_inf_nu",
+   "^scetlibNP.*"
+  ],
+  "spec": {
+   "np_model_nu_fit": "tanh_2",
+   "np_model_fit": "tanh_2",
+   "xparam_default": "lambda2=0.09754,delta_lambda2=-0.00785,lambda4=0.00029,lambda_inf=1.0,lambda2_nu=0.0870,lambda4_nu=0.0074,lambda_inf_nu=1.6853"
+  },
+  "np_model_nu": "tanh_2",
+  "params": {
+   "lambda2_nu": {
+    "postfit": 0.0378367126082851,
+    "prefit": 0.087,
+    "frozen": false,
+    "sigma_fitfile": NaN
+   },
+   "lambda4_nu": {
+    "postfit": 0.014730047915483114,
+    "prefit": 0.0074,
+    "frozen": false,
+    "sigma_fitfile": NaN
+   },
+   "lambda_inf_nu": {
+    "postfit": 1.6853,
+    "prefit": 1.6853,
+    "frozen": true,
+    "sigma_fitfile": NaN
+   }
+  },
+  "cov_names": [
+   "lambda2_nu",
+   "lambda4_nu"
+  ],
+  "cov_mean": [
+   0.0378367126082851,
+   0.014730047915483114
+  ],
+  "cov": [
+   [
+    0.0002833170013988007,
+    -4.085287447111151e-05
+   ],
+   [
+    -4.085287447111151e-05,
+    9.39414819666787e-06
+   ]
+  ],
+  "cov_file": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260806_Z_2D_CT18Z_noprior_wall/ct18z_latticeCS_wall_restart/cov/fitresults.hdf5",
+  "blind": {
+   "unblind": []
+  },
+  "regularizer": [
+   [
+    "wremnants.postprocessing.scetlib_np.np_damping_wall.NPDampingWall",
+    "wremnants.postprocessing.scetlib_np.np_damping_wall.NPDampingMapping",
+    "ymax=2.5"
+   ]
+  ],
+  "externalPostfit": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260806_Z_2D_CT18Z_noprior_wall/ct18z_latticeCS_wall/fitresults.hdf5"
+ },
+ {
+  "name": "CT18Z 2D wall (David's fix, reference)",
+  "dir": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260723_Z_2D_davidFix",
+  "freeze": [
+   "lambda_inf",
+   "lambda_inf_nu",
+   "lambda6",
+   "lambda6_nu"
+  ],
+  "spec": {
+   "np_model_nu_fit": "tanh_6",
+   "np_model_fit": "tanh_6",
+   "xparam_default": "lambda6_nu=0.01,lambda6=0.01",
+   "btgrid_dir": "/scratch/submit/cms/wmass/scetlib_np/Z_COM13_CT18Z_N3p0LL_btgrid_fineall/"
+  },
+  "np_model_nu": "tanh_6",
+  "params": {
+   "lambda2_nu": {
+    "postfit": 0.004295483730234841,
+    "prefit": 0.15,
+    "frozen": false,
+    "sigma_fitfile": 0.004753574070964502
+   },
+   "lambda4_nu": {
+    "postfit": 0.03434356289106095,
+    "prefit": 0.0,
+    "frozen": false,
+    "sigma_fitfile": NaN
+   },
+   "lambda_inf_nu": {
+    "postfit": 2.0,
+    "prefit": 2.0,
+    "frozen": true,
+    "sigma_fitfile": NaN
+   },
+   "lambda6_nu": {
+    "postfit": 0.01,
+    "prefit": 0.01,
+    "frozen": true,
+    "sigma_fitfile": NaN
+   }
+  },
+  "cov_names": [
+   "lambda2_nu",
+   "lambda4_nu"
+  ],
+  "cov_mean": [
+   0.004295483730234841,
+   0.03434356289106095
+  ],
+  "cov": [
+   [
+    2.259538706331477e-05,
+    -3.258058312887261e-06
+   ],
+   [
+    -3.258058312887261e-06,
+    0.00044691539571572076
+   ]
+  ],
+  "cov_file": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260723_Z_2D_davidFix/cov/fitresults.hdf5",
+  "blind": {
+   "unblind": []
+  },
+  "regularizer": [
+   [
+    "wremnants.postprocessing.scetlib_np.np_damping_wall.NPDampingWall",
+    "wremnants.postprocessing.scetlib_np.np_damping_wall.NPDampingMapping"
+   ]
+  ],
+  "externalPostfit": null
+ },
+ {
+  "name": "MSHT20aN3LO 1D ptll wall m=0",
+  "dir": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260728_Z_1D_MSHT20aN3LO/ZMassDilepton_ptll_realdata/wall_m0",
+  "freeze": [
+   "lambda_inf",
+   "lambda_inf_nu",
+   "lambda6",
+   "lambda6_nu"
+  ],
+  "spec": {
+   "np_model_nu_fit": "tanh_6",
+   "np_model_fit": "tanh_6",
+   "xparam_default": "lambda6_nu=0.01,lambda6=0.01",
+   "btgrid_dir": "/scratch/submit/cms/wmass/scetlib_np/Z_COM13_MSHT20aN3LO_N4p0LL_btgrid_fineall",
+   "nonsingular_fo_sing": "/work/submit/areimers/wmass/TheoryCorrections/SCETlib/com13_msht20an3lo_newnps_n4+0ll_lattice_lambda4bugfix_franksvalsvars_fine_n3lo_sing/inclusive_Z_COM13_MSHT20aN3LO_N4+0LL_lattice_lambda4bugfix_franksvalsvars_fine_n3lo_sing_combined.pkl",
+   "nonsingular_dyturbo": "/work/submit/areimers/wmass/WRemnants/WRemnantsScripts/nnlojet_fit/results/nnlojet_export_stitched/ptz"
+  },
+  "np_model_nu": "tanh_6",
+  "params": {
+   "lambda2_nu": {
+    "postfit": 0.01508933404445662,
+    "prefit": 0.15,
+    "frozen": false,
+    "sigma_fitfile": 0.02439355194769931
+   },
+   "lambda4_nu": {
+    "postfit": -0.02507177931316728,
+    "prefit": 0.0,
+    "frozen": false,
+    "sigma_fitfile": NaN
+   },
+   "lambda_inf_nu": {
+    "postfit": 2.0,
+    "prefit": 2.0,
+    "frozen": true,
+    "sigma_fitfile": NaN
+   },
+   "lambda6_nu": {
+    "postfit": 0.01,
+    "prefit": 0.01,
+    "frozen": true,
+    "sigma_fitfile": NaN
+   }
+  },
+  "cov_names": [
+   "lambda2_nu",
+   "lambda4_nu"
+  ],
+  "cov_mean": [
+   0.01508933404445662,
+   -0.02507177931316728
+  ],
+  "cov": [
+   [
+    0.000842828252443315,
+    -0.0006512746014529674
+   ],
+   [
+    -0.0006512746014529674,
+    0.0005170415149256968
+   ]
+  ],
+  "cov_file": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260728_Z_1D_MSHT20aN3LO/ZMassDilepton_ptll_realdata/wall_m0/cov/fitresults.hdf5",
+  "blind": {
+   "unblind": []
+  },
+  "regularizer": [
+   [
+    "wremnants.postprocessing.scetlib_np.np_damping_wall.NPDampingWall",
+    "wremnants.postprocessing.scetlib_np.np_damping_wall.NPDampingMapping",
+    "margin=0"
+   ]
+  ],
+  "externalPostfit": null
+ },
+ {
+  "name": "MSHT20aN3LO 1D ptll no wall, warm",
+  "dir": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260728_Z_1D_MSHT20aN3LO/ZMassDilepton_ptll_realdata/nowall_seedWalledFull",
+  "freeze": [
+   "lambda_inf",
+   "lambda_inf_nu",
+   "lambda6",
+   "lambda6_nu"
+  ],
+  "spec": {
+   "np_model_nu_fit": "tanh_6",
+   "np_model_fit": "tanh_6",
+   "xparam_default": "lambda6_nu=0.01,lambda6=0.01",
+   "btgrid_dir": "/scratch/submit/cms/wmass/scetlib_np/Z_COM13_MSHT20aN3LO_N4p0LL_btgrid_fineall",
+   "nonsingular_fo_sing": "/work/submit/areimers/wmass/TheoryCorrections/SCETlib/com13_msht20an3lo_newnps_n4+0ll_lattice_lambda4bugfix_franksvalsvars_fine_n3lo_sing/inclusive_Z_COM13_MSHT20aN3LO_N4+0LL_lattice_lambda4bugfix_franksvalsvars_fine_n3lo_sing_combined.pkl",
+   "nonsingular_dyturbo": "/work/submit/areimers/wmass/WRemnants/WRemnantsScripts/nnlojet_fit/results/nnlojet_export_stitched/ptz"
+  },
+  "np_model_nu": "tanh_6",
+  "params": {
+   "lambda2_nu": {
+    "postfit": -0.07187678079771763,
+    "prefit": 0.15,
+    "frozen": false,
+    "sigma_fitfile": 0.17998315598475953
+   },
+   "lambda4_nu": {
+    "postfit": 0.032605352946121026,
+    "prefit": 0.0,
+    "frozen": false,
+    "sigma_fitfile": NaN
+   },
+   "lambda_inf_nu": {
+    "postfit": 2.0,
+    "prefit": 2.0,
+    "frozen": true,
+    "sigma_fitfile": NaN
+   },
+   "lambda6_nu": {
+    "postfit": 0.01,
+    "prefit": 0.01,
+    "frozen": true,
+    "sigma_fitfile": NaN
+   }
+  },
+  "cov_names": [
+   "lambda2_nu",
+   "lambda4_nu"
+  ],
+  "cov_mean": [
+   -0.07187678079771763,
+   0.032605352946121026
+  ],
+  "cov": [
+   [
+    0.1169225921097202,
+    -0.013855449575031804
+   ],
+   [
+    -0.013855449575031804,
+    0.002447395288706641
+   ]
+  ],
+  "cov_file": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260728_Z_1D_MSHT20aN3LO/ZMassDilepton_ptll_realdata/nowall_seedWalledFull/cov/fitresults.hdf5",
+  "blind": {
+   "unblind": []
+  },
+  "regularizer": null,
+  "externalPostfit": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260728_Z_1D_MSHT20aN3LO/ZMassDilepton_ptll_realdata/wall_m0/fitresults.hdf5"
+ }
+]

@@ -1,0 +1,43 @@
+{
+ "label": "C2_relu3_matched",
+ "start": "CENS03R",
+ "N": 20,
+ "r": 0.0,
+ "stages": [
+  {
+   "restarts": 1,
+   "iters": 122,
+   "stops": [
+    "stall",
+    "stall",
+    "restart-bought-nothing"
+   ],
+   "capped": false,
+   "conv": [
+    79,
+    301
+   ],
+   "cfg": {
+    "pen": "relu3",
+    "K3": 6477748912578.26
+   },
+   "n_f": 91,
+   "n_hvp": 446,
+   "fstar": -9.924650168034648e-06,
+   "overshoot_star": 9.149969371988636e-07
+  }
+ ],
+ "E_conv": {
+  "n_f": 79,
+  "n_hvp": 301
+ },
+ "E_total": {
+  "n_f": 91,
+  "n_hvp": 446
+ },
+ "f_end_minus_fstar": -1.024192972306065e-08,
+ "face_end": -9.149969354520227e-07,
+ "failed": false,
+ "restarts": 1,
+ "seconds": 0.9966990947723389
+}

@@ -1,0 +1,40 @@
+{
+ "label": "RSX_N10_r0.0001",
+ "start": "CENS03R",
+ "N": 10,
+ "r": 0.0001,
+ "stages": [
+  {
+   "restarts": 3,
+   "iters": 71,
+   "stops": [
+    "stall",
+    "stall",
+    "restart-bought-nothing"
+   ],
+   "capped": false,
+   "conv": [
+    53,
+    211
+   ],
+   "cfg": {},
+   "n_f": 61,
+   "n_hvp": 322,
+   "fstar": -7.447328229736393e-06,
+   "overshoot_star": 9.154675144262779e-07
+  }
+ ],
+ "E_conv": {
+  "n_f": 53,
+  "n_hvp": 211
+ },
+ "E_total": {
+  "n_f": 61,
+  "n_hvp": 322
+ },
+ "f_end_minus_fstar": -1.0241929540132873e-08,
+ "face_end": -9.154675094831533e-07,
+ "failed": false,
+ "restarts": 3,
+ "seconds": 0.9229905605316162
+}

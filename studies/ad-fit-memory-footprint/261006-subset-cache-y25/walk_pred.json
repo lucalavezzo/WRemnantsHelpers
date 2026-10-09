@@ -1,0 +1,20 @@
+{
+ "full": {
+  "n_bins": 1050,
+  "blob_GB": 143.532855255,
+  "sum_sites": 380229,
+  "sum_sites_x_nv": 22813740,
+  "nominal_muf_GB": 13.432730112,
+  "member_muf_GB": 167.9091264,
+  "pred_total_GB": 331.83991475246347
+ },
+ "y25": {
+  "n_bins": 770,
+  "blob_GB": 102.528473925,
+  "sum_sites": 271621,
+  "sum_sites_x_nv": 16297260,
+  "nominal_muf_GB": 9.595826688,
+  "member_muf_GB": 119.9478336,
+  "pred_total_GB": 238.4066034622225
+ }
+}

@@ -1,0 +1,34 @@
+{
+ "label": "RSX_N20_r1e-05",
+ "start": "pert002",
+ "N": 20,
+ "r": 1e-05,
+ "stages": [
+  {
+   "restarts": 361,
+   "iters": 8000,
+   "stops": [
+    "stall",
+    "stall",
+    "cap"
+   ],
+   "capped": true,
+   "conv": null,
+   "cfg": {},
+   "n_f": 8361,
+   "n_hvp": 14212,
+   "fstar": -7.447328229736393e-06,
+   "overshoot_star": 9.154675144262779e-07
+  }
+ ],
+ "E_conv": null,
+ "E_total": {
+  "n_f": 8361,
+  "n_hvp": 14212
+ },
+ "f_end_minus_fstar": 427.9413470610377,
+ "face_end": 8.689533384509396e-09,
+ "failed": true,
+ "restarts": 361,
+ "seconds": 19.486206531524658
+}

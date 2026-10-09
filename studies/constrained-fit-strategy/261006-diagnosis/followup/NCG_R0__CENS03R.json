@@ -1,0 +1,38 @@
+{
+ "label": "NCG_R0",
+ "start": "CENS03R",
+ "N": 20,
+ "r": 0.0,
+ "stages": [
+  {
+   "restarts": 0,
+   "iters": 1539,
+   "stops": [
+    "pred<=0"
+   ],
+   "capped": false,
+   "conv": [
+    1499,
+    3980
+   ],
+   "cfg": {},
+   "n_f": 1502,
+   "n_hvp": 4160,
+   "fstar": -7.447328229736393e-06,
+   "overshoot_star": 9.154675144262779e-07
+  }
+ ],
+ "E_conv": {
+  "n_f": 1499,
+  "n_hvp": 3980
+ },
+ "E_total": {
+  "n_f": 1502,
+  "n_hvp": 4160
+ },
+ "f_end_minus_fstar": -1.0241929491287871e-08,
+ "face_end": -9.154675102256149e-07,
+ "failed": false,
+ "restarts": 0,
+ "seconds": 2.5021584033966064
+}

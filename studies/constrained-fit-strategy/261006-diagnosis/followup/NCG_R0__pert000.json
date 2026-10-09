@@ -1,0 +1,38 @@
+{
+ "label": "NCG_R0",
+ "start": "pert000",
+ "N": 20,
+ "r": 0.0,
+ "stages": [
+  {
+   "restarts": 0,
+   "iters": 1944,
+   "stops": [
+    "pred<=0"
+   ],
+   "capped": false,
+   "conv": [
+    1912,
+    5252
+   ],
+   "cfg": {},
+   "n_f": 1915,
+   "n_hvp": 5460,
+   "fstar": -7.447328229736393e-06,
+   "overshoot_star": 9.154675144262779e-07
+  }
+ ],
+ "E_conv": {
+  "n_f": 1912,
+  "n_hvp": 5252
+ },
+ "E_total": {
+  "n_f": 1915,
+  "n_hvp": 5460
+ },
+ "f_end_minus_fstar": -1.0241929519512703e-08,
+ "face_end": -9.154675102152066e-07,
+ "failed": false,
+ "restarts": 0,
+ "seconds": 4.057997226715088
+}

@@ -1,0 +1,121 @@
+{
+ "fitresult": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260928_lattice_y35_fits/fitresults_LATL4ZY35WALLWARM.hdf5",
+ "command": "/home/submit/lavezzo/alphaS/WRemnants/rabbit/bin/rabbit_fit.py '/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260923_lattice_fits/cards/cardA_latticeASWZ_l4zero_statsyst.hdf5' --jitCompile off -o '/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260928_lattice_y35_fits' -t 0 --postfix LATL4ZY35WALLWARM -m Project ch0 ptll --computeSaturatedProjectionTests --computeHistErrors --doImpacts --globalImpacts --globalImpactsDisableJVP --saveHists --regularizationStrength 5 -r 'wremnants.postprocessing.scetlib_ad.np_damping_wall.NPDampingWall' 'wremnants.postprocessing.scetlib_ad.np_damping_wall.NPDampingMapping' --snapshotFile '/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260928_lattice_y35_fits/snapshot_fitresults_LATL4ZY35WALLWARM.hdf5' --snapshotInterval '0.25' --paramModel 'wremnants.postprocessing.scetlib_ad.SCETlibADParamModel' 'cache=/scratch/submit/cms/alphaS/ad_scetlib_caches/pdf62_y35_260921/merged_full_bin0xzero/cache.npz' 'conf=/scratch/submit/cms/alphaS/ad_scetlib_caches/pdf62_y35_260921/merged_full_bin0xzero/cache.conf' 'threads=128' 'fit_params=alphaS,lambda2,lambda4,delta_lambda2,lambda2_nu,resumTNP_gamma_cusp,resumTNP_gamma_mu_q,resumTNP_gamma_nu,resumTNP_s,resumTNP_b_qqV,resumTNP_b_qqbarV,resumTNP_b_qqS,resumTNP_b_qg,resumTNP_h_qqV,resumTransition2,pdfEig0,pdfEig1,pdfEig2,pdfEig3,pdfEig4,pdfEig5,pdfEig6,pdfEig7,pdfEig8,pdfEig9,pdfEig10,pdfEig11,pdfEig12,pdfEig13,pdfEig14,pdfEig15,pdfEig16,pdfEig17,pdfEig18,pdfEig19,pdfEig20,pdfEig21,pdfEig22,pdfEig23,pdfEig24,pdfEig25,pdfEig26,pdfEig27,pdfEig28' 'prior_sigmas=lambda2_nu=nan' -v 4 --earlyStopping 100 --externalPostfit '/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260924_y35_bin0xzero_fits/fitresults_Y35ZWALLWARM.hdf5'",
+ "dropped_flags": [
+  [
+   "-o",
+   "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260928_lattice_y35_fits"
+  ],
+  [
+   "--snapshotFile",
+   "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260928_lattice_y35_fits/snapshot_fitresults_LATL4ZY35WALLWARM.hdf5"
+  ],
+  [
+   "--snapshotInterval",
+   "0.25"
+  ]
+ ],
+ "nll_stored": 376.6942441689123,
+ "a_L_default_t5_traced": 376.6942441689123,
+ "a_diff": 0.0,
+ "L_default_t5_fresh": 376.6942441689123,
+ "fresh_minus_traced": 0.0,
+ "L_base_unwalled": 376.69103432608273,
+ "pen5": 1.4572663901120996e-07,
+ "pen0": 0.0,
+ "e10": 22026.465794806718,
+ "e16": 8886110.520507872,
+ "b_L_margin0_t8": 376.69103432608273,
+ "b_lhs": -0.0032098428295626036,
+ "b_rhs": -0.003209842829572562,
+ "b_lhs_minus_rhs": 9.958613794713855e-15,
+ "check_default_eq_base_plus_pen": 0.0,
+ "check_m0_eq_base_plus_pen": 0.0,
+ "d_traced_after_swap_t8": 377.9859773461185,
+ "d_expected_if_reg5_baked": 377.9859773461185,
+ "d_expected_if_reg0": 376.69103432608273,
+ "lambdas_physical": {
+  "lambda_inf": 1.0,
+  "lambda_inf_nu": 2.0,
+  "lambda4_nu": 0.0,
+  "lambda2": 0.029005836116668515,
+  "lambda4": 0.08732390257694078,
+  "delta_lambda2": -0.00390201243253791,
+  "lambda2_nu": 0.0633850323384078
+ },
+ "held": {
+  "lambda_inf": 1.0,
+  "lambda_inf_nu": 2.0,
+  "lambda4_nu": 0.0
+ },
+ "conditions": [
+  {
+   "label": "lambda2_nu >= 0 (CS small-b turn-on)",
+   "coeff": 0.0633850323384078,
+   "bound5": 0.005,
+   "pen5": 0.0,
+   "pen5_scaled_t5": 0.0,
+   "bound0": 0.0,
+   "pen0": 0.0,
+   "pen0_scaled_t8": 0.0,
+   "active5": false,
+   "active0": false
+  },
+  {
+   "label": "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=0 (TMD small-b turn-on)",
+   "coeff": 0.029005836116668515,
+   "bound5": 0.005,
+   "pen5": 0.0,
+   "pen5_scaled_t5": 0.0,
+   "bound0": 0.0,
+   "pen0": 0.0,
+   "pen0_scaled_t8": 0.0,
+   "active5": false,
+   "active0": false
+  },
+  {
+   "label": "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=0 (TMD large-b)",
+   "coeff": 0.26199611145830815,
+   "bound5": 0.005,
+   "pen5": 0.0,
+   "pen5_scaled_t5": 0.0,
+   "bound0": 0.0,
+   "pen0": 0.0,
+   "pen0_scaled_t8": 0.0,
+   "active5": false,
+   "active0": false
+  },
+  {
+   "label": "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=2.5 (TMD small-b turn-on)",
+   "coeff": 0.00461825841330658,
+   "bound5": 0.005,
+   "pen5": 1.4572663901120996e-07,
+   "pen5_scaled_t5": 0.003209842829572562,
+   "bound0": 0.0,
+   "pen0": 0.0,
+   "pen0_scaled_t8": 0.0,
+   "active5": true,
+   "active0": false
+  },
+  {
+   "label": "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=2.5 (TMD large-b)",
+   "coeff": 0.261971806230473,
+   "bound5": 0.005,
+   "pen5": 0.0,
+   "pen5_scaled_t5": 0.0,
+   "bound0": 0.0,
+   "pen0": 0.0,
+   "pen0_scaled_t8": 0.0,
+   "active5": false,
+   "active0": false
+  }
+ ],
+ "margins": {
+  "reg5": 0.005,
+  "reg0": 0.0
+ },
+ "map_keys": {
+  "reg5": "NPDampingMapping smallb=1",
+  "reg0": "NPDampingMapping smallb=1 margin=0"
+ }
+}

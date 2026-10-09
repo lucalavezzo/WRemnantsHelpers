@@ -1,0 +1,13 @@
+postfix,point,k,start,seed,alphaS_offset_over_sigma,norm_dtheta_over_sigpost_nonalphaS,max_abs_dtheta_over_sigpost_nonalphaS,norm_kickblock,quad_cost_est,raw
+PROFM1W,M1,-1.0,W,/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261002_multistart_profile/seeds/PROFM1W.hdf5,-0.999999999999999,0.0,0.0,0.0,466.27718306371037,
+PROFM1R,M1,-1.0,R,/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261002_multistart_profile/seeds/PROFM1R.hdf5,-0.999999999999999,32.20048228753756,9.302823170501043,3.049624681792381,13154.393541963087,raw/pertraw_000.hdf5
+PROFM1K,M1,-1.0,K,/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261002_multistart_profile/seeds/PROFM1K.hdf5,-0.999999999999999,12.328828005937952,2.0000000000000004,12.328828005937952,53752.13284202548,
+PROFP1W,P1,1.0,W,/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261002_multistart_profile/seeds/PROFP1W.hdf5,+0.999999999999999,0.0,0.0,0.0,466.27718306371037,
+PROFP1R,P1,1.0,R,/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261002_multistart_profile/seeds/PROFP1R.hdf5,+0.999999999999999,32.00630637176639,8.875101429232139,3.6912476401428584,165535.02059551177,raw/pertraw_001.hdf5
+PROFP1K,P1,1.0,K,/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261002_multistart_profile/seeds/PROFP1K.hdf5,+0.999999999999999,12.328828005937952,2.0000000000000004,12.328828005937952,7809.864921629653,
+PROFM2W,M2,-2.0,W,/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261002_multistart_profile/seeds/PROFM2W.hdf5,-2.000000000000001,0.0,0.0,0.0,1865.1087322548472,
+PROFM2R,M2,-2.0,R,/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261002_multistart_profile/seeds/PROFM2R.hdf5,-2.000000000000001,31.071677823966418,5.376932196096397,3.4354944892701265,401684.7078868287,raw/pertraw_002.hdf5
+PROFM2K,M2,-2.0,K,/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261002_multistart_profile/seeds/PROFM2K.hdf5,-2.000000000000001,12.328828005937952,2.0000000000000004,12.328828005937952,10723.97744889262,
+PROFP2W,P2,2.0,W,/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261002_multistart_profile/seeds/PROFP2W.hdf5,+2.000000000000001,0.0,0.0,0.0,1865.1087322548472,
+PROFP2R,P2,2.0,R,/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261002_multistart_profile/seeds/PROFP2R.hdf5,+2.000000000000001,30.96770701071436,6.0696787224212825,3.452325594550398,162886.0932117754,raw/pertraw_003.hdf5
+PROFP2K,P2,2.0,K,/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261002_multistart_profile/seeds/PROFP2K.hdf5,+2.000000000000001,12.328828005937952,2.0000000000000004,12.328828005937952,5930.496479201689,

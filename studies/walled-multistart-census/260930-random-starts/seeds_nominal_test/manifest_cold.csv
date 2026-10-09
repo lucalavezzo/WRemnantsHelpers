@@ -1,0 +1,2 @@
+seed_id,file,mode,u,lambda2,lambda4,delta_lambda2,lambda2_nu,max_abs_z,max_abs_pull_nonnp,chi2_z,n_tries,feasible_margin,near_active_faces,roundtrip
+0,cold_000.hdf5,cold_except_alphas,0.0,0.4,0.4,0.0,0.15,nan,nan,nan,0,True,-,True

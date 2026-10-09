@@ -1,0 +1,58 @@
+{
+ "nparms": 3719,
+ "lambdas_in_vector": [
+  "lambda2",
+  "lambda4",
+  "delta_lambda2",
+  "lambda2_nu"
+ ],
+ "physical_lambdas": {
+  "lambda_inf": 1.0,
+  "lambda_inf_nu": 2.0,
+  "lambda4_nu": 0.0,
+  "lambda2": 0.025581284102796142,
+  "lambda4": 0.08758284351213724,
+  "delta_lambda2": -0.004093151901886217,
+  "lambda2_nu": 0.06426999671529844
+ },
+ "labels": [
+  "lambda2_nu >= 0 (CS small-b turn-on)",
+  "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=0 (TMD small-b turn-on)",
+  "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=0 (TMD large-b)",
+  "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=2.5 (TMD small-b turn-on)",
+  "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=2.5 (TMD large-b)"
+ ],
+ "constraint_values": [
+  0.06426999671529844,
+  0.025581284102796142,
+  0.26276527098235586,
+  -9.152839927153988e-07,
+  0.26274853053641173
+ ],
+ "lower_bounds": [
+  0.0,
+  0.0,
+  0.0,
+  0.0,
+  0.0
+ ],
+ "face_values_numpy": [
+  0.06426999671529844,
+  0.025581284102796142,
+  0.26276527098235586,
+  -9.152839927153988e-07,
+  0.26274853053641173
+ ],
+ "max_abs_diff_tf_vs_numpy": 0.0,
+ "fitter_path_max_abs_diff": 0.0,
+ "jacobian_nonzero_columns": [
+  "lambda2",
+  "lambda4",
+  "delta_lambda2",
+  "lambda2_nu"
+ ],
+ "penalty_tf_times_exp2tau": 7.444292768114144e-06,
+ "penalty_numpy_times_exp2tau": 7.444292768114144e-06,
+ "nllvalreduced_NOMSTIFF": 376.6146329237086,
+ "nll_minus_penalty": 376.61462547941585
+}

@@ -1,0 +1,99 @@
+{
+ "armed": [
+  "lambda4_nu >= 0 (CS large-b leading)",
+  "lambda2_nu >= 0 (CS small-b turn-on)",
+  "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=0 (TMD small-b turn-on)",
+  "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=0 (TMD large-b)",
+  "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=2.5 (TMD small-b turn-on)",
+  "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=2.5 (TMD large-b)"
+ ],
+ "points": {
+  "seed_C": {
+   "c_minus_lb": [
+    -0.00018507124910117564,
+    0.007266860053712548,
+    0.07826361174018326,
+    0.3562681267469325,
+    0.021802877012501033,
+    0.35579911136055864
+   ],
+   "feasible": false,
+   "lambdas": {
+    "lambda_inf": 1.0,
+    "lambda_inf_nu": 2.0,
+    "lambda2": 0.07826361174018326,
+    "lambda4": 0.11859624900873433,
+    "delta_lambda2": -0.009033717556429156,
+    "lambda2_nu": 0.007266860053712548,
+    "lambda4_nu": -0.00018507124910117564
+   },
+   "norm_dtheta_over_sigXW": 426.8786426208602
+  },
+  "XWSTIFF": {
+   "c_minus_lb": [
+    0.044408086224080615,
+    -1.1216393087931653e-06,
+    0.11882566722836224,
+    0.001461411599146319,
+    0.060013828411045154,
+    -2.026850692142567e-07
+   ],
+   "feasible": false,
+   "lambdas": {
+    "lambda_inf": 1.0,
+    "lambda_inf_nu": 2.0,
+    "lambda2": 0.11882566722836224,
+    "lambda4": -7.21173554438792e-05,
+    "delta_lambda2": -0.009409894210770734,
+    "lambda2_nu": -1.1216393087931653e-06,
+    "lambda4_nu": 0.044408086224080615
+   },
+   "norm_dtheta_over_sigXW": 0.0
+  },
+  "CMR1B": {
+   "c_minus_lb": [
+    -0.00016425399978433434,
+    -2.2797739226976255e-07,
+    0.09334288407958719,
+    0.3621049880103717,
+    0.035286098185337234,
+    0.3613356363836846
+   ],
+   "feasible": false,
+   "lambdas": {
+    "lambda_inf": 1.0,
+    "lambda_inf_nu": 2.0,
+    "lambda2": 0.09334288407958719,
+    "lambda4": 0.12043056711831923,
+    "delta_lambda2": -0.009289085743079992,
+    "lambda2_nu": -2.2797739226976255e-07,
+    "lambda4_nu": -0.00016425399978433434
+   },
+   "norm_dtheta_over_sigXW": 432.3581384923385
+  },
+  "XL4ZSTIFF": {
+   "c_minus_lb": [
+    0.0,
+    -7.416994249054287e-07,
+    0.0905553329903051,
+    0.36223461767587706,
+    0.03206791087748781,
+    0.3615250167116437
+   ],
+   "feasible": false,
+   "lambdas": {
+    "lambda_inf": 1.0,
+    "lambda_inf_nu": 2.0,
+    "lambda2": 0.0905553329903051,
+    "lambda4": 0.12049734654879124,
+    "delta_lambda2": -0.009357987538050767,
+    "lambda2_nu": -7.416994249054287e-07,
+    "lambda4_nu": 0.0
+   },
+   "norm_dtheta_over_sigXW": 432.5975572741581
+  }
+ },
+ "XL4ZSTIFF_absent": [
+  "lambda4_nu"
+ ]
+}

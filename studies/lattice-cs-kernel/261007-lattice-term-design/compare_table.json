@@ -1,0 +1,45 @@
+{
+ "max|kernel - class analytic| (zeta)": 0.0,
+ "max|exact-RGE class pert - shipped table pert|": 1.3577750035409508e-12,
+ "analytic(SCETlib fit default) - table: range": [
+  -0.0002321164771305756,
+  0.001880570851405583
+ ],
+ "... in sigma_lat (stat diag): max": 0.018823938708812854,
+ "d/d alpha_s: max|clad(analytic) - table(exact)|": 0.251769137527472,
+ "d/d alpha_s: max rel": 0.20282246145612717,
+ "d/d theta_cusp: max|clad(analytic) - table(exact)|": 0.00013746532704202803,
+ "d/d theta_cusp: max rel": 0.15711833014585608,
+ "d/d theta_gnu: max|clad(analytic) - table(exact)|": 6.593072265612034e-05,
+ "d/d theta_gnu: max rel": 0.01063796469478981,
+ "NP jac l2: max|clad - analytic tanh|": 4.708722300961199e-11,
+ "NP jac l4: max|clad - analytic tanh|": 4.170530587543908e-10,
+ "NP value: max|SCETlib NP - plugin np_zeta|": 8.620326674702028e-13,
+ "lattice-only fit, table pert: chi2_min, l2, l4": [
+  6.712728055519187,
+  0.18443326976177293,
+  -0.005920451433976041
+ ],
+ "lattice-only fit, SCETlib analytic pert: chi2_min, l2, l4": [
+  6.703175015165272,
+  0.18552605404377498,
+  -0.005969056610615942
+ ],
+ "shift (l2, l4) / sigma(Jnf+Jbt)": [
+  0.02547282708629478,
+  -0.014422901080089257
+ ],
+ "chi2 at NOMSTIFF (0.0643, 0): table, analytic": [
+  18.94319568660841,
+  19.144873921595476
+ ],
+ "chi2 at LATCHI8 (0.0295, 0.0073): table, analytic": [
+  17.453336326242535,
+  17.5973259129653
+ ],
+ "dchi2/dalpha_s at LATCHI8 lambda (Jnf+Jbt): table, SCETlib, ratio": [
+  -284.34703822141813,
+  -269.01730219884615,
+  0.9460879349457656
+ ]
+}

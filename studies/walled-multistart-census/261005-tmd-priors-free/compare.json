@@ -1,0 +1,255 @@
+{
+ "NOMSTIFF": {
+  "nll": 376.6146329237086,
+  "edm": 3.004579117754218e-14,
+  "half_sum_theta2_TMD": 0.47562121674912944,
+  "lambdas": {
+   "lambda2": {
+    "phys": 0.025581284102796142,
+    "sigma": 0.04272088997628132,
+    "theta": -0.7488374317944078,
+    "rho_alphaS": -0.046359790968385925,
+    "dist_from_anchor_in_REPARAM_widths": -0.7488374317944078
+   },
+   "lambda4": {
+    "phys": 0.08758284351213724,
+    "sigma": 0.02716435417398683,
+    "theta": -0.6248343129757256,
+    "rho_alphaS": 0.6762888919556872,
+    "dist_from_anchor_in_REPARAM_widths": -0.6248343129757256
+   },
+   "delta_lambda2": {
+    "phys": -0.004093151901886217,
+    "sigma": 0.006835291447830541,
+    "theta": -0.008186303803772435,
+    "rho_alphaS": 0.046356745908672614,
+    "dist_from_anchor_in_REPARAM_widths": -0.008186303803772435
+   },
+   "lambda2_nu": {
+    "phys": 0.06426999671529844,
+    "sigma": 0.022931336111338352,
+    "theta": -0.8573000328470155,
+    "rho_alphaS": 0.04992654047656152,
+    "dist_from_anchor_in_REPARAM_widths": -0.8573000328470155
+   }
+  },
+  "rho_lambda_lambda": {
+   "lambda2|lambda4": -0.09744710728111668,
+   "lambda2|delta_lambda2": -0.999984584867545,
+   "lambda2|lambda2_nu": -0.39081826492275695,
+   "lambda4|delta_lambda2": 0.09744510940417175,
+   "lambda4|lambda2_nu": -0.45695410916413637,
+   "delta_lambda2|lambda2_nu": 0.3908101699558294
+  },
+  "faces": [
+   {
+    "label": "\u03bb2_\u03bd",
+    "coeff": 0.06426999671529844,
+    "on": false
+   },
+   {
+    "label": "L2(0)",
+    "coeff": 0.025581284102796142,
+    "on": false
+   },
+   {
+    "label": "B(0)",
+    "coeff": 0.26276527098235586,
+    "on": false
+   },
+   {
+    "label": "L2(2.5)",
+    "coeff": -9.152839927153988e-07,
+    "on": true
+   },
+   {
+    "label": "B(2.5)",
+    "coeff": 0.26274853053641173,
+    "on": false
+   }
+  ]
+ },
+ "NOMTMDFREE": {
+  "nll": 376.13659625817854,
+  "edm": 5.4900322481887895e-17,
+  "half_sum_theta2_TMD": 0.4804630860455287,
+  "lambdas": {
+   "lambda2": {
+    "phys": 0.0229788573948837,
+    "sigma": 0.04283706520438648,
+    "theta": -0.7540422852102326,
+    "rho_alphaS": -0.04917064805408818,
+    "dist_from_anchor_in_REPARAM_widths": -0.7540422852102326
+   },
+   "lambda4": {
+    "phys": 0.0868337783359685,
+    "sigma": 0.02709677632375856,
+    "theta": -0.626332443328063,
+    "rho_alphaS": 0.6770175781244923,
+    "dist_from_anchor_in_REPARAM_widths": -0.626332443328063
+   },
+   "delta_lambda2": {
+    "phys": -0.003676773065008996,
+    "sigma": 0.006853878555885864,
+    "theta": -0.007353546130017992,
+    "rho_alphaS": 0.049167592544495445,
+    "dist_from_anchor_in_REPARAM_widths": -0.007353546130017992
+   },
+   "lambda2_nu": {
+    "phys": 0.06520306518409896,
+    "sigma": 0.02294044840713877,
+    "theta": -0.8479693481590103,
+    "rho_alphaS": 0.047646405902434796,
+    "dist_from_anchor_in_REPARAM_widths": -0.8479693481590103
+   }
+  },
+  "rho_lambda_lambda": {
+   "lambda2|lambda4": -0.09994993462307483,
+   "lambda2|delta_lambda2": -0.999984668363806,
+   "lambda2|lambda2_nu": -0.3937119443571574,
+   "lambda4|delta_lambda2": 0.09994790847695338,
+   "lambda4|lambda2_nu": -0.45652738585157554,
+   "delta_lambda2|lambda2_nu": 0.39370389734035954
+  },
+  "faces": [
+   {
+    "label": "\u03bb2_\u03bd",
+    "coeff": 0.06520306518409896,
+    "on": false
+   },
+   {
+    "label": "L2(0)",
+    "coeff": 0.0229788573948837,
+    "on": false
+   },
+   {
+    "label": "B(0)",
+    "coeff": 0.2605134684854254,
+    "on": false
+   },
+   {
+    "label": "L2(2.5)",
+    "coeff": -9.74261422523326e-07,
+    "on": true
+   },
+   {
+    "label": "B(2.5)",
+    "coeff": 0.2605013350079055,
+    "on": false
+   }
+  ]
+ },
+ "dalphaS_over_sigNOM": -0.019882107340946954,
+ "sig_alphaS_ratio": 0.9979305120513909,
+ "nll_free": 376.13659625817854,
+ "nll_NOM_minus_TMDprior": 376.1390117069595,
+ "dNLL_free_vs_NOMnoprior": -0.002415448780936913,
+ "top_movers_over_sigNOM": [
+  [
+   "lambda2",
+   -0.06091695911197805
+  ],
+  [
+   "delta_lambda2",
+   0.06091603263082165
+  ],
+  [
+   "lambda2_nu",
+   0.04068966868176384
+  ],
+  [
+   "lambda4",
+   -0.02757529854643334
+  ],
+  [
+   "alphaS",
+   -0.019882107340946954
+  ],
+  [
+   "pdfEig14",
+   0.013764237790519244
+  ],
+  [
+   "resumTNP_b_qqV",
+   0.010943180442383791
+  ],
+  [
+   "pdfEig7",
+   0.010297157254818508
+  ],
+  [
+   "pythiaew_ISR_Corr0",
+   0.009474327355715954
+  ],
+  [
+   "pdfEig28",
+   -0.009177855887541293
+  ],
+  [
+   "resumTNP_b_qg",
+   -0.008825932217042852
+  ],
+  [
+   "pdfEig22",
+   -0.007950133018133467
+  ],
+  [
+   "Resolution_correction_smearing_variation23",
+   0.00740628063109979
+  ],
+  [
+   "pdfEig19",
+   0.00722441202791591
+  ],
+  [
+   "pixel_multiplicity_syst_var48",
+   -0.007058522508798232
+  ]
+ ],
+ "dtheta_sig_family": {
+  "alphaS": 0.019882107340946954,
+  "NP lambda": 0.09918510556674512,
+  "resum TNP / transition / FO scale": 0.018174560464282823,
+  "PDF (eig + mb/mc)": 0.029519849320724354,
+  "QCDscaleZ helicity": 0.010653510952076723,
+  "muon calib": 0.017109409230841026,
+  "eff stat": 0.003202235803636275,
+  "eff syst": 0.010855032408536767,
+  "other (EW, lumi, bkg, prefire, ...)": 0.01508504722206698
+ },
+ "dtheta_sig_total": 0.11043818806395879,
+ "largest_sigma_ratio_changes": [
+  [
+   "lambda2",
+   1.002719400934055
+  ],
+  [
+   "delta_lambda2",
+   1.002719285373153
+  ],
+  [
+   "pdfEig14",
+   1.0026466768294808
+  ],
+  [
+   "lambda4",
+   0.9975122600082654
+  ],
+  [
+   "pdfEig26",
+   1.0023356860075678
+  ],
+  [
+   "alphaS",
+   0.9979305120513909
+  ],
+  [
+   "pdfEig19",
+   1.0019865601604627
+  ],
+  [
+   "pdfEig17",
+   1.0016360434866844
+  ]
+ ]
+}

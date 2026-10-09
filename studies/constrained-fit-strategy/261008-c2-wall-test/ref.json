@@ -1,0 +1,29 @@
+{
+ "nomstiff": {
+  "file": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260930_stiff_wall_fits/fitresults_NOMSTIFF.hdf5",
+  "nllvalreduced": 376.6146329237086,
+  "nllvalfull": null,
+  "edmval": 3.004579117754218e-14,
+  "sigma_alphaS": 0.582304421050124,
+  "lambdas_theta": {
+   "lambda2": -0.7488374317944078,
+   "lambda4": -0.6248343129757256,
+   "delta_lambda2": -0.008186303803772435,
+   "lambda2_nu": -0.8573000328470155
+  }
+ },
+ "cens03r_snapshot": {
+  "file": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261001_census_nominal/snapshot_fitresults_CENS03R.hdf5",
+  "attrs": {
+   "reason": "signal-SIGTERM"
+  },
+  "dalphaS_over_sigma_vs_nomstiff": -0.17452914256459703,
+  "lambdas_theta": {
+   "lambda2": -0.7079473297203126,
+   "lambda4": -0.6306681633392802,
+   "delta_lambda2": -0.014728424042978906,
+   "lambda2_nu": -0.9161389938787781
+  },
+  "norm_dtheta_over_sigma": 29.31550224862878
+ }
+}

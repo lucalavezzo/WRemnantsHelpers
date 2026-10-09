@@ -1,0 +1,31 @@
+{
+ "reference": {
+  "finite": true,
+  "grad_finite": true,
+  "grad_max": 7.5951853784062e-07,
+  "eval_s": 42.61002707481384,
+  "gate_diff_vs_stored": 0.0
+ },
+ "fitresults_CMR1B.hdf5": {
+  "finite": true,
+  "grad_finite": true,
+  "grad_max": 4.358071237220429e-09,
+  "eval_s": 5.6904566287994385,
+  "d_nll": 0.6696809765226135,
+  "d_ln": -0.42938717151037054,
+  "d_lc": 0.914199275237209,
+  "d_lbeta": -0.05486176547064048,
+  "d_lpen": 0.23973063826638533
+ },
+ "seed_1b_C_in_XWSTIFF.hdf5": {
+  "finite": true,
+  "grad_finite": true,
+  "grad_max": 5986.717299632842,
+  "eval_s": 7.480168342590332,
+  "d_nll": 1.1408276677707363,
+  "d_ln": -0.01149536705997889,
+  "d_lc": 0.8483449575536106,
+  "d_lbeta": -0.000371813086843531,
+  "d_lpen": 0.3043498903639378
+ }
+}

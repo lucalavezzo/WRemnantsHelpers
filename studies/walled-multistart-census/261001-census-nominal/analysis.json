@@ -1,0 +1,1468 @@
+{
+ "reference": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260930_stiff_wall_fits/fitresults_NOMSTIFF.hdf5",
+ "ref_nll": 376.6146329237086,
+ "ref_edm": 3.004579117754218e-14,
+ "ref_lambdas": {
+  "lambda_inf": 1.0,
+  "lambda2": 0.025581284102796142,
+  "lambda4": 0.08758284351213724,
+  "delta_lambda2": -0.004093151901886217,
+  "lambda_inf_nu": 2.0,
+  "lambda2_nu": 0.06426999671529844,
+  "lambda4_nu": 0.0
+ },
+ "rows": [
+  {
+   "postfix": "CENS01",
+   "seed": "pert_000.hdf5",
+   "mode": "perturb",
+   "u_start": -0.11708679574074443,
+   "start_lambdas": {
+    "lambda2": 0.46645271067017385,
+    "lambda4": 0.09767529648076223,
+    "delta_lambda2": -0.006009340961540526,
+    "lambda2_nu": 0.11910930281718775
+   },
+   "start_dnll": 6563.972563599151,
+   "chain": [
+    "CENS01"
+   ],
+   "n_iter": 95,
+   "n_rejected": 23,
+   "longest_rejected_run": 4,
+   "n_increase": 0,
+   "restarts": 0,
+   "stop": "A bad approximation caused failure to pr",
+   "t_minimize": 13133.7,
+   "t_hessian": 1139.7,
+   "t_wall": 14556.0,
+   "exit": [
+    0
+   ],
+   "last_loss": 376.6146329238309,
+   "state": "done",
+   "result_file": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261001_census_nominal/fitresults_CENS01.hdf5",
+   "nll": 376.6146329238309,
+   "dnll": 1.2232703738845885e-10,
+   "edm": 8.91287646924117e-15,
+   "lambdas": {
+    "lambda2": 0.025581285224313577,
+    "lambda4": 0.08758284572782915,
+    "delta_lambda2": -0.004093152081329861,
+    "lambda2_nu": 0.06426999669195445
+   },
+   "faces": [
+    {
+     "label": "lambda2_nu >= 0 (CS small-b turn-on)",
+     "coeff": 0.06426999669195445,
+     "on": false
+    },
+    {
+     "label": "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=0 (TMD small-b turn-on)",
+     "coeff": 0.025581285224313577,
+     "on": false
+    },
+    {
+     "label": "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=0 (TMD large-b)",
+     "coeff": 0.2627652776316334,
+     "on": false
+    },
+    {
+     "label": "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=2.5 (TMD small-b turn-on)",
+     "coeff": -9.152839980548777e-07,
+     "on": true
+    },
+    {
+     "label": "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=2.5 (TMD large-b)",
+     "coeff": 0.26274853718348745,
+     "on": false
+    }
+   ],
+   "faces_on": [
+    "L2(2.5)"
+   ],
+   "dtheta_raw": 2.6451810882680586e-07,
+   "dtheta_sig": 3.224352528709822e-07,
+   "dtheta_family": {
+    "alphaS": {
+     "raw": 8.003634377473645e-08,
+     "sig": 1.374475976507261e-07
+    },
+    "NP lambda": {
+     "raw": 4.985144153526488e-09,
+     "sig": 8.962391937489832e-08
+    },
+    "resum TNP / transition / FO scale": {
+     "raw": 1.2765313373584695e-07,
+     "sig": 1.3825607840405934e-07
+    },
+    "PDF (eig + mb/mc)": {
+     "raw": 1.64664238581681e-07,
+     "sig": 1.6603954839900728e-07
+    },
+    "QCDscaleZ helicity": {
+     "raw": 4.80653398858121e-08,
+     "sig": 5.368403007536634e-08
+    },
+    "muon calib": {
+     "raw": 8.047808107731614e-08,
+     "sig": 9.629275173634996e-08
+    },
+    "eff stat": {
+     "raw": 1.784030785957261e-08,
+     "sig": 1.7843431675346795e-08
+    },
+    "eff syst": {
+     "raw": 7.738816827073251e-08,
+     "sig": 1.0004494870518476e-07
+    },
+    "other (EW, lumi, bkg, prefire, ...)": {
+     "raw": 7.096001891864635e-08,
+     "sig": 8.873939082626953e-08
+    }
+   },
+   "dalphaS_over_sig": 1.374475976507261e-07,
+   "sig_ratio": 0.9999999828262849,
+   "max_pull": [
+    "alphaS",
+    1.374475976507261e-07
+   ],
+   "minimum": "M0 (NOMSTIFF)"
+  },
+  {
+   "postfix": "CENS02",
+   "seed": "pert_001.hdf5",
+   "mode": "perturb",
+   "u_start": 0.3774744026700443,
+   "start_lambdas": {
+    "lambda2": 0.44872461048267076,
+    "lambda4": 0.10656347707857955,
+    "delta_lambda2": -0.016612342408678815,
+    "lambda2_nu": 0.19258124255143594
+   },
+   "start_dnll": 11534.780023999056,
+   "chain": [
+    "CENS02"
+   ],
+   "n_iter": 173,
+   "n_rejected": 48,
+   "longest_rejected_run": 9,
+   "n_increase": 0,
+   "restarts": 0,
+   "stop": "A bad approximation caused failure to pr",
+   "t_minimize": 13715.2,
+   "t_hessian": 811.4,
+   "t_wall": 14804.0,
+   "exit": [
+    0
+   ],
+   "last_loss": 376.61463292354676,
+   "state": "done",
+   "result_file": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261001_census_nominal/fitresults_CENS02.hdf5",
+   "nll": 376.61463292354676,
+   "dnll": -1.6183321349672042e-10,
+   "edm": 2.959809674971977e-14,
+   "lambdas": {
+    "lambda2": 0.025581285033281942,
+    "lambda4": 0.08758284735922889,
+    "delta_lambda2": -0.004093152050763028,
+    "lambda2_nu": 0.0642699976484952
+   },
+   "faces": [
+    {
+     "label": "lambda2_nu >= 0 (CS small-b turn-on)",
+     "coeff": 0.0642699976484952,
+     "on": false
+    },
+    {
+     "label": "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=0 (TMD small-b turn-on)",
+     "coeff": 0.025581285033281942,
+     "on": false
+    },
+    {
+     "label": "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=0 (TMD large-b)",
+     "coeff": 0.26276528252545756,
+     "on": false
+    },
+    {
+     "label": "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=2.5 (TMD small-b turn-on)",
+     "coeff": -9.152839869838725e-07,
+     "on": true
+    },
+    {
+     "label": "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=2.5 (TMD large-b)",
+     "coeff": 0.26274854207768666,
+     "on": false
+    }
+   ],
+   "faces_on": [
+    "L2(2.5)"
+   ],
+   "dtheta_raw": 4.486483164084985e-07,
+   "dtheta_sig": 5.449716210674293e-07,
+   "dtheta_family": {
+    "alphaS": {
+     "raw": 1.5395798946826744e-07,
+     "sig": 2.643943337930023e-07
+    },
+    "NP lambda": {
+     "raw": 1.224083122631526e-08,
+     "sig": 1.5053872572988168e-07
+    },
+    "resum TNP / transition / FO scale": {
+     "raw": 2.0161461418336379e-07,
+     "sig": 2.221838004448686e-07
+    },
+    "PDF (eig + mb/mc)": {
+     "raw": 3.0218208590159337e-07,
+     "sig": 3.056011902192538e-07
+    },
+    "QCDscaleZ helicity": {
+     "raw": 8.85383615460016e-08,
+     "sig": 9.50015803739566e-08
+    },
+    "muon calib": {
+     "raw": 9.585980771307743e-08,
+     "sig": 1.1397051535448906e-07
+    },
+    "eff stat": {
+     "raw": 4.8524142185342645e-08,
+     "sig": 4.852975443241005e-08
+    },
+    "eff syst": {
+     "raw": 1.1403105082139164e-07,
+     "sig": 1.4145068712481903e-07
+    },
+    "other (EW, lumi, bkg, prefire, ...)": {
+     "raw": 1.1438587555953075e-07,
+     "sig": 1.3149925795235232e-07
+    }
+   },
+   "dalphaS_over_sig": 2.643943337930023e-07,
+   "sig_ratio": 1.0000000277069467,
+   "max_pull": [
+    "alphaS",
+    2.643943337930023e-07
+   ],
+   "minimum": "M0 (NOMSTIFF)"
+  },
+  {
+   "postfix": "CENS03",
+   "seed": "pert_002.hdf5",
+   "mode": "perturb",
+   "u_start": -0.9323721803927101,
+   "start_lambdas": {
+    "lambda2": 0.23726802380824114,
+    "lambda4": 0.2559225168293916,
+    "delta_lambda2": -0.027182642974328302,
+    "lambda2_nu": 0.06853147619455764
+   },
+   "start_dnll": 1949.8092928847368,
+   "chain": [
+    "CENS03",
+    "CENS03R"
+   ],
+   "n_iter": 390,
+   "n_rejected": 73,
+   "longest_rejected_run": 7,
+   "n_increase": 0,
+   "restarts": 0,
+   "stop": "SIGTERM",
+   "t_minimize": null,
+   "t_hessian": null,
+   "t_wall": 27321.0,
+   "exit": [
+    143,
+    143
+   ],
+   "last_loss": 806.5778129128407,
+   "state": "NOT CONVERGED (crawl on the wall face, SIGTERM x2)",
+   "snapshot_reason": "signal-SIGTERM",
+   "nll": 806.5778129128407,
+   "dnll": 429.96317998913213,
+   "dnll_split": {
+    "data": 5.590690212403388,
+    "constraints": 423.2560140617058,
+    "bbstat": 0.6760126808597064
+   },
+   "grad_max": 3.9258156421478745,
+   "edm": null,
+   "lambdas": {
+    "lambda2": 0.04602633513984372,
+    "lambda4": 0.08466591833035991,
+    "delta_lambda2": -0.007364212021489453,
+    "lambda2_nu": 0.05838610061212218
+   },
+   "faces": [
+    {
+     "label": "lambda2_nu >= 0 (CS small-b turn-on)",
+     "coeff": 0.05838610061212218,
+     "on": false
+    },
+    {
+     "label": "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=0 (TMD small-b turn-on)",
+     "coeff": 0.04602633513984372,
+     "on": false
+    },
+    {
+     "label": "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=0 (TMD large-b)",
+     "coeff": 0.2540952582622742,
+     "on": false
+    },
+    {
+     "label": "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=2.5 (TMD small-b turn-on)",
+     "coeff": 1.0005534643864333e-08,
+     "on": true
+    },
+    {
+     "label": "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=2.5 (TMD large-b)",
+     "coeff": 0.25399775499107974,
+     "on": false
+    }
+   ],
+   "faces_on": [
+    "L2(2.5)"
+   ],
+   "dtheta_raw": 29.229425029079366,
+   "dtheta_sig": 29.31550224862878,
+   "dtheta_family": {
+    "alphaS": {
+     "raw": 0.10162909131745224,
+     "sig": 0.17452914256459703
+    },
+    "NP lambda": {
+     "raw": 0.0721862655234067,
+     "sig": 0.7317199595139817
+    },
+    "resum TNP / transition / FO scale": {
+     "raw": 1.4881239185960105,
+     "sig": 1.5789516239573784
+    },
+    "PDF (eig + mb/mc)": {
+     "raw": 2.2485577651691755,
+     "sig": 2.352022798136318
+    },
+    "QCDscaleZ helicity": {
+     "raw": 6.131210125136721,
+     "sig": 6.161129501621733
+    },
+    "muon calib": {
+     "raw": 8.364185851565894,
+     "sig": 8.483360635667779
+    },
+    "eff stat": {
+     "raw": 25.504102565813348,
+     "sig": 25.506218221068313
+    },
+    "eff syst": {
+     "raw": 9.23136211428996,
+     "sig": 9.291967027711676
+    },
+    "other (EW, lumi, bkg, prefire, ...)": {
+     "raw": 1.9607617525466334,
+     "sig": 1.9932271570153435
+    }
+   },
+   "dalphaS_over_sig": -0.17452914256459703,
+   "sig_ratio": null,
+   "max_pull": [
+    "effStat_trigger_eta18pt5q1",
+    1.7504542091320299
+   ]
+  },
+  {
+   "postfix": "CENS04",
+   "seed": "pert_003.hdf5",
+   "mode": "perturb",
+   "u_start": -0.9755117196855618,
+   "start_lambdas": {
+    "lambda2": 0.44818286123499645,
+    "lambda4": 0.10289053652405333,
+    "delta_lambda2": -0.008506431758711124,
+    "lambda2_nu": 0.2125344577572113
+   },
+   "start_dnll": 9018.718220469915,
+   "chain": [
+    "CENS04"
+   ],
+   "n_iter": 145,
+   "n_rejected": 34,
+   "longest_rejected_run": 5,
+   "n_increase": 0,
+   "restarts": 0,
+   "stop": "A bad approximation caused failure to pr",
+   "t_minimize": 17027.9,
+   "t_hessian": 1139.7,
+   "t_wall": 18477.0,
+   "exit": [
+    0
+   ],
+   "last_loss": 376.61463292374106,
+   "state": "done",
+   "result_file": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261001_census_nominal/fitresults_CENS04.hdf5",
+   "nll": 376.61463292374106,
+   "dnll": 3.2457592169521376e-11,
+   "edm": 2.876119769399943e-17,
+   "lambdas": {
+    "lambda2": 0.0255812852143969,
+    "lambda4": 0.08758284507126257,
+    "delta_lambda2": -0.004093152079742772,
+    "lambda2_nu": 0.06426999685293519
+   },
+   "faces": [
+    {
+     "label": "lambda2_nu >= 0 (CS small-b turn-on)",
+     "coeff": 0.06426999685293519,
+     "on": false
+    },
+    {
+     "label": "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=0 (TMD small-b turn-on)",
+     "coeff": 0.0255812852143969,
+     "on": false
+    },
+    {
+     "label": "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=0 (TMD large-b)",
+     "coeff": 0.26276527566191415,
+     "on": false
+    },
+    {
+     "label": "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=2.5 (TMD small-b turn-on)",
+     "coeff": -9.152839954285064e-07,
+     "on": true
+    },
+    {
+     "label": "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=2.5 (TMD large-b)",
+     "coeff": 0.2627485352137877,
+     "on": false
+    }
+   ],
+   "faces_on": [
+    "L2(2.5)"
+   ],
+   "dtheta_raw": 2.276652324870163e-07,
+   "dtheta_sig": 2.738120325179183e-07,
+   "dtheta_family": {
+    "alphaS": {
+     "raw": 6.358447990351124e-08,
+     "sig": 1.0919456834767525e-07
+    },
+    "NP lambda": {
+     "raw": 4.084976333535531e-09,
+     "sig": 6.844288536367923e-08
+    },
+    "resum TNP / transition / FO scale": {
+     "raw": 1.1213803612054079e-07,
+     "sig": 1.193255493199138e-07
+    },
+    "PDF (eig + mb/mc)": {
+     "raw": 1.4269981172699e-07,
+     "sig": 1.4703916603231673e-07
+    },
+    "QCDscaleZ helicity": {
+     "raw": 4.1908414796337006e-08,
+     "sig": 4.629289633660571e-08
+    },
+    "muon calib": {
+     "raw": 7.562487514781506e-08,
+     "sig": 9.104823863275656e-08
+    },
+    "eff stat": {
+     "raw": 1.64065780925704e-08,
+     "sig": 1.640981916225757e-08
+    },
+    "eff syst": {
+     "raw": 6.819810226641934e-08,
+     "sig": 8.792489465054273e-08
+    },
+    "other (EW, lumi, bkg, prefire, ...)": {
+     "raw": 4.937626581585993e-08,
+     "sig": 6.382131694401309e-08
+    }
+   },
+   "dalphaS_over_sig": 1.0919456834767525e-07,
+   "sig_ratio": 1.0000000202528438,
+   "max_pull": [
+    "alphaS",
+    1.0919456834767525e-07
+   ],
+   "minimum": "M0 (NOMSTIFF)"
+  },
+  {
+   "postfix": "CENS05",
+   "seed": "pert_004.hdf5",
+   "mode": "perturb",
+   "u_start": -0.15690708150247668,
+   "start_lambdas": {
+    "lambda2": 0.1379929082356226,
+    "lambda4": 0.1975929910310339,
+    "delta_lambda2": -0.00841843845361221,
+    "lambda2_nu": 0.03223040245172695
+   },
+   "start_dnll": 1181.8515951594245,
+   "chain": [
+    "CENS05"
+   ],
+   "n_iter": 110,
+   "n_rejected": 25,
+   "longest_rejected_run": 8,
+   "n_increase": 0,
+   "restarts": 0,
+   "stop": "A bad approximation caused failure to pr",
+   "t_minimize": 20073.8,
+   "t_hessian": 1375.4,
+   "t_wall": 21813.0,
+   "exit": [
+    0
+   ],
+   "last_loss": 376.61463292393466,
+   "state": "done",
+   "result_file": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261001_census_nominal/fitresults_CENS05.hdf5",
+   "nll": 376.61463292393466,
+   "dnll": 2.2606627680943348e-10,
+   "edm": 3.434663566394278e-17,
+   "lambdas": {
+    "lambda2": 0.025581285292568645,
+    "lambda4": 0.08758284509402237,
+    "delta_lambda2": -0.004093152092250229,
+    "lambda2_nu": 0.06426999683063393
+   },
+   "faces": [
+    {
+     "label": "lambda2_nu >= 0 (CS small-b turn-on)",
+     "coeff": 0.06426999683063393,
+     "on": false
+    },
+    {
+     "label": "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=0 (TMD small-b turn-on)",
+     "coeff": 0.025581285292568645,
+     "on": false
+    },
+    {
+     "label": "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=0 (TMD large-b)",
+     "coeff": 0.262765275730347,
+     "on": false
+    },
+    {
+     "label": "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=2.5 (TMD small-b turn-on)",
+     "coeff": -9.15283995286259e-07,
+     "on": true
+    },
+    {
+     "label": "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=2.5 (TMD large-b)",
+     "coeff": 0.2627485352820671,
+     "on": false
+    }
+   ],
+   "faces_on": [
+    "L2(2.5)"
+   ],
+   "dtheta_raw": 2.2535415267698586e-07,
+   "dtheta_sig": 2.739856231110567e-07,
+   "dtheta_family": {
+    "alphaS": {
+     "raw": 6.427111287621301e-08,
+     "sig": 1.1037373331342205e-07
+    },
+    "NP lambda": {
+     "raw": 4.140876490479484e-09,
+     "sig": 7.048210959359093e-08
+    },
+    "resum TNP / transition / FO scale": {
+     "raw": 1.1302283601675227e-07,
+     "sig": 1.205375410031486e-07
+    },
+    "PDF (eig + mb/mc)": {
+     "raw": 1.3827819232537296e-07,
+     "sig": 1.4477412762969513e-07
+    },
+    "QCDscaleZ helicity": {
+     "raw": 4.135252139327439e-08,
+     "sig": 4.5621187916116146e-08
+    },
+    "muon calib": {
+     "raw": 7.475405279660352e-08,
+     "sig": 9.008626040733574e-08
+    },
+    "eff stat": {
+     "raw": 1.6380459269110255e-08,
+     "sig": 1.6383591411939997e-08
+    },
+    "eff syst": {
+     "raw": 6.835925839802482e-08,
+     "sig": 8.839886892079682e-08
+    },
+    "other (EW, lumi, bkg, prefire, ...)": {
+     "raw": 5.002043878825855e-08,
+     "sig": 6.441720947183414e-08
+    }
+   },
+   "dalphaS_over_sig": 1.1037373331342205e-07,
+   "sig_ratio": 1.0000000205572088,
+   "max_pull": [
+    "alphaS",
+    1.1037373331342205e-07
+   ],
+   "minimum": "M0 (NOMSTIFF)"
+  },
+  {
+   "postfix": "CENS06",
+   "seed": "pert_005.hdf5",
+   "mode": "perturb",
+   "u_start": -1.9331370373448387,
+   "start_lambdas": {
+    "lambda2": 0.4397625964904576,
+    "lambda4": 0.2412304015607019,
+    "delta_lambda2": 0.007243592351348381,
+    "lambda2_nu": 0.07933759966922774
+   },
+   "start_dnll": 5827.705911869583,
+   "chain": [
+    "CENS06"
+   ],
+   "n_iter": 83,
+   "n_rejected": 26,
+   "longest_rejected_run": 9,
+   "n_increase": 0,
+   "restarts": 0,
+   "stop": "A bad approximation caused failure to pr",
+   "t_minimize": 9626.8,
+   "t_hessian": 897.7,
+   "t_wall": 10945.0,
+   "exit": [
+    0
+   ],
+   "last_loss": 376.6146329236897,
+   "state": "done",
+   "result_file": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261001_census_nominal/fitresults_CENS06.hdf5",
+   "nll": 376.6146329236897,
+   "dnll": -1.887201506178826e-11,
+   "edm": 1.0855317083949534e-15,
+   "lambdas": {
+    "lambda2": 0.02558128551007588,
+    "lambda4": 0.0875828444563097,
+    "delta_lambda2": -0.00409315212705124,
+    "lambda2_nu": 0.06426999677440218
+   },
+   "faces": [
+    {
+     "label": "lambda2_nu >= 0 (CS small-b turn-on)",
+     "coeff": 0.06426999677440218,
+     "on": false
+    },
+    {
+     "label": "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=0 (TMD small-b turn-on)",
+     "coeff": 0.02558128551007588,
+     "on": false
+    },
+    {
+     "label": "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=0 (TMD large-b)",
+     "coeff": 0.26276527381763604,
+     "on": false
+    },
+    {
+     "label": "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=2.5 (TMD small-b turn-on)",
+     "coeff": -9.152839943737945e-07,
+     "on": true
+    },
+    {
+     "label": "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=2.5 (TMD large-b)",
+     "coeff": 0.2627485333689291,
+     "on": false
+    }
+   ],
+   "faces_on": [
+    "L2(2.5)"
+   ],
+   "dtheta_raw": 1.9677532267011687e-07,
+   "dtheta_sig": 2.331969092673766e-07,
+   "dtheta_family": {
+    "alphaS": {
+     "raw": 4.4505142682282894e-08,
+     "sig": 7.642934017574967e-08
+    },
+    "NP lambda": {
+     "raw": 3.469829102010442e-09,
+     "sig": 5.8180900821229833e-08
+    },
+    "resum TNP / transition / FO scale": {
+     "raw": 9.638558022554989e-08,
+     "sig": 1.0152164458114457e-07
+    },
+    "PDF (eig + mb/mc)": {
+     "raw": 1.2426551544214402e-07,
+     "sig": 1.2735626263388798e-07
+    },
+    "QCDscaleZ helicity": {
+     "raw": 3.839469095019425e-08,
+     "sig": 4.188219855822607e-08
+    },
+    "muon calib": {
+     "raw": 6.922544595063014e-08,
+     "sig": 8.378547766804975e-08
+    },
+    "eff stat": {
+     "raw": 1.5533149746704712e-08,
+     "sig": 1.5536243254487663e-08
+    },
+    "eff syst": {
+     "raw": 6.411112971559247e-08,
+     "sig": 8.2973055169615e-08
+    },
+    "other (EW, lumi, bkg, prefire, ...)": {
+     "raw": 3.711942098896244e-08,
+     "sig": 5.2230716235546755e-08
+    }
+   },
+   "dalphaS_over_sig": 7.642934017574967e-08,
+   "sig_ratio": 1.0000000191356782,
+   "max_pull": [
+    "resumTNP_gamma_nu",
+    8.835878401692029e-08
+   ],
+   "minimum": "M0 (NOMSTIFF)"
+  },
+  {
+   "postfix": "CENS07",
+   "seed": "pert_006.hdf5",
+   "mode": "perturb",
+   "u_start": 0.3562300793630291,
+   "start_lambdas": {
+    "lambda2": 0.12170697935795588,
+    "lambda4": 0.179343858009394,
+    "delta_lambda2": -0.015100546205431872,
+    "lambda2_nu": 0.18541863856882315
+   },
+   "start_dnll": 3629.9332340586816,
+   "chain": [
+    "CENS07"
+   ],
+   "n_iter": 132,
+   "n_rejected": 30,
+   "longest_rejected_run": 6,
+   "n_increase": 0,
+   "restarts": 0,
+   "stop": "A bad approximation caused failure to pr",
+   "t_minimize": 24349.6,
+   "t_hessian": 1348.0,
+   "t_wall": 26116.0,
+   "exit": [
+    0
+   ],
+   "last_loss": 376.6146329238218,
+   "state": "done",
+   "result_file": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261001_census_nominal/fitresults_CENS07.hdf5",
+   "nll": 376.6146329238218,
+   "dnll": 1.1317524695186876e-10,
+   "edm": 5.622417100004127e-15,
+   "lambdas": {
+    "lambda2": 0.025581285274022147,
+    "lambda4": 0.08758284509849312,
+    "delta_lambda2": -0.0040931520892828754,
+    "lambda2_nu": 0.06426999682948223
+   },
+   "faces": [
+    {
+     "label": "lambda2_nu >= 0 (CS small-b turn-on)",
+     "coeff": 0.06426999682948223,
+     "on": false
+    },
+    {
+     "label": "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=0 (TMD small-b turn-on)",
+     "coeff": 0.025581285274022147,
+     "on": false
+    },
+    {
+     "label": "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=0 (TMD large-b)",
+     "coeff": 0.2627652757437229,
+     "on": false
+    },
+    {
+     "label": "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=2.5 (TMD small-b turn-on)",
+     "coeff": -9.152839958240233e-07,
+     "on": true
+    },
+    {
+     "label": "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=2.5 (TMD large-b)",
+     "coeff": 0.26274853529547937,
+     "on": false
+    }
+   ],
+   "faces_on": [
+    "L2(2.5)"
+   ],
+   "dtheta_raw": 2.284807818448397e-07,
+   "dtheta_sig": 2.758156627716527e-07,
+   "dtheta_family": {
+    "alphaS": {
+     "raw": 6.435980104413375e-08,
+     "sig": 1.1052603881672012e-07
+    },
+    "NP lambda": {
+     "raw": 4.12279577826329e-09,
+     "sig": 7.027400468893193e-08
+    },
+    "resum TNP / transition / FO scale": {
+     "raw": 1.1262152531099157e-07,
+     "sig": 1.1996741961887813e-07
+    },
+    "PDF (eig + mb/mc)": {
+     "raw": 1.428831384516446e-07,
+     "sig": 1.4759566769535847e-07
+    },
+    "QCDscaleZ helicity": {
+     "raw": 4.11811957097613e-08,
+     "sig": 4.549978265911716e-08
+    },
+    "muon calib": {
+     "raw": 7.52755003961115e-08,
+     "sig": 9.044365436506395e-08
+    },
+    "eff stat": {
+     "raw": 1.634632565344445e-08,
+     "sig": 1.6349557980996868e-08
+    },
+    "eff syst": {
+     "raw": 6.898218311913659e-08,
+     "sig": 8.922983849167628e-08
+    },
+    "other (EW, lumi, bkg, prefire, ...)": {
+     "raw": 5.056729407010152e-08,
+     "sig": 6.52963933599824e-08
+    }
+   },
+   "dalphaS_over_sig": 1.1052603881672012e-07,
+   "sig_ratio": 0.9999999900360498,
+   "max_pull": [
+    "alphaS",
+    1.1052603881672012e-07
+   ],
+   "minimum": "M0 (NOMSTIFF)"
+  },
+  {
+   "postfix": "CENS08",
+   "seed": "pert_007.hdf5",
+   "mode": "perturb",
+   "u_start": 1.1073894908694508,
+   "start_lambdas": {
+    "lambda2": 0.26976446737703935,
+    "lambda4": 0.2004702734556019,
+    "delta_lambda2": -0.022804594009344537,
+    "lambda2_nu": 0.2666112491985516
+   },
+   "start_dnll": 9623.288396879703,
+   "chain": [
+    "CENS08"
+   ],
+   "n_iter": 175,
+   "n_rejected": 47,
+   "longest_rejected_run": 11,
+   "n_increase": 0,
+   "restarts": 0,
+   "stop": "stall early-stop (maxRestarts 0)",
+   "t_minimize": 21771.8,
+   "t_hessian": 339.7,
+   "t_wall": 22456.0,
+   "exit": [
+    0
+   ],
+   "last_loss": 376.61463292368614,
+   "state": "done",
+   "result_file": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261001_census_nominal/fitresults_CENS08.hdf5",
+   "nll": 376.61463292368614,
+   "dnll": -2.2453150450019166e-11,
+   "edm": 5.1759527774532125e-12,
+   "lambdas": {
+    "lambda2": 0.02558128266659343,
+    "lambda4": 0.08758282756772351,
+    "delta_lambda2": -0.004093151672072432,
+    "lambda2_nu": 0.0642700004565029
+   },
+   "faces": [
+    {
+     "label": "lambda2_nu >= 0 (CS small-b turn-on)",
+     "coeff": 0.0642700004565029,
+     "on": false
+    },
+    {
+     "label": "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=0 (TMD small-b turn-on)",
+     "coeff": 0.02558128266659343,
+     "on": false
+    },
+    {
+     "label": "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=0 (TMD large-b)",
+     "coeff": 0.26276522314629513,
+     "on": false
+    },
+    {
+     "label": "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=2.5 (TMD small-b turn-on)",
+     "coeff": -9.152838592700607e-07,
+     "on": true
+    },
+    {
+     "label": "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=2.5 (TMD large-b)",
+     "coeff": 0.2627484827031705,
+     "on": false
+    }
+   ],
+   "faces_on": [
+    "L2(2.5)"
+   ],
+   "dtheta_raw": 3.95746315604922e-06,
+   "dtheta_sig": 3.5736579078662166e-06,
+   "dtheta_family": {
+    "alphaS": {
+     "raw": 3.890310757981297e-07,
+     "sig": 6.680888238776439e-07
+    },
+    "NP lambda": {
+     "raw": 4.9244495802508154e-08,
+     "sig": 6.110654716120627e-07
+    },
+    "resum TNP / transition / FO scale": {
+     "raw": 6.857262813211401e-07,
+     "sig": 9.74400246097295e-07
+    },
+    "PDF (eig + mb/mc)": {
+     "raw": 3.5796994019823783e-06,
+     "sig": 2.874184648255062e-06
+    },
+    "QCDscaleZ helicity": {
+     "raw": 5.842223876898634e-07,
+     "sig": 6.831221273605923e-07
+    },
+    "muon calib": {
+     "raw": 1.0083117688694853e-06,
+     "sig": 1.087979837982175e-06
+    },
+    "eff stat": {
+     "raw": 3.2879538177972226e-07,
+     "sig": 3.2883753782804806e-07
+    },
+    "eff syst": {
+     "raw": 6.517910736074273e-07,
+     "sig": 7.6793364991166e-07
+    },
+    "other (EW, lumi, bkg, prefire, ...)": {
+     "raw": 5.764804103378525e-07,
+     "sig": 6.266432300054605e-07
+    }
+   },
+   "dalphaS_over_sig": -6.680888238776439e-07,
+   "sig_ratio": 1.0000000072904018,
+   "max_pull": [
+    "pdfEig3",
+    1.9829651767114016e-06
+   ],
+   "minimum": "M0 (NOMSTIFF)"
+  },
+  {
+   "postfix": "CENS09",
+   "seed": "cold_000.hdf5",
+   "mode": "cold_except_alphas",
+   "u_start": -0.8784557562784787,
+   "start_lambdas": {
+    "lambda2": 0.4,
+    "lambda4": 0.4,
+    "delta_lambda2": 0.0,
+    "lambda2_nu": 0.15
+   },
+   "start_dnll": 10116.09421387891,
+   "chain": [
+    "CENS09",
+    "CENS09PF"
+   ],
+   "n_iter": 90,
+   "n_rejected": 22,
+   "longest_rejected_run": 4,
+   "n_increase": 0,
+   "restarts": 0,
+   "stop": "A bad approximation caused failure to pr",
+   "t_minimize": 15085.3,
+   "t_hessian": 1963.6,
+   "t_wall": 17972.0,
+   "exit": [
+    143,
+    0
+   ],
+   "last_loss": 376.6146329237354,
+   "state": "done (result from CENS09PF)",
+   "result_file": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261001_census_nominal/fitresults_CENS09PF.hdf5",
+   "nll": 376.6146329237354,
+   "dnll": 2.6830093702301383e-11,
+   "edm": 1.0987737013770285e-15,
+   "lambdas": {
+    "lambda2": 0.02558128534501397,
+    "lambda4": 0.08758284510208775,
+    "delta_lambda2": -0.004093152100641011,
+    "lambda2_nu": 0.06426999693592604
+   },
+   "faces": [
+    {
+     "label": "lambda2_nu >= 0 (CS small-b turn-on)",
+     "coeff": 0.06426999693592604,
+     "on": false
+    },
+    {
+     "label": "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=0 (TMD small-b turn-on)",
+     "coeff": 0.02558128534501397,
+     "on": false
+    },
+    {
+     "label": "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=0 (TMD large-b)",
+     "coeff": 0.2627652757546461,
+     "on": false
+    },
+    {
+     "label": "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=2.5 (TMD small-b turn-on)",
+     "coeff": -9.152839923476375e-07,
+     "on": true
+    },
+    {
+     "label": "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=2.5 (TMD large-b)",
+     "coeff": 0.26274853530626324,
+     "on": false
+    }
+   ],
+   "faces_on": [
+    "L2(2.5)"
+   ],
+   "dtheta_raw": 2.2516378573534917e-07,
+   "dtheta_sig": 2.776076149072251e-07,
+   "dtheta_family": {
+    "alphaS": {
+     "raw": 6.595615964499757e-08,
+     "sig": 1.1326748906706334e-07
+    },
+    "NP lambda": {
+     "raw": 4.616260266423879e-09,
+     "sig": 7.2176423029315e-08
+    },
+    "resum TNP / transition / FO scale": {
+     "raw": 1.15646386034906e-07,
+     "sig": 1.2351696669363352e-07
+    },
+    "PDF (eig + mb/mc)": {
+     "raw": 1.341207691576906e-07,
+     "sig": 1.4654707882307937e-07
+    },
+    "QCDscaleZ helicity": {
+     "raw": 3.949327841653375e-08,
+     "sig": 4.380906906318978e-08
+    },
+    "muon calib": {
+     "raw": 7.669546245186026e-08,
+     "sig": 8.939991435627315e-08
+    },
+    "eff stat": {
+     "raw": 1.65077322563459e-08,
+     "sig": 1.6510725766388568e-08
+    },
+    "eff syst": {
+     "raw": 6.771528177694167e-08,
+     "sig": 8.697600678794157e-08
+    },
+    "other (EW, lumi, bkg, prefire, ...)": {
+     "raw": 5.1623256572566605e-08,
+     "sig": 6.742055561651074e-08
+    }
+   },
+   "dalphaS_over_sig": 1.1326748906706334e-07,
+   "sig_ratio": 1.000000020348856,
+   "max_pull": [
+    "alphaS",
+    1.1326748906706334e-07
+   ],
+   "minimum": "M0 (NOMSTIFF)"
+  },
+  {
+   "postfix": "CENS10",
+   "seed": "cold_001.hdf5",
+   "mode": "cold_except_alphas",
+   "u_start": -0.9743681606069887,
+   "start_lambdas": {
+    "lambda2": 0.4,
+    "lambda4": 0.4,
+    "delta_lambda2": 0.0,
+    "lambda2_nu": 0.15
+   },
+   "start_dnll": 9777.276004239966,
+   "chain": [
+    "CENS10"
+   ],
+   "n_iter": 110,
+   "n_rejected": 27,
+   "longest_rejected_run": 4,
+   "n_increase": 0,
+   "restarts": 0,
+   "stop": "A bad approximation caused failure to pr",
+   "t_minimize": 17094.8,
+   "t_hessian": 878.2,
+   "t_wall": 18487.0,
+   "exit": [
+    0
+   ],
+   "last_loss": 376.6146329237217,
+   "state": "done",
+   "result_file": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261001_census_nominal/fitresults_CENS10.hdf5",
+   "nll": 376.6146329237217,
+   "dnll": 1.3073986337985843e-11,
+   "edm": 5.160466897925927e-17,
+   "lambdas": {
+    "lambda2": 0.025581285236378093,
+    "lambda4": 0.08758284510835335,
+    "delta_lambda2": -0.004093152083259969,
+    "lambda2_nu": 0.06426999683219783
+   },
+   "faces": [
+    {
+     "label": "lambda2_nu >= 0 (CS small-b turn-on)",
+     "coeff": 0.06426999683219783,
+     "on": false
+    },
+    {
+     "label": "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=0 (TMD small-b turn-on)",
+     "coeff": 0.025581285236378093,
+     "on": false
+    },
+    {
+     "label": "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=0 (TMD large-b)",
+     "coeff": 0.2627652757732296,
+     "on": false
+    },
+    {
+     "label": "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=2.5 (TMD small-b turn-on)",
+     "coeff": -9.152839967156712e-07,
+     "on": true
+    },
+    {
+     "label": "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=2.5 (TMD large-b)",
+     "coeff": 0.26274853532506004,
+     "on": false
+    }
+   ],
+   "faces_on": [
+    "L2(2.5)"
+   ],
+   "dtheta_raw": 2.2810469538985654e-07,
+   "dtheta_sig": 2.756999690132278e-07,
+   "dtheta_family": {
+    "alphaS": {
+     "raw": 6.443389644061881e-08,
+     "sig": 1.1065328393766809e-07
+    },
+    "NP lambda": {
+     "raw": 4.102412466751889e-09,
+     "sig": 6.990764201387508e-08
+    },
+    "resum TNP / transition / FO scale": {
+     "raw": 1.1337106322199487e-07,
+     "sig": 1.2087132915280956e-07
+    },
+    "PDF (eig + mb/mc)": {
+     "raw": 1.4168737093848414e-07,
+     "sig": 1.4691302005383446e-07
+    },
+    "QCDscaleZ helicity": {
+     "raw": 4.1268646711790145e-08,
+     "sig": 4.569604673917281e-08
+    },
+    "muon calib": {
+     "raw": 7.580075750349728e-08,
+     "sig": 9.135419989493427e-08
+    },
+    "eff stat": {
+     "raw": 1.6695905802786575e-08,
+     "sig": 1.6699162569827375e-08
+    },
+    "eff syst": {
+     "raw": 6.88003033780913e-08,
+     "sig": 8.865058322904443e-08
+    },
+    "other (EW, lumi, bkg, prefire, ...)": {
+     "raw": 4.973726114058607e-08,
+     "sig": 6.414378473276847e-08
+    }
+   },
+   "dalphaS_over_sig": 1.1065328393766809e-07,
+   "sig_ratio": 1.0000000204086732,
+   "max_pull": [
+    "alphaS",
+    1.1065328393766809e-07
+   ],
+   "minimum": "M0 (NOMSTIFF)"
+  }
+ ],
+ "pair_keys": [
+  "NOMSTIFF",
+  "CENS01",
+  "CENS02",
+  "CENS04",
+  "CENS05",
+  "CENS06",
+  "CENS07",
+  "CENS08",
+  "CENS09",
+  "CENS10"
+ ],
+ "pair_dtheta_sig": [
+  [
+   0.0,
+   3.224352528709822e-07,
+   5.449716210674293e-07,
+   2.738120325179183e-07,
+   2.739856231110567e-07,
+   2.331969092673766e-07,
+   2.758156627716527e-07,
+   3.5736579078662166e-06,
+   2.776076149072251e-07,
+   2.756999690132278e-07
+  ],
+  [
+   3.224352528709822e-07,
+   0.0,
+   2.937257637949891e-07,
+   7.335824565731913e-08,
+   7.324237203702776e-08,
+   1.2698081559643167e-07,
+   7.192501635679095e-08,
+   3.6034211958671504e-06,
+   8.665828899952723e-08,
+   7.289919647855366e-08
+  ],
+  [
+   5.449716210674293e-07,
+   2.937257637949891e-07,
+   0.0,
+   3.3052397449512076e-07,
+   3.296418023762168e-07,
+   3.8671633507090603e-07,
+   3.2969333012540994e-07,
+   3.657249469140336e-06,
+   3.232817268991508e-07,
+   3.3098841607773677e-07
+  ],
+  [
+   2.738120325179183e-07,
+   7.335824565731913e-08,
+   3.3052397449512076e-07,
+   0.0,
+   1.1475159324184921e-08,
+   6.609010642565348e-08,
+   8.897310875220921e-09,
+   3.5927678891983616e-06,
+   4.6547650178142e-08,
+   1.2869917530916453e-08
+  ],
+  [
+   2.739856231110567e-07,
+   7.324237203702776e-08,
+   3.296418023762168e-07,
+   1.1475159324184921e-08,
+   0.0,
+   6.675199849234095e-08,
+   8.53921277581148e-09,
+   3.5987220933769715e-06,
+   3.971314328314045e-08,
+   1.1317913852971488e-08
+  ],
+  [
+   2.331969092673766e-07,
+   1.2698081559643167e-07,
+   3.8671633507090603e-07,
+   6.609010642565348e-08,
+   6.675199849234095e-08,
+   0.0,
+   6.72573520965199e-08,
+   3.574783092030226e-06,
+   8.62205416342588e-08,
+   6.737432826081253e-08
+  ],
+  [
+   2.758156627716527e-07,
+   7.192501635679095e-08,
+   3.2969333012540994e-07,
+   8.897310875220921e-09,
+   8.53921277581148e-09,
+   6.72573520965199e-08,
+   0.0,
+   3.594632510823152e-06,
+   4.499729808555922e-08,
+   9.95795132077465e-09
+  ],
+  [
+   3.5736579078662166e-06,
+   3.6034211958671504e-06,
+   3.657249469140336e-06,
+   3.5927678891983616e-06,
+   3.5987220933769715e-06,
+   3.574783092030226e-06,
+   3.594632510823152e-06,
+   0.0,
+   3.617369493591659e-06,
+   3.5971014940505594e-06
+  ],
+  [
+   2.776076149072251e-07,
+   8.665828899952723e-08,
+   3.232817268991508e-07,
+   4.6547650178142e-08,
+   3.971314328314045e-08,
+   8.62205416342588e-08,
+   4.499729808555922e-08,
+   3.617369493591659e-06,
+   0.0,
+   4.635750648591245e-08
+  ],
+  [
+   2.756999690132278e-07,
+   7.289919647855366e-08,
+   3.3098841607773677e-07,
+   1.2869917530916453e-08,
+   1.1317913852971488e-08,
+   6.737432826081253e-08,
+   9.95795132077465e-09,
+   3.5971014940505594e-06,
+   4.635750648591245e-08,
+   0.0
+  ]
+ ],
+ "pair_dnll": [
+  [
+   0.0,
+   -1.2232703738845885e-10,
+   1.6183321349672042e-10,
+   -3.2457592169521376e-11,
+   -2.2606627680943348e-10,
+   1.887201506178826e-11,
+   -1.1317524695186876e-10,
+   2.2453150450019166e-11,
+   -2.6830093702301383e-11,
+   -1.3073986337985843e-11
+  ],
+  [
+   1.2232703738845885e-10,
+   0.0,
+   2.8416025088517927e-10,
+   8.986944521893747e-11,
+   -1.0373923942097463e-10,
+   1.411990524502471e-10,
+   9.15179043659009e-12,
+   1.4478018783847801e-10,
+   9.549694368615746e-11,
+   1.09253051050473e-10
+  ],
+  [
+   -1.6183321349672042e-10,
+   -2.8416025088517927e-10,
+   0.0,
+   -1.942908056662418e-10,
+   -3.878994903061539e-10,
+   -1.4296119843493216e-10,
+   -2.750084604485892e-10,
+   -1.3938006304670125e-10,
+   -1.886633071990218e-10,
+   -1.7490719983470626e-10
+  ],
+  [
+   3.2457592169521376e-11,
+   -8.986944521893747e-11,
+   1.942908056662418e-10,
+   0.0,
+   -1.936086846399121e-10,
+   5.132960723130964e-11,
+   -8.071765478234738e-11,
+   5.491074261954054e-11,
+   5.6274984672199935e-12,
+   1.9383605831535533e-11
+  ],
+  [
+   2.2606627680943348e-10,
+   1.0373923942097463e-10,
+   3.878994903061539e-10,
+   1.936086846399121e-10,
+   0.0,
+   2.4493829187122174e-10,
+   1.1289102985756472e-10,
+   2.4851942725945264e-10,
+   1.992361831071321e-10,
+   2.1299229047144763e-10
+  ],
+  [
+   -1.887201506178826e-11,
+   -1.411990524502471e-10,
+   1.4296119843493216e-10,
+   -5.132960723130964e-11,
+   -2.4493829187122174e-10,
+   0.0,
+   -1.3204726201365702e-10,
+   3.581135388230905e-12,
+   -4.5702108764089644e-11,
+   -3.1946001399774104e-11
+  ],
+  [
+   1.1317524695186876e-10,
+   -9.15179043659009e-12,
+   2.750084604485892e-10,
+   8.071765478234738e-11,
+   -1.1289102985756472e-10,
+   1.3204726201365702e-10,
+   0.0,
+   1.3562839740188792e-10,
+   8.634515324956737e-11,
+   1.0010126061388291e-10
+  ],
+  [
+   -2.2453150450019166e-11,
+   -1.4478018783847801e-10,
+   1.3938006304670125e-10,
+   -5.491074261954054e-11,
+   -2.4851942725945264e-10,
+   -3.581135388230905e-12,
+   -1.3562839740188792e-10,
+   0.0,
+   -4.928324415232055e-11,
+   -3.552713678800501e-11
+  ],
+  [
+   2.6830093702301383e-11,
+   -9.549694368615746e-11,
+   1.886633071990218e-10,
+   -5.6274984672199935e-12,
+   -1.992361831071321e-10,
+   4.5702108764089644e-11,
+   -8.634515324956737e-11,
+   4.928324415232055e-11,
+   0.0,
+   1.375610736431554e-11
+  ],
+  [
+   1.3073986337985843e-11,
+   -1.09253051050473e-10,
+   1.7490719983470626e-10,
+   -1.9383605831535533e-11,
+   -2.1299229047144763e-10,
+   3.1946001399774104e-11,
+   -1.0010126061388291e-10,
+   3.552713678800501e-11,
+   -1.375610736431554e-11,
+   0.0
+  ]
+ ],
+ "clusters": {
+  "M0 (NOMSTIFF)": [
+   "NOMSTIFF",
+   "CENS01",
+   "CENS02",
+   "CENS04",
+   "CENS05",
+   "CENS06",
+   "CENS07",
+   "CENS08",
+   "CENS09",
+   "CENS10"
+  ]
+ },
+ "floor": 0.0001,
+ "dnll_tol": 0.0001,
+ "face_tol": 1e-05
+}

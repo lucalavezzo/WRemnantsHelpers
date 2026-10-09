@@ -1,0 +1,40 @@
+{
+ "label": "NCG_RS_N10_r1e-8",
+ "start": "CENS03R",
+ "N": 10,
+ "r": 1e-08,
+ "stages": [
+  {
+   "restarts": 2,
+   "iters": 849,
+   "stops": [
+    "stall",
+    "stall",
+    "pred<=0"
+   ],
+   "capped": false,
+   "conv": [
+    813,
+    2279
+   ],
+   "cfg": {},
+   "n_f": 817,
+   "n_hvp": 2494,
+   "fstar": -7.447328229736393e-06,
+   "overshoot_star": 9.154675144262779e-07
+  }
+ ],
+ "E_conv": {
+  "n_f": 813,
+  "n_hvp": 2279
+ },
+ "E_total": {
+  "n_f": 817,
+  "n_hvp": 2494
+ },
+ "f_end_minus_fstar": -1.0241929544207949e-08,
+ "face_end": -9.154675101943899e-07,
+ "failed": false,
+ "restarts": 2,
+ "seconds": 1.6135938167572021
+}

@@ -1,0 +1,40 @@
+{
+ "label": "RS_N10_r1e-08",
+ "start": "C1A",
+ "N": 10,
+ "r": 1e-08,
+ "stages": [
+  {
+   "restarts": 1,
+   "iters": 52,
+   "stops": [
+    "stall",
+    "stall",
+    "restart-bought-nothing"
+   ],
+   "capped": false,
+   "conv": [
+    32,
+    218
+   ],
+   "cfg": {},
+   "n_f": 37,
+   "n_hvp": 296,
+   "fstar": -7.447328229736393e-06,
+   "overshoot_star": 9.154675144262779e-07
+  }
+ ],
+ "E_conv": {
+  "n_f": 32,
+  "n_hvp": 218
+ },
+ "E_total": {
+  "n_f": 37,
+  "n_hvp": 296
+ },
+ "f_end_minus_fstar": -1.0241929484772494e-08,
+ "face_end": -9.154675102152066e-07,
+ "failed": false,
+ "restarts": 1,
+ "seconds": 1.1529781818389893
+}

@@ -1,0 +1,232 @@
+{
+ "lattice_only": {
+  "lam": [
+   0.18794838207992773,
+   -0.006088447476853377
+  ],
+  "sigma": [
+   0.042571429523764845,
+   0.0035080875928583883
+  ],
+  "rho": -0.8843286008789066,
+  "chi2_min": 6.68217949672697,
+  "k1hat": 0.24144789675101344,
+  "nf_shift": [
+   -0.027537225518605712,
+   0.0025335874032803712
+  ]
+ },
+ "frozen_reference": {
+  "alphas": 0.1168,
+  "tnp_gamma_nu": 0.0,
+  "tnp_gamma_cusp": 0.0,
+  "np_gnu_lambda_inf": 2.0,
+  "np_gnu_b0_bmax": 1.0
+ },
+ "fits": {
+  "lattice": {
+   "lam_cs": [
+    0.18794838207992773,
+    -0.006088447476853377
+   ],
+   "sigma_cs": [
+    0.042571429523764845,
+    0.0035080875928583883
+   ],
+   "rho_cs": -0.8843286008789066,
+   "chi2_lat": 6.682179496726972,
+   "dchi2_lat": 1.7763568394002505e-15,
+   "k1hat_own": 0.24144789675101344
+  },
+  "LATFROZ_V3": {
+   "lam_cs": [
+    0.03828668433414427,
+    0.010634472890992277
+   ],
+   "sigma_cs": [
+    0.030339698529691404,
+    0.005728342306158148
+   ],
+   "rho_cs": -0.7539929232003626,
+   "chi2_lat": 15.869445810542999,
+   "dchi2_lat": 9.187266313816028,
+   "k1hat_own": 0.14462812796203298,
+   "floating": [
+    "lambda2",
+    "lambda4",
+    "delta_lambda2",
+    "lambda2_nu",
+    "lambda4_nu"
+   ],
+   "mu": [
+    0.04814682621461397,
+    0.07256418530295294,
+    -0.007703539845568442,
+    0.03828668433414427,
+    0.010634472890992277
+   ],
+   "sigma": [
+    0.046007987503972635,
+    0.027387059889405253,
+    0.007361201220291011,
+    0.030339698529691404,
+    0.005728342306158148
+   ],
+   "held": {
+    "lambda_inf": 1.0,
+    "lambda_inf_nu": 2.0
+   },
+   "theta": {
+    "lambda2": -0.7037063475707721,
+    "lambda4": -0.6548716293940942,
+    "delta_lambda2": -0.015407079691136884,
+    "lambda2_nu": -1.1171331566585572,
+    "lambda4_nu": 0.021268945781984554
+   },
+   "faces": {
+    "lambda4_nu >= 0 (CS large-b leading)": 0.010634472890992277,
+    "lambda2_nu >= 0 (CS small-b turn-on)": 0.03828668433414427,
+    "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=0 (TMD small-b turn-on)": 0.04814682621461397,
+    "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=0 (TMD large-b)": 0.2178041658791625,
+    "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=2.5 (TMD small-b turn-on)": -2.978201887951504e-07,
+    "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=2.5 (TMD large-b)": 0.21769255590885883
+   },
+   "edm": 3.5914732285853155e-17,
+   "path": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261008_latfroz_nf_variants/fitresults_LATFROZ_V3.hdf5"
+  },
+  "XWSTIFF": {
+   "lam_cs": [
+    -1.1216393087931653e-06,
+    0.044408086224080615
+   ],
+   "sigma_cs": [
+    0.00023720687323963363,
+    0.011045014132349209
+   ],
+   "rho_cs": -0.0009748169366475719,
+   "chi2_lat": 36.47002886314723,
+   "dchi2_lat": 29.787849366420257,
+   "k1hat_own": 0.20385125218864086,
+   "floating": [
+    "lambda2",
+    "lambda4",
+    "delta_lambda2",
+    "lambda2_nu",
+    "lambda4_nu"
+   ],
+   "mu": [
+    0.11882566722836224,
+    -7.21173554438792e-05,
+    -0.009409894210770734,
+    -1.1216393087931653e-06,
+    0.044408086224080615
+   ],
+   "sigma": [
+    0.059425927848227394,
+    0.0002787228825324491,
+    0.007734021463257303,
+    0.00023720687323963363,
+    0.011045014132349209
+   ],
+   "held": {
+    "lambda_inf": 1.0,
+    "lambda_inf_nu": 2.0
+   },
+   "theta": {
+    "lambda2": -0.5623486655432756,
+    "lambda4": -0.8001442347108878,
+    "delta_lambda2": -0.01881978842154147,
+    "lambda2_nu": -1.5000112163930877,
+    "lambda4_nu": 0.08881617244816123
+   },
+   "faces": {
+    "lambda4_nu >= 0 (CS large-b leading)": 0.044408086224080615,
+    "lambda2_nu >= 0 (CS small-b turn-on)": -1.1216393087931653e-06,
+    "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=0 (TMD small-b turn-on)": 0.11882566722836224,
+    "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=0 (TMD large-b)": 0.001461411599146319,
+    "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=2.5 (TMD small-b turn-on)": 0.060013828411045154,
+    "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=2.5 (TMD large-b)": -2.026850692142567e-07
+   },
+   "edm": 7.405069621731706e-18,
+   "path": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260930_stiff_wall_fits/fitresults_XWSTIFF.hdf5"
+  },
+  "NOMSTIFF": {
+   "lam_cs": [
+    0.06426999671529844,
+    0.0
+   ],
+   "sigma_cs": [
+    0.022931336111338352,
+    0.0
+   ],
+   "rho_cs": null,
+   "chi2_lat": 20.876649635761225,
+   "dchi2_lat": 14.194470139034255,
+   "k1hat_own": 0.12904011409496155,
+   "floating": [
+    "lambda2",
+    "lambda4",
+    "delta_lambda2",
+    "lambda2_nu"
+   ],
+   "mu": [
+    0.025581284102796142,
+    0.08758284351213724,
+    -0.004093151901886217,
+    0.06426999671529844
+   ],
+   "sigma": [
+    0.04272088997628132,
+    0.02716435417398683,
+    0.006835291447830541,
+    0.022931336111338352
+   ],
+   "held": {
+    "lambda_inf": 1.0,
+    "lambda_inf_nu": 2.0,
+    "lambda4_nu": 0.0
+   },
+   "theta": {
+    "lambda2": -0.7488374317944078,
+    "lambda4": -0.6248343129757256,
+    "delta_lambda2": -0.008186303803772435,
+    "lambda2_nu": -0.8573000328470155
+   },
+   "faces": {
+    "lambda2_nu >= 0 (CS small-b turn-on)": 0.06426999671529844,
+    "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=0 (TMD small-b turn-on)": 0.025581284102796142,
+    "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=0 (TMD large-b)": 0.26276527098235586,
+    "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=2.5 (TMD small-b turn-on)": -9.152839927153988e-07,
+    "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=2.5 (TMD large-b)": 0.26274853053641173
+   },
+   "edm": 3.004579117754218e-14,
+   "path": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260930_stiff_wall_fits/fitresults_NOMSTIFF.hdf5"
+  }
+ },
+ "bands": {
+  "lattice_lat": {
+   "max_abs_halfwidth_sampled_minus_linear": 0.08465647816847222,
+   "max_halfwidth": 0.5289535830816903
+  },
+  "lattice_full": {
+   "max_abs_halfwidth_sampled_minus_linear": 0.6786254200926116,
+   "max_halfwidth": 0.8713200967917423
+  },
+  "LATFROZ_V3_lat": {
+   "max_abs_halfwidth_sampled_minus_linear": 0.01820371377765341,
+   "max_halfwidth": 0.1325865964286535
+  },
+  "LATFROZ_V3_full": {
+   "max_abs_halfwidth_sampled_minus_linear": 0.019017150882993834,
+   "max_halfwidth": 0.13415009783769488
+  },
+  "NOMSTIFF_lat": {
+   "max_abs_halfwidth_sampled_minus_linear": 0.006341774168911601,
+   "max_halfwidth": 0.1543931925867701
+  },
+  "NOMSTIFF_full": {
+   "max_abs_halfwidth_sampled_minus_linear": 0.017869985534038756,
+   "max_halfwidth": 0.16352517165431996
+  }
+ }
+}

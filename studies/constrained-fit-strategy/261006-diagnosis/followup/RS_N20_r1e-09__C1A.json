@@ -1,0 +1,40 @@
+{
+ "label": "RS_N20_r1e-09",
+ "start": "C1A",
+ "N": 20,
+ "r": 1e-09,
+ "stages": [
+  {
+   "restarts": 1,
+   "iters": 73,
+   "stops": [
+    "stall",
+    "stall",
+    "restart-bought-nothing"
+   ],
+   "capped": false,
+   "conv": [
+    32,
+    218
+   ],
+   "cfg": {},
+   "n_f": 45,
+   "n_hvp": 331,
+   "fstar": -7.447328229736393e-06,
+   "overshoot_star": 9.154675144262779e-07
+  }
+ ],
+ "E_conv": {
+  "n_f": 32,
+  "n_hvp": 218
+ },
+ "E_total": {
+  "n_f": 45,
+  "n_hvp": 331
+ },
+ "f_end_minus_fstar": -1.0241929525433464e-08,
+ "face_end": -9.15467510218676e-07,
+ "failed": false,
+ "restarts": 1,
+ "seconds": 0.6185801029205322
+}

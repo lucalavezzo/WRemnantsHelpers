@@ -1,0 +1,36 @@
+L4=0 | linf=2 | k1 [nominal]             chi2=  8.59/19  AIC= 12.59  l2=+0.1345(0.0201)  k1=+0.2094(0.0665)
+L4=0 | linf free | k1                    chi2=  6.82/18  AIC= 12.82  linf=+1.3241(0.3411)  l2=+0.1630(0.0390)  k1=+0.2318(0.0714)
+L4=0 | linf=2 | k2                       chi2=  8.82/19  AIC= 12.82  l2=+0.1168(0.0170)  k2=+0.2224(0.0716)
+L4=0 | linf=2 | k1+k2                    chi2=  8.54/18  AIC= 14.54  l2=+0.1295(0.0286)  k1=+0.1505(0.2747)  k2=+0.0647(0.2972)
+L4=0 | linf=2 | k1 | nf4 scheme          chi2=  8.48/19  AIC= 12.48  l2=+0.1225(0.0190)  k1=+0.2203(0.0661)
+L4=0 | linf=2 | k1 | nf matched mu=1     chi2=  8.64/19  AIC= 12.64  l2=+0.1215(0.0189)  k1=+0.2551(0.0661)
+L4=0 | linf=2 | k1 | drop bT<0.2         chi2=  6.35/15  AIC= 10.35  l2=+0.1251(0.0244)  k1=+0.1412(0.1414)
+L4=0 | linf=2 | k1 | nf-syst in cov      chi2=  8.58/19  AIC= 12.58  l2=+0.1336(0.0227)  k1=+0.2102(0.0675)
+L4=0 | linf=2 | no k                     chi2= 18.44/20  AIC= 20.44  l2=+0.1076(0.0162)
+
+[syst] n_f scheme  L4=0 | linf=2 | k1 | nf4 scheme          d = -0.01207  (-0.60 sigma_stat)
+[syst] n_f scheme  L4=0 | linf=2 | k1 | nf matched mu=1     d = -0.01309  (-0.65 sigma_stat)
+[syst] k-form      L4=0 | linf=2 | k2                       d = -0.01773  (-0.88 sigma_stat)
+[syst] k-form      L4=0 | linf=2 | k1+k2                    d = -0.00509  (-0.25 sigma_stat)
+[syst] b_T window  L4=0 | linf=2 | k1 | drop bT<0.2         d = -0.00947  (-0.47 sigma_stat)
+==> lambda2_nu (lambda4_nu=0, linf=2, k1) = 0.1345 +- 0.0201 (stat) +- 0.0240 (syst) = +- 0.0313 (tot)
+    taken: n_f scheme: nf matched mu=1 -0.0131; k-form: k2 -0.0177; b_T window: drop bT<0.2 -0.0095
+
+Delta chi2 (l4=0) - (l2,l4 free), linf=2, k1: 1.873  (1 dof -> 1.37 sigma); vs linf-free global best 2.123
+lattice-preferred lambda4_nu (2D fit) = -0.0059 +- 0.0033 -> lambda4_nu=0 is 1.82 sigma_stat away
+Gaussian conditional of 2D fit at l4=0 [stat]: lambda2_nu = 0.1229 +- 0.0180
+Gaussian conditional of 2D fit at l4=0 [stat+syst (injector)]: lambda2_nu = 0.1080 +- 0.0234
+
+Compatibility (tune fixed, k1 floated). Delta vs l4=0 best (1 dof: the lambda2_nu direction) and vs the free (l2,l4) best at linf=2 (2 dof). 1D pull uses the stat+syst sigma.
+  card anchor / FranksVals                       chi2=  9.08  d(l4=0 best)=  0.50 (0.7s, 1dof)  d(2D best)=  2.37 (1.0s, 2dof)  pull(stat+syst)=+0.49
+  Tackmann/AN as is (linf 1.6853, l4 0.0074)     chi2=  9.65  d(l4=0 best)=  1.06 (1.0s, 1dof)  d(2D best)=  2.94 (1.2s, 2dof)  pull(stat+syst)=+nan
+  Tackmann l2 centre at l4=0, linf=2             chi2= 14.88  d(l4=0 best)=  6.29 (2.5s, 1dof)  d(2D best)=  8.17 (2.4s, 2dof)  pull(stat+syst)=-1.52
+  Tackmann l2 +1sigma (0.1202) at l4=0, linf=2   chi2=  9.08  d(l4=0 best)=  0.49 (0.7s, 1dof)  d(2D best)=  2.37 (1.0s, 2dof)  pull(stat+syst)=-0.46
+  lambda2_nu=0 (switched off)                    chi2= 79.91  d(l4=0 best)= 71.32 (8.4s, 1dof)  d(2D best)= 73.20 (8.3s, 2dof)  pull(stat+syst)=-4.30
+  [postfit] unwalled, main min (warm) CCKRYLOVWARM         chi2=209.80  d(l4=0 best)=201.21
+  [postfit] unwalled, second min (cold) CCCOLDSELF         chi2=198.55  d(l4=0 best)=189.96
+  [postfit] walled, main (warm) CCWALLWARMPF               chi2= 40.61  d(l4=0 best)= 32.02
+  [postfit] walled, cold-resumed CCWALLCOLDR               chi2= 73.15  d(l4=0 best)= 64.57
+  [postfit] walled, warm from unwalled 2nd CCWALLSHIFT     chi2= 84.01  d(l4=0 best)= 75.43
+
+MCMC (l4=0, linf=2, k1): acc 0.72; l2 median 0.1367 [68% 0.1163, 0.1594]

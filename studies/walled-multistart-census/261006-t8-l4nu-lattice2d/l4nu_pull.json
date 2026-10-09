@@ -1,0 +1,67 @@
+{
+ "changes": [
+  "card /ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260923_lattice_fits/cards/cardA_latticeASWZ_l4zero_statsyst.hdf5 -> /ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260923_lattice_fits/cards/cardA_latticeASWZ_statsyst.hdf5",
+  "fit_params += lambda4_nu (after lambda2_nu)",
+  "prior_sigmas=lambda2_nu=nan -> lambda2_nu=nan,lambda4_nu=nan"
+ ],
+ "gate": -5.684341886080802e-14,
+ "ext1D_NOM": 2.5248755535802907,
+ "ext2D_NOM": 2.845910389849751,
+ "rabbit_ext": 2.845910389849751,
+ "wall_pen": 7.444292768114144e-06,
+ "grad_l4_theta": {
+  "total": -340.53234393273345,
+  "lattice": -331.3902099909178,
+  "data": -9.142133941815644
+ },
+ "grad_l2_theta": {
+  "total": -0.8170074730897339,
+  "lattice2D": -8.002261883792919
+ },
+ "H44": 112280.84063711436,
+ "H44_lattice": 91932.77206981386,
+ "H42": 5050.496593060325,
+ "H42_lattice": 1181.689974569723,
+ "rho_alphaS_l4_float": -0.0707915271319437,
+ "sigma_l4_phys_float": 0.0024690242385352413,
+ "newton": {
+  "float": {
+   "dtheta_l4": 0.007442380060387311,
+   "lambda4_nu": 0.0037211900301936554,
+   "lambda2_nu": 0.035110420719181454,
+   "dlambda2_nu": -0.029159575996116995,
+   "dalphaS_over_sigNOM": -0.1003573547349737,
+   "sigma_ratio": 1.0021425315655397,
+   "dNLL_pred": -1.1480675477965847,
+   "tmd_dphys": {
+    "lambda2": 0.022471528143494814,
+    "lambda4": 0.005577734691058257,
+    "delta_lambda2": -0.003595343648102713
+   }
+  },
+  "hold0_2Dcard": {
+   "dtheta_l4": 0.0,
+   "lambda4_nu": 0.0,
+   "lambda2_nu": 0.06728511959123937,
+   "dlambda2_nu": 0.00301512287594093,
+   "dalphaS_over_sigNOM": 0.006564693750374842,
+   "sigma_ratio": 0.9996282888731713,
+   "dNLL_pred": -0.012316895541387455,
+   "tmd_dphys": {
+    "lambda2": -0.0021952831837908585,
+    "lambda4": -0.0016321015800032316,
+    "delta_lambda2": 0.0003512354160919416
+   }
+  },
+  "dtheta_tmd_float": {
+   "lambda2": 0.04494305628698963,
+   "lambda4": 0.011155469382116513,
+   "delta_lambda2": -0.007190687296205426
+  },
+  "dtheta_tmd_hold": {
+   "lambda2": -0.004390566367581717,
+   "lambda4": -0.003264203160006463,
+   "delta_lambda2": 0.0007024708321838832
+  }
+ }
+}

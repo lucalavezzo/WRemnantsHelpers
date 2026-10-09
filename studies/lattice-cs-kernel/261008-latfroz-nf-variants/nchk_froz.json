@@ -1,0 +1,394 @@
+{
+ "R_loss_minus_stored": -2.1884716261411086e-11,
+ "F1_nonzero_gradient_entries": [
+  "lambda2_nu",
+  "lambda4_nu"
+ ],
+ "F1_zero_at": {
+  "alphaS": true,
+  "resumTNP_gamma_nu": true,
+  "resumTNP_gamma_cusp": true
+ },
+ "F2_armed_equals_disarmed": true,
+ "F3_rel_AD_vs_FD": {
+  "lambda2_nu": 5.535728345882453e-09,
+  "lambda4_nu": 9.48423728717315e-09
+ },
+ "F4_snapshot_status": 1,
+ "N": {
+  "live Jnf (LATB8 minus b_T window)": {
+   "args": [
+    "syst=Jnf"
+   ],
+   "dalphaS_vs_LATB8_over_sigNOM": -0.000836251978596757,
+   "dalphaS_vs_NOMSTIFF_over_sigNOM": -0.11362334448968545,
+   "sigma_ratio_vs_NOM": 0.9712299614364929,
+   "sigma_ratio_vs_LATB8": 0.9993883542084087,
+   "load_time": {
+    "data": "/home/submit/lavezzo/alphaS/WRemnants/wremnants/postprocessing/scetlib_ad/data/lattice_aswz_data.npz",
+    "syst": "Jnf",
+    "nf_match": 1.0,
+    "nf_switch": 1.0,
+    "nf_scheme": "evolve",
+    "ydata": "lattice",
+    "anchor_alphas": 0.118,
+    "nominal_stat_fit": {
+     "lam": [
+      0.1855328005785214,
+      -0.0059693557832792305
+     ],
+     "chi2": 6.7031751416896155
+    },
+    "final_fit": {
+     "lam": [
+      0.18553280057849997,
+      -0.005969355783276301
+     ],
+     "chi2": 6.7031751416896155,
+     "sigma": [
+      0.039384670446269886,
+      0.0034224696806071406
+     ],
+     "rho": -0.8874121378477366
+    },
+    "nf_shift_range": [
+     -0.009199331373798136,
+     -0.009199331373797692
+    ],
+    "syst_info": {
+     "Jnf": {
+      "dlam": [
+       -0.003963989014410085,
+       0.00016517659509834078
+      ],
+      "chi2min": 6.762495488969501
+     }
+    },
+    "chi2_min": 6.7031751416896155
+   },
+   "lambda2_nu": 0.035848981675227404,
+   "d_lambda2_nu_over_sigma": 0.008538435430572368,
+   "sigma_lambda2_nu": 0.030425584322240302,
+   "lambda4_nu": 0.011293693279321396,
+   "d_lambda4_nu_over_sigma": 0.0320263427987259,
+   "sigma_lambda4_nu": 0.005378166258868285,
+   "d_resumTNP_gamma_nu": 0.0020808734665612146,
+   "d_resumTNP_gamma_cusp": -0.0004882846424919764
+  },
+  "frozen none (stat only)": {
+   "args": [
+    "syst=none",
+    "pert=frozen",
+    "alphas_frozen=0.1168"
+   ],
+   "dalphaS_vs_LATB8_over_sigNOM": -0.034900142836676626,
+   "dalphaS_vs_NOMSTIFF_over_sigNOM": -0.14768723534776748,
+   "sigma_ratio_vs_NOM": 0.9806625581652985,
+   "sigma_ratio_vs_LATB8": 1.009094425576687,
+   "load_time": {
+    "data": "/home/submit/lavezzo/alphaS/WRemnants/wremnants/postprocessing/scetlib_ad/data/lattice_aswz_data.npz",
+    "syst": "none",
+    "nf_match": 1.0,
+    "nf_switch": 1.0,
+    "nf_scheme": "evolve",
+    "ydata": "lattice",
+    "anchor_alphas": 0.1168,
+    "nominal_stat_fit": {
+     "lam": [
+      0.18794838208461914,
+      -0.006088447477511798
+     ],
+     "chi2": 6.68217949672697
+    },
+    "final_fit": {
+     "lam": [
+      0.18794838208461914,
+      -0.006088447477511798
+     ],
+     "chi2": 6.68217949672697,
+     "sigma": [
+      0.039278584548635115,
+      0.003419313054563042
+     ],
+     "rho": -0.887490615501925
+    },
+    "nf_shift_range": [
+     -0.008319606127776158,
+     -0.008319606127775825
+    ],
+    "syst_info": {},
+    "chi2_min": 6.68217949672697
+   },
+   "lambda2_nu": 0.03837007719456112,
+   "d_lambda2_nu_over_sigma": 0.09200107384967461,
+   "sigma_lambda2_nu": 0.030226629865760437,
+   "lambda4_nu": 0.011622770660279743,
+   "d_lambda4_nu_over_sigma": 0.09364582870320125,
+   "sigma_lambda4_nu": 0.005353365805350252,
+   "d_resumTNP_gamma_nu": 0.13870314004131518,
+   "d_resumTNP_gamma_cusp": -0.028883938129395863,
+   "dchi2lat_at_LATB8": 9.825712916931014,
+   "dchi2lat_at_newton": 9.500470419248451
+  },
+  "frozen V1 (Jnf, nfmatch 1)": {
+   "args": [
+    "syst=Jnf",
+    "pert=frozen",
+    "alphas_frozen=0.1168",
+    "nfmatch=1.0"
+   ],
+   "dalphaS_vs_LATB8_over_sigNOM": -0.034549989007085766,
+   "dalphaS_vs_NOMSTIFF_over_sigNOM": -0.1473370815181766,
+   "sigma_ratio_vs_NOM": 0.9806750520469589,
+   "sigma_ratio_vs_LATB8": 1.0091072816873157,
+   "load_time": {
+    "data": "/home/submit/lavezzo/alphaS/WRemnants/wremnants/postprocessing/scetlib_ad/data/lattice_aswz_data.npz",
+    "syst": "Jnf",
+    "nf_match": 1.0,
+    "nf_switch": 1.0,
+    "nf_scheme": "evolve",
+    "ydata": "lattice",
+    "anchor_alphas": 0.1168,
+    "nominal_stat_fit": {
+     "lam": [
+      0.18794838208461914,
+      -0.006088447477511798
+     ],
+     "chi2": 6.68217949672697
+    },
+    "final_fit": {
+     "lam": [
+      0.18794838208417858,
+      -0.006088447477450855
+     ],
+     "chi2": 6.682179496726975,
+     "sigma": [
+      0.039440578469506445,
+      0.0034226200079701444
+     ],
+     "rho": -0.8869706145020737
+    },
+    "nf_shift_range": [
+     -0.008319606127776158,
+     -0.008319606127775825
+    ],
+    "syst_info": {
+     "Jnf": {
+      "dlam": [
+       -0.003605421074380971,
+       0.00015010666756130626
+      ],
+      "chi2min": 6.733119651806721
+     }
+    },
+    "chi2_min": 6.682179496726975
+   },
+   "lambda2_nu": 0.03836922288334649,
+   "d_lambda2_nu_over_sigma": 0.09194201988450909,
+   "sigma_lambda2_nu": 0.030236752453165924,
+   "lambda4_nu": 0.011584301779779408,
+   "d_lambda4_nu_over_sigma": 0.08606468751330736,
+   "sigma_lambda4_nu": 0.005377948959862349,
+   "d_resumTNP_gamma_nu": 0.13878072524587923,
+   "d_resumTNP_gamma_cusp": -0.02890214502082513,
+   "dchi2lat_at_LATB8": 9.808842425823393,
+   "dchi2lat_at_newton": 9.490457866021728
+  },
+  "frozen V2 (Jnf, nfswitch 1, nfmatch m_b)": {
+   "args": [
+    "syst=Jnf",
+    "pert=frozen",
+    "alphas_frozen=0.1168",
+    "nfmatch=4.18",
+    "nfswitch=1.0"
+   ],
+   "dalphaS_vs_LATB8_over_sigNOM": -0.027358760095408722,
+   "dalphaS_vs_NOMSTIFF_over_sigNOM": -0.14014585260649928,
+   "sigma_ratio_vs_NOM": 0.9809142924530104,
+   "sigma_ratio_vs_LATB8": 1.0093534582728385,
+   "load_time": {
+    "data": "/home/submit/lavezzo/alphaS/WRemnants/wremnants/postprocessing/scetlib_ad/data/lattice_aswz_data.npz",
+    "syst": "Jnf",
+    "nf_match": 4.18,
+    "nf_switch": 1.0,
+    "nf_scheme": "evolve",
+    "ydata": "lattice",
+    "anchor_alphas": 0.1168,
+    "nominal_stat_fit": {
+     "lam": [
+      0.18794838208461914,
+      -0.006088447477511798
+     ],
+     "chi2": 6.68217949672697
+    },
+    "final_fit": {
+     "lam": [
+      0.18794838207985648,
+      -0.006088447476847854
+     ],
+     "chi2": 6.682179496726965,
+     "sigma": [
+      0.04218424773922066,
+      0.0034807540047101606
+     ],
+     "rho": -0.8799969695762145
+    },
+    "nf_shift_range": [
+     -0.03636148877397362,
+     -0.03636148877397316
+    ],
+    "syst_info": {
+     "Jnf": {
+      "dlam": [
+       -0.015560012456743127,
+       0.0006505860979355328
+      ],
+      "chi2min": 6.9307961152834565
+     }
+    },
+    "chi2_min": 6.682179496726965
+   },
+   "lambda2_nu": 0.03849812435093933,
+   "d_lambda2_nu_over_sigma": 0.09573384273560333,
+   "sigma_lambda2_nu": 0.030385592803567327,
+   "lambda4_nu": 0.010803621591192582,
+   "d_lambda4_nu_over_sigma": -0.05448509607888935,
+   "sigma_lambda4_nu": 0.00583331433303469,
+   "d_resumTNP_gamma_nu": 0.14152891322409486,
+   "d_resumTNP_gamma_cusp": -0.029564494080987293,
+   "dchi2lat_at_LATB8": 9.573222942375699,
+   "dchi2lat_at_newton": 9.283179484360872
+  },
+  "frozen V3 (Jnf, full n_f=4, nfmatch m_b)": {
+   "args": [
+    "syst=Jnf",
+    "pert=frozen",
+    "alphas_frozen=0.1168",
+    "nfmatch=4.18",
+    "nfscheme=full"
+   ],
+   "dalphaS_vs_LATB8_over_sigNOM": -0.025890962864233577,
+   "dalphaS_vs_NOMSTIFF_over_sigNOM": -0.13867805537532168,
+   "sigma_ratio_vs_NOM": 0.9808915892400294,
+   "sigma_ratio_vs_LATB8": 1.0093300968367656,
+   "load_time": {
+    "data": "/home/submit/lavezzo/alphaS/WRemnants/wremnants/postprocessing/scetlib_ad/data/lattice_aswz_data.npz",
+    "syst": "Jnf",
+    "nf_match": 4.18,
+    "nf_switch": 4.18,
+    "nf_scheme": "full",
+    "ydata": "lattice",
+    "anchor_alphas": 0.1168,
+    "nominal_stat_fit": {
+     "lam": [
+      0.18794838208461914,
+      -0.006088447477511798
+     ],
+     "chi2": 6.68217949672697
+    },
+    "final_fit": {
+     "lam": [
+      0.18794838207992773,
+      -0.006088447476853377
+     ],
+     "chi2": 6.68217949672697,
+     "sigma": [
+      0.042571429523764845,
+      0.0035080875928583883
+     ],
+     "rho": -0.8843286008789066
+    },
+    "nf_shift_range": [
+     -0.027537225518605712,
+     0.0025335874032803712
+    ],
+    "syst_info": {
+     "Jnf": {
+      "dlam": [
+       -0.016468738386292647,
+       0.0007696907729429249
+      ],
+      "chi2min": 6.892003701755524
+     }
+    },
+    "chi2_min": 6.68217949672697
+   },
+   "lambda2_nu": 0.03829774611056186,
+   "d_lambda2_nu_over_sigma": 0.08915337809986458,
+   "sigma_lambda2_nu": 0.030380804185270133,
+   "lambda4_nu": 0.010629775946556166,
+   "d_lambda4_nu_over_sigma": -0.08479876035590415,
+   "sigma_lambda4_nu": 0.005798131181005409,
+   "d_resumTNP_gamma_nu": 0.14030231221153833,
+   "d_resumTNP_gamma_cusp": -0.029253221647431323,
+   "dchi2lat_at_LATB8": 9.462346428508479,
+   "dchi2lat_at_newton": 9.186046900532482
+  },
+  "frozen V3lit (Jnf, nfmatch m_b)": {
+   "args": [
+    "syst=Jnf",
+    "pert=frozen",
+    "alphas_frozen=0.1168",
+    "nfmatch=4.18"
+   ],
+   "dalphaS_vs_LATB8_over_sigNOM": -0.03434586586449137,
+   "dalphaS_vs_NOMSTIFF_over_sigNOM": -0.14713295837557985,
+   "sigma_ratio_vs_NOM": 0.9806824283504795,
+   "sigma_ratio_vs_LATB8": 1.0091148718483778,
+   "load_time": {
+    "data": "/home/submit/lavezzo/alphaS/WRemnants/wremnants/postprocessing/scetlib_ad/data/lattice_aswz_data.npz",
+    "syst": "Jnf",
+    "nf_match": 4.18,
+    "nf_switch": 4.18,
+    "nf_scheme": "evolve",
+    "ydata": "lattice",
+    "anchor_alphas": 0.1168,
+    "nominal_stat_fit": {
+     "lam": [
+      0.18794838208461914,
+      -0.006088447477511798
+     ],
+     "chi2": 6.68217949672697
+    },
+    "final_fit": {
+     "lam": [
+      0.1879483820839363,
+      -0.0060884474774173395
+     ],
+     "chi2": 6.682179496726968,
+     "sigma": [
+      0.039533981018546445,
+      0.0034244973665281935
+     ],
+     "rho": -0.8866645098812711
+    },
+    "nf_shift_range": [
+     0.010363797552114917,
+     0.010363797552115583
+    ],
+    "syst_info": {
+     "Jnf": {
+      "dlam": [
+       0.004530925960814974,
+       -0.00018807854616171606
+      ],
+      "chi2min": 6.623505505092739
+     }
+    },
+    "chi2_min": 6.682179496726968
+   },
+   "lambda2_nu": 0.03836952723265706,
+   "d_lambda2_nu_over_sigma": 0.09193445049748662,
+   "sigma_lambda2_nu": 0.030242552487748264,
+   "lambda4_nu": 0.011561927568243717,
+   "d_lambda4_nu_over_sigma": 0.08168460768331914,
+   "sigma_lambda4_nu": 0.005392414772499776,
+   "d_resumTNP_gamma_nu": 0.13883228079850893,
+   "d_resumTNP_gamma_cusp": -0.028914339056586327,
+   "dchi2lat_at_LATB8": 9.79947185858272,
+   "dchi2lat_at_newton": 9.484698736533769
+  }
+ },
+ "sigma_LATB8_over_sigNOM": 0.9718243737248475,
+ "LATB8_vs_NOMSTIFF_over_sigNOM": -0.11278709251108937
+}

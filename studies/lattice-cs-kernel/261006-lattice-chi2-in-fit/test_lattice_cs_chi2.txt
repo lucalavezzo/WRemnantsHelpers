@@ -1,0 +1,43 @@
+[agent_setup] PYTHONPATH prepended: /home/submit/lavezzo/alphaS/WRemnantsHelpers/studies/lattice-cs-kernel/261006-lattice-chi2-in-fit/scripts
+[agent_setup] WREM_BASE=/home/submit/lavezzo/alphaS/WRemnants  SCETLIB_BUILD=/home/submit/lavezzo/alphaS/WRemnants/scetlib-cms/build  rabbit=2a59246
+[PASS] 1a pert table == our_cs_kernel now max|d| 0.00e+00
+[PASS] 1b model(k1=0) == our_cs_kernel(lambda) max|d| 2.22e-16
+      lattice-ish    chi2 core    6.80137  kernel_fit    6.80137  k1 +0.23411 vs +0.23411
+      NOMSTIFF       chi2 core   23.81103  kernel_fit   23.81103  k1 +0.10055 vs +0.10055
+      XWSTIFF (W)    chi2 core   41.09006  kernel_fit   41.09006  k1 +0.24008 vs +0.24008
+      T8 Newton      chi2 core   25.16594  kernel_fit   25.16594  k1 +0.08394 vs +0.08394
+      card anchor    chi2 core    9.08438  kernel_fit    9.08438  k1 +0.23144 vs +0.23144
+      Tackmann       chi2 core    9.65033  kernel_fit    9.65033  k1 +0.18236 vs +0.18236
+[PASS] 2  analytic k1 profile == kernel_fit chi2_at max rel 6.53e-16
+[PASS] 3  lattice-only minimum == 260923 'tanh2|linf=2|k1' chi2 6.712728 vs 6.712728; l2 0.184433 vs 0.184433; l4 -0.0059205 vs -0.0059205; k1 0.2412 vs 0.2412
+      syst=J  min chi2 6.7127 at l2 0.18443 l4 -0.005920
+      stat    min chi2 6.7127 at l2 0.18443 l4 -0.005920
+      Gauss-Newton  stat sigma [0.03828129 0.00325194] rho -0.8825 | syst=J sigma [0.05666281 0.00399765] rho -0.9110
+      card 2D term  stat sigma [0.03828125 0.00325193] | stat+syst sigma [0.05666278 0.00399765] rho -0.9110
+      exact-chi2 Hessian (incl. 2nd-order residual term): stat sigma [0.03913222 0.00341474] rho -0.8883 | syst=J sigma [0.05748702 0.00418872] rho -0.9141  (ratio to GN: [1.02222824 1.05006349], [1.01454585 1.04779484])
+[PASS] 4  syst=J: same minimum and chi2_min as stat; Gauss-Newton cov == card stat / stat+syst cov (Woodbury) max rel cov diff stat 4.4e-06, J 2.9e-06
+       11.5, 12. , 13. , 14. , 15. , 16. , 17. , 18. , 19. , 20. , 22. ,
+       24. , 26. , 28. , 30. , 33. , 37. , 44. ]), underflow=False, name='ptll'), Variable([-2.5, -1.8, -1.5, -1.3, -1.1, -0.9, -0.7, -0.5, -0.3, -0.15, 0, 0.15, 0.3, 0.5, 0.7, 0.9, 1.1, 1.3, 1.5, 1.8, 2.5], name='yll')], 'masked': False, 'flow': False, 'era': '2016PostVFP', 'flavor': None, 'lumi': 16.809083707, 'start': 0, 'stop': 780}
+[PASS] 5a TF chi2 == numpy (theta map 0.15+0.1t, 0+0.5t; linf held 2) max rel 2.82e-16
+[PASS] 5b TF gradient == finite differences max rel 4.52e-08
+[PASS] 5c exp(2 tau) compensation (live fitter.tau 8 -> 5, and tau= arg) 0.0e+00 2.2e-16 0.0e+00
+[PASS] 5d tau mismatch raises LatticeCSChi2: tau=8.0 on the -r line but fitter.tau = 5.0
+[PASS] 5e default (syst=J, offset=min) is 0 at the lattice minimum 1.33e-15
+[PASS] 6a pert linear in alpha_s over +-0.002 (|nonlinear| / sigma_lat) max 2.4e-03
+[PASS] 6b alphas=live TF == numpy core(dalphas) max |d| 3.6e-15
+      dchi2/dalpha_s    -12.730 analytic vs    -12.731 FD (our_cs_kernel re-evaluated at 0.118 +- 1e-4)
+      dchi2/dalpha_s   -519.760 analytic vs   -519.760 FD (our_cs_kernel re-evaluated at 0.118 +- 1e-4)
+      dchi2/dalpha_s   +424.481 analytic vs   +424.480 FD (our_cs_kernel re-evaluated at 0.118 +- 1e-4)
+      dchi2/dalpha_s   -531.570 analytic vs   -531.571 FD (our_cs_kernel re-evaluated at 0.118 +- 1e-4)
+      dchi2/dalpha_s    +64.128 analytic vs    +64.127 FD (our_cs_kernel re-evaluated at 0.118 +- 1e-4)
+      dchi2/dalpha_s    -74.536 analytic vs    -74.536 FD (our_cs_kernel re-evaluated at 0.118 +- 1e-4)
+[PASS] 7a analytic d chi2/d alpha_s == FD of the exact evaluator max rel 6.1e-05
+[PASS] 7b TF d/d theta_alphaS (live) == FD max rel 1.4e-09
+[PASS] 7c live map taken from the fitter's param model (0.118, 0.002)
+[PASS] 7d param-model anchor != pert-table alpha_s raises LatticeCSChi2(pert live): the alphaS anchor 0.119 is not the pert tabl
+[PASS] 7e ydata=asimov: term == 0 at the truth (theta = 0), > 0 off it -1.9e-16, 1.036e-03
+[PASS] 7f syst components: J == Jnf+Jk+Jbt 
+[PASS] 8a dpert/dTNP == FD of our_cs_kernel (steps 0.1, 2: exactly linear) max rel 3.2e-13
+[PASS] 8b d2pert/(dalpha_s dTNP) == FD (h 1e-4 vs the 1e-3 table) max rel 3.4e-03
+[PASS] 8c pert=live expansion vs the exact evaluator, |TNP| <= 2: <= 5e-3 sigma_lat at |da| <= 0.002 4.2e-03 (|da| <= 0.004: 2.2e-02)
+ALL PASS

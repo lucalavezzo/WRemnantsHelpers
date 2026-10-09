@@ -1,0 +1,1113 @@
+{
+ "SATB8": {
+  "classes": {
+   "rejected": {
+    "n": 21,
+    "wall_s": 4054.43,
+    "frac": 0.19361085099037156
+   },
+   "ladder": {
+    "n": 18,
+    "wall_s": 1614.12,
+    "frac": 0.07707893509089528
+   },
+   "polish": {
+    "n": 73,
+    "wall_s": 4968.43,
+    "frac": 0.2372570152613541
+   },
+   "big": {
+    "n": 31,
+    "wall_s": 8161.5599999999995,
+    "frac": 0.3897382805989934
+   },
+   "other": {
+    "n": 15,
+    "wall_s": 2142.59,
+    "frac": 0.10231491805838558
+   }
+  },
+  "rejection_runs": [
+   {
+    "start": 4,
+    "n_rej": 1,
+    "ladder_after": 0,
+    "wall_rej": 231.86,
+    "wall_ladder": 13.23
+   },
+   {
+    "start": 16,
+    "n_rej": 1,
+    "ladder_after": 0,
+    "wall_rej": 218.03,
+    "wall_ladder": 15.19
+   },
+   {
+    "start": 19,
+    "n_rej": 1,
+    "ladder_after": 1,
+    "wall_rej": 125.63,
+    "wall_ladder": 159.66
+   },
+   {
+    "start": 22,
+    "n_rej": 2,
+    "ladder_after": 0,
+    "wall_rej": 199.08,
+    "wall_ladder": 11.51
+   },
+   {
+    "start": 25,
+    "n_rej": 1,
+    "ladder_after": 0,
+    "wall_rej": 129.77,
+    "wall_ladder": 11.83
+   },
+   {
+    "start": 33,
+    "n_rej": 2,
+    "ladder_after": 0,
+    "wall_rej": 143.47,
+    "wall_ladder": 12.22
+   },
+   {
+    "start": 36,
+    "n_rej": 1,
+    "ladder_after": 0,
+    "wall_rej": 48.88,
+    "wall_ladder": 12.0
+   },
+   {
+    "start": 38,
+    "n_rej": 1,
+    "ladder_after": 0,
+    "wall_rej": 64.61,
+    "wall_ladder": 12.19
+   },
+   {
+    "start": 58,
+    "n_rej": 7,
+    "ladder_after": 0,
+    "wall_rej": 66.06,
+    "wall_ladder": 11.19
+   },
+   {
+    "start": 95,
+    "n_rej": 1,
+    "ladder_after": 0,
+    "wall_rej": 389.98,
+    "wall_ladder": 12.93
+   },
+   {
+    "start": 107,
+    "n_rej": 1,
+    "ladder_after": 0,
+    "wall_rej": 479.75,
+    "wall_ladder": 14.57
+   },
+   {
+    "start": 131,
+    "n_rej": 1,
+    "ladder_after": 0,
+    "wall_rej": 774.29,
+    "wall_ladder": 18.67
+   },
+   {
+    "start": 141,
+    "n_rej": 1,
+    "ladder_after": 0,
+    "wall_rej": 1183.02,
+    "wall_ladder": 19.41
+   }
+  ],
+  "heavy": [
+   {
+    "it": 56,
+    "dt": 358.24,
+    "cls": "big",
+    "gain": 0.8324197769791795
+   },
+   {
+    "it": 90,
+    "dt": 466.53,
+    "cls": "big",
+    "gain": 0.140236027312028
+   },
+   {
+    "it": 95,
+    "dt": 389.98,
+    "cls": "rejected",
+    "gain": -0.0
+   },
+   {
+    "it": 101,
+    "dt": 477.58,
+    "cls": "big",
+    "gain": 0.09797203617210926
+   },
+   {
+    "it": 107,
+    "dt": 479.75,
+    "cls": "rejected",
+    "gain": -0.0
+   },
+   {
+    "it": 113,
+    "dt": 530.12,
+    "cls": "big",
+    "gain": 0.061465863538956
+   },
+   {
+    "it": 119,
+    "dt": 659.23,
+    "cls": "big",
+    "gain": 0.0386753799688222
+   },
+   {
+    "it": 125,
+    "dt": 681.47,
+    "cls": "big",
+    "gain": 0.016490084633744573
+   },
+   {
+    "it": 131,
+    "dt": 774.29,
+    "cls": "rejected",
+    "gain": -0.0
+   },
+   {
+    "it": 136,
+    "dt": 748.4,
+    "cls": "big",
+    "gain": 0.010414675225149495
+   },
+   {
+    "it": 141,
+    "dt": 1183.02,
+    "cls": "rejected",
+    "gain": -0.0
+   },
+   {
+    "it": 146,
+    "dt": 700.19,
+    "cls": "big",
+    "gain": 0.002071051338759844
+   },
+   {
+    "it": 151,
+    "dt": 488.09,
+    "cls": "big",
+    "gain": 0.00019274096899835058
+   },
+   {
+    "it": 152,
+    "dt": 1466.64,
+    "cls": "other",
+    "gain": 0.00020457137526364022
+   },
+   {
+    "it": 156,
+    "dt": 937.56,
+    "cls": "big",
+    "gain": 1.2426818329913658e-07
+   },
+   {
+    "it": 157,
+    "dt": 2379.56,
+    "cls": "polish",
+    "gain": 1.7917614059115294e-09
+   }
+  ],
+  "cls": [
+   "other",
+   "polish",
+   "polish",
+   "polish",
+   "rejected",
+   "big",
+   "other",
+   "polish",
+   "polish",
+   "polish",
+   "big",
+   "polish",
+   "polish",
+   "big",
+   "polish",
+   "polish",
+   "rejected",
+   "big",
+   "polish",
+   "rejected",
+   "big",
+   "ladder",
+   "rejected",
+   "rejected",
+   "polish",
+   "rejected",
+   "other",
+   "other",
+   "big",
+   "polish",
+   "big",
+   "ladder",
+   "ladder",
+   "rejected",
+   "rejected",
+   "polish",
+   "rejected",
+   "other",
+   "rejected",
+   "other",
+   "polish",
+   "big",
+   "ladder",
+   "ladder",
+   "ladder",
+   "ladder",
+   "ladder",
+   "ladder",
+   "ladder",
+   "ladder",
+   "polish",
+   "polish",
+   "big",
+   "polish",
+   "polish",
+   "big",
+   "big",
+   "polish",
+   "rejected",
+   "rejected",
+   "rejected",
+   "rejected",
+   "rejected",
+   "rejected",
+   "rejected",
+   "polish",
+   "other",
+   "other",
+   "polish",
+   "ladder",
+   "ladder",
+   "ladder",
+   "ladder",
+   "ladder",
+   "other",
+   "other",
+   "ladder",
+   "other",
+   "polish",
+   "big",
+   "polish",
+   "polish",
+   "polish",
+   "big",
+   "polish",
+   "polish",
+   "big",
+   "polish",
+   "polish",
+   "polish",
+   "big",
+   "polish",
+   "polish",
+   "polish",
+   "polish",
+   "rejected",
+   "big",
+   "polish",
+   "polish",
+   "polish",
+   "polish",
+   "big",
+   "polish",
+   "polish",
+   "polish",
+   "polish",
+   "big",
+   "rejected",
+   "big",
+   "polish",
+   "polish",
+   "polish",
+   "polish",
+   "big",
+   "other",
+   "polish",
+   "polish",
+   "polish",
+   "big",
+   "big",
+   "other",
+   "polish",
+   "polish",
+   "polish",
+   "big",
+   "big",
+   "ladder",
+   "polish",
+   "polish",
+   "polish",
+   "big",
+   "rejected",
+   "big",
+   "polish",
+   "polish",
+   "polish",
+   "big",
+   "polish",
+   "polish",
+   "polish",
+   "polish",
+   "rejected",
+   "big",
+   "polish",
+   "polish",
+   "polish",
+   "big",
+   "other",
+   "polish",
+   "polish",
+   "polish",
+   "big",
+   "other",
+   "polish",
+   "polish",
+   "polish",
+   "big",
+   "polish"
+  ],
+  "heavy_wall_s": 12720.65,
+  "heavy_frac": 0.6074481176517217
+ },
+ "SATB8SA": {
+  "classes": {
+   "rejected": {
+    "n": 13,
+    "wall_s": 740.3599999999999,
+    "frac": 0.06634115569239481
+   },
+   "ladder": {
+    "n": 11,
+    "wall_s": 985.85,
+    "frac": 0.08833868434187074
+   },
+   "polish": {
+    "n": 23,
+    "wall_s": 3884.62,
+    "frac": 0.34808766036224364
+   },
+   "big": {
+    "n": 8,
+    "wall_s": 3993.3300000000004,
+    "frac": 0.3578287958035429
+   },
+   "other": {
+    "n": 12,
+    "wall_s": 1555.73,
+    "frac": 0.13940370379994785
+   }
+  },
+  "rejection_runs": [
+   {
+    "start": 1,
+    "n_rej": 3,
+    "ladder_after": 0,
+    "wall_rej": 109.99000000000001,
+    "wall_ladder": 17.52
+   },
+   {
+    "start": 5,
+    "n_rej": 2,
+    "ladder_after": 0,
+    "wall_rej": 83.35999999999999,
+    "wall_ladder": 17.24
+   },
+   {
+    "start": 12,
+    "n_rej": 1,
+    "ladder_after": 1,
+    "wall_rej": 108.34,
+    "wall_ladder": 146.94
+   },
+   {
+    "start": 15,
+    "n_rej": 2,
+    "ladder_after": 1,
+    "wall_rej": 144.59,
+    "wall_ladder": 59.03
+   },
+   {
+    "start": 20,
+    "n_rej": 2,
+    "ladder_after": 0,
+    "wall_rej": 147.06,
+    "wall_ladder": 16.76
+   },
+   {
+    "start": 23,
+    "n_rej": 1,
+    "ladder_after": 0,
+    "wall_rej": 47.67,
+    "wall_ladder": 17.18
+   },
+   {
+    "start": 25,
+    "n_rej": 1,
+    "ladder_after": 0,
+    "wall_rej": 61.8,
+    "wall_ladder": 17.89
+   },
+   {
+    "start": 27,
+    "n_rej": 1,
+    "ladder_after": 0,
+    "wall_rej": 37.55,
+    "wall_ladder": 16.6
+   }
+  ],
+  "heavy": [
+   {
+    "it": 48,
+    "dt": 710.93,
+    "cls": "big",
+    "gain": 0.00580025079278812
+   },
+   {
+    "it": 52,
+    "dt": 937.26,
+    "cls": "big",
+    "gain": 0.004914916682253079
+   },
+   {
+    "it": 57,
+    "dt": 1171.91,
+    "cls": "big",
+    "gain": 0.001229614550311453
+   },
+   {
+    "it": 62,
+    "dt": 761.83,
+    "cls": "big",
+    "gain": 6.13906794342256e-05
+   },
+   {
+    "it": 63,
+    "dt": 1413.24,
+    "cls": "polish",
+    "gain": 7.323401803205343e-06
+   },
+   {
+    "it": 65,
+    "dt": 929.74,
+    "cls": "other",
+    "gain": 6.117886641732184e-09
+   },
+   {
+    "it": 66,
+    "dt": 1570.81,
+    "cls": "polish",
+    "gain": 7.008793545537628e-11
+   }
+  ],
+  "cls": [
+   "other",
+   "rejected",
+   "rejected",
+   "rejected",
+   "polish",
+   "rejected",
+   "rejected",
+   "polish",
+   "other",
+   "polish",
+   "polish",
+   "big",
+   "rejected",
+   "other",
+   "ladder",
+   "rejected",
+   "rejected",
+   "polish",
+   "ladder",
+   "polish",
+   "rejected",
+   "rejected",
+   "big",
+   "rejected",
+   "other",
+   "rejected",
+   "other",
+   "rejected",
+   "other",
+   "other",
+   "big",
+   "ladder",
+   "ladder",
+   "ladder",
+   "ladder",
+   "ladder",
+   "ladder",
+   "ladder",
+   "ladder",
+   "ladder",
+   "other",
+   "other",
+   "polish",
+   "polish",
+   "big",
+   "polish",
+   "polish",
+   "polish",
+   "big",
+   "polish",
+   "polish",
+   "polish",
+   "big",
+   "other",
+   "polish",
+   "polish",
+   "polish",
+   "big",
+   "other",
+   "polish",
+   "polish",
+   "polish",
+   "big",
+   "polish",
+   "polish",
+   "other",
+   "polish"
+  ],
+  "heavy_wall_s": 7495.719999999999,
+  "heavy_frac": 0.6716661185728532
+ },
+ "SATC2": {
+  "classes": {
+   "rejected": {
+    "n": 21,
+    "wall_s": 2765.8199999999997,
+    "frac": 0.18813937368503036
+   },
+   "ladder": {
+    "n": 19,
+    "wall_s": 1427.68,
+    "frac": 0.09711507654968299
+   },
+   "polish": {
+    "n": 74,
+    "wall_s": 3102.57,
+    "frac": 0.21104611891372713
+   },
+   "big": {
+    "n": 34,
+    "wall_s": 5978.29,
+    "frac": 0.40666122029180507
+   },
+   "other": {
+    "n": 13,
+    "wall_s": 1426.55,
+    "frac": 0.09703821055975446
+   }
+  },
+  "rejection_runs": [
+   {
+    "start": 5,
+    "n_rej": 1,
+    "ladder_after": 0,
+    "wall_rej": 196.2,
+    "wall_ladder": 12.54
+   },
+   {
+    "start": 17,
+    "n_rej": 1,
+    "ladder_after": 0,
+    "wall_rej": 163.18,
+    "wall_ladder": 13.41
+   },
+   {
+    "start": 20,
+    "n_rej": 1,
+    "ladder_after": 1,
+    "wall_rej": 93.18,
+    "wall_ladder": 135.10999999999999
+   },
+   {
+    "start": 23,
+    "n_rej": 2,
+    "ladder_after": 0,
+    "wall_rej": 171.37,
+    "wall_ladder": 8.71
+   },
+   {
+    "start": 26,
+    "n_rej": 1,
+    "ladder_after": 0,
+    "wall_rej": 103.52,
+    "wall_ladder": 9.79
+   },
+   {
+    "start": 34,
+    "n_rej": 2,
+    "ladder_after": 0,
+    "wall_rej": 112.74,
+    "wall_ladder": 9.76
+   },
+   {
+    "start": 37,
+    "n_rej": 1,
+    "ladder_after": 0,
+    "wall_rej": 36.57,
+    "wall_ladder": 9.51
+   },
+   {
+    "start": 39,
+    "n_rej": 1,
+    "ladder_after": 0,
+    "wall_rej": 47.47,
+    "wall_ladder": 10.26
+   },
+   {
+    "start": 60,
+    "n_rej": 7,
+    "ladder_after": 0,
+    "wall_rej": 55.44,
+    "wall_ladder": 9.63
+   },
+   {
+    "start": 97,
+    "n_rej": 1,
+    "ladder_after": 0,
+    "wall_rej": 296.49,
+    "wall_ladder": 18.15
+   },
+   {
+    "start": 109,
+    "n_rej": 1,
+    "ladder_after": 0,
+    "wall_rej": 253.34,
+    "wall_ladder": 8.59
+   },
+   {
+    "start": 136,
+    "n_rej": 1,
+    "ladder_after": 0,
+    "wall_rej": 592.41,
+    "wall_ladder": 13.5
+   },
+   {
+    "start": 146,
+    "n_rej": 1,
+    "ladder_after": 0,
+    "wall_rej": 643.91,
+    "wall_ladder": 11.91
+   }
+  ],
+  "heavy": [
+   {
+    "it": 92,
+    "dt": 347.25,
+    "cls": "big",
+    "gain": 0.1403721365312549
+   },
+   {
+    "it": 103,
+    "dt": 406.4,
+    "cls": "big",
+    "gain": 0.09804525377319351
+   },
+   {
+    "it": 127,
+    "dt": 354.04,
+    "cls": "big",
+    "gain": 0.014423410692813832
+   },
+   {
+    "it": 133,
+    "dt": 455.92,
+    "cls": "big",
+    "gain": 0.005662339456648624
+   },
+   {
+    "it": 136,
+    "dt": 592.41,
+    "cls": "rejected",
+    "gain": -0.0
+   },
+   {
+    "it": 141,
+    "dt": 415.0,
+    "cls": "big",
+    "gain": 0.009187480786351898
+   },
+   {
+    "it": 146,
+    "dt": 643.91,
+    "cls": "rejected",
+    "gain": -0.0
+   },
+   {
+    "it": 151,
+    "dt": 434.21,
+    "cls": "big",
+    "gain": 0.0009083752174205983
+   },
+   {
+    "it": 157,
+    "dt": 1008.44,
+    "cls": "other",
+    "gain": 4.166644123415608e-05
+   },
+   {
+    "it": 159,
+    "dt": 932.25,
+    "cls": "big",
+    "gain": 1.5608713965775678e-07
+   },
+   {
+    "it": 160,
+    "dt": 1194.93,
+    "cls": "polish",
+    "gain": 4.1382008930668235e-11
+   }
+  ],
+  "cls": [
+   "other",
+   "polish",
+   "big",
+   "polish",
+   "polish",
+   "rejected",
+   "big",
+   "other",
+   "polish",
+   "polish",
+   "polish",
+   "big",
+   "polish",
+   "polish",
+   "big",
+   "polish",
+   "polish",
+   "rejected",
+   "big",
+   "polish",
+   "rejected",
+   "big",
+   "ladder",
+   "rejected",
+   "rejected",
+   "polish",
+   "rejected",
+   "other",
+   "other",
+   "big",
+   "polish",
+   "big",
+   "ladder",
+   "ladder",
+   "rejected",
+   "rejected",
+   "polish",
+   "rejected",
+   "other",
+   "rejected",
+   "other",
+   "polish",
+   "big",
+   "ladder",
+   "ladder",
+   "ladder",
+   "ladder",
+   "ladder",
+   "ladder",
+   "ladder",
+   "polish",
+   "big",
+   "polish",
+   "polish",
+   "big",
+   "polish",
+   "polish",
+   "big",
+   "big",
+   "polish",
+   "rejected",
+   "rejected",
+   "rejected",
+   "rejected",
+   "rejected",
+   "rejected",
+   "rejected",
+   "polish",
+   "other",
+   "other",
+   "polish",
+   "ladder",
+   "ladder",
+   "ladder",
+   "ladder",
+   "ladder",
+   "other",
+   "ladder",
+   "ladder",
+   "other",
+   "polish",
+   "big",
+   "polish",
+   "polish",
+   "polish",
+   "big",
+   "polish",
+   "polish",
+   "big",
+   "polish",
+   "polish",
+   "polish",
+   "big",
+   "polish",
+   "polish",
+   "polish",
+   "polish",
+   "rejected",
+   "big",
+   "polish",
+   "polish",
+   "polish",
+   "polish",
+   "big",
+   "polish",
+   "polish",
+   "polish",
+   "polish",
+   "big",
+   "rejected",
+   "big",
+   "polish",
+   "polish",
+   "polish",
+   "polish",
+   "big",
+   "other",
+   "polish",
+   "polish",
+   "polish",
+   "big",
+   "big",
+   "other",
+   "polish",
+   "polish",
+   "polish",
+   "big",
+   "big",
+   "ladder",
+   "polish",
+   "polish",
+   "polish",
+   "big",
+   "big",
+   "polish",
+   "polish",
+   "rejected",
+   "big",
+   "polish",
+   "polish",
+   "polish",
+   "big",
+   "polish",
+   "polish",
+   "polish",
+   "polish",
+   "rejected",
+   "big",
+   "polish",
+   "polish",
+   "polish",
+   "big",
+   "ladder",
+   "polish",
+   "polish",
+   "polish",
+   "big",
+   "other",
+   "polish",
+   "big",
+   "polish"
+  ],
+  "heavy_wall_s": 6784.76,
+  "heavy_frac": 0.4615197290507867
+ },
+ "SATP": {
+  "classes": {
+   "rejected": {
+    "n": 9,
+    "wall_s": 716.8,
+    "frac": 0.15139642503363543
+   },
+   "ladder": {
+    "n": 9,
+    "wall_s": 304.09000000000003,
+    "frac": 0.06422731429754214
+   },
+   "polish": {
+    "n": 17,
+    "wall_s": 1002.4499999999999,
+    "frac": 0.21172899870949752
+   },
+   "big": {
+    "n": 11,
+    "wall_s": 1319.4,
+    "frac": 0.27867249328875365
+   },
+   "other": {
+    "n": 23,
+    "wall_s": 1391.85,
+    "frac": 0.29397476867057126
+   }
+  },
+  "rejection_runs": [
+   {
+    "start": 6,
+    "n_rej": 1,
+    "ladder_after": 0,
+    "wall_rej": 24.19,
+    "wall_ladder": 12.94
+   },
+   {
+    "start": 8,
+    "n_rej": 1,
+    "ladder_after": 0,
+    "wall_rej": 22.39,
+    "wall_ladder": 10.63
+   },
+   {
+    "start": 13,
+    "n_rej": 4,
+    "ladder_after": 1,
+    "wall_rej": 79.7,
+    "wall_ladder": 23.54
+   },
+   {
+    "start": 35,
+    "n_rej": 1,
+    "ladder_after": 0,
+    "wall_rej": 142.86,
+    "wall_ladder": 13.92
+   },
+   {
+    "start": 42,
+    "n_rej": 1,
+    "ladder_after": 0,
+    "wall_rej": 183.44,
+    "wall_ladder": 13.96
+   },
+   {
+    "start": 55,
+    "n_rej": 1,
+    "ladder_after": 0,
+    "wall_rej": 264.22,
+    "wall_ladder": 12.65
+   }
+  ],
+  "heavy": [
+   {
+    "it": 59,
+    "dt": 343.83,
+    "cls": "big",
+    "gain": 0.006712923971917917
+   },
+   {
+    "it": 62,
+    "dt": 339.36,
+    "cls": "big",
+    "gain": 0.0014227522916030466
+   },
+   {
+    "it": 66,
+    "dt": 595.24,
+    "cls": "other",
+    "gain": 2.469144294536818e-05
+   },
+   {
+    "it": 68,
+    "dt": 592.05,
+    "cls": "polish",
+    "gain": 3.747857135749655e-09
+   }
+  ],
+  "cls": [
+   "other",
+   "big",
+   "ladder",
+   "ladder",
+   "other",
+   "polish",
+   "rejected",
+   "big",
+   "rejected",
+   "other",
+   "other",
+   "other",
+   "polish",
+   "rejected",
+   "rejected",
+   "rejected",
+   "rejected",
+   "polish",
+   "ladder",
+   "other",
+   "other",
+   "other",
+   "other",
+   "ladder",
+   "other",
+   "other",
+   "polish",
+   "big",
+   "big",
+   "polish",
+   "ladder",
+   "ladder",
+   "other",
+   "other",
+   "polish",
+   "rejected",
+   "big",
+   "polish",
+   "ladder",
+   "big",
+   "polish",
+   "other",
+   "rejected",
+   "big",
+   "polish",
+   "other",
+   "big",
+   "polish",
+   "other",
+   "big",
+   "ladder",
+   "polish",
+   "other",
+   "ladder",
+   "polish",
+   "rejected",
+   "other",
+   "polish",
+   "other",
+   "big",
+   "polish",
+   "other",
+   "big",
+   "other",
+   "other",
+   "polish",
+   "other",
+   "polish",
+   "polish"
+  ],
+  "heavy_wall_s": 1870.48,
+  "heavy_frac": 0.39506694349457927
+ }
+}

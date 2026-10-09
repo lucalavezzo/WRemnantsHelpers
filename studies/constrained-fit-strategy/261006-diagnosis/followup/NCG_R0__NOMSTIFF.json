@@ -1,0 +1,40 @@
+{
+ "label": "NCG_R0",
+ "start": "NOMSTIFF",
+ "N": 20,
+ "r": 0.0,
+ "stages": [
+  {
+   "restarts": 1,
+   "iters": 44,
+   "stops": [
+    "stall",
+    "stall",
+    "restart-bought-nothing"
+   ],
+   "capped": false,
+   "conv": [
+    2,
+    2
+   ],
+   "cfg": {},
+   "n_f": 20,
+   "n_hvp": 1757,
+   "fstar": -7.447328229736393e-06,
+   "overshoot_star": 9.154675144262779e-07
+  }
+ ],
+ "E_conv": {
+  "n_f": 2,
+  "n_hvp": 2
+ },
+ "E_total": {
+  "n_f": 20,
+  "n_hvp": 1757
+ },
+ "f_end_minus_fstar": -1.0241929527624738e-08,
+ "face_end": -9.154674714545452e-07,
+ "failed": false,
+ "restarts": 1,
+ "seconds": 0.9721212387084961
+}

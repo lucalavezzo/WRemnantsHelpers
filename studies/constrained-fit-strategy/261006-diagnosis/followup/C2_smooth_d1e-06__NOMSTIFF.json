@@ -1,0 +1,43 @@
+{
+ "label": "C2_smooth_d1e-06",
+ "start": "NOMSTIFF",
+ "N": 20,
+ "r": 0.0,
+ "stages": [
+  {
+   "restarts": 1,
+   "iters": 46,
+   "stops": [
+    "stall",
+    "stall",
+    "restart-bought-nothing"
+   ],
+   "capped": false,
+   "conv": [
+    2,
+    2
+   ],
+   "cfg": {
+    "pen": "smooth2",
+    "delta": 1e-06
+   },
+   "n_f": 22,
+   "n_hvp": 131,
+   "fstar": -1.4841749650742226e-05,
+   "overshoot_star": 1.4154641653867292e-06
+  }
+ ],
+ "E_conv": {
+  "n_f": 2,
+  "n_hvp": 2
+ },
+ "E_total": {
+  "n_f": 22,
+  "n_hvp": 131
+ },
+ "f_end_minus_fstar": -1.0241892151772474e-08,
+ "face_end": -1.4154641613910168e-06,
+ "failed": false,
+ "restarts": 1,
+ "seconds": 0.8138711452484131
+}

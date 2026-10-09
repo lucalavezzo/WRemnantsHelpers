@@ -1,0 +1,38 @@
+{
+ "label": "NCG_RS_N10_r1e-8",
+ "start": "C1A",
+ "N": 10,
+ "r": 1e-08,
+ "stages": [
+  {
+   "restarts": 0,
+   "iters": 1267,
+   "stops": [
+    "pred<=0"
+   ],
+   "capped": false,
+   "conv": [
+    1261,
+    2755
+   ],
+   "cfg": {},
+   "n_f": 1264,
+   "n_hvp": 2934,
+   "fstar": -7.447328229736393e-06,
+   "overshoot_star": 9.154675144262779e-07
+  }
+ ],
+ "E_conv": {
+  "n_f": 1261,
+  "n_hvp": 2755
+ },
+ "E_total": {
+  "n_f": 1264,
+  "n_hvp": 2934
+ },
+ "f_end_minus_fstar": -1.0241929572431087e-08,
+ "face_end": -9.15467510187451e-07,
+ "failed": false,
+ "restarts": 0,
+ "seconds": 1.204007863998413
+}

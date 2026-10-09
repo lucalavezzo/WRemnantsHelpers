@@ -1,0 +1,21 @@
+fit nf=5 N3LL full   vs C++ exact                       max|py - C++| = 4.81e-11   (tol 1e-05)  PASS
+fit nf=5 N3LL pert   vs C++ exact                       max|py - C++| = 4.24e-11   (tol 1e-05)  PASS
+fit nf=5 N3LL mu0 (driver prints 8 dp)                  max|py - C++| = 4.96e-09   (tol 1e-07)  PASS
+fit nf=5 N3LL full   vs C++ analytic (fit default)      max|py - C++| = 1.88e-03   (tol 3e-03)  PASS
+lattice nf=4 N3LL full vs C++ exact (same start)        max|py - C++| = 3.08e-11   (tol 1e-05)  PASS
+fit nf=5 N3LL, theta_gnu=theta_cusp=1 vs C++ exact      max|py - C++| = 4.12e-11   (tol 1e-05)  PASS
+fit nf=5 N3LL tanh_6 vs C++ exact                       max|py - C++| = 4.88e-11   (tol 1e-05)  PASS
+fit nf=5 N4LL full vs C++ analytic                      max|py - C++| = 1.14e-03   (tol 5e-03)  PASS
+d gamma_zeta/d ln mu + 2 Gamma_cusp(2 GeV)              max|py - C++| = 4.05e-08   (tol 1e-05)  PASS
+
+bT[fm]  C++exact_fit  py_fit  C++analytic_fit  py_lattice(nf=4)
+ 0.05   0.211172   0.211172   0.210707   0.220588
+ 0.10   0.046410   0.046410   0.046256   0.047365
+ 0.15  -0.075876  -0.075876  -0.075534  -0.085942
+ 0.20  -0.170195  -0.170195  -0.169295  -0.190859
+ 0.30  -0.290729  -0.290729  -0.289150  -0.320160
+ 0.45  -0.488669  -0.488669  -0.486850  -0.518874
+ 0.60  -0.761518  -0.761518  -0.759655  -0.791612
+ 0.75  -0.962112  -0.962112  -0.960236  -0.992150
+ 0.90  -1.016269  -1.016269  -1.014389  -1.046283
+ 1.20  -1.020639  -1.020639  -1.018755  -1.050635

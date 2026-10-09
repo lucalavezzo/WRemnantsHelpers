@@ -1,0 +1,383 @@
+{
+ "point": {
+  "lambda2_nu": 0.03569263536868482,
+  "lambda4_nu": 0.009808483617542137,
+  "resumTNP_gamma_nu": 0.31484131331814297,
+  "resumTNP_gamma_cusp": -0.0674860192364965
+ },
+ "approx": "terms at Delta alpha_s = 0 (blinded); FD derivatives in theta",
+ "newton": {
+  "O old (LATFULL8)": {
+   "dalphaS_vs_LATFULL8_over_sigNOM": -0.0,
+   "dalphaS_vs_NOMSTIFF_over_sigNOM": -0.08547425770336584,
+   "sigma_ratio_vs_NOM": 0.9788715350325358,
+   "lambda2_nu": 0.03569263536868482,
+   "d_lambda2_nu_over_sigma": 0.0,
+   "lambda4_nu": 0.009808483617542137,
+   "d_lambda4_nu_over_sigma": 0.0,
+   "resumTNP_gamma_nu": 0.31484131331814297,
+   "d_resumTNP_gamma_nu_over_sigma": 0.0,
+   "resumTNP_gamma_cusp": -0.0674860192364965,
+   "d_resumTNP_gamma_cusp_over_sigma": -0.0,
+   "dchi2lat_at_LATFULL8": 9.090426999829393
+  },
+  "K kernel swap only (old cov)": {
+   "dalphaS_vs_LATFULL8_over_sigNOM": -0.006008372075889881,
+   "dalphaS_vs_NOMSTIFF_over_sigNOM": -0.09148262977925599,
+   "sigma_ratio_vs_NOM": 0.9780302593834443,
+   "lambda2_nu": 0.03580136090256682,
+   "d_lambda2_nu_over_sigma": 0.0035835464914599907,
+   "lambda4_nu": 0.00990642964193217,
+   "d_lambda4_nu_over_sigma": 0.01759639559838609,
+   "resumTNP_gamma_nu": 0.3159278759287069,
+   "d_resumTNP_gamma_nu_over_sigma": 0.0010726382118109842,
+   "resumTNP_gamma_cusp": -0.06442326409217054,
+   "d_resumTNP_gamma_cusp_over_sigma": 0.0030610035456144474,
+   "dchi2lat_at_LATFULL8": 9.186587927940218
+  },
+  "N Jnf+Jbt (default)": {
+   "dalphaS_vs_LATFULL8_over_sigNOM": -0.009525624354532561,
+   "dalphaS_vs_NOMSTIFF_over_sigNOM": -0.0949998820578995,
+   "sigma_ratio_vs_NOM": 0.9761163136611044,
+   "lambda2_nu": 0.03604020675441265,
+   "d_lambda2_nu_over_sigma": 0.011533937099279188,
+   "lambda4_nu": 0.011019993394040034,
+   "d_lambda4_nu_over_sigma": 0.2413153358053692,
+   "resumTNP_gamma_nu": 0.3275097382546165,
+   "d_resumTNP_gamma_nu_over_sigma": 0.012525778818549566,
+   "resumTNP_gamma_cusp": -0.06629768507079493,
+   "d_resumTNP_gamma_cusp_over_sigma": 0.0011877318606981029,
+   "dchi2lat_at_LATFULL8": 9.711573367296483
+  },
+  "N Jnf (no b_T window)": {
+   "dalphaS_vs_LATFULL8_over_sigNOM": -0.009081707237219004,
+   "dalphaS_vs_NOMSTIFF_over_sigNOM": -0.09455596494058553,
+   "sigma_ratio_vs_NOM": 0.9757263521463251,
+   "lambda2_nu": 0.0364524721244546,
+   "d_lambda2_nu_over_sigma": 0.025227853055597077,
+   "lambda4_nu": 0.011151080680658686,
+   "d_lambda4_nu_over_sigma": 0.2683464232738097,
+   "resumTNP_gamma_nu": 0.33184349698190446,
+   "d_resumTNP_gamma_nu_over_sigma": 0.01681674674454475,
+   "resumTNP_gamma_cusp": -0.06725836730090064,
+   "d_resumTNP_gamma_cusp_over_sigma": 0.0002275398613662252,
+   "dchi2lat_at_LATFULL8": 9.924715783860456
+  },
+  "N Jbt (no n_f syst)": {
+   "dalphaS_vs_LATFULL8_over_sigNOM": -0.009608824844705604,
+   "dalphaS_vs_NOMSTIFF_over_sigNOM": -0.09508308254807007,
+   "sigma_ratio_vs_NOM": 0.9759884815506311,
+   "lambda2_nu": 0.03606732999857459,
+   "d_lambda2_nu_over_sigma": 0.01243966361436236,
+   "lambda4_nu": 0.011066001236709522,
+   "d_lambda4_nu_over_sigma": 0.2517875341508303,
+   "resumTNP_gamma_nu": 0.3280372783764782,
+   "d_resumTNP_gamma_nu_over_sigma": 0.013048711850338344,
+   "resumTNP_gamma_cusp": -0.0663940158413341,
+   "d_resumTNP_gamma_cusp_over_sigma": 0.001091454653057076,
+   "dchi2lat_at_LATFULL8": 9.746726644117121
+  },
+  "N none (stat only)": {
+   "dalphaS_vs_LATFULL8_over_sigNOM": -0.009143527835778808,
+   "dalphaS_vs_NOMSTIFF_over_sigNOM": -0.09461778553914449,
+   "sigma_ratio_vs_NOM": 0.9755878920071048,
+   "lambda2_nu": 0.036483510960877305,
+   "d_lambda2_nu_over_sigma": 0.026271239056931735,
+   "lambda4_nu": 0.011195431033452328,
+   "d_lambda4_nu_over_sigma": 0.278673355203729,
+   "resumTNP_gamma_nu": 0.33236078326810525,
+   "d_resumTNP_gamma_nu_over_sigma": 0.017330291474847017,
+   "resumTNP_gamma_cusp": -0.067355664082089,
+   "d_resumTNP_gamma_cusp_over_sigma": 0.00013029158893600908,
+   "dchi2lat_at_LATFULL8": 9.96400801678952
+  },
+  "N direct_nf+Jbt": {
+   "dalphaS_vs_LATFULL8_over_sigNOM": -0.00975257367064109,
+   "dalphaS_vs_NOMSTIFF_over_sigNOM": -0.09522683137400823,
+   "sigma_ratio_vs_NOM": 0.9761236072190084,
+   "lambda2_nu": 0.03599741335271742,
+   "d_lambda2_nu_over_sigma": 0.010112459037025266,
+   "lambda4_nu": 0.011028823353238276,
+   "d_lambda4_nu_over_sigma": 0.24333508080586527,
+   "resumTNP_gamma_nu": 0.3274158215860491,
+   "d_resumTNP_gamma_nu_over_sigma": 0.012432797167326318,
+   "resumTNP_gamma_cusp": -0.06625107307703783,
+   "d_resumTNP_gamma_cusp_over_sigma": 0.001234319441602457,
+   "dchi2lat_at_LATFULL8": 9.713034209320337
+  },
+  "N Jnf+Jbt, n_f identified at 2 GeV": {
+   "dalphaS_vs_LATFULL8_over_sigNOM": -0.009608824844705604,
+   "dalphaS_vs_NOMSTIFF_over_sigNOM": -0.09508308254807007,
+   "sigma_ratio_vs_NOM": 0.9759884815506311,
+   "lambda2_nu": 0.03606732999857459,
+   "d_lambda2_nu_over_sigma": 0.01243966361436236,
+   "lambda4_nu": 0.011066001236709522,
+   "d_lambda4_nu_over_sigma": 0.2517875341508303,
+   "resumTNP_gamma_nu": 0.3280372783764782,
+   "d_resumTNP_gamma_nu_over_sigma": 0.013048711850338344,
+   "resumTNP_gamma_cusp": -0.0663940158413341,
+   "d_resumTNP_gamma_cusp_over_sigma": 0.001091454653057076,
+   "dchi2lat_at_LATFULL8": 9.746726644117121
+  }
+ },
+ "load_time": {
+  "N Jnf+Jbt (default)": {
+   "data": "/home/submit/lavezzo/alphaS/WRemnants/wremnants/postprocessing/scetlib_ad/data/lattice_aswz_data.npz",
+   "syst": "Jnf+Jbt",
+   "nf_match": 1.0,
+   "ydata": "lattice",
+   "anchor_alphas": 0.118,
+   "nominal_stat_fit": {
+    "lam": [
+     0.1855328005785214,
+     -0.0059693557832792305
+    ],
+    "chi2": 6.7031751416896155
+   },
+   "final_fit": {
+    "lam": [
+     0.18553280057848,
+     -0.005969355783273211
+    ],
+    "chi2": 6.703175141689604,
+    "sigma": [
+     0.04005096689973662,
+     0.003455518125024256
+    ],
+    "rho": -0.8893653098399352
+   },
+   "nf_shift_range": [
+    -0.009199331373798136,
+    -0.009199331373797692
+   ],
+   "syst_info": {
+    "Jnf": {
+     "dlam": [
+      -0.003963989014410085,
+      0.00016517659509834078
+     ],
+     "chi2min": 6.762495488969501
+    },
+    "Jbt": {
+     "dlam": [
+      0.007094863933664042,
+      -0.00044907491794743144
+     ],
+     "chi2min": 4.666419324246909,
+     "npts": 17
+    }
+   },
+   "chi2_min": 6.703175141689604
+  },
+  "N Jnf (no b_T window)": {
+   "data": "/home/submit/lavezzo/alphaS/WRemnants/wremnants/postprocessing/scetlib_ad/data/lattice_aswz_data.npz",
+   "syst": "Jnf",
+   "nf_match": 1.0,
+   "ydata": "lattice",
+   "anchor_alphas": 0.118,
+   "nominal_stat_fit": {
+    "lam": [
+     0.1855328005785214,
+     -0.0059693557832792305
+    ],
+    "chi2": 6.7031751416896155
+   },
+   "final_fit": {
+    "lam": [
+     0.18553280057849997,
+     -0.005969355783276301
+    ],
+    "chi2": 6.7031751416896155,
+    "sigma": [
+     0.039384670446269886,
+     0.0034224696806071406
+    ],
+    "rho": -0.8874121378477366
+   },
+   "nf_shift_range": [
+    -0.009199331373798136,
+    -0.009199331373797692
+   ],
+   "syst_info": {
+    "Jnf": {
+     "dlam": [
+      -0.003963989014410085,
+      0.00016517659509834078
+     ],
+     "chi2min": 6.762495488969501
+    }
+   },
+   "chi2_min": 6.7031751416896155
+  },
+  "N Jbt (no n_f syst)": {
+   "data": "/home/submit/lavezzo/alphaS/WRemnants/wremnants/postprocessing/scetlib_ad/data/lattice_aswz_data.npz",
+   "syst": "Jbt",
+   "nf_match": 1.0,
+   "ydata": "lattice",
+   "anchor_alphas": 0.118,
+   "nominal_stat_fit": {
+    "lam": [
+     0.1855328005785214,
+     -0.0059693557832792305
+    ],
+    "chi2": 6.7031751416896155
+   },
+   "final_fit": {
+    "lam": [
+     0.18553280057849952,
+     -0.005969355783275865
+    ],
+    "chi2": 6.703175141689616,
+    "sigma": [
+     0.03985863737699969,
+     0.003451570888582637
+    ],
+    "rho": -0.8899735556036955
+   },
+   "nf_shift_range": [
+    -0.009199331373798136,
+    -0.009199331373797692
+   ],
+   "syst_info": {
+    "Jbt": {
+     "dlam": [
+      0.007094863933664042,
+      -0.00044907491794743144
+     ],
+     "chi2min": 4.666419324246909,
+     "npts": 17
+    }
+   },
+   "chi2_min": 6.703175141689616
+  },
+  "N none (stat only)": {
+   "data": "/home/submit/lavezzo/alphaS/WRemnants/wremnants/postprocessing/scetlib_ad/data/lattice_aswz_data.npz",
+   "syst": "none",
+   "nf_match": 1.0,
+   "ydata": "lattice",
+   "anchor_alphas": 0.118,
+   "nominal_stat_fit": {
+    "lam": [
+     0.1855328005785214,
+     -0.0059693557832792305
+    ],
+    "chi2": 6.7031751416896155
+   },
+   "final_fit": {
+    "lam": [
+     0.1855328005785214,
+     -0.0059693557832792305
+    ],
+    "chi2": 6.7031751416896155,
+    "sigma": [
+     0.039188846303220524,
+     0.0034184771716357456
+    ],
+    "rho": -0.8880490682531104
+   },
+   "nf_shift_range": [
+    -0.009199331373798136,
+    -0.009199331373797692
+   ],
+   "syst_info": {},
+   "chi2_min": 6.7031751416896155
+  },
+  "N direct_nf+Jbt": {
+   "data": "/home/submit/lavezzo/alphaS/WRemnants/wremnants/postprocessing/scetlib_ad/data/lattice_aswz_data.npz",
+   "syst": "direct_nf+Jbt",
+   "nf_match": 1.0,
+   "ydata": "lattice",
+   "anchor_alphas": 0.118,
+   "nominal_stat_fit": {
+    "lam": [
+     0.1855328005785214,
+     -0.0059693557832792305
+    ],
+    "chi2": 6.7031751416896155
+   },
+   "final_fit": {
+    "lam": [
+     0.18564632720117688,
+     -0.0059740777178938385
+    ],
+    "chi2": 6.702359311152314,
+    "sigma": [
+     0.04006343641581329,
+     0.0034561195661359915
+    ],
+    "rho": -0.8892897190086515
+   },
+   "nf_shift_range": [
+    -0.009199331373798136,
+    -0.009199331373797692
+   ],
+   "syst_info": {
+    "direct_nf": {
+     "shift_range": [
+      -0.009199331373798136,
+      -0.009199331373797692
+     ]
+    },
+    "Jbt": {
+     "dlam": [
+      0.007094863933664042,
+      -0.00044907491794743144
+     ],
+     "chi2min": 4.666419324246909,
+     "npts": 17
+    }
+   },
+   "chi2_min": 6.702359311152314
+  },
+  "N Jnf+Jbt, n_f identified at 2 GeV": {
+   "data": "/home/submit/lavezzo/alphaS/WRemnants/wremnants/postprocessing/scetlib_ad/data/lattice_aswz_data.npz",
+   "syst": "Jnf+Jbt",
+   "nf_match": 2.0,
+   "ydata": "lattice",
+   "anchor_alphas": 0.118,
+   "nominal_stat_fit": {
+    "lam": [
+     0.1855328005785214,
+     -0.0059693557832792305
+    ],
+    "chi2": 6.7031751416896155
+   },
+   "final_fit": {
+    "lam": [
+     0.18553280057849952,
+     -0.005969355783275865
+    ],
+    "chi2": 6.703175141689616,
+    "sigma": [
+     0.03985863737699969,
+     0.003451570888582637
+    ],
+    "rho": -0.8899735556036955
+   },
+   "nf_shift_range": [
+    -3.469446951953614e-18,
+    2.220446049250313e-16
+   ],
+   "syst_info": {
+    "Jnf": {
+     "dlam": [
+      0.0,
+      8.673617379884035e-19
+     ],
+     "chi2min": 6.703175141689618
+    },
+    "Jbt": {
+     "dlam": [
+      0.007094863933664042,
+      -0.00044907491794743144
+     ],
+     "chi2min": 4.666419324246909,
+     "npts": 17
+    }
+   },
+   "chi2_min": 6.703175141689616
+  }
+ },
+ "old_offset": 6.712728055519187,
+ "K_offset": 6.70317501516382
+}

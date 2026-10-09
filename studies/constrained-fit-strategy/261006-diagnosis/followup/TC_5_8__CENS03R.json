@@ -1,0 +1,63 @@
+{
+ "label": "TC_5_8",
+ "start": "CENS03R",
+ "N": 20,
+ "r": 0.0,
+ "stages": [
+  {
+   "restarts": 1,
+   "iters": 75,
+   "stops": [
+    "stall",
+    "stall",
+    "restart-bought-nothing"
+   ],
+   "capped": false,
+   "conv": [
+    32,
+    215
+   ],
+   "cfg": {
+    "tau": 5.0
+   },
+   "n_f": 48,
+   "n_hvp": 349,
+   "fstar": -0.0029963898739402426,
+   "overshoot_star": 0.00036833311296131075
+  },
+  {
+   "restarts": 1,
+   "iters": 48,
+   "stops": [
+    "stall",
+    "stall",
+    "restart-bought-nothing"
+   ],
+   "capped": false,
+   "conv": [
+    54,
+    416
+   ],
+   "cfg": {
+    "tau": 8.0
+   },
+   "n_f": 24,
+   "n_hvp": 192,
+   "fstar": -7.447328229736393e-06,
+   "overshoot_star": 9.154675144262779e-07
+  }
+ ],
+ "E_conv": {
+  "n_f": 54,
+  "n_hvp": 416
+ },
+ "E_total": {
+  "n_f": 72,
+  "n_hvp": 541
+ },
+ "f_end_minus_fstar": -1.0241929551328955e-08,
+ "face_end": -9.154675106662347e-07,
+ "failed": false,
+ "restarts": 2,
+ "seconds": 2.0637707710266113
+}

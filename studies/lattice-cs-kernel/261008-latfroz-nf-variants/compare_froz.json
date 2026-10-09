@@ -1,0 +1,347 @@
+{
+ "NOMSTIFF": {
+  "path": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260930_stiff_wall_fits/fitresults_NOMSTIFF.hdf5",
+  "kind": "1d",
+  "nll": 376.6146329237086,
+  "wall": 7.211558700994007e-07,
+  "lattice": 2.5248755535802907,
+  "priors": 19.18203488218649,
+  "n_model_priors": 44,
+  "data_bb": 354.907721766786,
+  "data_bb_includes_live_lattice": false,
+  "edm": 3.004579117754218e-14,
+  "lambdas": {
+   "lambda2": 0.025581284102796142,
+   "lambda4": 0.08758284351213724,
+   "delta_lambda2": -0.004093151901886217,
+   "lambda2_nu": 0.06426999671529844,
+   "lambda4_nu": 0.0
+  },
+  "sigma_lambdas_phys": {
+   "lambda2": 0.04272088997628132,
+   "lambda4": 0.02716435417398683,
+   "delta_lambda2": 0.006835291447830541,
+   "lambda2_nu": 0.022931336111338352
+  },
+  "faces": {
+   "lambda2_nu >= 0 (CS small-b turn-on)": 0.06426999671529844,
+   "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=0 (TMD small-b turn-on)": 0.025581284102796142,
+   "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=0 (TMD large-b)": 0.26276527098235586,
+   "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=2.5 (TMD small-b turn-on)": -9.152839927153988e-07,
+   "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=2.5 (TMD large-b)": 0.26274853053641173
+  },
+  "active": [
+   "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=2.5 (TMD small-b turn-on)"
+  ],
+  "tnps": {
+   "resumTNP_gamma_nu": {
+    "theta": 0.6923507962312608,
+    "sigma": 1.0071183809032958
+   },
+   "resumTNP_gamma_cusp": {
+    "theta": -0.15026679135205567,
+    "sigma": 1.0000416308105238
+   }
+  },
+  "frozen_dchi2_by_variant": {
+   "V1": 17.76080115330175,
+   "V2": 14.212108645512219,
+   "V3": 14.194470139034255,
+   "V3lit": 17.61383265215572
+  },
+  "frozen_dchi2_stat_only": 18.01858667633579,
+  "dalphaS_vs_NOMSTIFF_over_sigNOM": 0.0,
+  "sigma_ratio_vs_NOMSTIFF": 1.0,
+  "d_nll_vs_NOMSTIFF": 0.0,
+  "d_wall_vs_NOMSTIFF": 0.0,
+  "d_priors_vs_NOMSTIFF": 0.0,
+  "dalphaS_vs_LATB8_over_sigNOM": 0.11278709251108937,
+  "sigma_ratio_vs_LATB8": 1.0289925083553522,
+  "d_nll_vs_LATB8": -0.060454165086923695,
+  "d_wall_vs_LATB8": 7.011122949238199e-07,
+  "d_priors_vs_LATB8": 0.6953242641122444
+ },
+ "LATB8": {
+  "path": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261007_lattice_term_native/fitresults_LATB8.hdf5",
+  "kind": "live",
+  "nll": 376.6750870887955,
+  "wall": 2.004357517558078e-08,
+  "lattice": null,
+  "priors": 18.486710618074245,
+  "n_model_priors": 44,
+  "data_bb": 358.1883764506777,
+  "data_bb_includes_live_lattice": true,
+  "edm": 5.1876105404080117e-17,
+  "lambdas": {
+   "lambda2": 0.049001103758959164,
+   "lambda4": 0.07377261967226484,
+   "delta_lambda2": -0.007840220961398846,
+   "lambda2_nu": 0.03558919478805453,
+   "lambda4_nu": 0.011121450283086339
+  },
+  "sigma_lambdas_phys": {
+   "lambda2": 0.046000263842400205,
+   "lambda4": 0.027337129486541573,
+   "delta_lambda2": 0.007359965597713761,
+   "lambda2_nu": 0.030438059610046104,
+   "lambda4_nu": 0.0054088043306476765
+  },
+  "faces": {
+   "lambda4_nu >= 0 (CS large-b leading)": 0.011121450283086339,
+   "lambda2_nu >= 0 (CS small-b turn-on)": 0.03558919478805453,
+   "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=0 (TMD small-b turn-on)": 0.049001103758959164,
+   "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=0 (TMD large-b)": 0.2214355159673494,
+   "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=2.5 (TMD small-b turn-on)": -2.77249783624256e-07,
+   "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=2.5 (TMD large-b)": 0.22131785901679452
+  },
+  "active": [
+   "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=2.5 (TMD small-b turn-on)"
+  ],
+  "tnps": {
+   "resumTNP_gamma_nu": {
+    "theta": 0.3035088543136196,
+    "sigma": 1.011118909705453
+   },
+   "resumTNP_gamma_cusp": {
+    "theta": -0.06042308799762166,
+    "sigma": 1.0004825204179553
+   }
+  },
+  "frozen_dchi2_by_variant": {
+   "V1": 9.808842425823393,
+   "V2": 9.573222942375699,
+   "V3": 9.462346428508479,
+   "V3lit": 9.79947185858272
+  },
+  "frozen_dchi2_stat_only": 9.825712916931014,
+  "dalphaS_vs_NOMSTIFF_over_sigNOM": -0.11278709251108937,
+  "sigma_ratio_vs_NOMSTIFF": 0.9718243737248475,
+  "d_nll_vs_NOMSTIFF": 0.060454165086923695,
+  "d_wall_vs_NOMSTIFF": -7.011122949238199e-07,
+  "d_priors_vs_NOMSTIFF": -0.6953242641122444,
+  "dalphaS_vs_LATB8_over_sigNOM": 0.0,
+  "sigma_ratio_vs_LATB8": 1.0,
+  "d_nll_vs_LATB8": 0.0,
+  "d_wall_vs_LATB8": 0.0,
+  "d_priors_vs_LATB8": 0.0
+ },
+ "LATFROZ_V1": {
+  "path": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261008_latfroz_nf_variants/fitresults_LATFROZ_V1.hdf5",
+  "kind": "V1",
+  "nll": 377.07462450123205,
+  "wall": 2.275482572506677e-08,
+  "lattice": 4.752713422142577,
+  "priors": 18.48031560944919,
+  "n_model_priors": 44,
+  "data_bb": 353.8415954468855,
+  "data_bb_includes_live_lattice": false,
+  "edm": 3.3642594566985896e-17,
+  "lambdas": {
+   "lambda2": 0.04847872405496195,
+   "lambda4": 0.06983151788072745,
+   "delta_lambda2": -0.007756642124953134,
+   "lambda2_nu": 0.03823529336084988,
+   "lambda4_nu": 0.011652027861280735
+  },
+  "sigma_lambdas_phys": {
+   "lambda2": 0.04606367092926424,
+   "lambda4": 0.026984454663178864,
+   "delta_lambda2": 0.007370110071509372,
+   "lambda2_nu": 0.030407385819198586,
+   "lambda4_nu": 0.005619581201441473
+  },
+  "faces": {
+   "lambda4_nu >= 0 (CS large-b leading)": 0.011652027861280735,
+   "lambda2_nu >= 0 (CS small-b turn-on)": 0.03823529336084988,
+   "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=0 (TMD small-b turn-on)": 0.04847872405496195,
+   "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=0 (TMD large-b)": 0.20960848769401044,
+   "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=2.5 (TMD small-b turn-on)": -2.8922599513286906e-07,
+   "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=2.5 (TMD large-b)": 0.20949455364218234
+  },
+  "active": [
+   "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=2.5 (TMD small-b turn-on)"
+  ],
+  "tnps": {
+   "resumTNP_gamma_nu": {
+    "theta": 0.44118028409193843,
+    "sigma": 1.0159657023798598
+   },
+   "resumTNP_gamma_cusp": {
+    "theta": -0.08904412408594747,
+    "sigma": 1.000678818219112
+   }
+  },
+  "frozen_dchi2_by_variant": {
+   "V1": 9.505426844285154,
+   "V2": 9.382564732826987,
+   "V3": 9.298467320046734,
+   "V3lit": 9.500622244173819
+  },
+  "frozen_dchi2_stat_only": 9.514171879846376,
+  "tension": {
+   "dchi2_lat": 9.505426844285154,
+   "dof": 2,
+   "p": 0.008628251322741835,
+   "chi2_lat_total": 16.187606341012128,
+   "gof_dof": 18,
+   "p_gof": 0.5794560680570859,
+   "lattice_only_chi2_min": 6.682179496726975
+  },
+  "dalphaS_vs_NOMSTIFF_over_sigNOM": -0.14760216859298597,
+  "sigma_ratio_vs_NOMSTIFF": 0.9793360468781582,
+  "d_nll_vs_NOMSTIFF": 0.45999157752345354,
+  "d_wall_vs_NOMSTIFF": -6.984010443743339e-07,
+  "d_priors_vs_NOMSTIFF": -0.7017192727373001,
+  "dalphaS_vs_LATB8_over_sigNOM": -0.03481507608189661,
+  "sigma_ratio_vs_LATB8": 1.0077294553999707,
+  "d_nll_vs_LATB8": 0.39953741243652985,
+  "d_wall_vs_LATB8": 2.71125054948599e-09,
+  "d_priors_vs_LATB8": -0.006395008625055709
+ },
+ "LATFROZ_V2": {
+  "path": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261008_latfroz_nf_variants/fitresults_LATFROZ_V2.hdf5",
+  "kind": "V2",
+  "nll": 376.9918647090293,
+  "wall": 2.558864413618252e-08,
+  "lattice": 4.641803944206288,
+  "priors": 18.500490888921558,
+  "n_model_priors": 44,
+  "data_bb": 353.84956985031283,
+  "data_bb_includes_live_lattice": false,
+  "edm": 3.460822842477945e-17,
+  "lambdas": {
+   "lambda2": 0.048040474898041585,
+   "lambda4": 0.07199234800754589,
+   "delta_lambda2": -0.007686524106228663,
+   "lambda2_nu": 0.03849383482439386,
+   "lambda4_nu": 0.010804199265433414
+  },
+  "sigma_lambdas_phys": {
+   "lambda2": 0.04603889779833295,
+   "lambda4": 0.0274160163414377,
+   "delta_lambda2": 0.007366146627795962,
+   "lambda2_nu": 0.03038385671014302,
+   "lambda4_nu": 0.005833813640299934
+  },
+  "faces": {
+   "lambda4_nu >= 0 (CS large-b leading)": 0.010804199265433414,
+   "lambda2_nu >= 0 (CS small-b turn-on)": 0.03849383482439386,
+   "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=0 (TMD small-b turn-on)": 0.048040474898041585,
+   "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=0 (TMD large-b)": 0.21608791602110256,
+   "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=2.5 (TMD small-b turn-on)": -3.007658875564534e-07,
+   "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=2.5 (TMD large-b)": 0.21597704402263768
+  },
+  "active": [
+   "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=2.5 (TMD small-b turn-on)"
+  ],
+  "tnps": {
+   "resumTNP_gamma_nu": {
+    "theta": 0.44510091570966476,
+    "sigma": 1.016079825825816
+   },
+   "resumTNP_gamma_cusp": {
+    "theta": -0.08999527430093035,
+    "sigma": 1.0006831215051746
+   }
+  },
+  "frozen_dchi2_by_variant": {
+   "V1": 9.50630838669871,
+   "V2": 9.283607888412575,
+   "V3": 9.17677978385821,
+   "V3lit": 9.497458133885758
+  },
+  "frozen_dchi2_stat_only": 9.522249721192924,
+  "tension": {
+   "dchi2_lat": 9.283607888412575,
+   "dof": 2,
+   "p": 0.009640291384522427,
+   "chi2_lat_total": 15.96578738513954,
+   "gof_dof": 18,
+   "p_gof": 0.5949351369937809,
+   "lattice_only_chi2_min": 6.682179496726965
+  },
+  "dalphaS_vs_NOMSTIFF_over_sigNOM": -0.13979614776186067,
+  "sigma_ratio_vs_NOMSTIFF": 0.9805604035043901,
+  "d_nll_vs_NOMSTIFF": 0.3772317853207028,
+  "d_wall_vs_NOMSTIFF": -6.955672259632182e-07,
+  "d_priors_vs_NOMSTIFF": -0.6815439932649312,
+  "dalphaS_vs_LATB8_over_sigNOM": -0.027009055250771297,
+  "sigma_ratio_vs_LATB8": 1.0089893091959186,
+  "d_nll_vs_LATB8": 0.3167776202337791,
+  "d_wall_vs_LATB8": 5.545068960601741e-09,
+  "d_priors_vs_LATB8": 0.013780270847313147
+ },
+ "LATFROZ_V3": {
+  "path": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261008_latfroz_nf_variants/fitresults_LATFROZ_V3.hdf5",
+  "kind": "V3",
+  "nll": 376.9370396949177,
+  "wall": 2.48441387157575e-08,
+  "lattice": 4.593633156908014,
+  "priors": 18.50268416617541,
+  "n_model_priors": 44,
+  "data_bb": 353.84072234699016,
+  "data_bb_includes_live_lattice": false,
+  "edm": 3.5914732285853155e-17,
+  "lambdas": {
+   "lambda2": 0.04814682621461397,
+   "lambda4": 0.07256418530295294,
+   "delta_lambda2": -0.007703539845568442,
+   "lambda2_nu": 0.03828668433414427,
+   "lambda4_nu": 0.010634472890992277
+  },
+  "sigma_lambdas_phys": {
+   "lambda2": 0.046007987503972635,
+   "lambda4": 0.027387059889405253,
+   "delta_lambda2": 0.007361201220291011,
+   "lambda2_nu": 0.0303396985296914,
+   "lambda4_nu": 0.005728342306158148
+  },
+  "faces": {
+   "lambda4_nu >= 0 (CS large-b leading)": 0.010634472890992277,
+   "lambda2_nu >= 0 (CS small-b turn-on)": 0.03828668433414427,
+   "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=0 (TMD small-b turn-on)": 0.04814682621461397,
+   "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=0 (TMD large-b)": 0.2178041658791625,
+   "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=2.5 (TMD small-b turn-on)": -2.978201887951504e-07,
+   "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=2.5 (TMD large-b)": 0.21769255590885883
+  },
+  "active": [
+   "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=2.5 (TMD small-b turn-on)"
+  ],
+  "tnps": {
+   "resumTNP_gamma_nu": {
+    "theta": 0.4437949271635163,
+    "sigma": 1.0159057254519748
+   },
+   "resumTNP_gamma_cusp": {
+    "theta": -0.08966528848847553,
+    "sigma": 1.000672860492474
+   }
+  },
+  "frozen_dchi2_by_variant": {
+   "V1": 9.552024370136522,
+   "V2": 9.299690200624907,
+   "V3": 9.187266313816028,
+   "V3lit": 9.541968631430972
+  },
+  "frozen_dchi2_stat_only": 9.570104627332277,
+  "tension": {
+   "dchi2_lat": 9.187266313816028,
+   "dof": 2,
+   "p": 0.010116038372755721,
+   "chi2_lat_total": 15.869445810542999,
+   "gof_dof": 18,
+   "p_gof": 0.6016583325742518,
+   "lattice_only_chi2_min": 6.68217949672697
+  },
+  "dalphaS_vs_NOMSTIFF_over_sigNOM": -0.13843157127859557,
+  "sigma_ratio_vs_NOMSTIFF": 0.9806178927171944,
+  "d_nll_vs_NOMSTIFF": 0.32240677120910277,
+  "d_wall_vs_NOMSTIFF": -6.963117313836431e-07,
+  "d_priors_vs_NOMSTIFF": -0.6793507160110792,
+  "dalphaS_vs_LATB8_over_sigNOM": -0.02564447876750619,
+  "sigma_ratio_vs_LATB8": 1.0090484651652054,
+  "d_nll_vs_LATB8": 0.2619526061221791,
+  "d_wall_vs_LATB8": 4.800563540176721e-09,
+  "d_priors_vs_LATB8": 0.015973548101165136
+ }
+}

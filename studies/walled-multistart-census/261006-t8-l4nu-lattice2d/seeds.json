@@ -1,0 +1,14 @@
+{
+ "seed_P": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261006_t8_l4nu_lattice2d/seeds/seed_P_pert000_l4nuU.hdf5",
+ "P_lambda4_nu_phys": 0.008112622310246608,
+ "P_dalphaS_over_sigNOM": -0.11708679574074299,
+ "P_norm_dtheta_over_sigNOM": 33.12551609780544,
+ "seed_A": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261006_t8_l4nu_lattice2d/seeds/seed_A_NOMSTIFF_l4nu0.hdf5",
+ "seed_B": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261006_t8_l4nu_lattice2d/seeds/seed_B_XWSTIFF_in_2D.hdf5",
+ "n": 3720,
+ "anchors_equal": true,
+ "B_dalphaS_over_sigNOM": -0.36730875196729623,
+ "B_norm_dtheta_over_sigNOM": 5.090637681954664,
+ "B_lambda4_nu_phys": 0.044408086224080615,
+ "B_lambda2_nu_phys": -1.1216393087931653e-06
+}

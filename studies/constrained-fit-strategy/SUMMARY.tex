@@ -1,0 +1,461 @@
+% title: A reliable minimisation strategy for the walled NP fit
+% slug: constrained-fit-strategy
+% status: active
+% period: 2026-10-06 – ongoing
+% updated: 2026-10-08
+% covers: 2026-10-08
+%
+% BUILD: scripts/summary_pdf.py constrained-fit-strategy  (pdflatex on the host, from this directory).
+% Converted from SUMMARY.md (first version, 2026-10-08) and refreshed the same day.
+% Figures made for this summary: summary_figs/make_summary_figs.py (log parsing + analytic curves only).
+% Public page: no absolute alpha_s from data; Delta alpha_s only in units of the reference fit's sigma.
+\documentclass[10pt,a4paper]{article}
+
+% ---- page and fonts ----
+\usepackage[a4paper,top=16mm,bottom=20mm,left=18mm,right=18mm,footskip=9mm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage[table]{xcolor}
+\usepackage[font=small,labelfont={bf,sf},margin=6pt,skip=4pt]{caption}
+\usepackage{subcaption}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage[section,below]{placeins}   % a result's figure stays inside its section
+\usepackage{tikz}                      % for a schematic / pipeline figure (Section 2)
+\usetikzlibrary{arrows.meta,positioning}
+\usepackage{url}
+% siunitx is not installed on the submit host's TeX Live; these fallbacks cover the usual
+% \num{0.547}, \SI{2.3}{\GeV}, \SI{0.14}{\percent} (no e-notation: write 1.2\times10^{-3}).
+\IfFileExists{siunitx.sty}{\usepackage{siunitx}}{}
+\providecommand\num[1]{\ensuremath{#1}}
+\providecommand\si[1]{\ensuremath{\mathrm{#1}}}
+\providecommand\SI[2]{\ensuremath{#1\,\mathrm{#2}}}
+\providecommand\GeV{GeV}\providecommand\MeV{MeV}\providecommand\TeV{TeV}
+\providecommand\percent{\%}\providecommand\pb{pb}\providecommand\fb{fb}
+\definecolor{sumblue}{HTML}{1B5FAE}
+\definecolor{sumrule}{HTML}{2A78D6}
+\definecolor{sumbox}{HTML}{EEF4FB}
+\definecolor{sumgray}{HTML}{5A5A5A}
+\definecolor{sumwarn}{HTML}{8A5A00}
+\usepackage[colorlinks=true,linkcolor=sumblue,urlcolor=sumblue,citecolor=sumblue,
+            pdfborder={0 0 0}]{hyperref}
+
+% unicode copied from a logbook would otherwise stop pdflatex
+\DeclareUnicodeCharacter{03B1}{\ensuremath{\alpha}}
+\DeclareUnicodeCharacter{03B2}{\ensuremath{\beta}}
+\DeclareUnicodeCharacter{03B3}{\ensuremath{\gamma}}
+\DeclareUnicodeCharacter{03B4}{\ensuremath{\delta}}
+\DeclareUnicodeCharacter{03B5}{\ensuremath{\epsilon}}
+\DeclareUnicodeCharacter{03B7}{\ensuremath{\eta}}
+\DeclareUnicodeCharacter{03B8}{\ensuremath{\theta}}
+\DeclareUnicodeCharacter{03BA}{\ensuremath{\kappa}}
+\DeclareUnicodeCharacter{03BB}{\ensuremath{\lambda}}
+\DeclareUnicodeCharacter{03BC}{\ensuremath{\mu}}
+\DeclareUnicodeCharacter{03BD}{\ensuremath{\nu}}
+\DeclareUnicodeCharacter{03C0}{\ensuremath{\pi}}
+\DeclareUnicodeCharacter{03C1}{\ensuremath{\rho}}
+\DeclareUnicodeCharacter{03C3}{\ensuremath{\sigma}}
+\DeclareUnicodeCharacter{03C4}{\ensuremath{\tau}}
+\DeclareUnicodeCharacter{03C6}{\ensuremath{\phi}}
+\DeclareUnicodeCharacter{03C7}{\ensuremath{\chi}}
+\DeclareUnicodeCharacter{03C8}{\ensuremath{\psi}}
+\DeclareUnicodeCharacter{03C9}{\ensuremath{\omega}}
+\DeclareUnicodeCharacter{0393}{\ensuremath{\Gamma}}
+\DeclareUnicodeCharacter{0394}{\ensuremath{\Delta}}
+\DeclareUnicodeCharacter{039B}{\ensuremath{\Lambda}}
+\DeclareUnicodeCharacter{03A3}{\ensuremath{\Sigma}}
+\DeclareUnicodeCharacter{03A6}{\ensuremath{\Phi}}
+\DeclareUnicodeCharacter{03A9}{\ensuremath{\Omega}}
+\DeclareUnicodeCharacter{2212}{\ensuremath{-}}
+\DeclareUnicodeCharacter{2248}{\ensuremath{\approx}}
+\DeclareUnicodeCharacter{2264}{\ensuremath{\leq}}
+\DeclareUnicodeCharacter{2265}{\ensuremath{\geq}}
+\DeclareUnicodeCharacter{2260}{\ensuremath{\neq}}
+\DeclareUnicodeCharacter{226A}{\ensuremath{\ll}}
+\DeclareUnicodeCharacter{226B}{\ensuremath{\gg}}
+\DeclareUnicodeCharacter{223C}{\ensuremath{\sim}}
+\DeclareUnicodeCharacter{221D}{\ensuremath{\propto}}
+\DeclareUnicodeCharacter{221E}{\ensuremath{\infty}}
+\DeclareUnicodeCharacter{221A}{\ensuremath{\surd}}
+\DeclareUnicodeCharacter{2202}{\ensuremath{\partial}}
+\DeclareUnicodeCharacter{2192}{\ensuremath{\rightarrow}}
+\DeclareUnicodeCharacter{2190}{\ensuremath{\leftarrow}}
+\DeclareUnicodeCharacter{21D2}{\ensuremath{\Rightarrow}}
+\DeclareUnicodeCharacter{2194}{\ensuremath{\leftrightarrow}}
+\DeclareUnicodeCharacter{2208}{\ensuremath{\in}}
+\DeclareUnicodeCharacter{2026}{\ldots}
+\DeclareUnicodeCharacter{2713}{\ensuremath{\checkmark}}
+\DeclareUnicodeCharacter{2080}{\ensuremath{_0}}
+\DeclareUnicodeCharacter{2081}{\ensuremath{_1}}
+\DeclareUnicodeCharacter{2082}{\ensuremath{_2}}
+\DeclareUnicodeCharacter{2083}{\ensuremath{_3}}
+\DeclareUnicodeCharacter{2084}{\ensuremath{_4}}
+\DeclareUnicodeCharacter{2085}{\ensuremath{_5}}
+\DeclareUnicodeCharacter{2086}{\ensuremath{_6}}
+\DeclareUnicodeCharacter{2087}{\ensuremath{_7}}
+\DeclareUnicodeCharacter{2088}{\ensuremath{_8}}
+\DeclareUnicodeCharacter{2089}{\ensuremath{_9}}
+\DeclareUnicodeCharacter{2070}{\ensuremath{^{0}}}
+\DeclareUnicodeCharacter{2074}{\ensuremath{^{4}}}
+\DeclareUnicodeCharacter{2075}{\ensuremath{^{5}}}
+\DeclareUnicodeCharacter{2076}{\ensuremath{^{6}}}
+\DeclareUnicodeCharacter{2077}{\ensuremath{^{7}}}
+\DeclareUnicodeCharacter{2078}{\ensuremath{^{8}}}
+\DeclareUnicodeCharacter{2079}{\ensuremath{^{9}}}
+\DeclareUnicodeCharacter{207B}{\ensuremath{^{-}}}
+\DeclareUnicodeCharacter{207A}{\ensuremath{^{+}}}
+
+% ---- layout ----
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.55ex plus 0.2ex}
+\setlist{itemsep=1pt,topsep=2pt,parsep=0pt,leftmargin=1.4em}
+\titleformat{\section}{\sffamily\large\bfseries}{\thesection}{0.6em}{}
+\titleformat{\subsection}{\sffamily\normalsize\bfseries}{\thesubsection}{0.6em}{}
+\titlespacing*{\section}{0pt}{2.0ex plus 0.6ex minus 0.3ex}{0.7ex}
+\titlespacing*{\subsection}{0pt}{1.4ex plus 0.4ex minus 0.2ex}{0.4ex}
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.8}
+\renewcommand{\textfraction}{0.07}
+\renewcommand{\floatpagefraction}{0.75}
+\setlength{\textfloatsep}{10pt plus 3pt minus 3pt}
+\setlength{\floatsep}{8pt plus 2pt minus 2pt}
+\setlength{\intextsep}{8pt plus 2pt minus 2pt}
+
+% ---- metadata: passed in by scripts/summary_pdf.py from the "% key:" lines ----
+\makeatletter
+\providecommand\SumTitle{\textcolor{red}{(build with scripts/summary\_pdf.py)}}
+\providecommand\SumSlug{?}
+\providecommand\SumStudy{?}       % the study slug (the parent study, for a task summary)
+\providecommand\SumViewPath{?}    % <slug> or <study>/<task>: the viewer anchor
+\providecommand\SumStatus{?}
+\providecommand\SumPeriod{?}
+\providecommand\SumUpdated{?}
+\providecommand\SumCovers{?}
+\begingroup\catcode`\#=12 \catcode`\~=12
+\gdef\Sum@web{https://submit.mit.edu/~lavezzo/alphaS/studies/#}
+\endgroup
+
+% ---- macros for the body ----
+% \taskref{261008-task}: cite the task a number comes from; links to its viewer page.
+\newcommand\taskref[1]{{\small\sffamily[\href{\Sum@web\SumStudy/#1}{#1}]}}
+% \logref{2026-07-02}: cite a dated entry of a single-layer study (no task dirs).
+\newcommand\logref[1]{{\small\sffamily[\href{\Sum@web\SumViewPath:logbook}{log #1}]}}
+% \viewerlink{<study>/<task>}{text}: any other page of the viewer.
+\newcommand\viewerlink[2]{\href{\Sum@web#1}{#2}}
+\newcommand\logbooklink[1]{\href{\Sum@web\SumViewPath:logbook}{#1}}
+% \code{path/or_flag}: typewriter, breaks at / and _, underscores need no escaping.
+\newcommand\code{\nolinkurl}
+% \caveat{...}: a comparability caveat set off before the number it qualifies.
+\newcommand\caveat[1]{{\color{sumwarn}\small\sffamily\textbf{Caveat.}}~{\small\itshape #1}}
+% physics shorthands
+\newcommand\alphas{\ensuremath{\alpha_\mathrm{s}}}
+\newcommand\dalphas{\ensuremath{\Delta\alpha_\mathrm{s}}}
+\newcommand\pT{\ensuremath{p_\mathrm{T}}}
+\newcommand\ptll{\ensuremath{p_\mathrm{T}^{\ell\ell}}}
+\newcommand\qT{\ensuremath{q_\mathrm{T}}}
+\newcommand\yll{\ensuremath{y^{\ell\ell}}}
+
+% the answer box: \begin{answer} ... \end{answer}, one or two sentences with the key number
+\newsavebox\Sum@box
+\newenvironment{answer}
+  {\par\vspace{1.2ex}\noindent\begin{lrbox}{\Sum@box}%
+   \begin{minipage}{\dimexpr\linewidth-3pt-2\fboxsep\relax}\vspace{1pt}%
+   {\sffamily\small\bfseries\color{sumblue}Answer}\par\vspace{1pt}}
+  {\vspace{1pt}\end{minipage}\end{lrbox}%
+   \hbox{{\color{sumrule}\vrule width 3pt}\colorbox{sumbox}{\usebox{\Sum@box}}}%
+   \par\vspace{0.8ex}}
+
+\newcommand\SummaryTitleBlock{%
+  {\sffamily\footnotesize\color{sumgray}%
+   \alphas\ analysis\,\textperiodcentered\,study summary\hfill status: \SumStatus\par}%
+  \vspace{3pt}%
+  {\sffamily\LARGE\bfseries\SumTitle\par}%
+  \vspace{5pt}%
+  {\small\color{sumgray}%
+   \texttt{\SumViewPath}\enspace\textperiodcentered\enspace period \SumPeriod
+   \enspace\textperiodcentered\enspace written \SumUpdated
+   \enspace\textperiodcentered\enspace covers logbook through \textbf{\SumCovers}\par
+   Full record: \logbooklink{logbook}
+   \enspace\textperiodcentered\enspace web page: \href{\Sum@web\SumViewPath}{\nolinkurl{submit.mit.edu/~lavezzo/alphaS/studies}}%
+   \enspace\textperiodcentered\enspace plots in each task directory\par}%
+  \vspace{4pt}{\color{sumgray}\hrule height 0.4pt}\vspace{2pt}}
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[L]{\sffamily\scriptsize\color{sumgray}\alphas\ study summary\enspace\textperiodcentered\enspace\texttt{\SumViewPath}\enspace\textperiodcentered\enspace covers logbook through \SumCovers}
+\fancyfoot[R]{\sffamily\scriptsize\color{sumgray}\thepage}
+\makeatother
+
+\hypersetup{pdftitle={\SumTitle}}
+
+% ---- study-local macros ----
+\newcommand\lnu[1]{\ensuremath{\lambda_{#1}^{\nu}}}
+\newcommand\fit[1]{\textsf{#1}}
+\newcommand\relu{relu$^2$}
+\newcommand\Ctwo{C$^2$}
+
+\begin{document}
+\thispagestyle{fancy}
+\SummaryTitleBlock
+
+\begin{answer}
+The hours-long ``crawl'' of walled SCETlib-AD fits is not a false minimum: scipy's trust-krylov locks its trust radius in a
+limit cycle at the curvature jump of the \relu\ NP damping wall. A curvature-continuous (\Ctwo) ramp on the wall removes it.
+From the same stuck point the \Ctwo\ fit reaches the reference minimum in 46 iterations (1.1\,h), while \relu\ is still
+430\,NLL above it after 219, and the minimum does not move: $\dalphas=+3.9\times10^{-6}\,\sigma$. \Ctwo\ is now the
+\code{NPDampingWall} default. \textbf{Caveat:} one real start was tested (six on a surrogate). The projected-\ptll\
+saturated sub-fit is slow for a different reason, the conditioning of the saturated model; a preconditioning test for it
+is running. Real data, \alphas\ blinded; shifts in units of the reference fit's $\sigma(\alphas)$.
+\end{answer}
+
+% ============================================================================================
+\section{Motivation and question}
+
+The walled NP fits (a rabbit regularizer keeps the SCETlib NP parameters in the physically damped region) minimise
+with scipy's trust-krylov, and some sat for hours on a slowly falling plateau that looked like a converged fit. The census fit \fit{CENS03} (perturbed start \fit{pert\_002}) had not converged after 390 iterations
+\taskref{261006-diagnosis}, and \fit{CMR1A} spent 1.5\,h on a plateau before escaping \logref{2026-10-06}. trust-constr
+holds the constraints exactly but did not converge from distant starts: \fit{TCB1} ran 600 iterations (13.6\,h) without
+leaving its first barrier stage \taskref{261006-diagnosis}. The question: which recipe holds the physical region exactly
+(or to a negligible violation) and reaches the same minimum from any start in predictable time? After the diagnosis it was
+narrowed (Luca, 10-06): trust-krylov stays, trust-constr only as a certifier, and a fix at the level of parameters or a
+few lines of wall code comes before any reparametrisation. On 10-08 a second question was added: why the projected-\ptll\
+saturated sub-fit takes about 5\,h, a cost that toy-calibrated goodness-of-fit tests would pay once per toy.
+
+% ============================================================================================
+\section{Setup and method}
+
+\paragraph{Fits.} All fits are on real data with \alphas\ blinded, in the nominal configuration: card~A (2D
+$\ptll\times\yll$, Z$\to\mu\mu$), the SCETlib-AD param model on the $|Y|\le2.5$ subset of the \code{pdf62_y35_260921}
+cache, the native lattice CS term, $\lnu4\equiv0$, TMD priors pinned. The wall adds $k\sum_iP(x_i)$ to the NLL, with
+$x_i$ the violation of physical-damping condition $i$ in that condition's own units (e.g.\ $L_2(Y)=\lambda_2+\delta\lambda_2Y^2\ge0$
+at $|Y|=0$ and 2.5, $\lnu2\ge0$, $3\lambda_\infty^2\lambda_4+L_2^3\ge0$), $k=e^{2\tau}$, $\tau=8$, margin 0. Fit names:
+\fit{NOMSTIFF} is the converged reference nominal walled fit (NLL 376.6146329237). \fit{CENS03R} is a restart of
+\fit{CENS03}, stopped mid-crawl after 260 iterations (4.5\,h) at $+430$\,NLL; its snapshot sits on the
+$L_2(|Y|{=}2.5)$ face, $-0.175\,\sigma$ in \alphas\ and $\|\Delta\theta/\sigma\|=29.3$ from \fit{NOMSTIFF}
+\taskref{261008-c2-wall-test}. \fit{C2A} (\Ctwo) and \fit{R2A} (\relu) restart from that snapshot at $\tau=8$, side by
+side on one node with the same cache subset. \fit{LATB8} is a walled lattice-term fit; \fit{SATB8} (\relu), \fit{SATC2} (\Ctwo) and \fit{SATB8SA} (\relu,
+seeded with a previous sub-fit via \code{--saturatedSeed}~\code{all}) are its projected-\ptll\ saturated sub-fits (39 free
+bin scales, \code{-m}~\code{Project}~\code{ch0}~\code{ptll}).
+
+\paragraph{Diagnosis.} From the fit logs and a quadratic surrogate (the real data-only Hessian, $3719^2$, the five exact
+wall conditions, and an instrumented copy of scipy's trust-region loop). It reproduces two census fits' iteration counts
+and \fit{CENS03}'s non-convergence, not \fit{CMR1A}'s crawl \taskref{261006-diagnosis}. Cheap fixes were screened on six
+surrogate starts, and the winner run on real fits.
+
+\paragraph{The \Ctwo\ ramp.} The study built a curvature-continuous version of the wall (Fig.~\ref{fig:penalty}). With
+$x$ the violation and $d$ the ramp width,
+\begin{equation}
+  P(x)=\begin{cases}0 & x\le0\\ x^3/(3d) & 0<x<d\\ x^2-dx+d^2/3 & x\ge d\end{cases}
+  \qquad\text{against}\qquad P_{\mathrm{relu}^2}(x)=\max(x,0)^2 .
+\end{equation}
+$P$, $P'$ and $P''$ are continuous; the curvature rises linearly from 0 to the \relu\ value 2 across $[0,d]$. A step that
+crosses the face by $\Delta x\ll d$ therefore pays $k\Delta x^3/(3d)$ instead of $k\Delta x^2$. The width is set per
+condition, $d=\tilde\delta/s$, with $\tilde\delta=10^{-3}$ in the NP exponent at $b_\mathrm{max}=12.6\,\mathrm{GeV}^{-1}$
+(the largest $b_T$ the cache reaches) and $s$ the exponent per unit of the condition at $b_\mathrm{max}$. That gives
+$d=3.15\times10^{-6}\,\mathrm{GeV}^2$ on $L_2$, $6.3\times10^{-6}\,\mathrm{GeV}^2$ on \lnu2,
+$5.95\times10^{-8}\,\mathrm{GeV}^6$ on the cubic condition and $3.97\times10^{-8}\,\mathrm{GeV}^4$ on \lnu4\
+\taskref{261008-c2-wall-test}. Because the ramp is softer than \relu, the equilibrium at an active face moves outward by up to
+$d/2$: at \fit{NOMSTIFF}'s face the prediction was $v=\sqrt{gd/k}=2.40\times10^{-6}\,\mathrm{GeV}^2$ (data force
+$g=16.3$), against $9.2\times10^{-7}$ for \relu, and a loss lower by $1.9\times10^{-5}$. Code: the \code{smooth=} option
+in WRemnants \code{wremnants/postprocessing/scetlib_ad/np_damping_wall.py} (each \code{Condition} carries its scale $s$),
+tested by \code{scripts/tests/test_np_damping_wall_c2.py} (78 checks, incl.\ gradient and HVP against finite differences
+and \code{smooth=relu2} bitwise equal to the old wall).
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=0.6\linewidth]{summary_figs/wall_penalty.pdf}
+  \caption{The per-condition wall penalty $P(x)$ (left) and its curvature $P''(x)$ (right) against the violation $x$ in
+    units of the ramp width $d$; the NLL term is $k\,P$ with $k=e^{2\tau}$. Blue: \relu, whose curvature jumps from 0 to 2
+    at the face. Red dashed: the \Ctwo\ ramp, whose curvature rises linearly over $[0,d]$, so crossing the face costs a
+    cubic, not a quadratic, amount. Analytic curves of the formula above. \taskref{261008-c2-wall-test}}
+  \label{fig:penalty}
+\end{figure}
+
+% ============================================================================================
+\section{Results}
+
+\subsection{\texorpdfstring{The \Ctwo\ wall removes the crawl on the real fit and does not move the minimum}{The C2 wall removes the crawl on the real fit and does not move the minimum}}
+
+\caveat{one real start, a snapshot of a fit stuck mid-crawl; \fit{C2A} and \fit{R2A} share node load, cache and
+settings, and differ only in the wall. \fit{CENS03R} ran three days earlier on the full cache with different stall
+flags, and its log ends where \fit{C2A} and \fit{R2A} begin.}
+
+From the \fit{CENS03R} snapshot, \fit{C2A} reaches the \fit{NOMSTIFF} loss to $10^{-6}$ in 46 iterations and 1.11\,h of
+minimiser time. \fit{R2A}, the same command with \relu, was still
+at $+430$\,NLL after 219 iterations and 1.69\,h and was stopped by hand; \fit{CENS03R} itself had spent 260 iterations
+and 4.5\,h there \taskref{261008-c2-wall-test} (Fig.~\ref{fig:crawl}). The log signature agrees: 78\,\% of \fit{R2A}'s
+consecutive accepted steps have a gain ratio near 1, the period-2 lock of Sec.~\ref{sec:mech}, against 7.5\,\% for
+\fit{C2A}, whose steps double instead as the radius grows (\code{analysis.json}, \taskref{261008-c2-wall-test}).
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=\linewidth]{summary_figs/crawl_fix.pdf}
+  \caption{Loss minus the \fit{NOMSTIFF} loss (symmetric-log axis, linear within $\pm10^{-6}$) against minimiser wall time
+    (left) and iteration (right), counted from the \fit{CENS03R} snapshot. Grey: \fit{CENS03R}, the original \relu\ crawl,
+    which ends at the snapshot ($t\le0$). From the snapshot ($t\ge0$): \fit{C2A} with the \Ctwo\ ramp (red) and
+    \fit{R2A} with \relu\ (blue), run side by side. \fit{C2A} ends $1.9\times10^{-5}$ below \fit{NOMSTIFF}: that is the
+    ramp's predicted equilibrium offset, not a better minimum. Real data, nominal configuration, $\tau=8$; from the fit logs. \taskref{261008-c2-wall-test}}
+  \label{fig:crawl}
+\end{figure}
+
+\begin{table}[htb]
+  \centering\small
+  \caption{\fit{C2A} (\Ctwo) against the \relu\ reference \fit{NOMSTIFF}: prediction made before the fit and result.
+    \dalphas\ in units of \fit{NOMSTIFF}'s $\sigma(\alphas)$; $\theta$ are the fit parameters in their own $\sigma$. The
+    normalised overshoot is the face violation in the NP exponent at $b_\mathrm{max}$ (tolerance $10^{-3}$).
+    \taskref{261008-c2-wall-test}}
+  \label{tab:c2a}
+  \begin{tabular}{lll}
+    \toprule
+    Quantity & Predicted & \fit{C2A} \\
+    \midrule
+    $\Delta$NLL vs \fit{NOMSTIFF} & $-1.9\times10^{-5}$ & $-1.86\times10^{-5}$ \\
+    \dalphas\ [$\sigma$] & $\sim5\times10^{-6}$ & $+3.9\times10^{-6}$ \\
+    $\max|\Delta\theta/\sigma|$ & $\lesssim10^{-2}$ & $3.3\times10^{-5}$ \\
+    $\sigma(\alphas)$ ratio; EDM & 1; -- & 0.9999998; $5.2\times10^{-15}$ (\fit{NOMSTIFF}: $3.0\times10^{-14}$) \\
+    $L_2(|Y|{=}2.5)$ face [GeV$^2$] & $-2.40\times10^{-6}$ & $-2.401\times10^{-6}$ (\fit{NOMSTIFF}: $-9.15\times10^{-7}$) \\
+    normalised overshoot & -- & $7.6\times10^{-4}$ (\relu: $2.9\times10^{-4}$) \\
+    full saturated GoF [$\chi^2$/ndf] & 753.23/778 & 753.23/778 ($p=73.2\,\%$) \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Every check lands on its prediction (Table~\ref{tab:c2a}). The ramp holds the active face $1.5\times10^{-6}\,\mathrm{GeV}^2$
+further out than \relu, and the active-face slope maps that onto $4\times10^{-6}\,\sigma$ in \alphas, which is what is seen.
+\textbf{Physics read:} \Ctwo\ changes the minimiser's path, not the measurement. The face is held at the wall with no margin,
+at $7.6\times10^{-4}$ of the NP exponent at $b_\mathrm{max}$, inside the $10^{-3}$ tolerance. A \Ctwo--\relu\ loss offset
+of $\sim10^{-5}$ is irrelevant for any test statistic.
+
+\subsection{\texorpdfstring{The crawl is a limit cycle of scipy's trust-radius rule at a C$^1$ face}{The crawl is a limit cycle of scipy's trust-radius rule at a C1 face}}
+\label{sec:mech}
+
+\caveat{the radius-level mechanism comes from the surrogate (nominal configuration only); the real logs record only the
+loss, and show the same signature.}
+
+scipy grows the trust radius only if the gain ratio $\rho>0.75$ \emph{and} the step reaches the trust boundary; it shrinks
+it if $\rho<0.25$. \relu\ is only C$^1$, so a quadratic model built on the physical side of a face has no wall curvature.
+The step from there crosses the face, and the penalty eats about 30\,\% of the predicted gain ($\rho\approx0.71$): no
+growth. The model built on the violating side contains the wall; its step lands just back inside, interior, with
+$\rho\approx1$: again no growth. The radius freezes (at $3.8\times10^{-6}$ in $\theta$ on the surrogate, scaling as
+$1/k$) and the loss falls by a constant amount per iteration (Fig.~\ref{fig:zigzag}). Gain ratios near 1 make up 40--44\,\% of the step
+pairs in \fit{CENS03} and \fit{CMR1A}, 1--9\,\% in census fits that converged normally. The
+lock-in worsens steeply with the stiffness: on the surrogate, 1 of 5 starts locks in at $\tau=8$, 2 at $\tau=9$, and 3 do
+not converge in 20\,000 iterations at $\tau=10$ \taskref{261006-diagnosis}. Conditioning alone is not the cause: with the
+active face eliminated exactly, the same Hessian converges from every start in 9--45 iterations. On
+the surrogate the \Ctwo\ ramp removes the lock-in from all six starts (18--159 evaluations) \taskref{261006-diagnosis}.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=0.94\linewidth]{261006-diagnosis/zigzag_mechanism.pdf}
+  \caption{The crawl signature. (a)~Surrogate at $\tau=8$ from \fit{CENS03}'s seed: the trust radius (blue) freezes after
+    $\sim$50 iterations while the $L_2(|Y|{=}2.5)$ face value (purple) alternates between violated and slack every
+    iteration. (b)~Real logs of the crawling fits \fit{CENS03} and \fit{CMR1A}: every step accepted, gains alternating
+    between two values at a constant rate. (c)~The same alternation on the surrogate. Surrogate = real data-only Hessian
+    plus the exact wall conditions, nominal configuration only. \taskref{261006-diagnosis}}
+  \label{fig:zigzag}
+\end{figure}
+
+\subsection{The saturated sub-fit is slow because the saturated model is ill-conditioned, not because of the wall}
+
+\caveat{one configuration (\fit{LATB8}); wall times depend on node load, so compare counts. Dense Hessians at three
+points, with plain CG standing in for trlib's solve. No remedy has been run yet.}
+
+\fit{SATC2} retraces \fit{SATB8} iteration for iteration (Fig.~\ref{fig:sat}, left): 157 against 153 iterations to the
+final loss $-10^{-6}$, 2141 against 2150 Hessian-vector products (HVPs), and the same projected test,
+$q=78.4/39$ \taskref{261008-c2-wall-test}\,\taskref{261008-saturated-subfit-diagnosis}. HVPs take 89--91\,\% of the
+time, much of it in a few deep, late Krylov solves of up to $\sim$270 HVPs. Each solve gains only 35--40\,\% of what is
+left, and the tail below $\Delta q=0.01$ costs 27--56\,\% of the run \taskref{261008-saturated-subfit-diagnosis}.
+
+The cause is the alternative model's geometry (Fig.~\ref{fig:sat}, right). Freeing the \ptll\ shape frees the parameters
+it constrained: \alphas\ is 97.9\,\% degenerate with the 39 bin scales ($\rho^2=0.979$). The sub-fit minimum lies
+$9.6\,\sigma$ (of the main fit) away in \alphas, with \lnu2, the TNPs and the luminosity moving by 1.6--3.5$\,\sigma$, while
+the scales absorb a smooth tilt from 0.908 to 1.106. The Hessian has $\kappa=1.3\times10^{10}$ at the start and
+$2.0\times10^{9}$ at the end, the valley is curved, and an exact Newton step diverges even 0.4\,NLL from the minimum.
+Profiling the scales analytically ($s_j=N_j/\nu_j$) straightens the valley: along the straight line from start to minimum the loss then falls monotonically, from 16 NLL to 0 \taskref{261008-saturated-subfit-diagnosis}.
+\textbf{Physics read:} the answer is robust (the three runs end at the same point to $2.6\times10^{-9}$ in $x$); what is at
+stake is the cost per toy.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[height=5.3cm,trim=455 0 0 0,clip]{261008-saturated-subfit-diagnosis/subfit_progress.pdf}\hfill
+  \includegraphics[height=5.3cm]{261008-saturated-subfit-diagnosis/hessian_spectra.pdf}
+  \caption{The projected-\ptll\ saturated sub-fit at \fit{LATB8}, real data. Left: $q$ still to go,
+    $2(\text{loss}-\text{final})$, per iteration, for \fit{SATB8} (\relu, blue), \fit{SATC2} (\Ctwo, green) and
+    \fit{SATB8SA} (red, seeded from a previous sub-fit, which toys cannot do): \Ctwo\ follows \relu\ step for step. Right:
+    sorted $|$eigenvalues$|$ of the sub-fit Hessian (3759 parameters), at the start (black, $\kappa=1.3\times10^{10}$) and
+    the end (blue, $2\times10^9$): the wall faces and the 39 bin scales on top, \alphas-dominated directions at the bottom.
+    Full spectral whitening (green) brings $\kappa$ to $1.2\times10^7$; Jacobi (orange) and partial whitening make the CG
+    work worse. \taskref{261008-saturated-subfit-diagnosis}}
+  \label{fig:sat}
+\end{figure}
+
+The remedies, ranked by estimate \taskref{261008-saturated-subfit-diagnosis}: (1)~full-scope spectral preconditioning of
+the sub-fit, CLI only, which cuts the CG work per solve 3--4$\times$ on the end Hessian (290$\to$77 HVPs to $10^{-6}$),
+estimated 2--3$\times$ overall; (2)~then \code{--minimizerGtol}~0.03, meaningful only under (1), to drop the tail
+($\times$1.3--2.3); (3)~variable projection of the 39 scales in rabbit ($\sim$1 day; 3--10$\times$ with (1), the least
+certain); (4)~a mid-fit preconditioner rebuild. A stall-window stop (\code{--earlyStopping}
+\code{--stallRelTol}) cannot cut the tail: it fires on false plateaus, with $q$ errors of 0.36--20.
+
+% ============================================================================================
+\section{Robustness, systematics and caveats}
+
+The real-fit evidence for \Ctwo\ is one start; cold and perturbed starts were covered only on the (quadratic,
+nominal-only) surrogate, and the study's benchmark of six starts has not been run. The \Ctwo\ ramp needs a constant scale per condition, so the
+interior discriminants of the \code{tanh_6} CS form keep \relu\ by default and can still crawl.
+
+Two problems are untouched. In the no-lattice configuration with \lnu4\ free, the fit \fit{CMR1B} leaks through the
+$\lnu4\ge0$ wall to $\gamma_\nu(b_\mathrm{max})=+1.94$ (anti-damped): the data curvature along \lnu4\ there ($7.6\times10^8$)
+is 40 times the wall's $2k$, so no practical \relu\ stiffness is exact ($\tau\approx14$, $\kappa\sim10^{12}$)
+\taskref{261006-diagnosis}. On the ordinary faces the $\tau=8$ wall leaks only $10^{-4}$--$3\times10^{-4}$ in the exponent at
+$b_\mathrm{max}$. In the saturated sub-fit, \lnu4\ also runs onto its face, with a small leak not chased
+\taskref{261008-saturated-subfit-diagnosis}.
+
+Fixes that did not work, on the surrogate \taskref{261006-diagnosis}: restart-on-stall either never fires or falls
+back into the cycle (up to 662 restarts); \code{--precondition} helped 2 of 5 starts and hurt 3 (built at a feasible start,
+it never sees the wall); \code{tf-trust-krylov} has scipy's radius rule (from the code, not run). $\tau$-continuation
+($\tau=5$, then $\tau=8$ warm) converged from all six starts but costs two cache loads and was never run on a real fit;
+\Ctwo\ superseded it.
+
+% ============================================================================================
+\section{What changed}
+
+Checked with \code{git} on 2026-10-08.
+\begin{itemize}
+  \item \textbf{WRemnants} branch \code{scetlib-ad-param-model}, both \textbf{pushed} to \code{origin} (\code{692f9483} is
+    the branch tip): \code{2f1c3df4} adds the opt-in ramp \code{smooth=c2} [\code{delta=}, \code{bmax=}] to
+    \code{np_damping_wall.py} with its test; \code{692f9483} makes \Ctwo\ the default ($\tilde\delta=10^{-3}$,
+    $b_\mathrm{max}=12.6$). Without \code{smooth=} the \code{tanh_6} interior discriminants keep \relu\ and are named in
+    one INFO line; an explicit \code{smooth=c2} still refuses them; \code{smooth=relu2} is the bitwise opt-out.
+    \textbf{An old command with no \code{smooth=} now gets \Ctwo}: reruns of earlier fits need \code{smooth=relu2} to
+    reproduce them exactly.
+  \item \textbf{WRemnantsHelpers} \code{main}: \code{851f47f} (pushed, 10-06) made $\tau$-continuation the default of
+    \code{workflows/fitterAD.sh}~\code{--wall}; \code{3c0a9fb} (10-08, \textbf{local, not pushed}) makes it opt-in again
+    (\code{--tau-continuation}), since \Ctwo\ removes the crawl.
+  \item \textbf{knowledge/}: nothing yet (the limit cycle is a candidate for \code{rabbit_minimizer_tolerances.md}). Bulk
+    outputs: \code{/ceph/.../lavezzo/alphaS/261006_constrained_fit_diagnosis}, \code{261008_c2_wall_test}, \code{261008_saturated_subfit_diag}.
+\end{itemize}
+
+% ============================================================================================
+\section{Conclusions and open items}
+
+For the \alphas\ measurement nothing moves: \Ctwo\ and \relu\ walls give the same minimum to $4\times10^{-6}\,\sigma$ and
+the same saturated tests. Walled fits should now finish in predictable time from one process and one cache load. Open:
+\begin{itemize}
+  \item \textbf{SATP} (approved by Luca 10-08, running since 16:42, owned by the sub-fit diagnosis task): \fit{SATB8}'s
+    command, \relu\ set explicitly, plus full-scope spectral preconditioning (\code{--precondition}
+    \code{--preconditionParams}~\code{'.*'} \code{--preconditionBlocks}~\code{none} \code{--preconditionTransform}~\code{spectral}), so it
+    differs from \fit{SATB8} only in the preconditioner. Success: $\le700$ HVPs (against 2150) at the same final loss
+    within $10^{-6}$. If it works, \code{--minimizerGtol} $\sim0.03$ under it, then the recipe goes into the
+    saturated-toy plan; if not, variable projection.
+  \item Confirm \Ctwo\ on real cold and perturbed starts (\fit{pert\_002}, \fit{cold\_000}, \fit{C1A}); push
+    \code{3c0a9fb}. The \lnu4\ notch: exact fixes (square-root bound basis, 1--2\,d; active set, 3--5\,d) are parked.
+\end{itemize}
+
+\end{document}

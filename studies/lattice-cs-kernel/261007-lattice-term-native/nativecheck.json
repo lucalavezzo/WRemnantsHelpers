@@ -1,0 +1,292 @@
+{
+ "V5a_loss_newbuild_oldterm_minus_stored": -3.0752289603697136e-11,
+ "V5b_data_part_new_minus_old": 0.0,
+ "V5c_dNLL_total_new_minus_old": 0.27401773412793773,
+ "V6A_max_abs_pfull_term_minus_model": 0.0,
+ "V6B_armed_differs_from_raw_x": true,
+ "V6C_rel_AD_vs_FD": {
+  "alphaS": 3.450965868445082e-10,
+  "lambda2_nu": 5.468238554760225e-09,
+  "lambda4_nu": 6.744191350516053e-05,
+  "resumTNP_gamma_nu": 7.085298128968281e-11,
+  "resumTNP_gamma_cusp": 2.2281728808859114e-10
+ },
+ "V6D_nonzero_outside_block": [],
+ "V6E_snapshot_status": 1,
+ "V8": {
+  "new Jnf+Jbt (default)": {
+   "dalphaS_vs_LATFULL8_over_sigNOM": -0.02562209338160413,
+   "dalphaS_vs_NOMSTIFF_over_sigNOM": -0.11109635108497123,
+   "sigma_ratio_vs_NOM": 0.9699132194140816,
+   "load_time": {
+    "data": "/home/submit/lavezzo/alphaS/WRemnants/wremnants/postprocessing/scetlib_ad/data/lattice_aswz_data.npz",
+    "syst": "Jnf+Jbt",
+    "nf_match": 1.0,
+    "ydata": "lattice",
+    "anchor_alphas": 0.118,
+    "nominal_stat_fit": {
+     "lam": [
+      0.1855328005785214,
+      -0.0059693557832792305
+     ],
+     "chi2": 6.7031751416896155
+    },
+    "final_fit": {
+     "lam": [
+      0.18553280057848,
+      -0.005969355783273211
+     ],
+     "chi2": 6.703175141689604,
+     "sigma": [
+      0.04005096689973662,
+      0.003455518125024256
+     ],
+     "rho": -0.8893653098399352
+    },
+    "nf_shift_range": [
+     -0.009199331373798136,
+     -0.009199331373797692
+    ],
+    "syst_info": {
+     "Jnf": {
+      "dlam": [
+       -0.003963989014410085,
+       0.00016517659509834078
+      ],
+      "chi2min": 6.762495488969501
+     },
+     "Jbt": {
+      "dlam": [
+       0.007094863933664042,
+       -0.00044907491794743144
+      ],
+      "chi2min": 4.666419324246909,
+      "npts": 17
+     }
+    },
+    "chi2_min": 6.703175141689604
+   },
+   "lambda2_nu": 0.03594237893504562,
+   "d_lambda2_nu_over_sigma": 0.00828380706137134,
+   "sigma_lambda2_nu": 0.03014840453315126,
+   "lambda4_nu": 0.010945217854667236,
+   "d_lambda4_nu_over_sigma": 0.2265860766793924,
+   "sigma_lambda4_nu": 0.005016787676382778,
+   "d_resumTNP_gamma_nu": -0.011607686296154,
+   "d_resumTNP_gamma_cusp": 0.006912951695812442
+  },
+  "new Jnf (no b_T window)": {
+   "dalphaS_vs_LATFULL8_over_sigNOM": -0.02601184879463177,
+   "dalphaS_vs_NOMSTIFF_over_sigNOM": -0.11148610649799819,
+   "sigma_ratio_vs_NOM": 0.969216251750403,
+   "load_time": {
+    "data": "/home/submit/lavezzo/alphaS/WRemnants/wremnants/postprocessing/scetlib_ad/data/lattice_aswz_data.npz",
+    "syst": "Jnf",
+    "nf_match": 1.0,
+    "ydata": "lattice",
+    "anchor_alphas": 0.118,
+    "nominal_stat_fit": {
+     "lam": [
+      0.1855328005785214,
+      -0.0059693557832792305
+     ],
+     "chi2": 6.7031751416896155
+    },
+    "final_fit": {
+     "lam": [
+      0.18553280057849997,
+      -0.005969355783276301
+     ],
+     "chi2": 6.7031751416896155,
+     "sigma": [
+      0.039384670446269886,
+      0.0034224696806071406
+     ],
+     "rho": -0.8874121378477366
+    },
+    "nf_shift_range": [
+     -0.009199331373798136,
+     -0.009199331373797692
+    ],
+    "syst_info": {
+     "Jnf": {
+      "dlam": [
+       -0.003963989014410085,
+       0.00016517659509834078
+      ],
+      "chi2min": 6.762495488969501
+     }
+    },
+    "chi2_min": 6.7031751416896155
+   },
+   "lambda2_nu": 0.03630536327296606,
+   "d_lambda2_nu_over_sigma": 0.020333203518063024,
+   "sigma_lambda2_nu": 0.03013435161542179,
+   "lambda4_nu": 0.011069193791238234,
+   "d_lambda4_nu_over_sigma": 0.2521743053144628,
+   "sigma_lambda4_nu": 0.004999360153382733,
+   "d_resumTNP_gamma_nu": -0.00964864546116155,
+   "d_resumTNP_gamma_cusp": 0.006389623602313355
+  },
+  "new Jbt (no n_f syst)": {
+   "dalphaS_vs_LATFULL8_over_sigNOM": -0.02585672611438097,
+   "dalphaS_vs_NOMSTIFF_over_sigNOM": -0.11133098381774596,
+   "sigma_ratio_vs_NOM": 0.9697035800948199,
+   "load_time": {
+    "data": "/home/submit/lavezzo/alphaS/WRemnants/wremnants/postprocessing/scetlib_ad/data/lattice_aswz_data.npz",
+    "syst": "Jbt",
+    "nf_match": 1.0,
+    "ydata": "lattice",
+    "anchor_alphas": 0.118,
+    "nominal_stat_fit": {
+     "lam": [
+      0.1855328005785214,
+      -0.0059693557832792305
+     ],
+     "chi2": 6.7031751416896155
+    },
+    "final_fit": {
+     "lam": [
+      0.18553280057849952,
+      -0.005969355783275865
+     ],
+     "chi2": 6.703175141689616,
+     "sigma": [
+      0.03985863737699969,
+      0.003451570888582637
+     ],
+     "rho": -0.8899735556036955
+    },
+    "nf_shift_range": [
+     -0.009199331373798136,
+     -0.009199331373797692
+    ],
+    "syst_info": {
+     "Jbt": {
+      "dlam": [
+       0.007094863933664042,
+       -0.00044907491794743144
+      ],
+      "chi2min": 4.666419324246909,
+      "npts": 17
+     }
+    },
+    "chi2_min": 6.703175141689616
+   },
+   "lambda2_nu": 0.035961957462124244,
+   "d_lambda2_nu_over_sigma": 0.008936766238093717,
+   "sigma_lambda2_nu": 0.030136414701260897,
+   "lambda4_nu": 0.01098427523867565,
+   "d_lambda4_nu_over_sigma": 0.2355658000457639,
+   "sigma_lambda4_nu": 0.004991351125269834,
+   "d_resumTNP_gamma_nu": -0.011600659805122007,
+   "d_resumTNP_gamma_cusp": 0.006907415443649179
+  },
+  "new none (stat only)": {
+   "dalphaS_vs_LATFULL8_over_sigNOM": -0.026233526395635424,
+   "dalphaS_vs_NOMSTIFF_over_sigNOM": -0.11170778409900103,
+   "sigma_ratio_vs_NOM": 0.9689887541545074,
+   "load_time": {
+    "data": "/home/submit/lavezzo/alphaS/WRemnants/wremnants/postprocessing/scetlib_ad/data/lattice_aswz_data.npz",
+    "syst": "none",
+    "nf_match": 1.0,
+    "ydata": "lattice",
+    "anchor_alphas": 0.118,
+    "nominal_stat_fit": {
+     "lam": [
+      0.1855328005785214,
+      -0.0059693557832792305
+     ],
+     "chi2": 6.7031751416896155
+    },
+    "final_fit": {
+     "lam": [
+      0.1855328005785214,
+      -0.0059693557832792305
+     ],
+     "chi2": 6.7031751416896155,
+     "sigma": [
+      0.039188846303220524,
+      0.0034184771716357456
+     ],
+     "rho": -0.8880490682531104
+    },
+    "nf_shift_range": [
+     -0.009199331373798136,
+     -0.009199331373797692
+    ],
+    "syst_info": {},
+    "chi2_min": 6.7031751416896155
+   },
+   "lambda2_nu": 0.03632817899512303,
+   "d_lambda2_nu_over_sigma": 0.021099372191472975,
+   "sigma_lambda2_nu": 0.03012144724832355,
+   "lambda4_nu": 0.011106872647431942,
+   "d_lambda4_nu_over_sigma": 0.2610482842506277,
+   "sigma_lambda4_nu": 0.004973750483045676,
+   "d_resumTNP_gamma_nu": -0.00965774453196833,
+   "d_resumTNP_gamma_cusp": 0.0063852366978456605
+  },
+  "new direct_nf+Jbt": {
+   "dalphaS_vs_LATFULL8_over_sigNOM": -0.025761066431571868,
+   "dalphaS_vs_NOMSTIFF_over_sigNOM": -0.11123532413493753,
+   "sigma_ratio_vs_NOM": 0.969917805847679,
+   "load_time": {
+    "data": "/home/submit/lavezzo/alphaS/WRemnants/wremnants/postprocessing/scetlib_ad/data/lattice_aswz_data.npz",
+    "syst": "direct_nf+Jbt",
+    "nf_match": 1.0,
+    "ydata": "lattice",
+    "anchor_alphas": 0.118,
+    "nominal_stat_fit": {
+     "lam": [
+      0.1855328005785214,
+      -0.0059693557832792305
+     ],
+     "chi2": 6.7031751416896155
+    },
+    "final_fit": {
+     "lam": [
+      0.18564632720117688,
+      -0.0059740777178938385
+     ],
+     "chi2": 6.702359311152314,
+     "sigma": [
+      0.04006343641581329,
+      0.0034561195661359915
+     ],
+     "rho": -0.8892897190086515
+    },
+    "nf_shift_range": [
+     -0.009199331373798136,
+     -0.009199331373797692
+    ],
+    "syst_info": {
+     "direct_nf": {
+      "shift_range": [
+       -0.009199331373798136,
+       -0.009199331373797692
+      ]
+     },
+     "Jbt": {
+      "dlam": [
+       0.007094863933664042,
+       -0.00044907491794743144
+      ],
+      "chi2min": 4.666419324246909,
+      "npts": 17
+     }
+    },
+    "chi2_min": 6.702359311152314
+   },
+   "lambda2_nu": 0.03590927552614828,
+   "d_lambda2_nu_over_sigma": 0.007185038487325719,
+   "sigma_lambda2_nu": 0.030151565345907873,
+   "lambda4_nu": 0.010953750669047604,
+   "d_lambda4_nu_over_sigma": 0.2285461593782288,
+   "sigma_lambda4_nu": 0.0050110973407788695,
+   "d_resumTNP_gamma_nu": -0.011572158497924437,
+   "d_resumTNP_gamma_cusp": 0.00692710513498047
+  }
+ },
+ "V6B_disarmed_equal": true
+}

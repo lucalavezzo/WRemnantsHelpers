@@ -1,0 +1,49 @@
+alpha_s check: numeric vs paper closed form at mu = 0.5, 0.6, 1, 4 GeV
+  mu=0.5: 1.4216  1.0673
+  mu=0.6: 0.7856  0.7506
+  mu=1.0: 0.4393  0.4384
+  mu=4.0: 0.2249  0.2235
+D_res numeric vs paper at b*=0.3,1,2 GeV^-1: [(np.float64(-0.0908), np.float64(-0.0916)), (np.float64(0.0791), np.float64(0.0773)), (np.float64(0.1767), np.float64(0.1731))]
+
+max |s - sqrt(diag cov)|: 0.0
+continuum file: implied k1 per point: [0.213649 0.213649 0.213649 0.213649 0.213649 0.213649 0.213649 0.213649
+ 0.213649 0.213649 0.213649 0.213649 0.213649 0.213649 0.213649 0.213649
+ 0.213649 0.213649 0.213649 0.213649 0.213649]
+  k1 mean, std: 0.21364915815039623 1.926774310909487e-16  sigma equal: 0.0
+L32: offdiag corr min/median/max = +0.008 +0.026 +0.068
+L48: offdiag corr min/median/max = -0.151 +0.006 +0.103
+L64: offdiag corr min/median/max = +0.012 +0.046 +0.260
+
+=== per-ensemble fits, full covariance, D_res=numeric ===
+  c0                     chi2= 17.63 ndf=20 chi2/ndf=0.882 AIC= 19.63  c0=+0.0240(0.0054)
+  c0,k1 [paper AIC-best] chi2=  7.32 ndf=19 chi2/ndf=0.385 AIC= 11.32  c0=+0.0324(0.0060), k1=+0.2130(0.0663)
+  c0,k2                  chi2=  8.28 ndf=19 chi2/ndf=0.436 AIC= 12.28  c0=+0.0272(0.0055), k2=+0.2197(0.0718)
+  c0,k1,k2               chi2=  7.28 ndf=18 chi2/ndf=0.404 AIC= 13.28  c0=+0.0337(0.0085), k1=+0.2665(0.2664), k2=-0.0598(0.2885)
+  c0,c1,k1               chi2=  7.31 ndf=18 chi2/ndf=0.406 AIC= 13.31  c0=+0.0331(0.0121), c1=+0.0039(0.0568), k1=+0.2079(0.1004)
+  c0,k1,B_NP             chi2=  7.07 ndf=18 chi2/ndf=0.393 AIC= 13.07  c0=+0.0278(0.0054), k1=+0.2240(0.0658), B_NP=2.401(0.319)
+  c0,c1,k1,k2,B_NP       chi2=  6.53 ndf=16 chi2/ndf=0.408 AIC= 16.53  c0=+0.0377(0.0152), c1=+0.0361(0.0888), k1=+0.1593(0.6952), k2=+0.0142(0.6277), B_NP=2.500(0.279) [AT BOUND]
+
+=== per-ensemble fits, diag covariance, D_res=numeric ===
+  c0                     chi2= 18.73 ndf=20 chi2/ndf=0.937 AIC= 20.73  c0=+0.0221(0.0050)
+  c0,k1 [paper AIC-best] chi2=  8.18 ndf=19 chi2/ndf=0.431 AIC= 12.18  c0=+0.0309(0.0057), k1=+0.2132(0.0656)
+  c0,k2                  chi2=  9.12 ndf=19 chi2/ndf=0.480 AIC= 13.12  c0=+0.0258(0.0052), k2=+0.2218(0.0715)
+  c0,k1,k2               chi2=  8.15 ndf=18 chi2/ndf=0.453 AIC= 14.15  c0=+0.0320(0.0082), k1=+0.2616(0.2651), k2=-0.0544(0.2890)
+  c0,c1,k1               chi2=  8.17 ndf=18 chi2/ndf=0.454 AIC= 14.17  c0=+0.0324(0.0118), c1=+0.0078(0.0563), k1=+0.2026(0.1008)
+  c0,k1,B_NP             chi2=  8.04 ndf=18 chi2/ndf=0.447 AIC= 14.04  c0=+0.0265(0.0051), k1=+0.2224(0.0652), B_NP=2.351(0.430)
+  c0,c1,k1,k2,B_NP       chi2=  7.41 ndf=16 chi2/ndf=0.463 AIC= 17.41  c0=+0.0392(0.0148), c1=+0.0541(0.0867), k1=+0.0291(0.6852), k2=+0.1277(0.6202), B_NP=2.500(0.303) [AT BOUND]
+
+=== information loss, model (c0) at a=0, B_NP=2 ===
+  (b) per-ensemble + free k1, full cov : c0=+0.0324(0.0060), k1=+0.2130(0.0663)  rho(c0,k1)=+0.434
+  (a) continuum file, diag errors      : c0=+0.0310(0.0050) chi2=8.18/20
+  (c) continuum file, full ens. cov    : c0=+0.0324(0.0054) chi2=7.32/20
+  (d) continuum file, diag + k1 prior 0.08 as correlated syst: c0=+0.0309(0.0055)
+  (e) continuum file, full cov + k1 prior 0.08 as correlated syst: c0=+0.0324(0.0058)
+
+=== sensitivity to b_T range, (c0,k1) full cov ===
+  b in [0.0,1.0] npts=21: chi2/ndf=7.32/19  c0=+0.0324(0.0060), k1=+0.2130(0.0663)
+  b in [0.2,1.0] npts=17: chi2/ndf=5.45/15  c0=+0.0322(0.0075), k1=+0.2096(0.1398)
+  b in [0.0,0.8] npts=19: chi2/ndf=6.02/17  c0=+0.0334(0.0062), k1=+0.2174(0.0666)
+  b in [0.2,0.8] npts=15: chi2/ndf=4.15/13  c0=+0.0337(0.0079), k1=+0.2271(0.1422)
+  b in [0.25,1.0] npts=16: chi2/ndf=4.83/14  c0=+0.0346(0.0081), k1=+0.2931(0.1758)
+  pulls (diag): [ 0.05  0.74  0.17 -0.47  0.29  1.   -0.84 -0.66 -0.56 -0.76 -0.67 -0.44
+ -0.58  0.95  0.79  0.5   0.33  0.64  0.91  0.4   0.31]

@@ -1,0 +1,47 @@
+{
+ "reference": {
+  "finite": true,
+  "lpen_default": 0.003209842829572562,
+  "pen_margin0_raw": 0.0,
+  "grad_finite": true,
+  "grad_max": 5.112260055284423e-06,
+  "grad_norm": 1.1076131077921524e-05,
+  "gate_diff_vs_stored": 0.0
+ },
+ "seed_000.hdf5": {
+  "finite": true,
+  "lpen_default": 0.0,
+  "pen_margin0_raw": 0.0,
+  "grad_finite": true,
+  "grad_max": 97064.83133310328,
+  "grad_norm": 148086.09377129693,
+  "d_nll": 277265.4039808085,
+  "d_ln": 244928.71592543306,
+  "d_lc": 7796.85079620109,
+  "d_lbeta": 24528.667403768042
+ },
+ "seed_004.hdf5": {
+  "finite": true,
+  "lpen_default": 0.0,
+  "pen_margin0_raw": 0.0,
+  "grad_finite": true,
+  "grad_max": 12894.35437864423,
+  "grad_norm": 20554.816023354284,
+  "d_nll": 16356.778588903575,
+  "d_ln": 7779.319857957555,
+  "d_lc": 7601.243031967887,
+  "d_lbeta": 972.9605794332313
+ },
+ "cold_000.hdf5": {
+  "finite": true,
+  "lpen_default": 0.0,
+  "pen_margin0_raw": 0.0,
+  "grad_finite": true,
+  "grad_max": 12898.265518692957,
+  "grad_norm": 20011.39073581685,
+  "d_nll": 13536.850718631777,
+  "d_ln": 12031.986207440514,
+  "d_lc": -19.16643267773594,
+  "d_lbeta": 1526.5009836355277
+ }
+}

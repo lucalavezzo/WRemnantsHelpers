@@ -1,0 +1,41 @@
+{
+ "label": "C2_relu3_tau8",
+ "start": "cold000",
+ "N": 20,
+ "r": 0.0,
+ "stages": [
+  {
+   "restarts": 0,
+   "iters": 46,
+   "stops": [
+    "pred<=0"
+   ],
+   "capped": false,
+   "conv": [
+    44,
+    220
+   ],
+   "cfg": {
+    "pen": "relu3",
+    "K3": 8886110.520507872
+   },
+   "n_f": 48,
+   "n_hvp": 301,
+   "fstar": -0.008437487284652774,
+   "overshoot_star": 0.0007789975712596113
+  }
+ ],
+ "E_conv": {
+  "n_f": 44,
+  "n_hvp": 220
+ },
+ "E_total": {
+  "n_f": 48,
+  "n_hvp": 301
+ },
+ "f_end_minus_fstar": -1.018362332134981e-08,
+ "face_end": -0.0007789975695293716,
+ "failed": false,
+ "restarts": 0,
+ "seconds": 0.9613845348358154
+}

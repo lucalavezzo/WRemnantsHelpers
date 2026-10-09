@@ -1,0 +1,844 @@
+{
+ "reference": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260930_stiff_wall_fits/fitresults_NOMSTIFF.hdf5",
+ "nll_ref": 376.6146329237086,
+ "rows": [
+  {
+   "point": "M2",
+   "k": -2,
+   "start": "W",
+   "start_label": "warm",
+   "chain": [
+    "PROFM2W"
+   ],
+   "chain_states": {
+    "PROFM2W": "done"
+   },
+   "n_iter_total": 82,
+   "loss0": 975.5858299975795,
+   "stall_stop": false,
+   "state": "done",
+   "result_from": "PROFM2W",
+   "nll": 378.7502700983585,
+   "two_dnll": 4.2712743492998015,
+   "edm": 1.0137656904041298e-16,
+   "converged": true,
+   "k_measured": -2.000000000000001,
+   "frozen_bit_exact": true,
+   "lambdas": {
+    "lambda2": 0.03315393842251907,
+    "lambda4": 0.051980673383841824,
+    "delta_lambda2": -0.005304719325597663,
+    "lambda2_nu": 0.06276962200824805
+   },
+   "faces_on": [
+    "L2(2.5)"
+   ],
+   "faces": {
+    "\u03bb2_\u03bd": 0.06276962200824805,
+    "L2(0)": 0.03315393842251907,
+    "B(0)": 0.15597846241800647,
+    "L2(2.5)": -5.57362466326039e-07,
+    "B(2.5)": 0.15594202015152547
+   },
+   "dz_nom_family": {
+    "alphaS": 0.0,
+    "NP lambda": 1.335981644451076,
+    "resum TNP / transition / FO scale": 1.2920172314315734,
+    "PDF (eig + mb/mc)": 1.5820177084273501,
+    "QCDscaleZ helicity": 0.3977513680904215,
+    "muon calib": 0.18769178827802924,
+    "eff stat": 0.06564958081481707,
+    "eff syst": 0.3022664815285027,
+    "other (EW, lumi, bkg, prefire, ...)": 1.1031759292565708
+   },
+   "dz_nom_kick": 1.8933825310654495,
+   "dz_nom_all": 2.7318568580393663
+  },
+  {
+   "point": "M2",
+   "k": -2,
+   "start": "R",
+   "start_label": "perturbed",
+   "chain": [
+    "PROFM2R",
+    "PROFM2RS"
+   ],
+   "chain_states": {
+    "PROFM2R": "exit 137 (killed)",
+    "PROFM2RS": "done"
+   },
+   "n_iter_total": 186,
+   "loss0": 2070.3684934669086,
+   "stall_stop": false,
+   "state": "done",
+   "result_from": "PROFM2RS",
+   "nll": 378.7502700982536,
+   "two_dnll": 4.271274349090049,
+   "edm": 2.410076817293943e-17,
+   "converged": true,
+   "k_measured": -2.000000000000001,
+   "frozen_bit_exact": true,
+   "lambdas": {
+    "lambda2": 0.033153938436501273,
+    "lambda4": 0.05198067338596801,
+    "delta_lambda2": -0.005304719327835057,
+    "lambda2_nu": 0.06276962196102195
+   },
+   "faces_on": [
+    "L2(2.5)"
+   ],
+   "faces": {
+    "\u03bb2_\u03bd": 0.06276962196102195,
+    "L2(0)": 0.033153938436501273,
+    "B(0)": 0.15597846242443114,
+    "L2(2.5)": -5.57362467831779e-07,
+    "B(2.5)": 0.15594202015790404
+   },
+   "dz_nom_family": {
+    "alphaS": 0.0,
+    "NP lambda": 1.3359816445620052,
+    "resum TNP / transition / FO scale": 1.2920172321862362,
+    "PDF (eig + mb/mc)": 1.5820177090485572,
+    "QCDscaleZ helicity": 0.39775136841355563,
+    "muon calib": 0.18769178761832617,
+    "eff stat": 0.06564958053393771,
+    "eff syst": 0.3022664795323014,
+    "other (EW, lumi, bkg, prefire, ...)": 1.1031759290747072
+   },
+   "dz_nom_kick": 1.8933825326420315,
+   "dz_nom_all": 2.731856858510933
+  },
+  {
+   "point": "M2",
+   "k": -2,
+   "start": "K",
+   "start_label": "PDF/TNP kick",
+   "chain": [
+    "PROFM2K",
+    "PROFM2KS"
+   ],
+   "chain_states": {
+    "PROFM2K": "exit 137 (killed)",
+    "PROFM2KS": "done"
+   },
+   "n_iter_total": 208,
+   "loss0": 14311.051777613484,
+   "stall_stop": false,
+   "state": "done",
+   "result_from": "PROFM2KS",
+   "nll": 378.750270098642,
+   "two_dnll": 4.271274349866758,
+   "edm": 3.488919259664364e-17,
+   "converged": true,
+   "k_measured": -2.000000000000001,
+   "frozen_bit_exact": true,
+   "lambdas": {
+    "lambda2": 0.03315393840744607,
+    "lambda4": 0.05198067338365031,
+    "delta_lambda2": -0.005304719323186061,
+    "lambda2_nu": 0.06276962199680053
+   },
+   "faces_on": [
+    "L2(2.5)"
+   ],
+   "faces": {
+    "\u03bb2_\u03bd": 0.06276962199680053,
+    "L2(0)": 0.03315393840744607,
+    "B(0)": 0.15597846241738225,
+    "L2(2.5)": -5.573624668048227e-07,
+    "B(2.5)": 0.15594202015095093
+   },
+   "dz_nom_family": {
+    "alphaS": 0.0,
+    "NP lambda": 1.3359816443888177,
+    "resum TNP / transition / FO scale": 1.2920172311817297,
+    "PDF (eig + mb/mc)": 1.5820177091303766,
+    "QCDscaleZ helicity": 0.3977513683140929,
+    "muon calib": 0.18769178711925247,
+    "eff stat": 0.06564958061505528,
+    "eff syst": 0.30226647903761183,
+    "other (EW, lumi, bkg, prefire, ...)": 1.1031759290739866
+   },
+   "dz_nom_kick": 1.893382531421526,
+   "dz_nom_all": 2.731856857896696
+  },
+  {
+   "point": "M1",
+   "k": -1,
+   "start": "W",
+   "start_label": "warm",
+   "chain": [
+    "PROFM1W"
+   ],
+   "chain_states": {
+    "PROFM1W": "done"
+   },
+   "n_iter_total": 65,
+   "loss0": 526.8260660474384,
+   "stall_stop": false,
+   "state": "done",
+   "result_from": "PROFM1W",
+   "nll": 377.13067314660805,
+   "two_dnll": 1.032080445798897,
+   "edm": 6.692498923811203e-14,
+   "converged": true,
+   "k_measured": -0.9999999999999989,
+   "frozen_bit_exact": true,
+   "lambdas": {
+    "lambda2": 0.028458936804127144,
+    "lambda4": 0.06956075983382481,
+    "delta_lambda2": -0.004553550412006691,
+    "lambda2_nu": 0.0633184926995222
+   },
+   "faces_on": [
+    "L2(2.5)"
+   ],
+   "faces": {
+    "\u03bb2_\u03bd": 0.0633184926995222,
+    "L2(0)": 0.028458936804127144,
+    "B(0)": 0.20870532870983158,
+    "L2(2.5)": -7.532709146752803e-07,
+    "B(2.5)": 0.20868227950147444
+   },
+   "dz_nom_family": {
+    "alphaS": 0.0,
+    "NP lambda": 0.6715329628812025,
+    "resum TNP / transition / FO scale": 0.6318058867904314,
+    "PDF (eig + mb/mc)": 0.7833816427832481,
+    "QCDscaleZ helicity": 0.1978250678567416,
+    "muon calib": 0.09277383822674197,
+    "eff stat": 0.033828875203052486,
+    "eff syst": 0.14945666032951302,
+    "other (EW, lumi, bkg, prefire, ...)": 0.5387375905354931
+   },
+   "dz_nom_kick": 0.9319910130404179,
+   "dz_nom_all": 1.3510305759571173
+  },
+  {
+   "point": "M1",
+   "k": -1,
+   "start": "R",
+   "start_label": "perturbed",
+   "chain": [
+    "PROFM1R"
+   ],
+   "chain_states": {
+    "PROFM1R": "done"
+   },
+   "n_iter_total": 1095,
+   "loss0": 5728.092817912672,
+   "stall_stop": true,
+   "state": "done",
+   "result_from": "PROFM1R",
+   "nll": 377.1306731468501,
+   "two_dnll": 1.0320804462829756,
+   "edm": 2.5440001258451514e-10,
+   "converged": true,
+   "k_measured": -0.9999999999999989,
+   "frozen_bit_exact": true,
+   "lambdas": {
+    "lambda2": 0.028459098947213768,
+    "lambda4": 0.06956070783578205,
+    "delta_lambda2": -0.004553576355703146,
+    "lambda2_nu": 0.06331840986304943
+   },
+   "faces_on": [
+    "L2(2.5)"
+   ],
+   "faces": {
+    "\u03bb2_\u03bd": 0.06331840986304943,
+    "L2(0)": 0.028459098947213768,
+    "B(0)": 0.20870517310967,
+    "L2(2.5)": -7.532759308953585e-07,
+    "B(2.5)": 0.20868212350734616
+   },
+   "dz_nom_family": {
+    "alphaS": 0.0,
+    "NP lambda": 0.6715358386713112,
+    "resum TNP / transition / FO scale": 0.6318055454119121,
+    "PDF (eig + mb/mc)": 0.7833830202627758,
+    "QCDscaleZ helicity": 0.19782754044401657,
+    "muon calib": 0.09277357211331558,
+    "eff stat": 0.033829021484049655,
+    "eff syst": 0.14945503188320663,
+    "other (EW, lumi, bkg, prefire, ...)": 0.5387373859803462
+   },
+   "dz_nom_kick": 0.9319910715123693,
+   "dz_nom_all": 1.3510327301782006
+  },
+  {
+   "point": "M1",
+   "k": -1,
+   "start": "K",
+   "start_label": "PDF/TNP kick",
+   "chain": [
+    "PROFM1K"
+   ],
+   "chain_states": {
+    "PROFM1K": "done"
+   },
+   "n_iter_total": 195,
+   "loss0": 153768.55967062616,
+   "stall_stop": false,
+   "state": "done",
+   "result_from": "PROFM1K",
+   "nll": 377.13067314654955,
+   "two_dnll": 1.0320804456819133,
+   "edm": 6.012823650488673e-14,
+   "converged": true,
+   "k_measured": -0.9999999999999989,
+   "frozen_bit_exact": true,
+   "lambdas": {
+    "lambda2": 0.02845893935950128,
+    "lambda4": 0.06956075883475255,
+    "delta_lambda2": -0.004553550820865017,
+    "lambda2_nu": 0.06331849324243781
+   },
+   "faces_on": [
+    "L2(2.5)"
+   ],
+   "faces": {
+    "\u03bb2_\u03bd": 0.06331849324243781,
+    "L2(0)": 0.02845893935950128,
+    "B(0)": 0.20870532571882364,
+    "L2(2.5)": -7.5327090507879e-07,
+    "B(2.5)": 0.20868227650425764
+   },
+   "dz_nom_family": {
+    "alphaS": 0.0,
+    "NP lambda": 0.6715330097537453,
+    "resum TNP / transition / FO scale": 0.6318058574264843,
+    "PDF (eig + mb/mc)": 0.7833817273661127,
+    "QCDscaleZ helicity": 0.19782507325478324,
+    "muon calib": 0.09277388856123704,
+    "eff stat": 0.03382884956402293,
+    "eff syst": 0.14945666626871487,
+    "other (EW, lumi, bkg, prefire, ...)": 0.5387375373031907
+   },
+   "dz_nom_kick": 0.9319910467703011,
+   "dz_nom_all": 1.351030617602716
+  },
+  {
+   "point": "P1",
+   "k": 1,
+   "start": "W",
+   "start_label": "warm",
+   "chain": [
+    "PROFP1W"
+   ],
+   "chain_states": {
+    "PROFP1W": "done"
+   },
+   "n_iter_total": 29,
+   "loss0": 837.2880853617775,
+   "stall_stop": false,
+   "state": "done",
+   "result_from": "PROFP1W",
+   "nll": 377.10039758328315,
+   "two_dnll": 0.9715293191491128,
+   "edm": 1.7232035474220327e-17,
+   "converged": true,
+   "k_measured": 0.9999999999999989,
+   "frozen_bit_exact": true,
+   "lambdas": {
+    "lambda2": 0.024462542700930345,
+    "lambda4": 0.10648802023572951,
+    "delta_lambda2": -0.003914173762518385,
+    "lambda2_nu": 0.06558713242928874
+   },
+   "faces_on": [
+    "L2(2.5)"
+   ],
+   "faces": {
+    "\u03bb2_\u03bd": 0.06558713242928874,
+    "L2(0)": 0.024462542700930345,
+    "B(0)": 0.3194786994840288,
+    "L2(2.5)": -1.0433148095630174e-06,
+    "B(2.5)": 0.3194640607071885
+   },
+   "dz_nom_family": {
+    "alphaS": 0.0,
+    "NP lambda": 0.6993027598066084,
+    "resum TNP / transition / FO scale": 0.6036246514418855,
+    "PDF (eig + mb/mc)": 0.7674424146268796,
+    "QCDscaleZ helicity": 0.19573634685907235,
+    "muon calib": 0.09369659953950064,
+    "eff stat": 0.03598615908762712,
+    "eff syst": 0.14987109703088541,
+    "other (EW, lumi, bkg, prefire, ...)": 0.5186170401219921
+   },
+   "dz_nom_kick": 0.9007891470647439,
+   "dz_nom_all": 1.3349781583954208
+  },
+  {
+   "point": "P1",
+   "k": 1,
+   "start": "R",
+   "start_label": "perturbed",
+   "chain": [
+    "PROFP1R"
+   ],
+   "chain_states": {
+    "PROFP1R": "done"
+   },
+   "n_iter_total": 376,
+   "loss0": 9327.58706487867,
+   "stall_stop": false,
+   "state": "done",
+   "result_from": "PROFP1R",
+   "nll": 377.10039758324575,
+   "two_dnll": 0.9715293190743068,
+   "edm": 2.7786653427055924e-15,
+   "converged": true,
+   "k_measured": 0.9999999999999989,
+   "frozen_bit_exact": true,
+   "lambdas": {
+    "lambda2": 0.024462542704346224,
+    "lambda4": 0.10648802016501147,
+    "delta_lambda2": -0.003914173763064682,
+    "lambda2_nu": 0.06558713252504243
+   },
+   "faces_on": [
+    "L2(2.5)"
+   ],
+   "faces": {
+    "\u03bb2_\u03bd": 0.06558713252504243,
+    "L2(0)": 0.024462542704346224,
+    "B(0)": 0.3194786992718808,
+    "L2(2.5)": -1.0433148080364607e-06,
+    "B(2.5)": 0.3194640604950344
+   },
+   "dz_nom_family": {
+    "alphaS": 0.0,
+    "NP lambda": 0.6993027575527185,
+    "resum TNP / transition / FO scale": 0.603624649354861,
+    "PDF (eig + mb/mc)": 0.7674424136533229,
+    "QCDscaleZ helicity": 0.19573634550274097,
+    "muon calib": 0.09369659942829325,
+    "eff stat": 0.03598615942376211,
+    "eff syst": 0.14987109609471488,
+    "other (EW, lumi, bkg, prefire, ...)": 0.5186170409927314
+   },
+   "dz_nom_kick": 0.9007891462513299,
+   "dz_nom_all": 1.33497815574698
+  },
+  {
+   "point": "P1",
+   "k": 1,
+   "start": "K",
+   "start_label": "PDF/TNP kick",
+   "chain": [
+    "PROFP1K"
+   ],
+   "chain_states": {
+    "PROFP1K": "done"
+   },
+   "n_iter_total": 313,
+   "loss0": 60223.83198664989,
+   "stall_stop": false,
+   "state": "done",
+   "result_from": "PROFP1K",
+   "nll": 377.1003975833673,
+   "two_dnll": 0.9715293193173693,
+   "edm": 2.880642324504246e-15,
+   "converged": true,
+   "k_measured": 0.9999999999999989,
+   "frozen_bit_exact": true,
+   "lambdas": {
+    "lambda2": 0.024462542557698752,
+    "lambda4": 0.10648802032398946,
+    "delta_lambda2": -0.003914173739602032,
+    "lambda2_nu": 0.06558713232606483
+   },
+   "faces_on": [
+    "L2(2.5)"
+   ],
+   "faces": {
+    "\u03bb2_\u03bd": 0.06558713232606483,
+    "L2(0)": 0.024462542557698752,
+    "B(0)": 0.31947869974855153,
+    "L2(2.5)": -1.0433148139518678e-06,
+    "B(2.5)": 0.3194640609719684
+   },
+   "dz_nom_family": {
+    "alphaS": 0.0,
+    "NP lambda": 0.6993027629215202,
+    "resum TNP / transition / FO scale": 0.603624650632296,
+    "PDF (eig + mb/mc)": 0.7674424165570786,
+    "QCDscaleZ helicity": 0.195736345199749,
+    "muon calib": 0.09369659950990857,
+    "eff stat": 0.035986159200866286,
+    "eff syst": 0.14987109741540333,
+    "other (EW, lumi, bkg, prefire, ...)": 0.5186170391461845
+   },
+   "dz_nom_kick": 0.9007891463011085,
+   "dz_nom_all": 1.334978160192428
+  },
+  {
+   "point": "P2",
+   "k": 2,
+   "start": "W",
+   "start_label": "warm",
+   "chain": [
+    "PROFP2W",
+    "PROFP2WS"
+   ],
+   "chain_states": {
+    "PROFP2W": "exit 137 (killed)",
+    "PROFP2WS": "done"
+   },
+   "n_iter_total": 52,
+   "loss0": 2197.2675723719713,
+   "stall_stop": false,
+   "state": "done",
+   "result_from": "PROFP2WS",
+   "nll": 378.5077422814512,
+   "two_dnll": 3.7862187154852336,
+   "edm": 3.897170589557166e-15,
+   "converged": true,
+   "k_measured": 2.000000000000001,
+   "frozen_bit_exact": true,
+   "lambdas": {
+    "lambda2": 0.024933670848677758,
+    "lambda4": 0.12695111314765245,
+    "delta_lambda2": -0.003989569637777365,
+    "lambda2_nu": 0.0671844485455115
+   },
+   "faces_on": [
+    "L2(2.5)"
+   ],
+   "faces": {
+    "\u03bb2_\u03bd": 0.0671844485455115,
+    "L2(0)": 0.024933670848677758,
+    "B(0)": 0.38086884040547353,
+    "L2(2.5)": -1.1393874307721874e-06,
+    "B(2.5)": 0.38085333944295735
+   },
+   "dz_nom_family": {
+    "alphaS": 0.0,
+    "NP lambda": 1.454982205758363,
+    "resum TNP / transition / FO scale": 1.1799786703529498,
+    "PDF (eig + mb/mc)": 1.519347821780291,
+    "QCDscaleZ helicity": 0.3902801016926211,
+    "muon calib": 0.19080570421652593,
+    "eff stat": 0.07369696386617668,
+    "eff syst": 0.30254876732452074,
+    "other (EW, lumi, bkg, prefire, ...)": 1.0205067746843108
+   },
+   "dz_nom_kick": 1.7697539103135653,
+   "dz_nom_all": 2.6729884279431375
+  },
+  {
+   "point": "P2",
+   "k": 2,
+   "start": "R",
+   "start_label": "perturbed",
+   "chain": [
+    "PROFP2R"
+   ],
+   "chain_states": {
+    "PROFP2R": "done"
+   },
+   "n_iter_total": 112,
+   "loss0": 7965.875038463117,
+   "stall_stop": false,
+   "state": "done",
+   "result_from": "PROFP2R",
+   "nll": 378.5077422817155,
+   "two_dnll": 3.7862187160137637,
+   "edm": 6.357863648846295e-15,
+   "converged": true,
+   "k_measured": 2.000000000000001,
+   "frozen_bit_exact": true,
+   "lambdas": {
+    "lambda2": 0.024933670941346298,
+    "lambda4": 0.12695111287402328,
+    "delta_lambda2": -0.003989569652603352,
+    "lambda2_nu": 0.06718444874227267
+   },
+   "faces_on": [
+    "L2(2.5)"
+   ],
+   "faces": {
+    "\u03bb2_\u03bd": 0.06718444874227267,
+    "L2(0)": 0.024933670941346298,
+    "B(0)": 0.3808688395847588,
+    "L2(2.5)": -1.139387424652083e-06,
+    "B(2.5)": 0.3808533386220698
+   },
+   "dz_nom_family": {
+    "alphaS": 0.0,
+    "NP lambda": 1.4549821964291902,
+    "resum TNP / transition / FO scale": 1.1799786602980609,
+    "PDF (eig + mb/mc)": 1.5193478241712834,
+    "QCDscaleZ helicity": 0.3902800979309523,
+    "muon calib": 0.19080571210590308,
+    "eff stat": 0.07369696873689843,
+    "eff syst": 0.3025487725423012,
+    "other (EW, lumi, bkg, prefire, ...)": 1.0205067802885084
+   },
+   "dz_nom_kick": 1.7697539035916552,
+   "dz_nom_all": 2.6729884226637872
+  },
+  {
+   "point": "P2",
+   "k": 2,
+   "start": "K",
+   "start_label": "PDF/TNP kick",
+   "chain": [
+    "PROFP2K"
+   ],
+   "chain_states": {
+    "PROFP2K": "done"
+   },
+   "n_iter_total": 197,
+   "loss0": 72403.7305432413,
+   "stall_stop": false,
+   "state": "done",
+   "result_from": "PROFP2K",
+   "nll": 378.50774228129205,
+   "two_dnll": 3.7862187151669104,
+   "edm": 1.0385262114227942e-14,
+   "converged": true,
+   "k_measured": 2.000000000000001,
+   "frozen_bit_exact": true,
+   "lambdas": {
+    "lambda2": 0.024933670627292293,
+    "lambda4": 0.12695111297184536,
+    "delta_lambda2": -0.003989569602354028,
+    "lambda2_nu": 0.06718444870199995
+   },
+   "faces_on": [
+    "L2(2.5)"
+   ],
+   "faces": {
+    "\u03bb2_\u03bd": 0.06718444870199995,
+    "L2(0)": 0.024933670627292293,
+    "B(0)": 0.38086883987763936,
+    "L2(2.5)": -1.1393874203811938e-06,
+    "B(2.5)": 0.3808533389155361
+   },
+   "dz_nom_family": {
+    "alphaS": 0.0,
+    "NP lambda": 1.454982200015902,
+    "resum TNP / transition / FO scale": 1.1799786710741798,
+    "PDF (eig + mb/mc)": 1.519347819502527,
+    "QCDscaleZ helicity": 0.39028010087241977,
+    "muon calib": 0.19080570686782333,
+    "eff stat": 0.07369696265491082,
+    "eff syst": 0.30254877774476285,
+    "other (EW, lumi, bkg, prefire, ...)": 1.0205067783333341
+   },
+   "dz_nom_kick": 1.7697539031014768,
+   "dz_nom_all": 2.6729884264497277
+  }
+ ],
+ "pairs": [
+  {
+   "point": "M2",
+   "a": "W",
+   "b": "R",
+   "dnll": -1.0487610779819079e-10,
+   "dz": 9.172600487077907e-09,
+   "dz_max": 4.9101736694435955e-09,
+   "dz_max_name": "pdfEig19",
+   "dz_kick": 6.692847890726363e-09,
+   "same": true,
+   "both_converged": true
+  },
+  {
+   "point": "M2",
+   "a": "W",
+   "b": "K",
+   "dnll": 2.8347812985884957e-10,
+   "dz": 1.1348846880215893e-08,
+   "dz_max": 6.285667547109986e-09,
+   "dz_max_name": "pdfEig19",
+   "dz_kick": 9.68690235788423e-09,
+   "same": true,
+   "both_converged": true
+  },
+  {
+   "point": "M2",
+   "a": "R",
+   "b": "K",
+   "dnll": 3.8835423765704036e-10,
+   "dz": 9.627676611484926e-09,
+   "dz_max": 4.02480017746134e-09,
+   "dz_max_name": "pdfEig28",
+   "dz_kick": 7.435663470366908e-09,
+   "same": true,
+   "both_converged": true
+  },
+  {
+   "point": "M1",
+   "a": "W",
+   "b": "R",
+   "dnll": 2.4203927750932053e-10,
+   "dz": 1.6230305891736015e-05,
+   "dz_max": 5.322278577298022e-06,
+   "dz_max_name": "pdfEig14",
+   "dz_kick": 9.091112559774801e-06,
+   "same": true,
+   "both_converged": true
+  },
+  {
+   "point": "M1",
+   "a": "W",
+   "b": "K",
+   "dnll": -5.849187800777145e-11,
+   "dz": 4.757817663115689e-07,
+   "dz_max": 1.9664168823976702e-07,
+   "dz_max_name": "pdfEig28",
+   "dz_kick": 3.9036045768061773e-07,
+   "same": true,
+   "both_converged": true
+  },
+  {
+   "point": "M1",
+   "a": "R",
+   "b": "K",
+   "dnll": -3.00531155517092e-10,
+   "dz": 1.626764382973136e-05,
+   "dz_max": 5.293468536790608e-06,
+   "dz_max_name": "pdfEig14",
+   "dz_kick": 9.146714578562893e-06,
+   "same": true,
+   "both_converged": true
+  },
+  {
+   "point": "P1",
+   "a": "W",
+   "b": "R",
+   "dnll": -3.7402969610411674e-11,
+   "dz": 5.0017692236740414e-08,
+   "dz_max": 1.3934724606009467e-08,
+   "dz_max_name": "pdfEig27",
+   "dz_kick": 2.668517234122187e-08,
+   "same": true,
+   "both_converged": true
+  },
+  {
+   "point": "P1",
+   "a": "W",
+   "b": "K",
+   "dnll": 8.412825991399586e-11,
+   "dz": 2.2019353660446287e-08,
+   "dz_max": 1.1508332617231292e-08,
+   "dz_max_name": "pdfEig12",
+   "dz_kick": 1.7362807153625e-08,
+   "same": true,
+   "both_converged": true
+  },
+  {
+   "point": "P1",
+   "a": "R",
+   "b": "K",
+   "dnll": 1.2153122952440754e-10,
+   "dz": 5.586231493712135e-08,
+   "dz_max": 1.6153258435630235e-08,
+   "dz_max_name": "pdfEig12",
+   "dz_kick": 3.2709603219506056e-08,
+   "same": true,
+   "both_converged": true
+  },
+  {
+   "point": "P2",
+   "a": "W",
+   "b": "R",
+   "dnll": 2.6426505428389646e-10,
+   "dz": 1.3081058324224381e-07,
+   "dz_max": 4.862481194057193e-08,
+   "dz_max_name": "pdfEig19",
+   "dz_kick": 1.0165366592963551e-07,
+   "same": true,
+   "both_converged": true
+  },
+  {
+   "point": "P2",
+   "a": "W",
+   "b": "K",
+   "dnll": -1.5916157281026244e-10,
+   "dz": 1.7385234368200146e-07,
+   "dz_max": 5.820396273654027e-08,
+   "dz_max_name": "pdfEig19",
+   "dz_kick": 1.3063347406656517e-07,
+   "same": true,
+   "both_converged": true
+  },
+  {
+   "point": "P2",
+   "a": "R",
+   "b": "K",
+   "dnll": -4.234266270941589e-10,
+   "dz": 1.553801512994307e-07,
+   "dz_max": 3.916323351884022e-08,
+   "dz_max_name": "pdfEig11",
+   "dz_kick": 1.0073608774337411e-07,
+   "same": true,
+   "both_converged": true
+  }
+ ],
+ "profile": {
+  "-2": {
+   "two_dnll": 4.271274349090049,
+   "start": "R",
+   "n_conv": 3,
+   "spread": 7.767084753140807e-10
+  },
+  "-1": {
+   "two_dnll": 1.0320804456819133,
+   "start": "K",
+   "n_conv": 3,
+   "spread": 6.01062311034184e-10
+  },
+  "1": {
+   "two_dnll": 0.9715293190743068,
+   "start": "R",
+   "n_conv": 3,
+   "spread": 2.4306245904881507e-10
+  },
+  "2": {
+   "two_dnll": 3.7862187151669104,
+   "start": "K",
+   "n_conv": 3,
+   "spread": 8.468532541883178e-10
+  }
+ },
+ "fit": {
+  "a": 1.0068700594642372,
+  "c": -0.030315355369174783,
+  "resid": {
+   "-2": 0.0012712682797024755,
+   "-1": -0.005104969151498828,
+   "1": -0.005025385020755668,
+   "2": 0.0012613202633597886
+  },
+  "interval_up": 1.0121233634444304,
+  "interval_down": -0.9821662751876838,
+  "n_points": 4,
+  "sym_antisym": {
+   "1": {
+    "sym": 1.00180488237811,
+    "antisym": -0.03027556330380321
+   },
+   "2": {
+    "sym": 4.02874653212848,
+    "antisym": -0.24252781696156944
+   }
+  },
+  "quartic": {
+   "a": 1.00001096549344,
+   "c": -0.030315355369174783,
+   "d": 0.0017939168846700067,
+   "interval_up": 1.0147735242654459,
+   "interval_down": -0.9845661018669688
+  },
+  "through_pm1": {
+   "a": 1.00180488237811,
+   "c": -0.03027556330380321,
+   "interval_up": 1.0147804346569302,
+   "interval_down": -0.9845586840703161
+  }
+ }
+}
