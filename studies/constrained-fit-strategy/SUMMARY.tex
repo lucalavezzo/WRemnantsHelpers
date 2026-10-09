@@ -1,13 +1,14 @@
 % title: A reliable minimisation strategy for the walled NP fit
 % slug: constrained-fit-strategy
-% status: active
-% period: 2026-10-06 – ongoing
-% updated: 2026-10-08
-% covers: 2026-10-08
+% status: done
+% period: 2026-10-06 – 2026-10-09
+% updated: 2026-10-09
+% covers: 2026-10-09
 %
 % BUILD: scripts/summary_pdf.py constrained-fit-strategy  (pdflatex on the host, from this directory).
-% Converted from SUMMARY.md (first version, 2026-10-08) and refreshed the same day.
-% Figures made for this summary: summary_figs/make_summary_figs.py (log parsing + analytic curves only).
+% Final summary (study closed 2026-10-09). First version 2026-10-08 (converted from SUMMARY.md), refreshed 2026-10-09.
+% Figures made for this summary: summary_figs/make_summary_figs.py (log parsing + analytic curves),
+%   summary_figs/make_precond_scope.py (reads 261008-saturated-subfit-diagnosis/spectra.json).
 % Public page: no absolute alpha_s from data; Delta alpha_s only in units of the reference fit's sigma.
 \documentclass[10pt,a4paper]{article}
 
@@ -206,27 +207,29 @@
 \SummaryTitleBlock
 
 \begin{answer}
-The hours-long ``crawl'' of walled SCETlib-AD fits is not a false minimum: scipy's trust-krylov locks its trust radius in a
-limit cycle at the curvature jump of the \relu\ NP damping wall. A curvature-continuous (\Ctwo) ramp on the wall removes it.
-From the same stuck point the \Ctwo\ fit reaches the reference minimum in 46 iterations (1.1\,h), while \relu\ is still
-430\,NLL above it after 219, and the minimum does not move: $\dalphas=+3.9\times10^{-6}\,\sigma$. \Ctwo\ is now the
-\code{NPDampingWall} default. \textbf{Caveat:} one real start was tested (six on a surrogate). The projected-\ptll\
-saturated sub-fit is slow for a different reason, the conditioning of the saturated model; a preconditioning test for it
-is running. Real data, \alphas\ blinded; shifts in units of the reference fit's $\sigma(\alphas)$.
+Two slow-downs of the walled SCETlib-AD fits were diagnosed and fixed; neither fix moves the minimum. (1)~The
+hours-long ``crawl'' of the main fit is a limit cycle of scipy trust-krylov's radius rule at the curvature jump of the
+\relu\ NP damping wall; a curvature-continuous (\Ctwo) ramp removes it (from the same stuck point: reference minimum in 46
+iterations, 1.1\,h; \relu\ still 430\,NLL above it after 219), with $\dalphas=+3.9\times10^{-6}\,\sigma$. (2)~The projected-\ptll\ saturated sub-fit is slow because \alphas\ is 97.9\,\% degenerate
+with the 39 free bin scales; full-scope spectral preconditioning reaches the same minimum ($\Delta$loss
+$-1.7\times10^{-10}$) with 614 instead of 2150 Hessian-vector products, about $3\times$ faster at equal node load. Both
+are now defaults. \textbf{Caveat:} one real start each; preconditioning is unmeasured on toys and on the main fit.
+Real data, \alphas\ blinded; shifts in units of the reference fit's $\sigma(\alphas)$.
 \end{answer}
 
 % ============================================================================================
 \section{Motivation and question}
 
-The walled NP fits (a rabbit regularizer keeps the SCETlib NP parameters in the physically damped region) minimise
-with scipy's trust-krylov, and some sat for hours on a slowly falling plateau that looked like a converged fit. The census fit \fit{CENS03} (perturbed start \fit{pert\_002}) had not converged after 390 iterations
-\taskref{261006-diagnosis}, and \fit{CMR1A} spent 1.5\,h on a plateau before escaping \logref{2026-10-06}. trust-constr
-holds the constraints exactly but did not converge from distant starts: \fit{TCB1} ran 600 iterations (13.6\,h) without
-leaving its first barrier stage \taskref{261006-diagnosis}. The question: which recipe holds the physical region exactly
-(or to a negligible violation) and reaches the same minimum from any start in predictable time? After the diagnosis it was
-narrowed (Luca, 10-06): trust-krylov stays, trust-constr only as a certifier, and a fix at the level of parameters or a
-few lines of wall code comes before any reparametrisation. On 10-08 a second question was added: why the projected-\ptll\
-saturated sub-fit takes about 5\,h, a cost that toy-calibrated goodness-of-fit tests would pay once per toy.
+The walled NP fits (a rabbit regularizer keeps the SCETlib NP parameters in the physically damped region) minimise with
+scipy's trust-krylov, and some sat for hours on a slowly falling plateau that looked like a converged fit: the census
+fit \fit{CENS03} had not converged after 390 iterations \taskref{261006-diagnosis}, and \fit{CMR1A} spent 1.5\,h on a
+plateau before escaping \logref{2026-10-06}. trust-constr holds the constraints exactly but did not converge from distant
+starts (\fit{TCB1}: 600 iterations, 13.6\,h, still in its first barrier stage) \taskref{261006-diagnosis}. The question
+(Luca, 10-06): which recipe holds the physical region exactly, or to a negligible violation, and reaches the same minimum
+from any start in predictable time? After the diagnosis it was narrowed: keep trust-krylov, and try a parameter-level or
+few-line fix before any reparametrisation. On 10-08 a second question was
+added: why does the projected-\ptll\ saturated sub-fit take about 5\,h, a cost that toy-calibrated goodness-of-fit tests
+pay once per toy?
 
 % ============================================================================================
 \section{Setup and method}
@@ -236,45 +239,53 @@ $\ptll\times\yll$, Z$\to\mu\mu$), the SCETlib-AD param model on the $|Y|\le2.5$ 
 cache, the native lattice CS term, $\lnu4\equiv0$, TMD priors pinned. The wall adds $k\sum_iP(x_i)$ to the NLL, with
 $x_i$ the violation of physical-damping condition $i$ in that condition's own units (e.g.\ $L_2(Y)=\lambda_2+\delta\lambda_2Y^2\ge0$
 at $|Y|=0$ and 2.5, $\lnu2\ge0$, $3\lambda_\infty^2\lambda_4+L_2^3\ge0$), $k=e^{2\tau}$, $\tau=8$, margin 0. Fit names:
-\fit{NOMSTIFF} is the converged reference nominal walled fit (NLL 376.6146329237). \fit{CENS03R} is a restart of
-\fit{CENS03}, stopped mid-crawl after 260 iterations (4.5\,h) at $+430$\,NLL; its snapshot sits on the
-$L_2(|Y|{=}2.5)$ face, $-0.175\,\sigma$ in \alphas\ and $\|\Delta\theta/\sigma\|=29.3$ from \fit{NOMSTIFF}
-\taskref{261008-c2-wall-test}. \fit{C2A} (\Ctwo) and \fit{R2A} (\relu) restart from that snapshot at $\tau=8$, side by
-side on one node with the same cache subset. \fit{LATB8} is a walled lattice-term fit; \fit{SATB8} (\relu), \fit{SATC2} (\Ctwo) and \fit{SATB8SA} (\relu,
-seeded with a previous sub-fit via \code{--saturatedSeed}~\code{all}) are its projected-\ptll\ saturated sub-fits (39 free
-bin scales, \code{-m}~\code{Project}~\code{ch0}~\code{ptll}).
+\fit{NOMSTIFF} is the converged reference walled fit. \fit{CENS03R} is a restart of \fit{CENS03}, stopped mid-crawl
+after 260 iterations (4.5\,h) at $+430$\,NLL, on the $L_2(|Y|{=}2.5)$ face, $-0.175\,\sigma$ in \alphas\ from
+\fit{NOMSTIFF} \taskref{261008-c2-wall-test}; \fit{C2A} (\Ctwo) and \fit{R2A} (\relu) restart from it at $\tau=8$. \fit{LATB8} is a walled lattice-term fit; \fit{SATB8}
+(\relu), \fit{SATC2} (\Ctwo), \fit{SATB8SA} (\relu, seeded with a previous sub-fit via \code{--saturatedSeed}~\code{all},
+which toys cannot do) and \fit{SATP} (\relu, preconditioned) are its projected-\ptll\ saturated sub-fits (39 free bin
+scales, \code{-m}~\code{Project}~\code{ch0}~\code{ptll}), started at \fit{LATB8}'s minimum.
 
-\paragraph{Diagnosis.} From the fit logs and a quadratic surrogate (the real data-only Hessian, $3719^2$, the five exact
-wall conditions, and an instrumented copy of scipy's trust-region loop). It reproduces two census fits' iteration counts
-and \fit{CENS03}'s non-convergence, not \fit{CMR1A}'s crawl \taskref{261006-diagnosis}. Cheap fixes were screened on six
-surrogate starts, and the winner run on real fits.
+\paragraph{Diagnosis.} The crawl was studied from the fit logs and a quadratic surrogate (the real data-only Hessian,
+$3719^2$, the five exact wall conditions, and an instrumented copy of scipy's trust-region loop), which reproduces two
+census fits' iteration counts and \fit{CENS03}'s non-convergence \taskref{261006-diagnosis}. The sub-fit was studied
+from its logs and one diagnostic job computing dense Hessians at its start ($H_s$), its end ($H_e$) and near the end,
+with plain CG on those matrices standing in for trlib's Krylov solve \taskref{261008-saturated-subfit-diagnosis}.
 
-\paragraph{The \Ctwo\ ramp.} The study built a curvature-continuous version of the wall (Fig.~\ref{fig:penalty}). With
-$x$ the violation and $d$ the ramp width,
+\paragraph{The \Ctwo\ ramp} (built by the study, Fig.~\ref{fig:penalty}). With $x$ the violation and $d$ the ramp width,
 \begin{equation}
   P(x)=\begin{cases}0 & x\le0\\ x^3/(3d) & 0<x<d\\ x^2-dx+d^2/3 & x\ge d\end{cases}
   \qquad\text{against}\qquad P_{\mathrm{relu}^2}(x)=\max(x,0)^2 .
 \end{equation}
-$P$, $P'$ and $P''$ are continuous; the curvature rises linearly from 0 to the \relu\ value 2 across $[0,d]$. A step that
-crosses the face by $\Delta x\ll d$ therefore pays $k\Delta x^3/(3d)$ instead of $k\Delta x^2$. The width is set per
-condition, $d=\tilde\delta/s$, with $\tilde\delta=10^{-3}$ in the NP exponent at $b_\mathrm{max}=12.6\,\mathrm{GeV}^{-1}$
-(the largest $b_T$ the cache reaches) and $s$ the exponent per unit of the condition at $b_\mathrm{max}$. That gives
-$d=3.15\times10^{-6}\,\mathrm{GeV}^2$ on $L_2$, $6.3\times10^{-6}\,\mathrm{GeV}^2$ on \lnu2,
-$5.95\times10^{-8}\,\mathrm{GeV}^6$ on the cubic condition and $3.97\times10^{-8}\,\mathrm{GeV}^4$ on \lnu4\
-\taskref{261008-c2-wall-test}. Because the ramp is softer than \relu, the equilibrium at an active face moves outward by up to
-$d/2$: at \fit{NOMSTIFF}'s face the prediction was $v=\sqrt{gd/k}=2.40\times10^{-6}\,\mathrm{GeV}^2$ (data force
-$g=16.3$), against $9.2\times10^{-7}$ for \relu, and a loss lower by $1.9\times10^{-5}$. Code: the \code{smooth=} option
-in WRemnants \code{wremnants/postprocessing/scetlib_ad/np_damping_wall.py} (each \code{Condition} carries its scale $s$),
-tested by \code{scripts/tests/test_np_damping_wall_c2.py} (78 checks, incl.\ gradient and HVP against finite differences
-and \code{smooth=relu2} bitwise equal to the old wall).
+$P$, $P'$, $P''$ are continuous; a step crossing the face by $\Delta x\ll d$ pays $k\Delta x^3/(3d)$ instead of
+$k\Delta x^2$. The width is set per condition, $d=\tilde\delta/s$, with $\tilde\delta=10^{-3}$ in the NP exponent at
+$b_\mathrm{max}=12.6\,\mathrm{GeV}^{-1}$ (the largest $b_T$ the cache reaches) and $s$ the exponent per unit of the
+condition there: $d=3.15\times10^{-6}\,\mathrm{GeV}^2$ on $L_2$, $6.3\times10^{-6}\,\mathrm{GeV}^2$ on \lnu2
+\taskref{261008-c2-wall-test}. Being softer than \relu, the ramp moves an active face's equilibrium outward, predicted
+$v=\sqrt{gd/k}=2.40\times10^{-6}\,\mathrm{GeV}^2$ at \fit{NOMSTIFF}'s face (\relu: $9.2\times10^{-7}$). Code: the
+\code{smooth=} option of \code{wremnants/postprocessing/scetlib_ad/np_damping_wall.py} (each \code{Condition} carries
+its scale $s$), tested by \code{scripts/tests/test_np_damping_wall_c2.py} (78 checks, gradient and HVP against finite
+differences, \code{smooth=relu2} bitwise equal to the old wall).
+
+\paragraph{The spectral preconditioner} (rabbit's existing option, unmodified; adopted, not built, by the study).
+\emph{Once per fit}, at the minimiser's start point, rabbit computes the dense Hessian $H_s$ (306\,s for the 3759-parameter
+sub-fit), diagonalises it, replaces the eigenvalues by their absolute values (floored at machine precision times the
+largest), and Cholesky-factorises $|H_s|$ into the linear map $T$ with $T^\top|H_s|T=I$. \emph{At every step}
+the minimiser works in $y$, with $x=x_0+Ty$: it sees the gradient $T^\top g$ and Hessian-vector products $T^\top HTv$,
+at the cost of two dense matrix-vector products, so per-call costs barely change while the Krylov solves see a
+whitened Hessian. The flags used,
+\begin{center}\small\verb|--precondition --preconditionParams '.*' --preconditionBlocks none --preconditionTransform spectral|\end{center}
+whiten all parameters as one block; rabbit's default scope covers only the unconstrained ones. In a saturated test the deep-copied
+sub-fitter builds its own $T$ at the sub-fit's start. Code: \code{rabbit/fitter.py} (\code{_build_preconditioner}) and
+\code{rabbit/preconditioner.py}, rabbit 2a59246 \taskref{261008-saturated-subfit-diagnosis}.
 
 \begin{figure}[htb]
   \centering
-  \includegraphics[width=0.6\linewidth]{summary_figs/wall_penalty.pdf}
+  \includegraphics[width=0.46\linewidth]{summary_figs/wall_penalty.pdf}
   \caption{The per-condition wall penalty $P(x)$ (left) and its curvature $P''(x)$ (right) against the violation $x$ in
     units of the ramp width $d$; the NLL term is $k\,P$ with $k=e^{2\tau}$. Blue: \relu, whose curvature jumps from 0 to 2
-    at the face. Red dashed: the \Ctwo\ ramp, whose curvature rises linearly over $[0,d]$, so crossing the face costs a
-    cubic, not a quadratic, amount. Analytic curves of the formula above. \taskref{261008-c2-wall-test}}
+    at the face. Red dashed: the \Ctwo\ ramp, whose curvature rises linearly over $[0,d]$. Analytic curves of the formula
+    above. \taskref{261008-c2-wall-test}}
   \label{fig:penalty}
 \end{figure}
 
@@ -284,30 +295,33 @@ and \code{smooth=relu2} bitwise equal to the old wall).
 \subsection{\texorpdfstring{The \Ctwo\ wall removes the crawl on the real fit and does not move the minimum}{The C2 wall removes the crawl on the real fit and does not move the minimum}}
 
 \caveat{one real start, a snapshot of a fit stuck mid-crawl; \fit{C2A} and \fit{R2A} share node load, cache and
-settings, and differ only in the wall. \fit{CENS03R} ran three days earlier on the full cache with different stall
-flags, and its log ends where \fit{C2A} and \fit{R2A} begin.}
+settings, and differ only in the wall. \fit{CENS03R} ran three days earlier on the full cache with different stall flags.}
 
 From the \fit{CENS03R} snapshot, \fit{C2A} reaches the \fit{NOMSTIFF} loss to $10^{-6}$ in 46 iterations and 1.11\,h of
-minimiser time. \fit{R2A}, the same command with \relu, was still
-at $+430$\,NLL after 219 iterations and 1.69\,h and was stopped by hand; \fit{CENS03R} itself had spent 260 iterations
-and 4.5\,h there \taskref{261008-c2-wall-test} (Fig.~\ref{fig:crawl}). The log signature agrees: 78\,\% of \fit{R2A}'s
-consecutive accepted steps have a gain ratio near 1, the period-2 lock of Sec.~\ref{sec:mech}, against 7.5\,\% for
-\fit{C2A}, whose steps double instead as the radius grows (\code{analysis.json}, \taskref{261008-c2-wall-test}).
+minimiser time. \fit{R2A}, the same command with \relu, was still at $+430$\,NLL after 219 iterations and 1.69\,h and was
+stopped by hand; \fit{CENS03R} itself had spent 260 iterations and 4.5\,h there (Fig.~\ref{fig:crawl})
+\taskref{261008-c2-wall-test}. The log signature agrees: 78\,\% of \fit{R2A}'s consecutive accepted steps have a gain
+ratio near 1, the period-2 lock of Sec.~\ref{sec:mech}, against 7.5\,\% for \fit{C2A}, whose steps double instead as the
+radius grows. Every check lands on its prediction (Table~\ref{tab:c2a}): the ramp holds the active face
+$1.5\times10^{-6}\,\mathrm{GeV}^2$ further out than \relu, and the active-face slope maps that onto
+$4\times10^{-6}\,\sigma$ in \alphas, which is what is seen. \textbf{Physics read:} \Ctwo\ changes the minimiser's path,
+not the measurement. The face is held with no margin, at $7.6\times10^{-4}$ of the NP exponent at $b_\mathrm{max}$, inside
+the $10^{-3}$ tolerance; a \Ctwo--\relu\ loss offset of $\sim10^{-5}$ is irrelevant for any test statistic.
 
 \begin{figure}[htb]
   \centering
-  \includegraphics[width=\linewidth]{summary_figs/crawl_fix.pdf}
+  \includegraphics[width=0.84\linewidth]{summary_figs/crawl_fix.pdf}
   \caption{Loss minus the \fit{NOMSTIFF} loss (symmetric-log axis, linear within $\pm10^{-6}$) against minimiser wall time
     (left) and iteration (right), counted from the \fit{CENS03R} snapshot. Grey: \fit{CENS03R}, the original \relu\ crawl,
-    which ends at the snapshot ($t\le0$). From the snapshot ($t\ge0$): \fit{C2A} with the \Ctwo\ ramp (red) and
-    \fit{R2A} with \relu\ (blue), run side by side. \fit{C2A} ends $1.9\times10^{-5}$ below \fit{NOMSTIFF}: that is the
-    ramp's predicted equilibrium offset, not a better minimum. Real data, nominal configuration, $\tau=8$; from the fit logs. \taskref{261008-c2-wall-test}}
+    ending at the snapshot ($t\le0$). From the snapshot: \fit{C2A} with the \Ctwo\ ramp (red) and \fit{R2A} with \relu\
+    (blue), run side by side. \fit{C2A} ends $1.9\times10^{-5}$ below \fit{NOMSTIFF}: the ramp's predicted equilibrium
+    offset, not a better minimum. Real data, nominal configuration, $\tau=8$; from the fit logs. \taskref{261008-c2-wall-test}}
   \label{fig:crawl}
 \end{figure}
 
 \begin{table}[htb]
   \centering\small
-  \caption{\fit{C2A} (\Ctwo) against the \relu\ reference \fit{NOMSTIFF}: prediction made before the fit and result.
+  \caption{\fit{C2A} (\Ctwo) against the \relu\ reference \fit{NOMSTIFF}: prediction made before the fit, and result.
     \dalphas\ in units of \fit{NOMSTIFF}'s $\sigma(\alphas)$; $\theta$ are the fit parameters in their own $\sigma$. The
     normalised overshoot is the face violation in the NP exponent at $b_\mathrm{max}$ (tolerance $10^{-3}$).
     \taskref{261008-c2-wall-test}}
@@ -327,11 +341,92 @@ consecutive accepted steps have a gain ratio near 1, the period-2 lock of Sec.~\
   \end{tabular}
 \end{table}
 
-Every check lands on its prediction (Table~\ref{tab:c2a}). The ramp holds the active face $1.5\times10^{-6}\,\mathrm{GeV}^2$
-further out than \relu, and the active-face slope maps that onto $4\times10^{-6}\,\sigma$ in \alphas, which is what is seen.
-\textbf{Physics read:} \Ctwo\ changes the minimiser's path, not the measurement. The face is held at the wall with no margin,
-at $7.6\times10^{-4}$ of the NP exponent at $b_\mathrm{max}$, inside the $10^{-3}$ tolerance. A \Ctwo--\relu\ loss offset
-of $\sim10^{-5}$ is irrelevant for any test statistic.
+\FloatBarrier
+\subsection{Full-scope spectral preconditioning makes the saturated sub-fit about three times faster}
+\label{sec:satp}
+
+\caveat{one configuration (\fit{LATB8}), one start (the data); toys have a shorter valley ($q\sim39$ each), so the gain
+there is not measured. Node load differed between runs (cost per HVP 6.1--9.9\,s): compare the counts, and the
+per-iteration panel of Fig.~\ref{fig:satp}. \fit{SATP} is \fit{SATB8}'s command with only the preconditioner flags added
+(and \code{smooth=relu2} written out, since \Ctwo\ had become the default).}
+
+\fit{SATP} reaches \fit{SATB8}'s minimum with 614 Hessian-vector products (HVPs) instead of 2150, 71 loss+gradient
+evaluations instead of 156, and 69 iterations instead of 158 (Table~\ref{tab:satp}, Fig.~\ref{fig:satp}). Its minimiser
+ran 1.32\,h plus the 306\,s preconditioner Hessian, against 5.82\,h; converted to \fit{SATB8}'s per-call costs that is
+1.8\,h against 5.82\,h, about $3\times$ at equal load, and against \fit{SATC2} at similar load 1.40\,h against 4.08\,h. The
+answer is unchanged: final loss $1.7\times10^{-10}$ below \fit{SATB8}'s, $q=78.40/39$ in both, converged vectors equal to
+$4\times10^{-8}$ in the internal coordinates \taskref{261008-saturated-subfit-diagnosis}. The \Ctwo\ wall, by contrast,
+leaves the sub-fit's work unchanged (2141 against 2150 HVPs, the same path iteration for iteration)
+\taskref{261008-c2-wall-test}: the cost is not the wall.
+
+\begin{table}[htb]
+  \centering\small
+  \caption{The four projected-\ptll\ saturated sub-fits at \fit{LATB8} (real data, $\tau=8$). HVP: Hessian-vector
+    product; $t_\mathrm{HVP}$: its measured cost, a proxy for node load. ``To $q_\mathrm{left}<0.01$'' is the minimiser
+    time until $2(\text{loss}-\text{final})<0.01$. \fit{SATB8SA} is seeded with a previous sub-fit, which toys cannot be.
+    \fit{SATP}'s time excludes its 306\,s preconditioner Hessian. $\dagger$\,The \Ctwo\ equilibrium offset (a different wall). \taskref{261008-saturated-subfit-diagnosis}}
+  \label{tab:satp}
+  \setlength{\tabcolsep}{4.5pt}
+  \begin{tabular}{llrrrrrrl}
+    \toprule
+    Run & Wall, preconditioner & Iter. & $n_\mathrm{f}$ & $n_\mathrm{HVP}$ & $t_\mathrm{HVP}$ [s] & Time [h] & To $q_\mathrm{left}<0.01$ [h] & Loss $-$ \fit{SATB8} \\
+    \midrule
+    \fit{SATB8}   & \relu, none            & 158 & 156 & 2150 & 8.9  & 5.82 & 4.03 & 0 \\
+    \fit{SATC2}   & \Ctwo, none            & 161 & 159 & 2141 & 6.1  & 4.08 & 2.99 & $-4.9\times10^{-6}$\,$\dagger$ \\
+    \fit{SATB8SA} & \relu, none, seeded    &  67 &  69 & 1002 & 9.9  & 3.10 & 1.36 & $+1.2\times10^{-11}$ \\
+    \fit{SATP}    & \relu, full spectral   & \textbf{69} & \textbf{71} & \textbf{614} & 6.25 & \textbf{1.32} & \textbf{0.82} & $-1.7\times10^{-10}$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=0.86\linewidth]{261008-saturated-subfit-diagnosis/subfit_progress.pdf}
+  \caption{Progress of the projected-\ptll\ saturated sub-fit at \fit{LATB8}, real data: $q$ still to go,
+    $2(\text{loss}-\text{final})$, against minimiser wall time (left) and iteration (right). Blue \fit{SATB8} (\relu),
+    green \fit{SATC2} (\Ctwo), red \fit{SATB8SA} (seeded from a previous sub-fit), purple \fit{SATP} (\relu, full
+    spectral preconditioner). Node loads differ, so the right panel is the like-for-like comparison. \Ctwo\ retraces \relu;
+    the preconditioner cuts both iterations and the depth of each solve. All four end at $q=78.40/39$.
+    \taskref{261008-saturated-subfit-diagnosis}}
+  \label{fig:satp}
+\end{figure}
+
+\paragraph{Why it works.} Freeing the \ptll\ shape frees the parameters it constrained: \alphas\ is 97.9\,\% degenerate
+with the 39 bin scales ($\rho^2=0.979$), and the sub-fit minimum lies $9.6\,\sigma$ (of the main fit) away in \alphas,
+with \lnu2, TNPs and luminosity moving by 1.6--3.5$\,\sigma$ while the scales absorb a smooth tilt from 0.908 to 1.106.
+The Hessian has $\kappa=1.3\times10^{10}$ at the start and $2.0\times10^9$ at the end, and in raw coordinates the late
+Krylov solves need up to $\sim$270 HVPs, each gaining only 35--40\,\% of what is left \taskref{261008-saturated-subfit-diagnosis}.
+The obstacle is the \emph{correlation} between \alphas\ and the scales, not their normalisation. The scales' own block is
+well conditioned ($\kappa=2.2$); rescaling each parameter (Jacobi) lowers $\kappa$ to $5.5\times10^7$ but leaves the
+correlated soft direction and makes CG \emph{slower} (682 HVPs to $10^{-6}$); whitening only the scale block, or rabbit's
+default scope, rotates part of the problem and gives $\kappa\sim10^{12}$. Only whitening all parameters together removes
+the coupling: $\kappa=1.2\times10^7$ and 77 HVPs, against 290 unpreconditioned (Fig.~\ref{fig:scope}). What remains is
+the drift of the soft \alphas\ curvature along the curved valley away from the start-built $T$: in \fit{SATP} the steps are
+large until $q_\mathrm{left}\sim4$ (11 iterations, 4\,min), then the tail converges linearly again, but with solves of at
+most 93 HVPs instead of 267; 40\,\% of its time is in four solves below $q_\mathrm{left}=0.01$
+\taskref{261008-saturated-subfit-diagnosis}.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=0.8\linewidth]{summary_figs/precond_scope.pdf}
+  \caption{Why the scope matters. Each preconditioner is built, as rabbit would, from the sub-fit start Hessian $H_s$ and
+    applied to the end Hessian $H_e$ (\fit{SATB8}'s minimum, 3759 parameters). Left: plain-CG iterations (= HVPs) to reach
+    a given relative residual, a stand-in for one late trlib solve. Right: condition number of the preconditioned $H_e$.
+    Jacobi fixes the normalisations but not the \alphas--scale correlation and is the slowest; partial whitening is worse
+    than none; only full-scope whitening helps ($290\to77$ HVPs at $10^{-6}$). Offline, dense matrices, no fit.
+    Made for this summary from \code{spectra.json}. \taskref{261008-saturated-subfit-diagnosis}}
+  \label{fig:scope}
+\end{figure}
+
+\paragraph{A looser stop is not safe.} The previous version of this note proposed \code{--minimizerGtol}~0.03 under the
+preconditioner to cut the tail. It is dropped: rabbit does not log $\|g_y\|$, and in the start-built frame the soft
+direction's curvature drifts so far that a model bound maps $\|g_y\|=0.03$ onto a stop error anywhere between
+$\Delta q\sim10^{-7}$ and 0.86; a guaranteed $\Delta q\le0.01$ would need $\lesssim3\times10^{-3}$. Stopping at $q_\mathrm{left}=0.01$ would have saved 37\,\% of \fit{SATP}'s time, but safely only with an EDM-type
+stop or a mid-fit rebuild of $T$; a stall-window stop (\code{--earlyStopping} \code{--stallRelTol}), replayed on the logs,
+fires on false plateaus with $q$ errors of 0.36--20 \taskref{261008-saturated-subfit-diagnosis}.
+\textbf{Physics read:} the preconditioner is a pure reparametrisation; the saturated $q$ and its $p$-value are unchanged,
+and a toy calibration of the projected test becomes about three times cheaper per toy, at one extra Hessian
+(300--900\,s) per fit.
 
 \subsection{\texorpdfstring{The crawl is a limit cycle of scipy's trust-radius rule at a C$^1$ face}{The crawl is a limit cycle of scipy's trust-radius rule at a C1 face}}
 \label{sec:mech}
@@ -340,20 +435,19 @@ of $\sim10^{-5}$ is irrelevant for any test statistic.
 loss, and show the same signature.}
 
 scipy grows the trust radius only if the gain ratio $\rho>0.75$ \emph{and} the step reaches the trust boundary; it shrinks
-it if $\rho<0.25$. \relu\ is only C$^1$, so a quadratic model built on the physical side of a face has no wall curvature.
-The step from there crosses the face, and the penalty eats about 30\,\% of the predicted gain ($\rho\approx0.71$): no
-growth. The model built on the violating side contains the wall; its step lands just back inside, interior, with
-$\rho\approx1$: again no growth. The radius freezes (at $3.8\times10^{-6}$ in $\theta$ on the surrogate, scaling as
-$1/k$) and the loss falls by a constant amount per iteration (Fig.~\ref{fig:zigzag}). Gain ratios near 1 make up 40--44\,\% of the step
-pairs in \fit{CENS03} and \fit{CMR1A}, 1--9\,\% in census fits that converged normally. The
-lock-in worsens steeply with the stiffness: on the surrogate, 1 of 5 starts locks in at $\tau=8$, 2 at $\tau=9$, and 3 do
-not converge in 20\,000 iterations at $\tau=10$ \taskref{261006-diagnosis}. Conditioning alone is not the cause: with the
-active face eliminated exactly, the same Hessian converges from every start in 9--45 iterations. On
-the surrogate the \Ctwo\ ramp removes the lock-in from all six starts (18--159 evaluations) \taskref{261006-diagnosis}.
+it if $\rho<0.25$. \relu\ is only C$^1$, so a quadratic model built on the physical side of a face has no wall curvature:
+its step crosses the face and the penalty eats about 30\,\% of the predicted gain ($\rho\approx0.71$), no growth. The model
+built on the violating side contains the wall; its step lands just back inside, interior, with $\rho\approx1$: again no
+growth. The radius freezes (scaling as $1/k$) and the loss falls by a constant amount per iteration
+(Fig.~\ref{fig:zigzag}). Gain ratios near 1 make up 40--44\,\% of the step pairs in \fit{CENS03} and \fit{CMR1A}, 1--9\,\%
+in normally converged census fits. The lock-in worsens with stiffness: on the surrogate 1 of 5 starts locks in at
+$\tau=8$, 2 at $\tau=9$, and 3 do not converge in 20\,000 iterations at $\tau=10$. With the active face eliminated
+exactly the same Hessian converges from every start (9--45 iterations), and the \Ctwo\ ramp removes the lock-in from all
+six surrogate starts \taskref{261006-diagnosis}.
 
 \begin{figure}[htb]
   \centering
-  \includegraphics[width=0.94\linewidth]{261006-diagnosis/zigzag_mechanism.pdf}
+  \includegraphics[width=0.74\linewidth]{261006-diagnosis/zigzag_mechanism.pdf}
   \caption{The crawl signature. (a)~Surrogate at $\tau=8$ from \fit{CENS03}'s seed: the trust radius (blue) freezes after
     $\sim$50 iterations while the $L_2(|Y|{=}2.5)$ face value (purple) alternates between violated and slack every
     iteration. (b)~Real logs of the crawling fits \fit{CENS03} and \fit{CMR1A}: every step accepted, gains alternating
@@ -362,100 +456,67 @@ the surrogate the \Ctwo\ ramp removes the lock-in from all six starts (18--159 e
   \label{fig:zigzag}
 \end{figure}
 
-\subsection{The saturated sub-fit is slow because the saturated model is ill-conditioned, not because of the wall}
-
-\caveat{one configuration (\fit{LATB8}); wall times depend on node load, so compare counts. Dense Hessians at three
-points, with plain CG standing in for trlib's solve. No remedy has been run yet.}
-
-\fit{SATC2} retraces \fit{SATB8} iteration for iteration (Fig.~\ref{fig:sat}, left): 157 against 153 iterations to the
-final loss $-10^{-6}$, 2141 against 2150 Hessian-vector products (HVPs), and the same projected test,
-$q=78.4/39$ \taskref{261008-c2-wall-test}\,\taskref{261008-saturated-subfit-diagnosis}. HVPs take 89--91\,\% of the
-time, much of it in a few deep, late Krylov solves of up to $\sim$270 HVPs. Each solve gains only 35--40\,\% of what is
-left, and the tail below $\Delta q=0.01$ costs 27--56\,\% of the run \taskref{261008-saturated-subfit-diagnosis}.
-
-The cause is the alternative model's geometry (Fig.~\ref{fig:sat}, right). Freeing the \ptll\ shape frees the parameters
-it constrained: \alphas\ is 97.9\,\% degenerate with the 39 bin scales ($\rho^2=0.979$). The sub-fit minimum lies
-$9.6\,\sigma$ (of the main fit) away in \alphas, with \lnu2, the TNPs and the luminosity moving by 1.6--3.5$\,\sigma$, while
-the scales absorb a smooth tilt from 0.908 to 1.106. The Hessian has $\kappa=1.3\times10^{10}$ at the start and
-$2.0\times10^{9}$ at the end, the valley is curved, and an exact Newton step diverges even 0.4\,NLL from the minimum.
-Profiling the scales analytically ($s_j=N_j/\nu_j$) straightens the valley: along the straight line from start to minimum the loss then falls monotonically, from 16 NLL to 0 \taskref{261008-saturated-subfit-diagnosis}.
-\textbf{Physics read:} the answer is robust (the three runs end at the same point to $2.6\times10^{-9}$ in $x$); what is at
-stake is the cost per toy.
-
-\begin{figure}[htb]
-  \centering
-  \includegraphics[height=5.3cm,trim=455 0 0 0,clip]{261008-saturated-subfit-diagnosis/subfit_progress.pdf}\hfill
-  \includegraphics[height=5.3cm]{261008-saturated-subfit-diagnosis/hessian_spectra.pdf}
-  \caption{The projected-\ptll\ saturated sub-fit at \fit{LATB8}, real data. Left: $q$ still to go,
-    $2(\text{loss}-\text{final})$, per iteration, for \fit{SATB8} (\relu, blue), \fit{SATC2} (\Ctwo, green) and
-    \fit{SATB8SA} (red, seeded from a previous sub-fit, which toys cannot do): \Ctwo\ follows \relu\ step for step. Right:
-    sorted $|$eigenvalues$|$ of the sub-fit Hessian (3759 parameters), at the start (black, $\kappa=1.3\times10^{10}$) and
-    the end (blue, $2\times10^9$): the wall faces and the 39 bin scales on top, \alphas-dominated directions at the bottom.
-    Full spectral whitening (green) brings $\kappa$ to $1.2\times10^7$; Jacobi (orange) and partial whitening make the CG
-    work worse. \taskref{261008-saturated-subfit-diagnosis}}
-  \label{fig:sat}
-\end{figure}
-
-The remedies, ranked by estimate \taskref{261008-saturated-subfit-diagnosis}: (1)~full-scope spectral preconditioning of
-the sub-fit, CLI only, which cuts the CG work per solve 3--4$\times$ on the end Hessian (290$\to$77 HVPs to $10^{-6}$),
-estimated 2--3$\times$ overall; (2)~then \code{--minimizerGtol}~0.03, meaningful only under (1), to drop the tail
-($\times$1.3--2.3); (3)~variable projection of the 39 scales in rabbit ($\sim$1 day; 3--10$\times$ with (1), the least
-certain); (4)~a mid-fit preconditioner rebuild. A stall-window stop (\code{--earlyStopping}
-\code{--stallRelTol}) cannot cut the tail: it fires on false plateaus, with $q$ errors of 0.36--20.
-
 % ============================================================================================
 \section{Robustness, systematics and caveats}
 
-The real-fit evidence for \Ctwo\ is one start; cold and perturbed starts were covered only on the (quadratic,
-nominal-only) surrogate, and the study's benchmark of six starts has not been run. The \Ctwo\ ramp needs a constant scale per condition, so the
-interior discriminants of the \code{tanh_6} CS form keep \relu\ by default and can still crawl.
+The real-fit evidence for \Ctwo\ is one start; cold and perturbed starts were covered only on the quadratic, nominal-only
+surrogate, and the study's benchmark of six real starts was never run. The \Ctwo\ ramp needs a constant scale per
+condition, so the interior discriminants of the \code{tanh_6} CS form keep \relu\ by default and can still crawl.
 
-Two problems are untouched. In the no-lattice configuration with \lnu4\ free, the fit \fit{CMR1B} leaks through the
-$\lnu4\ge0$ wall to $\gamma_\nu(b_\mathrm{max})=+1.94$ (anti-damped): the data curvature along \lnu4\ there ($7.6\times10^8$)
-is 40 times the wall's $2k$, so no practical \relu\ stiffness is exact ($\tau\approx14$, $\kappa\sim10^{12}$)
-\taskref{261006-diagnosis}. On the ordinary faces the $\tau=8$ wall leaks only $10^{-4}$--$3\times10^{-4}$ in the exponent at
-$b_\mathrm{max}$. In the saturated sub-fit, \lnu4\ also runs onto its face, with a small leak not chased
-\taskref{261008-saturated-subfit-diagnosis}.
+The preconditioning now applies to \emph{every} fit through \code{fitterAD.sh}, the main fit included, where it has not
+been measured. On the \relu\ surrogate, full data-Hessian whitening built at a feasible start helped 2 of 5 starts and
+hurt 3 (e.g.\ \fit{cold\_000} 95$\to$1181 iterations), because the start Hessian has no wall curvature
+\taskref{261006-diagnosis}; with the \Ctwo\ wall the combination is untested. Being a reparametrisation it cannot move a
+converged minimum, only the cost.
 
-Fixes that did not work, on the surrogate \taskref{261006-diagnosis}: restart-on-stall either never fires or falls
-back into the cycle (up to 662 restarts); \code{--precondition} helped 2 of 5 starts and hurt 3 (built at a feasible start,
-it never sees the wall); \code{tf-trust-krylov} has scipy's radius rule (from the code, not run). $\tau$-continuation
-($\tau=5$, then $\tau=8$ warm) converged from all six starts but costs two cache loads and was never run on a real fit;
-\Ctwo\ superseded it.
+Two problems are untouched. In the no-lattice configuration with \lnu4\ free, \fit{CMR1B} leaks through the $\lnu4\ge0$
+wall to $\gamma_\nu(b_\mathrm{max})=+1.94$ (anti-damped): the data curvature along \lnu4\ there ($7.6\times10^8$) is 40
+times the wall's $2k$, so no practical stiffness is exact \taskref{261006-diagnosis}; on the ordinary faces the $\tau=8$
+wall leaks only $10^{-4}$--$3\times10^{-4}$ in the exponent at $b_\mathrm{max}$. In the saturated sub-fit \lnu4\ also runs
+onto its face, with a leak of $-1.09\times10^{-5}\,\mathrm{GeV}^4$ that was not chased \taskref{261008-saturated-subfit-diagnosis}.
+On the surrogate, restart-on-stall did not cure the crawl (it never fires, or falls back into the cycle);
+$\tau$-continuation ($\tau=5$, then 8 warm) did, but costs a second stage, was never run on a real fit, and was superseded
+by \Ctwo\ \taskref{261006-diagnosis}.
 
 % ============================================================================================
 \section{What changed}
 
-Checked with \code{git} on 2026-10-08.
+Checked with \code{git} on 2026-10-09; all code commits are \textbf{pushed}.
 \begin{itemize}
-  \item \textbf{WRemnants} branch \code{scetlib-ad-param-model}, both \textbf{pushed} to \code{origin} (\code{692f9483} is
-    the branch tip): \code{2f1c3df4} adds the opt-in ramp \code{smooth=c2} [\code{delta=}, \code{bmax=}] to
-    \code{np_damping_wall.py} with its test; \code{692f9483} makes \Ctwo\ the default ($\tilde\delta=10^{-3}$,
-    $b_\mathrm{max}=12.6$). Without \code{smooth=} the \code{tanh_6} interior discriminants keep \relu\ and are named in
-    one INFO line; an explicit \code{smooth=c2} still refuses them; \code{smooth=relu2} is the bitwise opt-out.
-    \textbf{An old command with no \code{smooth=} now gets \Ctwo}: reruns of earlier fits need \code{smooth=relu2} to
-    reproduce them exactly.
-  \item \textbf{WRemnantsHelpers} \code{main}: \code{851f47f} (pushed, 10-06) made $\tau$-continuation the default of
-    \code{workflows/fitterAD.sh}~\code{--wall}; \code{3c0a9fb} (10-08, \textbf{local, not pushed}) makes it opt-in again
-    (\code{--tau-continuation}), since \Ctwo\ removes the crawl.
-  \item \textbf{knowledge/}: nothing yet (the limit cycle is a candidate for \code{rabbit_minimizer_tolerances.md}). Bulk
-    outputs: \code{/ceph/.../lavezzo/alphaS/261006_constrained_fit_diagnosis}, \code{261008_c2_wall_test}, \code{261008_saturated_subfit_diag}.
+  \item \textbf{WRemnants} branch \code{scetlib-ad-param-model} (on \code{origin}): \code{2f1c3df4} adds the opt-in ramp
+    \code{smooth=c2} [\code{delta=}, \code{bmax=}] to \code{np_damping_wall.py} with its test; \code{692f9483} makes \Ctwo\
+    the default ($\tilde\delta=10^{-3}$, $b_\mathrm{max}=12.6$); \code{tanh_6} interior discriminants keep \relu\ (one INFO
+    line), an explicit \code{smooth=c2} refuses them, \code{smooth=relu2} is the bitwise opt-out. \textbf{An old command
+    with no \code{smooth=} now gets \Ctwo}: reproducing an earlier fit exactly needs \code{smooth=relu2}. The later
+    lattice-term commits on the branch (\code{1b3732bb}, \code{3841ee42}) belong to another study.
+  \item \textbf{WRemnantsHelpers} \code{main}: \code{851f47f} (10-06) made $\tau$-continuation the default of
+    \code{workflows/fitterAD.sh}~\code{--wall}; \code{3c0a9fb} (10-08) makes it opt-in again (\code{--tau-continuation});
+    \code{1c5d93a} (10-09) adds the full-scope spectral preconditioning flags of Sec.~2 to every \code{fitterAD.sh} fit (with \code{set -f}, so the regex is not glob-expanded), the main fit paying one Hessian, and the same flags to the
+    toy recipe in \code{knowledge/20_frameworks/saturated_test_toys.md}.
+  \item \textbf{knowledge/} (WRemnantsHelpers \code{a8fe31c}, 10-09, \textbf{local, not yet pushed} when this was
+    written): the crawl mechanism and the ill-conditioned sub-fit in \code{rabbit_minimizer_tolerances.md}, the \Ctwo\
+    default in \code{np_parametrization_constraints.md}, and updates to \code{saturated_test_toys.md} and
+    \code{active_wall_face_sensitivity.md}. \textbf{rabbit}: no change (2a59246).
+  \item Bulk outputs under \code{/ceph/.../lavezzo/alphaS/}: \code{261006_constrained_fit_diagnosis},
+    \code{261008_c2_wall_test}, \code{261008_saturated_subfit_diag}.
 \end{itemize}
 
 % ============================================================================================
 \section{Conclusions and open items}
 
-For the \alphas\ measurement nothing moves: \Ctwo\ and \relu\ walls give the same minimum to $4\times10^{-6}\,\sigma$ and
-the same saturated tests. Walled fits should now finish in predictable time from one process and one cache load. Open:
+The study is closed (Luca, 2026-10-09) with its goal met. For the \alphas\ measurement nothing moves: \Ctwo\ and \relu\
+walls give the same minimum to $4\times10^{-6}\,\sigma$ and the same saturated tests, and the preconditioner changes no
+minimum. What changes is the cost: walled fits should finish in predictable time from one process and one cache load, and
+a projected saturated sub-fit, the per-toy unit of a toy-calibrated GoF test, costs about a third of what it did. The
+following are \textbf{open but parked}; nobody is on them:
 \begin{itemize}
-  \item \textbf{SATP} (approved by Luca 10-08, running since 16:42, owned by the sub-fit diagnosis task): \fit{SATB8}'s
-    command, \relu\ set explicitly, plus full-scope spectral preconditioning (\code{--precondition}
-    \code{--preconditionParams}~\code{'.*'} \code{--preconditionBlocks}~\code{none} \code{--preconditionTransform}~\code{spectral}), so it
-    differs from \fit{SATB8} only in the preconditioner. Success: $\le700$ HVPs (against 2150) at the same final loss
-    within $10^{-6}$. If it works, \code{--minimizerGtol} $\sim0.03$ under it, then the recipe goes into the
-    saturated-toy plan; if not, variable projection.
-  \item Confirm \Ctwo\ on real cold and perturbed starts (\fit{pert\_002}, \fit{cold\_000}, \fit{C1A}); push
-    \code{3c0a9fb}. The \lnu4\ notch: exact fixes (square-root bound basis, 1--2\,d; active set, 3--5\,d) are parked.
+  \item \textbf{Variable projection} of the 39 saturated scales ($s_j=N_j/\nu_j$ inside the loss, which straightens the
+    valley; a rabbit change of $\sim$1 day, estimated 3--10$\times$ with the preconditioner, the least certain estimate).
+  \item \textbf{A mid-fit preconditioner rebuild} (against the drifting \alphas\ curvature behind \fit{SATP}'s tail), and
+    \textbf{an EDM-style stop} (rabbit would need to log $\|g_y\|$ or the EDM), to take the 37\,\% tail safely.
+  \item \textbf{\Ctwo\ from a fully cold start} on a real fit; \textbf{preconditioning on toys}, to be measured in the toy
+    campaign, and on the main fit (Sec.~4).
+  \item The \lnu4\ notch: exact fixes (square-root bound basis, 1--2\,d; active set, 3--5\,d) remain parked.
 \end{itemize}
 
 \end{document}

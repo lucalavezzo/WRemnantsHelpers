@@ -4,7 +4,7 @@ slug: 261008-saturated-subfit-diagnosis
 study: constrained-fit-strategy
 status: done          # active | done | paused | abandoned
 created: 2026-10-08
-updated: 2026-10-08
+updated: 2026-10-09
 owner: study-worker
 ---
 
@@ -32,9 +32,8 @@ owner: study-worker
 - **Gtol 0.03 is NOT a safe add-on.** ||g_y|| is not logged, and in the start-built whitened frame the soft alphaS
   direction's curvature drifts down to ~1e-3. So a gtol of 0.03 could stop anywhere between Delta q ~ 1e-7 and 0.9.
   What a stop at q-to-go 0.01 would have saved on SATP: 1766 s (37 % of the minimiser time).
-- **Next action (Luca):**
-  - Adopt `--precondition --preconditionParams '.*' --preconditionBlocks none --preconditionTransform spectral` for
-    saturated-test runs and toys.
+- **Next action:** none; the study is closed. (Orchestrator, 2026-10-09: the flags were adopted in fitterAD.sh and the toy recipe, 1c5d93a.)
+  - Parked:
   - Optionally: variable projection (remedy 3), or a mid-fit preconditioner rebuild (remedy 4), to attack the remaining
     linear tail.
 - **Blocking on:** nothing.
