@@ -1,7 +1,7 @@
 # NP-model parameter constraints (CS kernel and TMD b.c.)
 
 Source: AN-25-085 `theory.tex` Eqs. \ref{eq:npgamma}, \ref{eq:npf} (lines 233–234), with our locally-added $\lambda_6,\Lambda_6$ extensions.
-Last updated: 2026-07-28
+Last updated: 2026-10-08 (§16d: Y² form re-checked at the lattice-χ² nominal)
 Status: provisional — algebra derived, not yet implemented in the fit.
 
 ## 1. Functional forms
@@ -321,6 +321,14 @@ and −γ_ν^NP ≤ ~1.5 uniformly in b_T.
 > only** — how big the CS-kernel NP function is, and how narrow the b_T region that matters is. An
 > earlier version of this section recommended a "3σ correlated lattice Gaussian" prior; that
 > recommendation is **WITHDRAWN**. See §11 for what to do instead.
+>
+> **Scope, clarified 2026-10-09 (Luca).** This warning covers the parameter-space (λ) covariance of
+> the table above (the Tackmann-style translation). It does not cover the in-fit lattice constraint
+> used since 2026-10-06: an exact χ² of the 21 published ASWZ per-ensemble points with their own
+> covariances, through `LatticeCSTerm` (`studies/lattice-cs-kernel`; nominal = LATFROZ_V3, the default
+> since 2026-10-09). Using the lattice that way is fine. For the TMD boundary condition no Tackmann
+> priors are used: the TMD λ are free (the default since 2026-10-06, WRemnants a008faa5). Those priors
+> were broad anyway.
 
 **Four facts that follow, and that keep getting forgotten:**
 1. **The α_s-sensitive b_T window sits inside the lattice's range.** b_T ≈ 0.5–3 GeV⁻¹ = 0.1–0.6 fm,
@@ -774,6 +782,10 @@ i.e. NOT flat ⇒ λ₂ is not even a meaningful local coefficient there. Anothe
 
 ### 16c. Should the y parametrization be made more flexible? NO (decided 2026-08-03)
 
+> **Re-checked 2026-10-07 at the lattice-χ² nominal (§16d): still NO.** Two numbers below are era-specific: the
+> fit's σ(δλ₂) is 0.0078 there, not 0.002 (item 2's ratio still holds, ≥ 20×), and item 3's ρ(α_s, δλ₂) = −0.4…−0.6
+> is the 1D fit; in the rapidity-resolved nominal ρ(α_s, shape) = −0.025.
+
 1. **It is validated, not deficient** — see 16b: where the data can constrain δλ₂ it hits the external
    value at 0.5σ.
 2. **Quadratic-vs-true shape error is 1.6% of L₂**, an order of magnitude below the fit's own
@@ -804,6 +816,47 @@ from `map_replicas.py` if needed).
 (colour-matched per y, dashed), alongside the §13 lattice reference on the CS panel.
 `--no-map22-reference`, `--map22-Q`, `--map22-sqrts` (defaults: on-shell Z, 13 TeV). The inverted
 y-ordering between our fit and MAP22 makes finding 2 visible at a glance.
+
+### 16d. The Y² form re-checked at the lattice-χ² nominal: α_s sees the LEVEL, not the shape (2026-10-07)
+
+Source: `studies/tmd-rapidity-shape/261007-y-shape-first-look/` (closed 2026-10-08). Evaluated at LATB8 (card A,
+|Y| ≤ 2.5 subset cache `pdf62_y35_260921_y25`, native `LatticeCSTerm`, τ = 8, λ4_ν floating), from a wall-free
+Hessian pass at LATB8's exact vector (YNOWALL8,
+`/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261007_y_shape_first_look/fitresults_YNOWALL8.hdf5`;
+numbers in the task's `slope.json`, `map22_y4.json`). Real data, α_s blinded: shifts are in σ_NOM = σ(α_s) of NOMSTIFF.
+
+1. **The only active wall face, L₂(|Y| = 2.5) ≥ 0, is a floor on the TMD LEVEL in disguise.** Wall-free correlations:
+   ρ(α_s, Λ₂) = −0.44, ρ(α_s, 6.25·δλ₂) = **−0.025**. The face binds because Λ₂ is low (0.049 GeV²), not because the
+   shape is off; δλ₂ only decides where in Y the floor bites first. With δλ₂ = 0 the same floor would bind at all Y.
+   The lever on α_s through the TMD side is the level (and the Λ₂ ↔ λ₂_ν degeneracy, wall-free ρ = −0.90), never Y².
+2. **The floor is cheap for the data but not free for α_s.** dα_s/dc at c = L₂(2.5): **−0.032 σ_NOM per +0.01 GeV²**
+   (NOMSTIFF −0.026). Releasing the face entirely buys only Δχ² = 0.50 (multiplier 4.93 GeV⁻²; NOMSTIFF 16.3), so it
+   is not a tension. Raising the floor to MAP22's forward value L₂(2.5) = 0.052 GeV² ⇒ **−0.17 σ_NOM** at Δχ² ≈ 0.6
+   (linear, physical side). This ~0.1–0.3σ dependence on where the floor sits is the open systematic question.
+   The boundary also trims σ(α_s): wall-free/walled = 1.074/0.972 of σ_NOM (one-sided-boundary effect; the walled
+   Hessian σ is the physical-side width). Method: `20_frameworks/active_wall_face_sensitivity.md`.
+3. **δλ₂ is data-determined and matches MAP22.** δλ₂ = −0.0078 ± 0.0078 GeV² (prior ±0.5, 64× wider) vs MAP22
+   −0.0079 ± 0.0011 (§16, converged Y grid): 0.0σ. The AN's ΔΛ₂ = +0.125 is 17σ away on our σ (6.6σ on the AN's own
+   ±0.02) — same verdict as §16b. No forward-rapidity pattern in the LATB8 residuals (all |yll| × ptll windows within
+   1.7σ, data stat only).
+   ⚠️ **σ(δλ₂) is 4× wider here (0.0078) than in the 2026-07/08 2D btgrid fits (±0.002, §16b).** Different model
+   (btgrid tanh_6 with λ₆ = 0.01 vs AD cache) and freeze list (here λ4_ν and the lattice term float). Not chased.
+4. **The beyond-Y² part of a realistic x dependence is sub-resolution.** Y² is the leading term of a symmetric ln x
+   expansion, not a small-Y approximation: with L₂(Y) = [c(x_a)+c(x_b)]/8 and c_n = dⁿc/dℓⁿ (ℓ = ln x/x₀),
+   L₂ = [2c₀ + c₂Y² + c₄Y⁴/12 + …]/8, odd terms cancel, so ΔΛ₂ = c₂/8 and δ₄ = c₄/96. For MAP22 (251 replicas):
+   δ₄ = −2.5·10⁻⁴ GeV², Y²-only error ≤ 0.0025 GeV² (0.0016 at the edge), 20–30× below our σ of the shape ⇒
+   **≤ 0.008 σ_NOM** on α_s. (For a width linear in x the sum ∝ cosh Y, δ₄/ΔΛ₂ = 1/12, but the whole Y variation is
+   suppressed by x₀ ≈ 7·10⁻³ at Z/13 TeV.) Literature fits (MAP22, SV19, ART23) all parametrise in x per beam, so they
+   generate every even power of Y.
+5. **Decision (Luca, 2026-10-08): no Y⁴ term.** Reaffirms 16c. Besides being sub-resolution, it is expensive:
+   - a new NP parameter refuses every existing AD cache (`20_frameworks/scetlib_cache_format_versions_and_pins.md`,
+     "Adding a parameter"), so ≈ 1 week including a full rebuild;
+   - **the `NPDampingWall` endpoint logic would become WRONG.** With L₂(u) = λ₂ + δ₂u + δ₄u² (u = Y² ∈ [0, 6.25]),
+     L₂ is no longer monotone in u; for δ₄ > 0 the minimum can sit at the interior vertex u* = −δ₂/(2δ₄), and the
+     B condition (monotone in L₂) is minimal at the same u. A Y⁴ wall must enforce min over u (dense u-grid, or
+     endpoints + a gated vertex term), not "Y = 0 and Y_max".
+
+   If shape flexibility is ever needed, 16c's anchor-basis route still stands.
 
 ## 15. b\* check: our scale floors ARE the paper's b\* (2026-07-31) — a hypothesis that DIED
 

@@ -725,7 +725,11 @@ it by +0.031σ.
 ---
 
 ## Decisions
-- 2026-10-08 (PROPOSED, awaiting Luca): LATFROZ_V3 as the nominal lattice configuration (`pert=frozen alphas_frozen=0.1168
+- 2026-10-09 (Luca): **V3 is the default** of LatticeCSTerm (pert=frozen, alphas_frozen=0.1168, syst=Jnf, nfmatch=4.18,
+  nfscheme=full). Retire the table-based term (lattice_cs_chi2), its inputs and the Gaussian 1D/2D lattice cards. λ∞_ν rows
+  deferred. Lattice-derived priors are fine; TMD boundary-condition λ stay free (no Tackmann priors). knowledge §10 scope
+  clarified.
+- 2026-10-08 (superseded 10-09: adopted): LATFROZ_V3 as the nominal lattice configuration (`pert=frozen alphas_frozen=0.1168
   syst=Jnf nfmatch=4.18 nfscheme=full`). The code defaults (`DEFAULT_SYST = Jnf+Jbt`, `pert=live`) still need changing.
 - 2026-10-08 (Luca): keep the simultaneous (exact χ²) lattice fit; do not switch to fixing the CS λs.
 - 2026-10-08 (Luca): the b_T window systematic is dropped from the lattice term.
