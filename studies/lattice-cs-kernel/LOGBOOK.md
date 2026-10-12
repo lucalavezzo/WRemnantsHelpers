@@ -152,6 +152,13 @@ it by +0.031σ.
 
 ## Log
 
+### 2026-10-12
+- The ASWZ lattice files are private author data. They were removed from the repo tips (WRemnants 1bc2bbaa, WRemnantsHelpers
+  9423ea8; no history rewrite, per Luca) and now live at `/scratch/submit/cms/wmass/lattice/ASWZ2024/`: `lattice_aswz_data.npz`
+  (read by LatticeCSTerm by default, via the parent of `getDataPath()`), `author_files/`, and `derived/` (the moved
+  `lattice_aswz_inputs.npz` from 261006 and `np_figs_data.npz` from 261008-np-function-figures; rerunning that task's
+  plot.py needs this path). Readable by the submit-cms group only, not web-served.
+
 ### 2026-10-09
 - Luca: wait on toys. All commits pushed (WRemnants 3841ee42, WRemnantsHelpers 1c5d93a). Summary refresh dispatched.
 - WRemnants 1b3732bb retires the table-based term: lattice_cs_chi2, its lattice_aswz_inputs.npz/.json, and its test.
