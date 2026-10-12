@@ -31,3 +31,11 @@ studies/**/*.toc
 studies/**/*.fls
 studies/**/*.fdb_latexmk
 studies/**/*.synctex.gz
+
+# Private third-party inputs (author data files, covariances, unpublished notebooks) never go into
+# git or a study directory: they live on the group data area (<dirname(getDataPath())>/..., e.g.
+# /scratch/submit/cms/wmass/lattice/ASWZ2024/) and are referenced by path. These rules are a
+# backstop for copies that already exist in working trees.
+studies/lattice-cs-kernel/260923-lattice-data-refit/data/
+studies/**/data/CS_*.csv
+studies/**/CS_lattice_results/

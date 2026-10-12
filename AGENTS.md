@@ -81,7 +81,7 @@ Publish a study once with `scripts/webpublish_study.sh <slug>` (the `study` skil
 
 Images inside study directories are **not** tracked (see `.gitignore`) — the publish is a symlink to the working tree, so they are live on the web without going into git history. Which means they are not backed up by a push either: keep the script that made them in the task directory, and `save_plot`'s per-plot `.log` records the exact command, so anything lost is one rerun away.
 
-`~/public_html` has **no authentication**, and the symlink publishes everything in the study directory, now and later. So keep bulk outputs on ceph with a path in the logbook, and never put unblinded numbers, credentials, or session transcripts in a study folder. `webpublish_study.sh` refuses a study holding `sessions/`, any `*.jsonl`, or a file over 5 MB (25 MB for a `SUMMARY.pdf`) until you pass `--force`.
+`~/public_html` has **no authentication**, and the symlink publishes everything in the study directory, now and later. So keep bulk outputs on ceph with a path in the logbook, and never put unblinded numbers, credentials, or session transcripts in a study folder. Private third-party inputs (author data files, covariances, unpublished notebooks) never go into a repo or a study directory either, not even chmod'ed: they live on the group data area, next to the NanoAOD directory `getDataPath()` returns (`os.path.dirname(getDataPath())/...`; e.g. the ASWZ lattice data at `/scratch/submit/cms/wmass/lattice/ASWZ2024/`, readable by `submit-cms` only), and code and logbooks reference them by path. `webpublish_study.sh` refuses a study holding `sessions/`, any `*.jsonl`, or a file over 5 MB (25 MB for a `SUMMARY.pdf`) until you pass `--force`.
 
 ## Logbooks vs. knowledge vs. memory
 

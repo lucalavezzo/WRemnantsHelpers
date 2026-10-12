@@ -4,13 +4,15 @@ slug: 260923-lattice-data-refit
 study: lattice-cs-kernel
 status: done        # active | done | paused | abandoned
 created: 2026-09-23
-updated: 2026-09-24
+updated: 2026-10-12
 owner: study-worker
 ---
 
 # Lattice per-ensemble refit and continuum-file audit
 
 **Task:** From the per-ensemble ASWZ lattice data with covariances, can we reproduce their (arXiv:2402.06725) continuum extrapolation? And what is the "continuum-extrapolated" file they sent us: how much uncertainty and correlation do we lose by using it instead of the per-ensemble data plus a lattice-spacing nuisance?
+
+> **Data (2026-10-12):** the ASWZ per-ensemble files and the continuum file (`data/`) are private author files. The copy is at `/scratch/submit/cms/wmass/lattice/ASWZ2024/author_files/` (`submit-cms` group only); they are not in git (untracked and git-ignored since 2026-10-12) and not on the web (the local `data/` copy is chmod 600).
 
 ---
 
