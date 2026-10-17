@@ -1,0 +1,49 @@
+{
+ "outdir": "/home/submit/lavezzo/alphaS/WRemnantsHelpers/studies/ct18z-nominal-fits/261015-np-functions-tool/constrained_test",
+ "command": "/home/submit/lavezzo/alphaS/WRemnantsHelpers/scripts/np_functions/np_functions.py --fit P2B=/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261013_constrained_postfit_validation/fitresults_P2B.hdf5 --fit P1B=/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261013_constrained_postfit_validation/fitresults_P1B.hdf5 --band all=yes --all -o /home/submit/lavezzo/alphaS/WRemnantsHelpers/studies/ct18z-nominal-fits/261015-np-functions-tool/constrained_test",
+ "fits": [
+  {
+   "key": "P2B",
+   "path": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261013_constrained_postfit_validation/fitresults_P2B.hdf5",
+   "label": "P2B",
+   "short": "P2B",
+   "color": "#e42536",
+   "band": "yes"
+  },
+  {
+   "key": "P1B",
+   "path": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261013_constrained_postfit_validation/fitresults_P1B.hdf5",
+   "label": "P1B",
+   "short": "P1B",
+   "color": "#f89c20",
+   "band": "yes"
+  }
+ ],
+ "conf": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/scetlib_ad_caches/pdf62_y35_260921_y25/cache.conf",
+ "card": null,
+ "ntoy": 2000,
+ "seed": 20261008,
+ "face_tol": 1e-05,
+ "alphas_frozen": 0.1168,
+ "lattice_band": true,
+ "lattice_points": true,
+ "np_fits": [
+  "P2B",
+  "P1B"
+ ],
+ "pulls": [
+  "P2B"
+ ],
+ "pg": {},
+ "pg_text": {},
+ "total_note": null,
+ "map22": false,
+ "only": [
+  "cs",
+  "tmd",
+  "1",
+  "2",
+  "3"
+ ],
+ "need_kernel": true
+}

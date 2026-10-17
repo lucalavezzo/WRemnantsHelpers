@@ -7,7 +7,9 @@ Extended 2026-09-22 from `studies/alphas-scan-discontinuity/` (what the reported
 Extended 2026-10-09 from `studies/constrained-fit-strategy/` (the trust-krylov crawl at a
 relu² penalty face, trust-constr's warm-start and barrier problems, and full-scope spectral
 preconditioning of ill-conditioned sub-fits).
-Last updated: 2026-10-09.
+Extended 2026-10-16 from `studies/ct18z-nominal-fits/261015-trustconstr-warmstart/` (trust-constr warm
+starts: slack init, keep_feasible pinning, unsigned status 1, centred barrier; saturated `edmval`).
+Last updated: 2026-10-16.
 
 ## The fact
 
@@ -190,8 +192,9 @@ constraints, rabbit branch `trust-constr-nominal`;
 - **It throws away a warm start.** scipy hard-codes the slack initialisation
   `s0 = max(1.5*slack, 1)` in `tr_interior_point`, ignoring where you start. TCA, started
   *at* the minimum, was at **+333 NLL by iteration 3** and took 7.2 h to come back. Every
-  warm/polish use pays an O(100 NLL) detour. Fixing it means copying scipy's interior-point
-  driver.
+  warm/polish use pays an O(100 NLL) detour. *(Superseded 2026-10-16: no driver copy is
+  needed. A subclass hook on scipy's `BarrierSubproblem` fixes it; see "trust-constr warm
+  starts" below. Note the init only hits rows NOT held feasible.)*
 - **The first barrier stage (mu0 = 0.1) is biased and may never end.** Its own solution sits
   ~mu/lambda inside the active face, with barrier forces of 0.4–3 on the inactive faces; it ends
   only on a sup-norm optimality < 0.1. TCB1 (cold start) spent all **600 iterations / 13.6 h**
@@ -205,6 +208,57 @@ constraints, rabbit branch `trust-constr-nominal`;
 
 Decision (Luca, 2026-10-06): trust-krylov stays the production minimiser; trust-constr only
 as a warm certifier.
+
+## trust-constr warm starts: what walks away, what freezes, the fix (2026-10-16)
+
+Source: `studies/ct18z-nominal-fits/261015-trustconstr-warmstart/`, a toy with 40 parameters, kappa 1e3 and 8 rows,
+plus rabbit's test model. Real-fit check in `261016-saturated-subfit-diagnosis/`. The fix is rabbit branch
+`tc-warmstart` (PR to WMass/rabbit), flag `--minimizerWarmStart auto|on|off`.
+
+1. **The slack init `s0 = max(1.5(c-lb), 1)` only hits rows NOT held feasible.** For a row with
+   `keep_feasible=True`, scipy overwrites the slack in place with c - lb, on the same array it then starts from.
+   rabbit holds every row of a strictly feasible start. So the walk-away affects only rows exactly on a bound and
+   every row of an infeasible start, such as a penalty-walled fit: that was TCA's +333 NLL. On the toy the excursion
+   scales with the initial slack, 0.3–0.5 at s0 = 1.
+2. **keep_feasible pinning freezes warm starts of a CHANGED problem.** This covers the saturated sub-fit, scan
+   points, toys, and any refit after the data or model changed. A held curved row with slack ~1e-9 rejects every
+   step that crosses it, the trust radius collapses, and scipy stops with **status 2 ("success")** or at maxiter,
+   away from the minimum. On the toy that was 11/44 runs; linear rows alone do not freeze. **How to recognise a
+   frozen status 2:** the loss is bit-identical over many iterations, `tr_radius` drops ×10 per iteration down to
+   xtol, and the constraint values still equal their start values. LAT's plain saturated ptll sub-fit ended exactly
+   like this (226 iterations, 12.8 h).
+3. **scipy's status 1 does not check the multipliers' sign.** With a small barrier it can stop on a face the loss
+   wants to leave (toy: 8/44 with mu0 = 1e-9). Check the sign of each near-bound row's least-squares multiplier
+   yourself. In practice a warm leg whose minimum has moved off a face stops on it at status 2 (see "Why" below).
+4. **A warm mu0 must sit on the start's central path, mu0 = multiplier × slack.** For a converged fit that is its
+   final mu. A mu0 off that value in either direction stalls in rabbit: scipy's projected CG uses a relative stopping
+   rule and skips the slack residual, and the remaining steps (predicted gain ~1e-14) are lost in rabbit's loss
+   noise (~1e-12). On rabbit's saturated test this cost 43 and 113 iterations, against 18 when centred. The toy, in
+   exact arithmetic, does not show it.
+5. The initial trust radius plays no part.
+6. **A saturated sub-fit's `edmval` is the UNCONSTRAINED EDM** (`edmval_cov` on the composite). At an active face
+   it is nonzero by construction and says nothing about convergence. Use `minimizer_status` (status, optimality,
+   barrier, constraint values) and the dual-sign check instead.
+
+**The fix.** In a warm leg: hold no row feasible; start the slacks at max(c - lb, 1e-3·mu0) through a subclass of
+scipy's private `BarrierSubproblem`, guarded at run time so it falls back to the cold start if scipy changes, with
+tests that pin the internals; centre mu0; run the dual-sign check. If the check fires, take a release step: a Newton
+step on the loss along the releasing rows' normals, with the binding rows held, cut back until the loss decreases and
+no row is violated. Then start a new centred warm leg from that point, for at most 3 rounds.
+
+Do not continue from scipy's own start here. That was the first version, and on NOLAT's ptll sub-fit
+(2026-10-16) it walked away from 335.537 to 335.92 and needed about 1 h to come back.
+
+Why the warm leg stops ON a face it should leave: in the scaled interior-point step, a slack of about 1e-9 has a
+loss gradient mu_i·s_i ~ 1e-17 and a barrier push mu ~ 1e-8. Neither survives the relative CG stop next to the
+other directions' residual, nor the loss noise, so the trust radius collapses on the face (status 2). Only a large
+barrier pushes off a face, and that is the walk-away.
+Under `auto` it is used for the saturated sub-fit, a fit after `--externalPostfit`, `nll_scan` points and asym-impact
+refits; cold fits are unchanged.
+
+Real data, LAT saturated ptll, combined with the trust-constr preconditioner: status 1, q = 79.10711 vs 79.10694
+for the plain run (which was frozen at status 2), the same point to ≤ 1.3e-4 σ, 89 iterations / 3.6 h vs 226 / 12.8 h.
+The two fixes' shares were not separated; 74 % of the plain run's time was the mu0 = 0.1 stage.
 
 ## `--earlyStopping` is NOT a safe substitute with trust-constr
 

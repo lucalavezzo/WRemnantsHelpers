@@ -7,6 +7,8 @@ usage() {
     echo "--asimov <Asimov instead of real data>"
     echo "--wall <add the NP damping wall (C^2 ramp by default), tau=8>"
     echo "--tau-continuation <with --wall: run a tau=5 stage first, then tau=8 warm from it (opt-in)>"
+    echo "--constraints <physical NP region as HARD constraints (NPDomainConstraints) under trust-constr; no wall, no preconditioner>"
+    echo "--lattice <add the ASWZ lattice CS-kernel chi2 (LatticeCSTerm, LATFROZ_V3 defaults), tau=8>"
     echo "-h, --help <show this help message>"
     exit 1
 }
@@ -21,8 +23,10 @@ shift
 do_asimov=false
 do_wall=false
 do_tau_continuation=false
+do_constraints=false
+do_lattice=false
 
-PARSED=$(getopt -o c:o:f:p:h --long cache:,output:,extra-fit:,postfix:,asimov,wall,tau-continuation,no-tau-continuation,help -- "$@")
+PARSED=$(getopt -o c:o:f:p:h --long cache:,output:,extra-fit:,postfix:,asimov,wall,tau-continuation,no-tau-continuation,constraints,lattice,help -- "$@")
 if [[ $? -ne 0 ]]; then
     echo "Failed to parse arguments." >&2
     exit 1
@@ -39,11 +43,18 @@ while true; do
         --wall)          do_wall=true; shift ;;
         --tau-continuation) do_tau_continuation=true; shift ;;
         --no-tau-continuation) do_tau_continuation=false; shift ;;  # the default since 2026-10-08, kept for old commands
+        --constraints)   do_constraints=true; shift ;;
+        --lattice)       do_lattice=true; shift ;;
         -h|--help)       usage ;;
         --)              shift; break ;;
         *)               echo "Unexpected option: $1" >&2; exit 1 ;;
     esac
 done
+
+if $do_constraints && $do_wall; then
+    echo "--constraints and --wall are alternatives (hard constraints vs the penalty); pick one." >&2
+    exit 1
+fi
 
 if [ -z "$cache" ]; then
     echo "Cache directory is required. Use -c to specify it."
@@ -83,6 +94,29 @@ if $do_wall; then
     wall_arg="--regularizationStrength 8 $wall_reg"
 fi
 
+# Hard constraints (2026-10-15): the wall's own conditions as trust-constr inequality rows, so the
+# physical NP region is enforced exactly with no penalty in the loss. Converges from the cold anchor
+# (studies/trust-constr-nominal/261013-constraints-class-validation, V2: 104 it / 2.3 h). The
+# tolerances are V2's; --earlyStopping -1 because <20 silently aborts trust-constr
+# (knowledge/20_frameworks/rabbit_minimizer_tolerances.md). At an active face rabbit stores the
+# face-held covariance and SKIPS --doImpacts (global impacts still run).
+constraints_arg=""
+if $do_constraints; then
+    constraints_arg="--constraints wremnants.postprocessing.scetlib_ad.np_damping_wall.NPDomainConstraints margin=0 \
+--minimizerMethod trust-constr --earlyStopping -1 --maxRestarts 0 --minimizerGtol 1e-8 \
+--minimizerXtol 1e-10 --minimizerBarrierTol 1e-9 --minimizerMaxiter 600"
+fi
+
+# ASWZ lattice CS-kernel chi2 in the likelihood (LatticeCSTerm; its defaults ARE LATFROZ_V3) at tau=8.
+# The CS lambdas are prior-free by default (WRemnants cc3859f4), so this term is their only external
+# constraint. See studies/lattice-cs-kernel.
+lattice_arg=""
+if $do_lattice; then
+    lat=wremnants.postprocessing.scetlib_ad.lattice_cs_term
+    lattice_arg="-r ${lat}.LatticeCSTerm ${lat}.LatticeCSTermMapping"
+    [ -z "$wall_arg" ] && lattice_arg="--regularizationStrength 8 $lattice_arg"
+fi
+
 postfix_arg=""
 if [ -n "$postfix" ]; then
     postfix_arg="--postfix ${postfix}"
@@ -111,6 +145,8 @@ snapshot_arg="--snapshotFile ${output_dir}/snapshot_${out_file} --snapshotInterv
 # pays one Hessian (~5-15 min) to build its preconditioner. Accepted (Luca); no rabbit change for now.
 # See studies/constrained-fit-strategy/261008-saturated-subfit-diagnosis.
 precond_arg="--precondition --preconditionParams .* --preconditionBlocks none --preconditionTransform spectral"
+# trust-constr refuses --precondition (the constraint Jacobian is not transformed to internal coordinates).
+$do_constraints && precond_arg=""
 # The commands are built as strings and word-split by run_cmd, so ".*" would be glob-expanded against the cwd
 # (".git", "..", ...): turn globbing off. Nothing in this script relies on it.
 set -f
@@ -118,7 +154,7 @@ set -f
 fit_command="rabbit_fit.py $card --jitCompile off -o $output_dir $toys $postfix_arg \
 $precond_arg -m Project ch0 ptll --computeSaturatedProjectionTests --computeHistErrors \
 --doImpacts --globalImpacts --globalImpactsDisableJVP \
---saveHists $wall_arg $snapshot_arg \
+--saveHists $wall_arg $lattice_arg $constraints_arg $snapshot_arg \
 --paramModel wremnants.postprocessing.scetlib_ad.SCETlibADParamModel \
 cache=$cache/cache.npz conf=$cache/cache.conf $extra_fit"
 

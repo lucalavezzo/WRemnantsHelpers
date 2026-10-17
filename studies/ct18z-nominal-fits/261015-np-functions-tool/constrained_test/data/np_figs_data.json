@@ -1,0 +1,180 @@
+{
+ "lattice_only": {
+  "lam": [
+   0.18794838207992773,
+   -0.006088447476853377
+  ],
+  "sigma": [
+   0.042571429523764845,
+   0.0035080875928583883
+  ],
+  "rho": -0.8843286008789066,
+  "chi2_min": 6.68217949672697,
+  "k1hat": 0.24144789675101344,
+  "nf_shift": [
+   -0.027537225518605712,
+   0.0025335874032803712
+  ]
+ },
+ "frozen_reference": {
+  "alphas": 0.1168,
+  "tnp_gamma_nu": 0.0,
+  "tnp_gamma_cusp": 0.0,
+  "np_gnu_lambda_inf": 2.0,
+  "np_gnu_b0_bmax": 1.0
+ },
+ "fits": {
+  "lattice": {
+   "lam_cs": [
+    0.18794838207992773,
+    -0.006088447476853377
+   ],
+   "sigma_cs": [
+    0.042571429523764845,
+    0.0035080875928583883
+   ],
+   "rho_cs": -0.8843286008789066,
+   "chi2_lat": 6.682179496726972,
+   "dchi2_lat": 1.7763568394002505e-15,
+   "k1hat_own": 0.24144789675101344
+  },
+  "P2B": {
+   "lam_cs": [
+    0.038286579123705006,
+    0.010634488427050184
+   ],
+   "sigma_cs": [
+    0.030339584617082627,
+    0.005728330605588671
+   ],
+   "rho_cs": -0.7539915627240149,
+   "chi2_lat": 15.86945633531488,
+   "dchi2_lat": 9.187276838587909,
+   "k1hat_own": 0.1446280711532017,
+   "floating": [
+    "lambda2",
+    "lambda4",
+    "delta_lambda2",
+    "lambda2_nu",
+    "lambda4_nu"
+   ],
+   "mu": [
+    0.048147093929016005,
+    0.07256415161161028,
+    -0.0077035347190982555,
+    0.038286579123705006,
+    0.010634488427050184
+   ],
+   "sigma": [
+    0.04600750172199738,
+    0.02738705028409639,
+    0.007361200275519574,
+    0.030339584617082627,
+    0.005728330605588671
+   ],
+   "held": {
+    "lambda_inf": 1.0,
+    "lambda_inf_nu": 2.0
+   },
+   "theta": {
+    "lambda2": -0.703705812141968,
+    "lambda4": -0.6548716967767795,
+    "delta_lambda2": -0.015407069438196511,
+    "lambda2_nu": -1.1171342087629499,
+    "lambda4_nu": 0.02126897685410037
+   },
+   "faces": {
+    "lambda4_nu >= 0 (CS large-b leading)": 0.010634488427050184,
+    "lambda2_nu >= 0 (CS small-b turn-on)": 0.038286579123705006,
+    "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=0 (TMD small-b turn-on)": 0.048147093929016005,
+    "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=0 (TMD large-b)": 0.21780406666692467,
+    "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=2.5 (TMD small-b turn-on)": 1.9346519108953686e-09,
+    "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=2.5 (TMD large-b)": 0.21769245483483085
+   },
+   "edm": 1.4676658274809265e-16,
+   "path": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261013_constrained_postfit_validation/fitresults_P2B.hdf5"
+  },
+  "P1B": {
+   "lam_cs": [
+    4.320344938191223e-07,
+    0.04425363374309349
+   ],
+   "sigma_cs": [
+    0.0,
+    0.010985484603926557
+   ],
+   "rho_cs": null,
+   "chi2_lat": 36.367304084061544,
+   "dchi2_lat": 29.685124587334574,
+   "k1hat_own": 0.20348401231185467,
+   "floating": [
+    "lambda2",
+    "lambda4",
+    "delta_lambda2",
+    "lambda2_nu",
+    "lambda4_nu"
+   ],
+   "mu": [
+    0.11820540143620217,
+    -7.179616175390091e-05,
+    -0.009282665718051013,
+    4.320344938191223e-07,
+    0.04425363374309349
+   ],
+   "sigma": [
+    0.0593464013878854,
+    0.00026887897649012195,
+    0.007819175608866356,
+    0.0,
+    0.010985484603926557
+   ],
+   "held": {
+    "lambda_inf": 1.0,
+    "lambda_inf_nu": 2.0
+   },
+   "theta": {
+    "lambda2": -0.5635891971275957,
+    "lambda4": -0.8001435923235078,
+    "delta_lambda2": -0.018565331436102027,
+    "lambda2_nu": -1.4999956796550618,
+    "lambda4_nu": 0.08850726748618698
+   },
+   "faces": {
+    "lambda4_nu >= 0 (CS large-b leading)": 0.04425363374309349,
+    "lambda2_nu >= 0 (CS small-b turn-on)": 4.320344938191223e-07,
+    "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=0 (TMD small-b turn-on)": 0.11820540143620217,
+    "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=0 (TMD large-b)": 0.0014362384873686676,
+    "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=2.5 (TMD small-b turn-on)": 0.06018874069838334,
+    "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=2.5 (TMD large-b)": 2.656333153577638e-06
+   },
+   "edm": 7.63904576534405e-08,
+   "path": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261013_constrained_postfit_validation/fitresults_P1B.hdf5"
+  }
+ },
+ "bands": {
+  "lattice_lat": {
+   "max_abs_halfwidth_sampled_minus_linear": 0.08465647816847222,
+   "max_halfwidth": 0.5289535830816903
+  },
+  "lattice_full": {
+   "max_abs_halfwidth_sampled_minus_linear": 0.6786254200926116,
+   "max_halfwidth": 0.8713200967917423
+  },
+  "P2B_lat": {
+   "max_abs_halfwidth_sampled_minus_linear": 0.018203825886432205,
+   "max_halfwidth": 0.1325862415774423
+  },
+  "P2B_full": {
+   "max_abs_halfwidth_sampled_minus_linear": 0.01901718683029229,
+   "max_halfwidth": 0.13414996315705513
+  },
+  "P1B_lat": {
+   "max_abs_halfwidth_sampled_minus_linear": 0.0060231148772036044,
+   "max_halfwidth": 0.11313030620970127
+  },
+  "P1B_full": {
+   "max_abs_halfwidth_sampled_minus_linear": 0.00493826114862702,
+   "max_halfwidth": 0.1109105572602061
+  }
+ }
+}

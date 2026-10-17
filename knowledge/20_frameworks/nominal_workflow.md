@@ -45,8 +45,38 @@ python /home/submit/lavezzo/alphaS/gh/WRemnants/rabbit/bin/rabbit_print_impacts.
   - `--noConstrainParams REGEX` — drop the Gaussian prior (free-floating nuisance). Added 2026-05-04, lives in `Datagroups.no_constraint_patterns` and is wired into `addSystematic` next to `scale_params_patterns` / `force_asymmetric_patterns`. Use this instead of patching `rabbit_theory_helper.py:noConstraint=True` lines.
 - **Stale `fitresults.hdf5` stubs (verified 2026-06-12):** `rabbit_fit.py` writes the `meta` group at startup and the `results*` group only at the very end — an aborted/killed run leaves a small (~54K) `fitresults.hdf5` containing only `['meta']`. Any later `--externalPostfit` against it fails with the misleading `ValueError: 'results_asimov' not in h5file` (that's just `io_tools.get_fitresult`'s fallback key when `results` is absent — NOT a `-t` mismatch). Naive `[ -f ... ]` existence checks in wrapper scripts pass on the stub; check for a `results*` key or file size when in doubt. `workflows/fitterSCETlibNP.py` (rewritten in python 2026-07-07, replacing the `.sh`) guards against this: before its hessian/saturated steps inherit settings from a fit postfit it checks for a `results*` group and aborts on a meta-only stub. It also keeps `-d/--fitdir <subdir>` to nest fit variants under the datacard dir (and inherits `-t`/`--pseudoData` from the fit postfit in the later steps, `DATA_ARGS` overriding), so multiple fits off one datacard don't trample each other's `fitresults.hdf5`.
 
+## SCETlib-AD fits: the fit and the standard post-fit deliverables (Luca, 2026-10-15)
+Every AD (param-model) fit result is shown with the SAME four things, made by the SAME workflow scripts —
+never ask, never hand-roll a replacement:
+
+```bash
+# fit (one pass: fit + face-held Hessian + traditional/global impacts + hists + ptll saturated projection)
+workflows/fitterAD.sh <card> -c <cachedir> -o <out> -p <PF> --constraints [--lattice] -f '<param-model tokens> -v 4'
+# 1. pulls + traditional AND global impacts, grouped and ungrouped (POI is alphaS for the param model)
+workflows/pullsAndImpacts.sh <out>/fitresults_<PF>.hdf5 -o <taskdir>/impacts -P alphaS
+# 2. postfit ptll with the saturated-projection chi2/p (needs --computeSaturatedProjectionTests in the fit)
+workflows/plotPtll.sh <out>/fitresults_<PF>.hdf5 -o <taskdir>/ptll
+# 3. NP functions: ONE two-panel figure (np_function_plots): CS kernel gamma_nu^NP(b_T) | TMD boundary condition F_eff(b_T,y), fits overlaid with bands
+workflows/plotNPFunctions.sh LABEL1=<fitresults1> [LABEL2=<fitresults2> ...] -o <taskdir>/np_functions
+# 4. the fit p-value: the full saturated test in the fit log ("Saturated chi2: ndof / 2*deltaNLL / p-value")
+```
+
+- `--constraints` = trust-constr with the physical NP region as HARD constraints (`NPDomainConstraints`), the
+  default minimisation since 2026-10-15 (converges from the cold anchor; V2 in
+  `studies/trust-constr-nominal/261013-constraints-class-validation`). It turns OFF the spectral preconditioner:
+  rabbit refuses `--precondition` with trust-constr (the constraint Jacobian/HVP are not transformed to the
+  preconditioned coordinates — an implementation gap, not a limitation of the method).
+- `--lattice` adds the ASWZ lattice χ² (`LatticeCSTerm`, defaults = LATFROZ_V3), τ = 8. Since WRemnants cc3859f4 NO
+  NP λ carries a prior (TMD and CS), so the lattice is the only external NP information.
+- At an ACTIVE constraint face rabbit SKIPS `--doImpacts` (global impacts still run on the face-held covariance; the
+  grouped `stat` remainder can be NaN). Check the log's `[constraints] active:` lines before reading impacts.
+- Run via `mem_gate.sh <GB> <log> -- agent_setup.sh --scetlib <build> -- bash workflows/fitterAD.sh ...`. mem_gate
+  re-splits its command with `bash -c "$*"`, so the `-f` value must be single-quoted INSIDE: `-f "'threads=128 -v 4'"`.
+- `plotNPFunctions.sh` wraps `np_function_plots.py` (ported to the analysis branch 2026-10-15, with an AD-fitresult reader).
+  Validation: `studies/ct18z-nominal-fits/261015-np-functions-tool`.
+
 ## Last Updated
-- 2026-07-07
+- 2026-10-15
 
 ## Source
 - Migration from legacy nominal workflow notes (2026-02-16)

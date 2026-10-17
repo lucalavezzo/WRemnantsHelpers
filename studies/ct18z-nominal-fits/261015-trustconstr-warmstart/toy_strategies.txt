@@ -1,0 +1,16 @@
+cold 3 {'cold_nit': 111, 'cold_status': 1, 'fstar': 4.089116733356743, 'active': ['lin0', 'lin1', 'lin2', 'cubic', 'ball']}
+cold 5 {'cold_nit': 80, 'cold_status': 1, 'fstar': 1.3990190100768358, 'active': ['lin0', 'lin1', 'lin2', 'exp', 'cubic']}
+cold 7 {'cold_nit': 116, 'cold_status': 1, 'fstar': 2.2536204094211163, 'active': ['lin0', 'lin1', 'lin2', 'exp', 'cubic']}
+cold 11 {'cold_nit': 93, 'cold_status': 1, 'fstar': 1.3515220851498515, 'active': ['lin2', 'exp', 'cubic']}
+cold 13 {'cold_nit': 104, 'cold_status': 1, 'fstar': 4.174181889871081, 'active': ['lin0', 'lin1', 'cubic', 'ball']}
+strategy         |        at_min |       on_face |        infeas |        0.1sig |          1sig | fail/n | verify-retries | worst exc (min/face)
+S0 rabbit-now    |     11 [  78] |     86 [ 170] |    109 [ 177] |    164 [2000] |   1311 [2000] |  11/ 44 |   0 | 5e-01
+S1 scipy-none    |     97 [ 121] |     91 [ 107] |    109 [ 177] |     93 [ 130] |    242 [1938] |   0/ 44 |   0 | 9e-01
+S2 safe-warm     |      5 [   7] |     80 [  97] |     98 [ 174] |    102 [ 297] |    260 [2000] |   0/ 44 |   0 | 3e-06
+S3 fast-warm     |      1 [  17] |      6 [  21] |     11 [  12] |     17 [  37] |     31 [1253] |   8/ 44 |   0 | 5e-12
+S4 fast+verify   |      1 [  17] |      6 [  21] |     11 [  12] |     17 [  37] |    352 [1478] |   0/ 44 |   8 | 5e-12
+S5 safe+verify   |      5 [   7] |     80 [  97] |     98 [ 174] |    102 [ 297] |    260 [2000] |   0/ 44 |   0 | 3e-06
+S6 centred       |      1 [  24] |      3 [  13] |      8 [  14] |     14 [  83] |     92 [1779] |   3/ 44 |   0 | 5e-12
+S7 centred+verify |      1 [  24] |      3 [  13] |      8 [  14] |     14 [  83] |    136 [1779] |   0/ 44 |   3 | 5e-12
+S8 centred+release |      1 [  24] |      3 [  13] |      8 [  14] |     14 [  83] |     92 [1779] |   0/ 44 |   3 | 5e-12
+(starts whose own cold reference hit maxiter, excluded: 1)

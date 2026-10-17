@@ -1,0 +1,46 @@
+{
+ "outdir": "/home/submit/lavezzo/alphaS/WRemnantsHelpers/studies/ct18z-nominal-fits/261015-np-functions-tool/two_plots/no_lattice",
+ "command": "/home/submit/lavezzo/alphaS/WRemnantsHelpers/scripts/np_functions/np_functions.py --fit LATFROZ_V3=/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261008_latfroz_nf_variants/fitresults_LATFROZ_V3.hdf5 --fit XWSTIFF=/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260930_stiff_wall_fits/fitresults_XWSTIFF.hdf5 -o /home/submit/lavezzo/alphaS/WRemnantsHelpers/studies/ct18z-nominal-fits/261015-np-functions-tool/two_plots/no_lattice --label 'LATFROZ_V3=Z + lattice (LATFROZ V3)' --label 'XWSTIFF=Z only (XWSTIFF)' --no-lattice",
+ "fits": [
+  {
+   "key": "LATFROZ_V3",
+   "path": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261008_latfroz_nf_variants/fitresults_LATFROZ_V3.hdf5",
+   "label": "Z + lattice (LATFROZ V3)",
+   "short": "Z + lattice",
+   "color": "#e42536",
+   "band": "auto"
+  },
+  {
+   "key": "XWSTIFF",
+   "path": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260930_stiff_wall_fits/fitresults_XWSTIFF.hdf5",
+   "label": "Z only (XWSTIFF)",
+   "short": "Z only",
+   "color": "#f89c20",
+   "band": "auto"
+  }
+ ],
+ "conf": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/scetlib_ad_caches/pdf62_y35_260921_y25/cache.conf",
+ "card": null,
+ "ntoy": 2000,
+ "seed": 20261008,
+ "face_tol": 1e-05,
+ "alphas_frozen": 0.1168,
+ "lattice_band": false,
+ "lattice_points": false,
+ "np_fits": [
+  "LATFROZ_V3",
+  "XWSTIFF"
+ ],
+ "pulls": [
+  "LATFROZ_V3"
+ ],
+ "pg": {},
+ "pg_text": {},
+ "total_note": null,
+ "map22": false,
+ "only": [
+  "cs",
+  "tmd"
+ ],
+ "need_kernel": false
+}

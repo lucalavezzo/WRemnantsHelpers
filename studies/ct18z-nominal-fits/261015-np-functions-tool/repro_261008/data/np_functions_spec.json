@@ -1,0 +1,61 @@
+{
+ "outdir": "/home/submit/lavezzo/alphaS/WRemnantsHelpers/studies/ct18z-nominal-fits/261015-np-functions-tool/repro_261008",
+ "command": "/home/submit/lavezzo/alphaS/WRemnantsHelpers/scripts/np_functions/np_functions.py --fit LATFROZ_V3=/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261008_latfroz_nf_variants/fitresults_LATFROZ_V3.hdf5 --fit XWSTIFF=/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260930_stiff_wall_fits/fitresults_XWSTIFF.hdf5 --fit NOMSTIFF=/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260930_stiff_wall_fits/fitresults_NOMSTIFF.hdf5 --label 'LATFROZ_V3=Z + lattice (LATFROZ V3)' --label 'XWSTIFF=Z only (XWSTIFF)' --label 'NOMSTIFF=Z + 1D lattice prior, $\\lambda_4^\\nu$=0 (NOMSTIFF)' --all --np-fits LATFROZ_V3,XWSTIFF --pg XWSTIFF=13.475287497597833 --pg-text 'XWSTIFF=Z vs lattice' --total-note 'Z + lattice and Z only give the same product:\\nthe Z data fix CS $\\times$ TMD, the lattice\\nmoves damping from the TMD to the CS side' -o /home/submit/lavezzo/alphaS/WRemnantsHelpers/studies/ct18z-nominal-fits/261015-np-functions-tool/repro_261008 --stage plot",
+ "fits": [
+  {
+   "key": "LATFROZ_V3",
+   "path": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261008_latfroz_nf_variants/fitresults_LATFROZ_V3.hdf5",
+   "label": "Z + lattice (LATFROZ V3)",
+   "short": "Z + lattice",
+   "color": "#e42536",
+   "band": "auto"
+  },
+  {
+   "key": "XWSTIFF",
+   "path": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260930_stiff_wall_fits/fitresults_XWSTIFF.hdf5",
+   "label": "Z only (XWSTIFF)",
+   "short": "Z only",
+   "color": "#f89c20",
+   "band": "auto"
+  },
+  {
+   "key": "NOMSTIFF",
+   "path": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260930_stiff_wall_fits/fitresults_NOMSTIFF.hdf5",
+   "label": "Z + 1D lattice prior, $\\lambda_4^\\nu$=0 (NOMSTIFF)",
+   "short": "Z + 1D lattice prior, $\\lambda_4^\\nu$=0",
+   "color": "#964a8b",
+   "band": "auto"
+  }
+ ],
+ "conf": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/scetlib_ad_caches/pdf62_y35_260921_y25/cache.conf",
+ "card": null,
+ "ntoy": 2000,
+ "seed": 20261008,
+ "face_tol": 1e-05,
+ "alphas_frozen": 0.1168,
+ "lattice_band": true,
+ "lattice_points": true,
+ "np_fits": [
+  "LATFROZ_V3",
+  "XWSTIFF"
+ ],
+ "pulls": [
+  "LATFROZ_V3"
+ ],
+ "pg": {
+  "XWSTIFF": 13.475287497597833
+ },
+ "pg_text": {
+  "XWSTIFF": "Z vs lattice"
+ },
+ "total_note": "Z + lattice and Z only give the same product:\\nthe Z data fix CS $\\times$ TMD, the lattice\\nmoves damping from the TMD to the CS side",
+ "map22": false,
+ "only": [
+  "cs",
+  "tmd",
+  "1",
+  "2",
+  "3"
+ ],
+ "need_kernel": true
+}

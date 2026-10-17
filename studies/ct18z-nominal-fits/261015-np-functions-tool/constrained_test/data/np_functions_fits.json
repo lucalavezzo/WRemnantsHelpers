@@ -1,0 +1,103 @@
+{
+ "fits": [
+  {
+   "key": "P2B",
+   "path": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261013_constrained_postfit_validation/fitresults_P2B.hdf5",
+   "label": "P2B",
+   "short": "P2B",
+   "color": "#e42536",
+   "band": true,
+   "band_request": "yes",
+   "kind": "constraints",
+   "cs_on_face": [],
+   "cs_faces": {},
+   "tmd_faces": {
+    "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=2.5 (TMD small-b turn-on)": 1.9346519108953686e-09
+   },
+   "lambda4_nu_held": false,
+   "lambda2_nu_held": false,
+   "card": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260916_Z_2D_card_adcorr/ZMassDilepton_ptll_yll_adexclpdf/ZMassDilepton.hdf5",
+   "forms": [
+    "tanh_2",
+    "tanh_2"
+   ],
+   "warnings": []
+  },
+  {
+   "key": "P1B",
+   "path": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261013_constrained_postfit_validation/fitresults_P1B.hdf5",
+   "label": "P1B",
+   "short": "P1B",
+   "color": "#f89c20",
+   "band": true,
+   "band_request": "yes",
+   "kind": "constraints",
+   "cs_on_face": [
+    "lambda2_nu"
+   ],
+   "cs_faces": {
+    "lambda2_nu >= 0 (CS small-b turn-on)": 4.320344938191223e-07
+   },
+   "tmd_faces": {
+    "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=2.5 (TMD large-b)": 2.656333153577638e-06
+   },
+   "lambda4_nu_held": false,
+   "lambda2_nu_held": false,
+   "card": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/260916_Z_2D_card_adcorr/ZMassDilepton_ptll_yll_adexclpdf/ZMassDilepton.hdf5",
+   "forms": [
+    "tanh_2",
+    "tanh_2"
+   ],
+   "warnings": []
+  }
+ ],
+ "spec": {
+  "outdir": "/home/submit/lavezzo/alphaS/WRemnantsHelpers/studies/ct18z-nominal-fits/261015-np-functions-tool/constrained_test",
+  "command": "/home/submit/lavezzo/alphaS/WRemnantsHelpers/scripts/np_functions/np_functions.py --fit P2B=/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261013_constrained_postfit_validation/fitresults_P2B.hdf5 --fit P1B=/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261013_constrained_postfit_validation/fitresults_P1B.hdf5 --band all=yes --all -o /home/submit/lavezzo/alphaS/WRemnantsHelpers/studies/ct18z-nominal-fits/261015-np-functions-tool/constrained_test",
+  "fits": [
+   {
+    "key": "P2B",
+    "path": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261013_constrained_postfit_validation/fitresults_P2B.hdf5",
+    "label": "P2B",
+    "short": "P2B",
+    "color": "#e42536",
+    "band": "yes"
+   },
+   {
+    "key": "P1B",
+    "path": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261013_constrained_postfit_validation/fitresults_P1B.hdf5",
+    "label": "P1B",
+    "short": "P1B",
+    "color": "#f89c20",
+    "band": "yes"
+   }
+  ],
+  "conf": "/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/scetlib_ad_caches/pdf62_y35_260921_y25/cache.conf",
+  "card": null,
+  "ntoy": 2000,
+  "seed": 20261008,
+  "face_tol": 1e-05,
+  "alphas_frozen": 0.1168,
+  "lattice_band": true,
+  "lattice_points": true,
+  "np_fits": [
+   "P2B",
+   "P1B"
+  ],
+  "pulls": [
+   "P2B"
+  ],
+  "pg": {},
+  "pg_text": {},
+  "total_note": null,
+  "map22": false,
+  "only": [
+   "cs",
+   "tmd",
+   "1",
+   "2",
+   "3"
+  ],
+  "need_kernel": true
+ }
+}

@@ -1,0 +1,188 @@
+{
+ "ref": {
+  "nll_main": 376.472642734532,
+  "nll_sat": 336.91917329232524,
+  "q_stored": 79.10693888441347,
+  "q_recomputed": 79.10693888441347,
+  "status": {
+   "success": true,
+   "status": 2,
+   "nit": 226,
+   "nfev": 152,
+   "message": "`xtol` termination condition is satisfied.",
+   "optimality": 0.0006584960649479686,
+   "constr_violation": 0.0,
+   "barrier_parameter": 4.0960000000000027e-10,
+   "tr_radius": 1.0000000000000006e-11,
+   "multipliers": [
+    -207.45002584291748,
+    3.9448793995207194e-05,
+    -0.00013351665927629504,
+    -0.0003116842613980117,
+    -1.9135250818086924,
+    -0.0003126279422794988
+   ],
+   "constraint_values": [
+    3.340341721783796e-07,
+    0.1325307756613907,
+    0.14783877867186146,
+    0.10109632761213905,
+    9.269282394447353e-06,
+    0.0978651182516564
+   ],
+   "constraint_lower_bounds": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "constraint_upper_bounds": [
+    Infinity,
+    Infinity,
+    Infinity,
+    Infinity,
+    Infinity,
+    Infinity
+   ],
+   "constraint_labels": [
+    "lambda4_nu >= 0 (CS large-b leading)",
+    "lambda2_nu >= 0 (CS small-b turn-on)",
+    "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=0 (TMD small-b turn-on)",
+    "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=0 (TMD large-b)",
+    "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=2.5 (TMD small-b turn-on)",
+    "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=2.5 (TMD large-b)"
+   ]
+  }
+ },
+ "new": {
+  "nll_main": 376.472642734532,
+  "nll_sat": 336.9190862332205,
+  "q_stored": 79.1071130026229,
+  "q_recomputed": 79.1071130026229,
+  "status": {
+   "success": true,
+   "status": 1,
+   "nit": 89,
+   "nfev": 112,
+   "message": "`gtol` termination condition is satisfied.",
+   "optimality": 2.4967975464917913e-09,
+   "constr_violation": 0.0,
+   "barrier_parameter": 4.095582731741198e-10,
+   "tr_radius": 6.965003391622734,
+   "multipliers": [
+    -207.45765703752485,
+    -2.0421652036428256e-09,
+    -5.029080908281235e-09,
+    -7.042159496581907e-09,
+    -1.912868782664231,
+    -7.038315240496769e-09
+   ],
+   "optimality_frame": "preconditioned",
+   "optimality_physical": 1.6019234357462122e-06,
+   "constraint_values": [
+    1.952320249909434e-12,
+    0.13253440356741275,
+    0.14783551340998446,
+    0.10100957132565387,
+    6.488520831737787e-11,
+    0.09777857606011509
+   ],
+   "constraint_lower_bounds": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "constraint_upper_bounds": [
+    Infinity,
+    Infinity,
+    Infinity,
+    Infinity,
+    Infinity,
+    Infinity
+   ],
+   "constraint_labels": [
+    "lambda4_nu >= 0 (CS large-b leading)",
+    "lambda2_nu >= 0 (CS small-b turn-on)",
+    "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=0 (TMD small-b turn-on)",
+    "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=0 (TMD large-b)",
+    "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=2.5 (TMD small-b turn-on)",
+    "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=2.5 (TMD large-b)"
+   ],
+   "warm_start_legs": [
+    "warm"
+   ],
+   "warm_start_releasing": [],
+   "warm_start_barrier": 4.095582731741198e-10
+  }
+ },
+ "dq_new_minus_ref": 0.0001741182094292526,
+ "max_abs_dx": 6.175484837989131e-05,
+ "largest_dx_over_sigma_sat": [
+  [
+   "lambda4",
+   -5.76947943603523e-05,
+   -0.0001271866036268879
+  ],
+  [
+   "saturated_ch0_ptll0",
+   -4.395104673982075e-06,
+   -8.006544887189564e-05
+  ],
+  [
+   "saturated_ch0_ptll1",
+   -2.977115588498336e-06,
+   -5.820412189199571e-05
+  ],
+  [
+   "lambda2_nu",
+   3.627906022041216e-05,
+   5.3335437156519016e-05
+  ],
+  [
+   "delta_lambda2",
+   -1.921265802319605e-06,
+   -4.9849921642233475e-05
+  ],
+  [
+   "lambda4_nu",
+   -6.680644397162594e-07,
+   -3.7293889827028125e-05
+  ],
+  [
+   "saturated_ch0_ptll2",
+   -1.6068947433778291e-06,
+   -3.413448471291604e-05
+  ],
+  [
+   "saturated_ch0_ptll6",
+   6.528681659734303e-07,
+   2.4039767790236454e-05
+  ],
+  [
+   "saturated_ch0_ptll7",
+   5.479414479925282e-07,
+   2.2654700066463662e-05
+  ],
+  [
+   "saturated_ch0_ptll38",
+   1.1653832672209319e-06,
+   2.053759278998453e-05
+  ],
+  [
+   "saturated_ch0_ptll37",
+   1.159989728938271e-06,
+   2.0297791422982974e-05
+  ],
+  [
+   "saturated_ch0_ptll5",
+   6.369967771036045e-07,
+   2.0105281035597214e-05
+  ]
+ ],
+ "alphaS_dx_over_sigma_sat (blinded difference only)": -1.7559308173381842e-05
+}
