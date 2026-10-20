@@ -53,12 +53,13 @@ Every AD (param-model) fit result is shown with the SAME four things, made by th
 never ask, never hand-roll a replacement:
 
 ```bash
-# fit (one pass: fit + face-held Hessian + traditional/global impacts + hists + ptll saturated projection)
-workflows/fitterAD.sh <card> -c <cachedir> -o <out> -p <PF> --constraints [--lattice] -f '<param-model tokens> -v 4'
+# CANONICAL fit (2026-10-20). Main call: fit + face-held Hessian + traditional/global impacts + hists -> fitresults_<PF>.hdf5;
+# --computeSaturatedProjectionTests adds a separate warm call: ptll saturated test only -> fitresults_<PF>_sat.hdf5
+workflows/fitterAD.sh <card> -c <cachedir> -o <out> -p <PF> --constraints [--lattice] --computeSaturatedProjectionTests -f '<param-model tokens> -v 4'
 # 1. pulls + traditional AND global impacts, grouped and ungrouped (POI is alphaS for the param model)
 workflows/pullsAndImpacts.sh <out>/fitresults_<PF>.hdf5 -o <taskdir>/impacts -P alphaS
-# 2. postfit ptll with the saturated-projection chi2/p (needs --computeSaturatedProjectionTests in the fit)
-workflows/plotPtll.sh <out>/fitresults_<PF>.hdf5 -o <taskdir>/ptll
+# 2. postfit ptll with the saturated-projection chi2/p: from the _sat file
+workflows/plotPtll.sh <out>/fitresults_<PF>_sat.hdf5 -o <taskdir>/ptll
 # 3. NP functions: ONE two-panel figure (np_function_plots): CS kernel gamma_nu^NP(b_T) | TMD boundary condition F_eff(b_T,y), fits overlaid with bands
 workflows/plotNPFunctions.sh LABEL1=<fitresults1> [LABEL2=<fitresults2> ...] -o <taskdir>/np_functions
 # 4. the fit p-value: the full saturated test in the fit log ("Saturated chi2: ndof / 2*deltaNLL / p-value")
@@ -76,16 +77,16 @@ workflows/plotNPFunctions.sh LABEL1=<fitresults1> [LABEL2=<fitresults2> ...] -o 
   anchor unit y-steps are ~1σ in soft directions, scipy grows the radius to hundreds, steps get rejected and
   constrained nuisances detour to 11σ. PCLAT (LAT + preconditioner, cold) was ~70× behind LAT in loss at equal wall
   time; no cold main fit was ever faster with it (`ct18z-nominal-fits/261015-trustconstr-precondition`, Log
-  2026-10-15 16:10). `fitterAD.sh --constraints` therefore drops `--precondition` for the whole process — which also
-  drops it from the saturated sub-fit, where it pays (next bullet).
+  2026-10-15 16:10). `fitterAD.sh --constraints` therefore runs its main call without `--precondition`, and the
+  saturated test (the only minimisation in the post-fit, where the preconditioner pays) as its own call (next bullet).
 - **Saturated sub-fits and other warm legs: warm start + full spectral preconditioner** (rabbit #194 merged
   2026-10-19 df99d93: `--precondition` works under trust-constr via the chain rule; #195 `--minimizerWarmStart
-  auto|on|off`, READY not merged as of 2026-10-20). Run the post-fit as a SECOND pass from the cold minimum:
-  `rabbit_fit.py <card> --externalPostfit <cold fitresults> --noFit <same constraints/lattice/model args>
-  --minimizerWarmStart auto --precondition --preconditionParams '.*' --preconditionBlocks none
-  --preconditionTransform spectral -m Project ch0 ptll --computeSaturatedProjectionTests --doImpacts --globalImpacts`.
-  Templates: `ct18z-nominal-fits/261017-gen-cold-fits/scripts/run_fit.sh` + `run_pf.sh` (gen), `261017-ptll-gof-forensics/scripts/run_p2.sh`
-  (warm refit). On LAT's ptll sub-fit: 4667 HVPs / 12.6 h plain (and NOT converged: frozen status 2) → 1504 HVPs
+  auto|on|off`, READY not merged as of 2026-10-20). `fitterAD.sh --constraints --computeSaturatedProjectionTests`
+  does this itself: after the main call it runs `rabbit_fit.py --externalPostfit fitresults_<PF>.hdf5 --noFit` (the
+  covariance is loaded, no Hessian recomputed) with `--minimizerWarmStart auto`, the full spectral preconditioner
+  and gtol 1e-5, ptll saturated test + hists only → `fitresults_<PF>_sat.hdf5`; `--saturated-from <fitresults>` reruns
+  just that call. It refuses to run if the imported rabbit lacks #194/#195. Gen-level templates (not through
+  fitterAD.sh): `ct18z-nominal-fits/261017-gen-cold-fits/scripts/run_fit.sh` + `run_pf.sh`. On LAT's ptll sub-fit: 4667 HVPs / 12.6 h plain (and NOT converged: frozen status 2) → 1504 HVPs
   with the preconditioner alone (3.1×) → 982 HVPs / 3.2 h with both (4.75×), same minimum (q +1.7e-4). The
   preconditioner is the speed; the warm start is correctness (no false stops at releasing faces). Needs a rabbit
   build with #194 + #195 (+ #196 for face impacts): the production `main-plus-ours` tree (2d9f380) has none of them;
