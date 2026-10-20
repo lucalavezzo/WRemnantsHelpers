@@ -1,0 +1,16 @@
+held faces  : [('lambda2_nu >= 0 (CS small-b turn-on)', 32.448), ('3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=2.5 (TMD large-b)', 4.104)]
+frozen faces: [('3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=2.5 (TMD large-b)', 4.104)]
+sigma_tot held 0.543454  frozen 0.543454
+cov (lambda2_nu excluded): max|diff|/max = 0.00e+00
+held cov row lambda2_nu exactly 0: True
+impacts                  n= 3720 max|held-frozen| = 0.00e+00 (max rel 0.0e+00); NaN pattern equal: True; only in one: []
+   held impact of lambda2_nu on the POI: 0.0
+impacts_grouped          n=   63 max|held-frozen| = 0.00e+00 (max rel 0.0e+00); NaN pattern equal: True; only in one: []
+global_impacts           n= 3720 max|held-frozen| = 0.00e+00 (max rel 0.0e+00); NaN pattern equal: True; only in one: []
+global_impacts_grouped   n=   63 max|held-frozen| = 0.00e+00 (max rel 0.0e+00); NaN pattern equal: True; only in one: []
+held vs NOLAT_PF impacts_grouped         : largest |diff| 1.092e-13 at binByBinStat
+   stat: held 0.392625  NOLAT_PF 0.392625  stat_PF^2 - stat_held^2 = 0.0000e+00
+held vs NOLAT_PF global_impacts_grouped  : largest |diff| 2.405e-04 at stat
+   stat: held 0.162203  NOLAT_PF 0.162443  stat_PF^2 - stat_held^2 = 7.8071e-05
+held traditional grouped (rabbit units; x2 = alphaS 1e-3): {'stat': 0.3926, 'binByBinStat': 0.0783, 'resumNonpert': 0.432, 'scetlibNPFeff': 0.127, 'scetlibNPgammaNu': 0.4149, 'pdfEig': 0.3541, 'resumTNP': 0.3242}
+held global stat: 0.162202719167183  total: 0.5434539196120345

@@ -1,0 +1,190 @@
+{
+ "ref": {
+  "nll_main": 376.472642734532,
+  "nll_sat": 336.9190862332205,
+  "q_stored": 79.1071130026229,
+  "q_recomputed": 79.1071130026229,
+  "status": {
+   "success": true,
+   "status": 1,
+   "nit": 89,
+   "nfev": 112,
+   "message": "`gtol` termination condition is satisfied.",
+   "optimality": 2.4967975464917913e-09,
+   "constr_violation": 0.0,
+   "barrier_parameter": 4.095582731741198e-10,
+   "tr_radius": 6.965003391622734,
+   "multipliers": [
+    -207.45765703752485,
+    -2.0421652036428256e-09,
+    -5.029080908281235e-09,
+    -7.042159496581907e-09,
+    -1.912868782664231,
+    -7.038315240496769e-09
+   ],
+   "optimality_frame": "preconditioned",
+   "optimality_physical": 1.6019234357462122e-06,
+   "constraint_values": [
+    1.952320249909434e-12,
+    0.13253440356741275,
+    0.14783551340998446,
+    0.10100957132565387,
+    6.488520831737787e-11,
+    0.09777857606011509
+   ],
+   "constraint_lower_bounds": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "constraint_upper_bounds": [
+    Infinity,
+    Infinity,
+    Infinity,
+    Infinity,
+    Infinity,
+    Infinity
+   ],
+   "constraint_labels": [
+    "lambda4_nu >= 0 (CS large-b leading)",
+    "lambda2_nu >= 0 (CS small-b turn-on)",
+    "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=0 (TMD small-b turn-on)",
+    "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=0 (TMD large-b)",
+    "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=2.5 (TMD small-b turn-on)",
+    "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=2.5 (TMD large-b)"
+   ],
+   "warm_start_legs": [
+    "warm"
+   ],
+   "warm_start_releasing": [],
+   "warm_start_barrier": 4.095582731741198e-10
+  }
+ },
+ "new": {
+  "nll_main": 376.472642734532,
+  "nll_sat": 336.9190862563705,
+  "q_stored": 79.10711295632291,
+  "q_recomputed": 79.10711295632291,
+  "status": {
+   "success": true,
+   "status": 1,
+   "nit": 167,
+   "nfev": 126,
+   "message": "`gtol` termination condition is satisfied.",
+   "optimality": 1.5591529924779968e-09,
+   "constr_violation": 0.0,
+   "barrier_parameter": 1.0240000000000006e-08,
+   "tr_radius": 32.353705896686364,
+   "multipliers": [
+    -207.457652723554,
+    -7.843765836755557e-08,
+    -7.166912498882068e-08,
+    -1.068669550803902e-07,
+    -1.912869088126495,
+    -1.1022553412656095e-07
+   ],
+   "optimality_frame": "preconditioned",
+   "optimality_physical": 1.0683456888032718e-06,
+   "constraint_values": [
+    2.4444012786117852e-11,
+    0.13253440297951768,
+    0.14783552053275328,
+    0.10100958627471919,
+    9.800263101045203e-09,
+    0.09777859054216881
+   ],
+   "constraint_lower_bounds": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "constraint_upper_bounds": [
+    Infinity,
+    Infinity,
+    Infinity,
+    Infinity,
+    Infinity,
+    Infinity
+   ],
+   "constraint_labels": [
+    "lambda4_nu >= 0 (CS large-b leading)",
+    "lambda2_nu >= 0 (CS small-b turn-on)",
+    "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=0 (TMD small-b turn-on)",
+    "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=0 (TMD large-b)",
+    "lambda2 + delta_lambda2*Y^2 >= 0 at |Y|=2.5 (TMD small-b turn-on)",
+    "3*lambda_inf^2*lambda4 + L2^3 >= 0 at |Y|=2.5 (TMD large-b)"
+   ]
+  }
+ },
+ "dq_new_minus_ref": -4.629998784366762e-08,
+ "max_abs_dx": 1.4245537638402084e-08,
+ "largest_dx_over_sigma_sat": [
+  [
+   "saturated_ch0_ptll0",
+   1.8210172259003343e-09,
+   3.317339928684692e-08
+  ],
+  [
+   "saturated_ch0_ptll1",
+   1.4115650870394347e-09,
+   2.759681465306647e-08
+  ],
+  [
+   "delta_lambda2",
+   8.360349079694629e-10,
+   2.1692091997917013e-08
+  ],
+  [
+   "lambda4",
+   9.654702481931565e-09,
+   2.1283528057474533e-08
+  ],
+  [
+   "saturated_ch0_ptll2",
+   9.86412396208891e-10,
+   2.0953879787898624e-08
+  ],
+  [
+   "lambda2",
+   1.4245537638402084e-08,
+   1.8269128823495097e-08
+  ],
+  [
+   "saturated_ch0_ptll3",
+   5.974654104790034e-10,
+   1.4083862363932973e-08
+  ],
+  [
+   "pixel_multiplicity_syst_var48",
+   -4.484765114831646e-09,
+   -1.0051564757981066e-08
+  ],
+  [
+   "lambda2_nu",
+   -5.878950659621296e-09,
+   -8.642903175694523e-09
+  ],
+  [
+   "saturated_ch0_ptll4",
+   2.878085547664e-10,
+   7.741565555608622e-09
+  ],
+  [
+   "pdfEig7",
+   6.4378687936184065e-09,
+   6.431608242167483e-09
+  ],
+  [
+   "saturated_ch0_ptll11",
+   -1.7181989164782863e-10,
+   -6.311048939432401e-09
+  ]
+ ],
+ "alphaS_dx_over_sigma_sat (blinded difference only)": -1.6559250502824338e-09
+}

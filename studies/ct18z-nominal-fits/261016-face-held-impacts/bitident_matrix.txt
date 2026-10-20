@@ -1,0 +1,15 @@
+base 2d9f380  new 8b3f180
+chisq            leaves    0  impact hists  6  non-identical: 1
+    chisq gaussian_global_impacts          max rel diff new-vs-main 0.0e+00   main-vs-main 0.0e+00
+    chisq gaussian_global_impacts_grouped  max rel diff new-vs-main 0.0e+00   main-vs-main 0.0e+00
+    chisq global_impacts                   max rel diff new-vs-main 0.0e+00   main-vs-main 0.0e+00
+    chisq global_impacts_grouped           max rel diff new-vs-main 0.0e+00   main-vs-main 0.0e+00
+    chisq impacts                          max rel diff new-vs-main 0.0e+00   main-vs-main 0.0e+00
+    chisq impacts_grouped                  max rel diff new-vs-main 0.0e+00   main-vs-main 0.0e+00
+    chisq cov                              max rel diff new-vs-main 0.0e+00   main-vs-main 0.0e+00
+full             leaves   26  impact hists  6  non-identical: none
+inactive         leaves   45  impact hists  6  non-identical: none
+inactive_nobbb   leaves   45  impact hists  6  non-identical: none
+lite             leaves   26  impact hists  6  non-identical: none
+nobbb            leaves   26  impact hists  6  non-identical: none
+sparse           leaves   26  impact hists  6  non-identical: none

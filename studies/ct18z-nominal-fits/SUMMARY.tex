@@ -1,0 +1,464 @@
+% title: CT18Z nominal fits at reco and gen level, with and without the lattice, cold trust-constr
+% slug: ct18z-nominal-fits
+% status: done
+% period: 2026-10-15 – 2026-10-20
+% updated: 2026-10-20
+% covers: 2026-10-20
+%
+% BUILD: scripts/summary_pdf.py ct18z-nominal-fits  (on the host; pdflatex is not in the container)
+\documentclass[10pt,a4paper]{article}
+
+% ---- page and fonts ----
+\usepackage[a4paper,top=16mm,bottom=20mm,left=18mm,right=18mm,footskip=9mm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage[table]{xcolor}
+\usepackage[font=small,labelfont={bf,sf},margin=6pt,skip=4pt]{caption}
+\usepackage{subcaption}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage[section,below]{placeins}   % a result's figure stays inside its section
+\usepackage{tikz}                      % for a schematic / pipeline figure (Section 2)
+\usetikzlibrary{arrows.meta,positioning}
+\usepackage{url}
+% siunitx is not installed on the submit host's TeX Live; these fallbacks cover the usual
+% \num{0.547}, \SI{2.3}{\GeV}, \SI{0.14}{\percent} (no e-notation: write 1.2\times10^{-3}).
+\IfFileExists{siunitx.sty}{\usepackage{siunitx}}{}
+\providecommand\num[1]{\ensuremath{#1}}
+\providecommand\si[1]{\ensuremath{\mathrm{#1}}}
+\providecommand\SI[2]{\ensuremath{#1\,\mathrm{#2}}}
+\providecommand\GeV{GeV}\providecommand\MeV{MeV}\providecommand\TeV{TeV}
+\providecommand\percent{\%}\providecommand\pb{pb}\providecommand\fb{fb}
+\definecolor{sumblue}{HTML}{1B5FAE}
+\definecolor{sumrule}{HTML}{2A78D6}
+\definecolor{sumbox}{HTML}{EEF4FB}
+\definecolor{sumgray}{HTML}{5A5A5A}
+\definecolor{sumwarn}{HTML}{8A5A00}
+\usepackage[colorlinks=true,linkcolor=sumblue,urlcolor=sumblue,citecolor=sumblue,
+            pdfborder={0 0 0}]{hyperref}
+
+% unicode copied from a logbook would otherwise stop pdflatex
+\DeclareUnicodeCharacter{03B1}{\ensuremath{\alpha}}
+\DeclareUnicodeCharacter{03B2}{\ensuremath{\beta}}
+\DeclareUnicodeCharacter{03B3}{\ensuremath{\gamma}}
+\DeclareUnicodeCharacter{03B4}{\ensuremath{\delta}}
+\DeclareUnicodeCharacter{03B5}{\ensuremath{\epsilon}}
+\DeclareUnicodeCharacter{03B7}{\ensuremath{\eta}}
+\DeclareUnicodeCharacter{03B8}{\ensuremath{\theta}}
+\DeclareUnicodeCharacter{03BA}{\ensuremath{\kappa}}
+\DeclareUnicodeCharacter{03BB}{\ensuremath{\lambda}}
+\DeclareUnicodeCharacter{03BC}{\ensuremath{\mu}}
+\DeclareUnicodeCharacter{03BD}{\ensuremath{\nu}}
+\DeclareUnicodeCharacter{03C0}{\ensuremath{\pi}}
+\DeclareUnicodeCharacter{03C1}{\ensuremath{\rho}}
+\DeclareUnicodeCharacter{03C3}{\ensuremath{\sigma}}
+\DeclareUnicodeCharacter{03C4}{\ensuremath{\tau}}
+\DeclareUnicodeCharacter{03C6}{\ensuremath{\phi}}
+\DeclareUnicodeCharacter{03C7}{\ensuremath{\chi}}
+\DeclareUnicodeCharacter{03C8}{\ensuremath{\psi}}
+\DeclareUnicodeCharacter{03C9}{\ensuremath{\omega}}
+\DeclareUnicodeCharacter{0393}{\ensuremath{\Gamma}}
+\DeclareUnicodeCharacter{0394}{\ensuremath{\Delta}}
+\DeclareUnicodeCharacter{039B}{\ensuremath{\Lambda}}
+\DeclareUnicodeCharacter{03A3}{\ensuremath{\Sigma}}
+\DeclareUnicodeCharacter{03A6}{\ensuremath{\Phi}}
+\DeclareUnicodeCharacter{03A9}{\ensuremath{\Omega}}
+\DeclareUnicodeCharacter{2212}{\ensuremath{-}}
+\DeclareUnicodeCharacter{2248}{\ensuremath{\approx}}
+\DeclareUnicodeCharacter{2264}{\ensuremath{\leq}}
+\DeclareUnicodeCharacter{2265}{\ensuremath{\geq}}
+\DeclareUnicodeCharacter{2260}{\ensuremath{\neq}}
+\DeclareUnicodeCharacter{226A}{\ensuremath{\ll}}
+\DeclareUnicodeCharacter{226B}{\ensuremath{\gg}}
+\DeclareUnicodeCharacter{223C}{\ensuremath{\sim}}
+\DeclareUnicodeCharacter{221D}{\ensuremath{\propto}}
+\DeclareUnicodeCharacter{221E}{\ensuremath{\infty}}
+\DeclareUnicodeCharacter{221A}{\ensuremath{\surd}}
+\DeclareUnicodeCharacter{2202}{\ensuremath{\partial}}
+\DeclareUnicodeCharacter{2192}{\ensuremath{\rightarrow}}
+\DeclareUnicodeCharacter{2190}{\ensuremath{\leftarrow}}
+\DeclareUnicodeCharacter{21D2}{\ensuremath{\Rightarrow}}
+\DeclareUnicodeCharacter{2194}{\ensuremath{\leftrightarrow}}
+\DeclareUnicodeCharacter{2208}{\ensuremath{\in}}
+\DeclareUnicodeCharacter{2026}{\ldots}
+\DeclareUnicodeCharacter{2713}{\ensuremath{\checkmark}}
+\DeclareUnicodeCharacter{2080}{\ensuremath{_0}}
+\DeclareUnicodeCharacter{2081}{\ensuremath{_1}}
+\DeclareUnicodeCharacter{2082}{\ensuremath{_2}}
+\DeclareUnicodeCharacter{2083}{\ensuremath{_3}}
+\DeclareUnicodeCharacter{2084}{\ensuremath{_4}}
+\DeclareUnicodeCharacter{2085}{\ensuremath{_5}}
+\DeclareUnicodeCharacter{2086}{\ensuremath{_6}}
+\DeclareUnicodeCharacter{2087}{\ensuremath{_7}}
+\DeclareUnicodeCharacter{2088}{\ensuremath{_8}}
+\DeclareUnicodeCharacter{2089}{\ensuremath{_9}}
+\DeclareUnicodeCharacter{2070}{\ensuremath{^{0}}}
+\DeclareUnicodeCharacter{2074}{\ensuremath{^{4}}}
+\DeclareUnicodeCharacter{2075}{\ensuremath{^{5}}}
+\DeclareUnicodeCharacter{2076}{\ensuremath{^{6}}}
+\DeclareUnicodeCharacter{2077}{\ensuremath{^{7}}}
+\DeclareUnicodeCharacter{2078}{\ensuremath{^{8}}}
+\DeclareUnicodeCharacter{2079}{\ensuremath{^{9}}}
+\DeclareUnicodeCharacter{207B}{\ensuremath{^{-}}}
+\DeclareUnicodeCharacter{207A}{\ensuremath{^{+}}}
+
+% ---- layout ----
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.55ex plus 0.2ex}
+\setlist{itemsep=1pt,topsep=2pt,parsep=0pt,leftmargin=1.4em}
+\titleformat{\section}{\sffamily\large\bfseries}{\thesection}{0.6em}{}
+\titleformat{\subsection}{\sffamily\normalsize\bfseries}{\thesubsection}{0.6em}{}
+\titlespacing*{\section}{0pt}{2.0ex plus 0.6ex minus 0.3ex}{0.7ex}
+\titlespacing*{\subsection}{0pt}{1.4ex plus 0.4ex minus 0.2ex}{0.4ex}
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.8}
+\renewcommand{\textfraction}{0.07}
+\renewcommand{\floatpagefraction}{0.75}
+\setlength{\textfloatsep}{10pt plus 3pt minus 3pt}
+\setlength{\floatsep}{8pt plus 2pt minus 2pt}
+\setlength{\intextsep}{8pt plus 2pt minus 2pt}
+
+% ---- metadata: passed in by scripts/summary_pdf.py from the "% key:" lines ----
+\makeatletter
+\providecommand\SumTitle{\textcolor{red}{(build with scripts/summary\_pdf.py)}}
+\providecommand\SumSlug{?}
+\providecommand\SumStudy{?}       % the study slug (the parent study, for a task summary)
+\providecommand\SumViewPath{?}    % <slug> or <study>/<task>: the viewer anchor
+\providecommand\SumStatus{?}
+\providecommand\SumPeriod{?}
+\providecommand\SumUpdated{?}
+\providecommand\SumCovers{?}
+\begingroup\catcode`\#=12 \catcode`\~=12
+\gdef\Sum@web{https://submit.mit.edu/~lavezzo/alphaS/studies/#}
+\endgroup
+
+% ---- macros for the body ----
+% \taskref{261008-task}: cite the task a number comes from; links to its viewer page.
+\newcommand\taskref[1]{{\small\sffamily[\href{\Sum@web\SumStudy/#1}{#1}]}}
+% \logref{2026-07-02}: cite a dated entry of a single-layer study (no task dirs).
+\newcommand\logref[1]{{\small\sffamily[\href{\Sum@web\SumViewPath:logbook}{log #1}]}}
+% \viewerlink{<study>/<task>}{text}: any other page of the viewer.
+\newcommand\viewerlink[2]{\href{\Sum@web#1}{#2}}
+\newcommand\logbooklink[1]{\href{\Sum@web\SumViewPath:logbook}{#1}}
+% \code{path/or_flag}: typewriter, breaks at / and _, underscores need no escaping.
+\newcommand\code{\nolinkurl}
+% \caveat{...}: a comparability caveat set off before the number it qualifies.
+\newcommand\caveat[1]{{\color{sumwarn}\small\sffamily\textbf{Caveat.}}~{\small\itshape #1}}
+% physics shorthands
+\newcommand\alphas{\ensuremath{\alpha_\mathrm{s}}}
+\newcommand\dalphas{\ensuremath{\Delta\alpha_\mathrm{s}}}
+\newcommand\pT{\ensuremath{p_\mathrm{T}}}
+\newcommand\ptll{\ensuremath{p_\mathrm{T}^{\ell\ell}}}
+\newcommand\qT{\ensuremath{q_\mathrm{T}}}
+\newcommand\yll{\ensuremath{y^{\ell\ell}}}
+
+% the answer box: \begin{answer} ... \end{answer}, one or two sentences with the key number
+\newsavebox\Sum@box
+\newenvironment{answer}
+  {\par\vspace{1.2ex}\noindent\begin{lrbox}{\Sum@box}%
+   \begin{minipage}{\dimexpr\linewidth-3pt-2\fboxsep\relax}\vspace{1pt}%
+   {\sffamily\small\bfseries\color{sumblue}Answer}\par\vspace{1pt}}
+  {\vspace{1pt}\end{minipage}\end{lrbox}%
+   \hbox{{\color{sumrule}\vrule width 3pt}\colorbox{sumbox}{\usebox{\Sum@box}}}%
+   \par\vspace{0.8ex}}
+
+\newcommand\SummaryTitleBlock{%
+  {\sffamily\footnotesize\color{sumgray}%
+   \alphas\ analysis\,\textperiodcentered\,study summary\hfill status: \SumStatus\par}%
+  \vspace{3pt}%
+  {\sffamily\LARGE\bfseries\SumTitle\par}%
+  \vspace{5pt}%
+  {\small\color{sumgray}%
+   \texttt{\SumViewPath}\enspace\textperiodcentered\enspace period \SumPeriod
+   \enspace\textperiodcentered\enspace written \SumUpdated
+   \enspace\textperiodcentered\enspace covers logbook through \textbf{\SumCovers}\par
+   Full record: \logbooklink{logbook}
+   \enspace\textperiodcentered\enspace web page: \href{\Sum@web\SumViewPath}{\nolinkurl{submit.mit.edu/~lavezzo/alphaS/studies}}%
+   \enspace\textperiodcentered\enspace plots in each task directory\par}%
+  \vspace{4pt}{\color{sumgray}\hrule height 0.4pt}\vspace{2pt}}
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[L]{\sffamily\scriptsize\color{sumgray}\alphas\ study summary\enspace\textperiodcentered\enspace\texttt{\SumViewPath}\enspace\textperiodcentered\enspace covers logbook through \SumCovers}
+\fancyfoot[R]{\sffamily\scriptsize\color{sumgray}\thepage}
+\makeatother
+
+\hypersetup{pdftitle={\SumTitle}}
+
+\begin{document}
+\thispagestyle{fancy}
+\SummaryTitleBlock
+\begin{answer}
+Four cold trust-constr fits to real CT18Z data with the physical NP region as hard constraints (reco $\ptll\times\yll$
+and unfolded gen-level $\sigma_\text{UL}$, each without and with the ASWZ lattice CS-kernel $\chi^2$) all converge, and each
+level lands on the same NP faces. The lattice costs $2\Delta\mathrm{NLL}=13.5$ (reco) / 11.0 (gen) for two CS
+parameters, moves the NP damping from the CS kernel to the TMD factor, shifts $\alphas$ by $+0.21\,\sigma$ / $+0.35\,\sigma$
+and widens $\sigma(\alphas)$ by $+5\,\%$ / $+1\,\%$ (to $1.14$ / $1.18\times10^{-3}$); gen$-$reco is $-0.61\,\sigma$ (Z only) and $-0.42\,\sigma$
+(with lattice). Caveats: $\alphas$ blinded (differences only); the full fits are acceptable but the \ptll\ (\ptll\
+projection p = 0.02--0.25\,\%) and gen $p_\mathrm{T}^V$ shapes are not, a characterised mis-modelling left without a remedy;
+the lattice fits sit on a weakly binding face, so their $\alphas$ interval needs a likelihood scan.
+\end{answer}
+
+% ============================================================================================
+\section{Motivation and question}
+
+The study went back to the nominal physics fits: CT18Z at the nominal order, without (``NOLAT'') and with
+(``LAT'') the lattice information on the Collins--Soper (CS) kernel, now \emph{cold} (no warm start) and with the
+physical NP region as hard constraints instead of a penalty wall. The questions (2026-10-15) were: (1) does the minimisation work cold; (2) what does the lattice do to the fit and the NP parameters;
+(3) is the fit good. On 2026-10-17 three were added: (4) are these the same minima as the older trust-krylov + wall fits
+on which earlier conclusions rest; (5) the same pair at gen level on the unfolded data, the gen-level half of the same four-way comparison
+\taskref{261017-gen-cold-fits}; (6) why the \ptll\
+projection of the GoF is poor.
+
+% ============================================================================================
+\section{Setup and method}
+
+\textbf{Reco fits.} Real data, card \code{260916_Z_2D_card_adcorr/ZMassDilepton_ptll_yll_adexclpdf} (2D
+$\ptll\times\yll$, 780 bins, Poisson, BB-lite), the N$^3$LL+NNLO SCETlib AD cache \code{pdf62_y35_260921_y25} (the
+770-bin $|Y|\le2.5$ subset of \code{merged_full_bin0xzero}), \code{SCETlibADParamModel}; 3720 parameters
+\taskref{261015-cold-tc-fits}. \textbf{Gen fits.} The $\sigma_\text{UL}$ of the iteration-0 real-data unfolding (20
+$p_\mathrm{T}^V\times10$ $|Y^V|$ = 200 bins), covariance $\chi^2$, 6 card nuisances; the same cache folded onto the gen bins
+(\code{gen_level=1}), same model defaults, constraints and lattice settings \taskref{261017-gen-cold-fits}. Unfolding-level systematics enter the
+gen fits only through the data covariance.
+
+\textbf{Common to all four.} No NP $\lambda$ carries a prior (the CS $\lambda_{2\nu},\lambda_{4\nu}$ were made prior-free for this
+study), so LAT$-$NOLAT is exactly the lattice term (\code{LatticeCSTerm}, ASWZ points, frozen perturbative kernel,
+$\tau=8$). \code{NPDomainConstraints} (margin 0) imposes six hard rows: $\lambda_{2\nu}\ge0$, $\lambda_{4\nu}\ge0$, the TMD
+small-$b$ turn-on $L_2(Y)=\lambda_2+\delta\lambda_2Y^2\ge0$ and the TMD large-$b$ ``cubic'' $3\lambda_\infty^2\lambda_4+L_2^3\ge0$,
+each at $|Y|=0$ and 2.5. Minimiser: scipy \code{trust-constr}, cold from the anchor, unpreconditioned (preconditioning
+a cold start was found to hurt). Reco via \code{workflows/fitterAD.sh} with \code{--constraints} (and \code{--lattice}); gen through task
+scripts with the same flags, since \code{fitterAD.sh} cannot run a gen card. All four fits use the same real-data
+blinding frame (at gen forced with \code{--blindingFrame} \code{data}), so stored $\alphas$ differences across levels are physical.
+The post-fit pass computes the face-held Hessian, traditional and global impacts, and the full and projected saturated
+tests (\ptll\ at reco; $p_\mathrm{T}^V$ and $|Y^V|$ at gen).
+
+% ============================================================================================
+\section{Results}
+
+\subsection{The four fits: same faces per configuration, a consistent lattice effect, gen below reco}
+
+\caveat{Real data, $\alphas$ blinded: differences only, in units of the reference fit's $\sigma$ or in $10^{-3}$.
+$\sigma(\alphas)$ is in $\alphas$ units $\times10^{-3}$ (twice rabbit's \code{alphaS} nuisance units), traditional total
+with active faces held. Reco and gen are different likelihoods on the same events, not nested; NLLs compare only within a
+level. Gen ``Data stat.'' is the whole unfolded-data
+covariance (statistics, experimental, luminosity, response theory) and is not comparable to reco ``Data stat.''. LAT's
+NLL and full saturated $q$ include the lattice $\chi^2$; ndof counts bins only.}
+
+\begin{table}[htb]
+  \centering\small
+  \caption{The four nominal fits. Physical NP $\lambda$; ``face'' = parameter on a hard constraint, with its release
+  $\Delta$NLL (the NLL gain if the constraint were removed). Impacts are traditional grouped, face held, in $10^{-3}$.
+  $^*$Gen ``Data stat.'' = full unfolded covariance. \taskref{261015-cold-tc-fits} \taskref{261017-gen-cold-fits}}
+  \label{tab:fits}
+  \footnotesize\setlength{\tabcolsep}{3pt}
+  \begin{tabular}{lllll}
+    \toprule
+     & reco NOLAT & reco LAT & gen NOLAT & gen LAT \\
+    \midrule
+    cold fit: iter., time & 62, 7.4\,h & 113, 4.8\,h & 57, 5.5\,h & 46, 1.6\,h \\
+    lattice cost $2\Delta$NLL & & 13.51 & & 10.99 \\
+    faces (release $\Delta$NLL) & $\lambda_{2\nu}{\ge}0$ (15.6); cubic$_{2.5}$ & $L_2(2.5)$ (0.46) & $\lambda_{2\nu}{\ge}0$ (14.1); cubic$_{2.5}$ (4.9) & $L_2(2.5)$ (0.34) \\
+    full saturated $q$/ndf, $p$ & 739.4/774, 81\,\% & 753.0/774, 70\,\% & 226.4/194, 5.6\,\% & 237.4/194, 1.8\,\% \\
+    proj.\ \ptll\ / $p_\mathrm{T}^V$ & 68.4/39, 0.25\,\% & 79.1/39, 0.02\,\% & 52.5/20, $10^{-4}$ & 60.3/20, $6\times10^{-6}$ \\
+    proj.\ $|Y^V|$ & & & 16.6/10, 8.3\,\% & 16.4/10, 9.0\,\% \\
+    $\sigma(\alphas)$ [$10^{-3}$] & 1.09 & 1.14 & 1.17 & 1.18 \\
+    $\dalphas$ LAT$-$NOLAT [$\sigma_\text{NOLAT}$] & & $+0.21$ & & $+0.35$ \\
+    $\dalphas$ gen$-$reco [$\sigma_\text{reco}$] & & & $-0.61$ & $-0.42$ \\
+    CS $\lambda_{2\nu}$ / $\lambda_{4\nu}$ & 0 (face) / 0.045 & 0.040 / 0.011 & 0 (face) / 0.031 & 0.079 / 0.005 \\
+    TMD $\lambda_2$ / $\lambda_4$ / $\delta\lambda_2$ & 0.115 / 0.000 / $-0.009$ & 0.046 / 0.072 / $-0.007$ & 0.171 / $-0.001$ / $-0.007$ & 0.018 / 0.042 / $-0.003$ \\
+    impacts: NP (lead.\ sub-group) & 0.86 ($\gamma_\nu$ 0.83) & 0.93 ($F_\text{eff}$ 0.83) & 0.89 ($\gamma_\nu$ 0.85) & 0.91 ($F_\text{eff}$ 0.81) \\
+    impacts: stat.\ / PDF / TNP & 0.79 / 0.71 / 0.65 & 0.86 / 0.79 / 0.77 & 1.05$^*$ / 0.77 / 0.69 & 1.09$^*$ / 0.79 / 0.77 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=0.37\linewidth]{summary_figs/four_fits_alphas.pdf}
+  \caption{Blinded $\alphas$ of the four fits relative to reco NOLAT, in $10^{-3}$, all in the same real-data blinding
+  frame; the error bar is each fit's own face-held $\sigma(\alphas)$, \emph{not} the uncertainty of the difference (the
+  fits share the events and are strongly correlated). Reco and gen are different likelihoods (card, histmaker,
+  systematics treatment). Made from \code{compare.json} by \code{summary_figs/plot_four_fits.py}. \taskref{261017-gen-cold-fits}}
+  \label{fig:alphas}
+\end{figure}
+
+\textbf{Convergence.} All four main fits reach trust-constr status 1 from the cold anchor (optimality $\le7\times10^{-9}$,
+no violation) in 1.6--7.4\,h
+\taskref{261015-cold-tc-fits} \taskref{261017-gen-cold-fits}. \textbf{Faces.} The configuration, not the level, decides the faces: without the
+lattice the Z data put the CS small-$b$ coefficient on its bound ($\lambda_{2\nu}=0$, strongly binding) and the TMD
+large-$b$ damping on its cubic face at $|Y|=2.5$; with the lattice the CS kernel moves onto the lattice side and only the
+TMD small-$b$ face at $|Y|=2.5$ is active, weakly binding. \textbf{Lattice.} The lattice costs 13.5 (reco, $\approx3.2\sigma$
+for 2 dof) and 11.0 (gen, $\approx2.9\sigma$), moves $\alphas$ up at both levels ($+0.21$ / $+0.35\,\sigma$) and makes
+the NP sector's residual freedom move from the CS kernel ($\gamma_\nu$ group) to the TMD factor ($F_\text{eff}$ group); the NP
+group stays the largest single source of $\sigma(\alphas)$ at reco. \textbf{Gen vs reco.} Gen lies below reco by
+$0.66$ / $0.48\times10^{-3}$ ($-0.61$ / $-0.42\,\sigma_\text{reco}$, Fig.~\ref{fig:alphas}); the LAT value equals the earlier
+gen--reco difference measured with unit TMD priors (z-data-unfolding study), so it does not come from those priors.
+$\sigma(\alphas)$ is 3--8\,\% larger at gen. The gen fits want more CS damping at small $b$ ($\lambda_{2\nu}$ 0.079 vs 0.040 in
+LAT) and less TMD $\lambda_2$ \taskref{261017-gen-cold-fits}.
+
+\textbf{Physics read.} The nominal fits no longer depend on a warm-start history. With the NP $\lambda$ prior-free, the lattice is the only NP information and is
+in $\approx3\sigma$ tension with the Z data at both levels; the cost of including it is $+5\,\%$ (reco) / $+1\,\%$ (gen) in $\sigma(\alphas)$
+and a shift of about a quarter to a third of $\sigma$.
+
+\subsection{The NP functions: the lattice moves damping from the CS kernel to the TMD factor}
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=0.64\linewidth]{261015-cold-tc-fits/np_functions_NOLAT_vs_LAT/np_functions.pdf}\\[2pt]
+  \includegraphics[width=0.64\linewidth]{261017-gen-cold-fits/np_gen_vs_reco_LAT/np_functions.pdf}
+  \caption{Post-fit NP functions with 68\,\% bands from Gaussian toys of each fit's face-held covariance; dashed:
+  prefit anchor. Left: CS rapidity anomalous dimension $\tilde\gamma_\nu^\text{NP}(b_T)$; right: TMD factor
+  $F_\text{eff}(b_T,y)$ at $y=0$ and 2.5. Top: reco NOLAT vs reco LAT; bottom: gen LAT vs reco LAT. The grey/black
+  ``lattice fit'' curve is the plotter's built-in reference (arXiv:2506.13874), \emph{not} the ASWZ $\chi^2$ used in LAT; NOLAT's $|Y|=2.5$ band runs away because toys around a point on the curved cubic face
+  cross it: it is not a physical band. Bands pinch where a parameter sits on a face. \taskref{261015-cold-tc-fits} \taskref{261017-gen-cold-fits}}
+  \label{fig:np}
+\end{figure}
+
+Without the lattice the CS kernel turns on late ($\lambda_{2\nu}=0$) and saturates early, while the TMD factor is weakly
+damped at large $b_T$; with the lattice the CS kernel follows the lattice and the TMD factor damps much more strongly
+(Fig.~\ref{fig:np}, top). The lattice thus decides which NP group dominates $\sigma(\alphas)$. Gen and reco LAT agree within the bands
+(bottom); the gen CS kernel is slightly steeper at small $b_T$ and its TMD factor correspondingly less damped.
+
+\subsection{\texorpdfstring{The \ptll\ misfit: a characterised mis-modelling, not adopted as a systematic}{The ptll misfit: a characterised mis-modelling}}
+
+\caveat{All tests below are rabbit fits on the reco LAT configuration (NOLAT where stated), warm from LAT's minimum,
+$\alphas$ shifts in units of LAT's post-fit $\sigma(\alphas)$. A first, surrogate-based pass of this task (quadratic
+model of the saturated sub-fit, not rabbit) read the misfit as a low-order shape; that reading was wrong and is
+superseded by the exact decomposition below \taskref{261017-ptll-gof-forensics}.}
+
+\begin{figure}[htb]
+  \centering
+  \begin{subfigure}[t]{0.29\linewidth}\centering
+    \includegraphics[width=\linewidth]{261015-cold-tc-fits/LAT/ptll/postfit_ptll_ch0_Project_ch0_ptll_preliminary.pdf}
+    \caption{reco LAT post-fit \ptll}\end{subfigure}\hspace{0.03\linewidth}
+  \begin{subfigure}[t]{0.35\linewidth}\centering
+    \includegraphics[width=\linewidth]{261017-ptll-gof-forensics/p3/leading_mode_and_smooth_fit.pdf}
+    \caption{the residual wave (LAT top, NOLAT bottom)}\end{subfigure}
+  \caption{(a) Post-fit \ptll\ projection of the reco LAT fit; the label's ``$p=0\,\%$'' is 0.02\,\% rounded. (b) Post-fit
+  residual (data$-$postfit)/postfit in \% with errors from the exact profiled residual covariance $R$; red: its component
+  along the leading eigenmode of $R$ (a covariance-built shape, only its amplitude is from data); blue: best smooth
+  7- and 10-parameter Legendre shapes. LAT's $R$ is approximate (it misses the lattice term); NOLAT's is validated to
+  1\,\%. \taskref{261015-cold-tc-fits} \taskref{261017-ptll-gof-forensics}}
+  \label{fig:ptll}
+\end{figure}
+
+The \ptll\ projection fails in every physical-NP fit since April 2026, across models, PDFs and cards; in these fits
+$q=79.1/39$ (LAT) and 68.4/39 (NOLAT), and the gen $p_\mathrm{T}^V$ projection fails as well (Table~\ref{tab:fits}), which points to the
+model side (the unfolded spectrum inherits the reco response, so a detector cause is not excluded; no detector template
+was tested). The residuals are statistically ordinary bin by bin (data-only
+$\sum z^2=41.5/39$ LAT, 39.7/39 NOLAT) and the misfit is common to all rapidities: splitting \ptll\ into 6 \yll\ bands adds
+$\chi^2=210.6/195$ (LAT, $p$ 21\,\%) and 189.1/195 (NOLAT) \taskref{261017-ptll-gof-forensics}. It has two parts.
+
+\textbf{(i) A smooth wave.} With the exact post-fit covariance the misfit is a $y$-independent $\pm0.2$--$0.3\,\%$ wave
+between 3 and 22\,GeV ($-0.2\,\%$ at 5--6, $+0.3\,\%$ at 9--12, $-0.2\,\%$ at 16--20\,GeV; Fig.~\ref{fig:ptll}b), with
+$<2\,\%$ of $\chi^2$ in flat to cubic components; one covariance mode with six sign changes carries 19--25 units, and after
+10 smooth parameters the remainder is 35/29 (NOLAT, $p$ 20\,\%). The nested coarse-rebin saturated fits confirm it, and
+put LAT's $\approx10$ extra units over NOLAT in this finer structure (remainder after 10 coarse bins 45.5/29 LAT, 34.7/29
+NOLAT).
+
+\textbf{(ii) A normalisation--shape tension.} The coarse saturated fits release mainly one overall normalisation
+($\approx22$ units, equal coarse scales $\approx0.89$). Freeing the normalisation directly (luminosity unconstrained) is the
+most informative test (Table~\ref{tab:ptlltests}): the data prefer $-12.3\pm3.0\,\%$, $2\Delta\mathrm{NLL}=16.1$ on 1 dof
+($4.0\sigma$, asymptotic; Wilks is not guaranteed along this nonlinear $\alphas$--$\lambda_4$--normalisation valley), and $\alphas$ moves by $+4.2\,\sigma$ with $\sigma(\alphas)$ $\times1.53$ ($\lambda_4$ 0.072$\to$0.181). The
+\ptll\ shape thus prefers an $\alphas$/NP point whose larger cross-section the luminosity (1.2\,\%), EW and FSR constraints
+forbid; the nominal sits at a compromise held by those priors. An earlier, template-NP version of this test found
+$6.1\sigma$. At gen level the post-fit $p_\mathrm{T}^V$ spectrum sits 3--4\,\% low, a coherent offset the correlated
+unfolded covariance allows (linear $\chi^2$ $p$ 21\,\%) \taskref{261017-gen-cold-fits}. Even with the normalisation free the \ptll\ projection stays poor (62.96/38, $p$ 0.66\,\%): that is the wave.
+
+\begin{table}[htb]
+  \centering\small
+  \caption{Decisive \ptll\ tests on reco LAT (reference: full 752.95/774, \ptll\ 79.11/39). ``Theory'' = A0 scale, FO
+  envelope, $b/c$ masses, EW, FSR, luminosity priors. With the normalisation free the \ptll\ ndf is 38 (rabbit prints 39).
+  \taskref{261017-ptll-gof-forensics}}
+  \label{tab:ptlltests}
+  \begin{tabular}{lcccc}
+    \toprule
+    test & $\Delta q_\text{full}$ & \ptll\ $q$/ndf, $p$ & $\dalphas$ [$\sigma_\text{LAT}$] & $\sigma(\alphas)$ ratio \\
+    \midrule
+    A0 scale prior $\times2$ & $-12.7$ & 67.54/39, 0.31\,\% & $-0.44$ & 1.00 \\
+    all theory priors $\times2$ & $-22.5$ & 58.58/39, 2.3\,\% & $-0.01$ & 1.26 \\
+    free normalisation & $-16.1$ & 62.96/38, 0.66\,\% & $+4.2$ & 1.53 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Inflating the theory priors absorbs only part of the wave, and the pulls run with the prior: at doubled width the A0
+15--20\,GeV scale and the FO-envelope nuisances still sit at $-1.9$ and $-2.1\sigma$ of the \emph{new} width ($-3.8$,
+$-4.1\sigma$ in original units): a missing shape, not a too-narrow envelope;
+$\alphas$ does not move ($-0.01\,\sigma$).
+
+\textbf{Physics read and decision.} $\alphas$ is insensitive to the wave but depends, at the $4\sigma$ level, on the
+absolute normalisation constraint. On 2026-10-20 Luca decided not to adopt any remedy (no normalisation-free systematic,
+no shape nuisance): the \ptll\ misfit is reported as a known, characterised mis-modelling of the model's $q_T$ shape.
+Untested: A0 modelling, $b/c$ masses in the resummation, QED, resummation order.
+
+\subsection{The new fits are the same minima as the old trust-krylov + wall fits}
+
+The earlier conclusions rest on warm trust-krylov fits with a penalty wall and unit priors on NP coordinates.
+Evaluating the new objectives at the old points,
+one Newton step from the old minima with the priors removed, and warm rabbit refits from the old points all land on the
+new minima: the old points lie only 0.0023 above them, Newton predicts them to $\le8\times10^{-3}\,\sigma$, the refits
+reach them to $\le5\times10^{-6}\,\sigma$, with the same faces. $\alphas$ moves by $\mp0.017\,\sigma$ (the prior removal), $\sigma(\alphas)$ by
+$<0.2\,\%$, and the Z--lattice tension is 13.51 vs 13.48 before. The cold NOLAT found the lower of the two known Z-only
+basins (the other sits 0.57 higher) \taskref{261017-minima-vs-trustkrylov}. The old conclusions stand.
+
+% ============================================================================================
+\section{Robustness, systematics and caveats}
+
+\textbf{Saturated sub-fits.} Restarting scipy's barrier at $\mu_0=0.1$ from a minimum made the plain LAT \ptll\ sub-fit
+crawl for 12.8\,h and stop on \code{xtol}; a converged rerun changed $q$ by $1.7\times10^{-4}$, so the quoted $q$ stand
+\taskref{261016-saturated-subfit-diagnosis}. In Hessian-vector products the preconditioner alone gives $3.1\times$
+(4667$\to$1504) and with the warm start $4.75\times$ (982), at the same point; an interim claim (2026-10-17) that most of
+the gain came from the warm start was wrong: most of the speed comes from the preconditioner ($3.1\times$); the warm
+start adds $1.5\times$ and fixes the false stops at releasing faces
+\taskref{261015-trustconstr-precondition} \taskref{261015-trustconstr-warmstart}. The gen $p_\mathrm{T}^V$ sub-fits end on
+\code{xtol} at optimality $\le2\times10^{-6}$ after $\approx5$\,h; their saturated covariances fail Cholesky ($q$ unaffected)
+\taskref{261017-gen-cold-fits}. The ptll tests of Table~\ref{tab:ptlltests} ran at \code{gtol} $10^{-5}$, shown to move $q$ by $\lesssim10^{-6}$.
+
+\textbf{Impacts.} Face-held traditional impacts match exact references and are bit-identical without faces \taskref{261016-face-held-impacts}. LAT's
+impacts are those \emph{on} its weakly binding face: released, its total would be $1.28$ instead of $1.14\times10^{-3}$, so
+the interval along that direction is one-sided.
+
+% ============================================================================================
+\section{What changed}
+
+\begin{itemize}
+  \item \textbf{rabbit (WMass):} \#194 spectral preconditioner under trust-constr (chain rule on the constraints; warm
+  fits only) \emph{merged}; \#195 \code{--minimizerWarmStart} (\code{auto}/\code{on}/\code{off}; consistent slacks, centred $\mu_0$, a Newton
+  release step at releasing faces) and \#196 face-held traditional impacts \emph{ready}, rebased on main, merge cleanly
+  together \taskref{261020-pr-shepherd}.
+  \item \textbf{WRemnants:} the CS $\lambda$ are prior-free by default (\code{cc3859f4}) and the two-panel NP plotter
+  \code{scetlib_ad/np_function_plots.py} was ported (\code{74c7e3e3}), both on the closed \#715, which was split into
+  reviewable PRs \taskref{261017-wremnants-pr-split}: \#736 (setupRabbit fixes) \emph{merged}; \#737 (response inputs;
+  \code{--responseGenBinning} now defaults to \code{none}), \#738 (\code{ptZgen_binning_corr} edges, needs the
+  theory-correction producers' sign-off) and \#739 (core param model, after \#737) \emph{ready}. The second wave (NP
+  constraints, lattice term, validation tools, cache-to-theory-correction, NP plots, a rename of the response aux group to
+  \code{response_matrix} with an old-name fallback) is built locally, not pushed \taskref{261020-pr-shepherd}.
+  \item \textbf{WRemnantsHelpers:} new \code{--constraints} and \code{--lattice} options of \code{workflows/fitterAD.sh},
+  and the NP-plot wrapper \code{workflows/plotNPFunctions.sh} (\code{010d37b}, \code{5c80345}, pushed); two validation scripts moved to
+  \code{scripts/scetlib_ad/} (\code{d5508b5}, local). \textbf{knowledge/:} the AD post-fit recipe in
+  \code{20_frameworks/nominal_workflow.md}; a trust-constr warm-start section in
+  \code{20_frameworks/rabbit_minimizer_tolerances.md}.
+\end{itemize}
+
+% ============================================================================================
+\section{Conclusions and open items}\label{sec:open}
+
+The nominal CT18Z fits are cold, reproducible and equal to the earlier wall fits up to the intended prior removal.
+Per configuration reco and gen share the NP faces; the $\approx3\sigma$ Z--lattice tension moves NP damping from the CS
+kernel to the TMD factor and $\alphas$ up by 0.2--0.35$\,\sigma$; gen lies 0.4--0.6$\,\sigma$ below reco. The full fits are acceptable, but the model's $q_T$ shape is not: a $y$-independent few-per-mille
+wave, which $\alphas$ ignores, plus a $4\sigma$ normalisation--shape tension to which $\alphas$ is sensitive; by decision
+this is quoted as a characterised mis-modelling.
+
+Open, none assigned: \textbf{(i)} both LAT fits sit on a weakly binding face, so an $\alphas$ interval for them needs a
+likelihood scan; \textbf{(ii)} the NOLAT free-normalisation refit was not run;
+\textbf{(iii)} merging \#195/\#196 and \#737--\#739, then opening the second WRemnants wave.
+
+\end{document}

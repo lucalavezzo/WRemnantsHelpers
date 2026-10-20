@@ -1,0 +1,10 @@
+cov held vs PF max|diff|/max 1.4126891024513381e-13  sigma 0.5434539196120345
+held lambda2_nu cov row exactly 0: True  PF: 0.0
+impacts                  finite True  max|held-PF| 8.394e-14 at resumTNP_b_qg
+impacts_grouped          finite True  max|held-PF| 1.092e-13 at binByBinStat
+   stat held 0.392625 PF 0.392625 PF^2-held^2 0.0000e+00
+global_impacts           finite True  max|held-PF| 6.552e-14 at pdfMSHT20mcrangeSymAvg
+global_impacts_grouped   finite True  max|held-PF| 2.405e-04 at stat
+   stat held 0.162203 PF 0.162443 PF^2-held^2 7.8071e-05
+{'stat': 0.3926, 'binByBinStat': 0.0783, 'resumNonpert': 0.432, 'scetlibNPFeff': 0.127, 'scetlibNPgammaNu': 0.4149, 'pdfEig': 0.3541, 'resumTNP': 0.3242}
+global: sum src^2 + bbb^2 + stat^2 0.2953421627416837 sigma^2 0.2953421627416837

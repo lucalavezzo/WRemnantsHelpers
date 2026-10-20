@@ -2,9 +2,9 @@
 title: trust-constr + preconditioning
 slug: 261015-trustconstr-precondition
 study: ct18z-nominal-fits
-status: done          # active | done | paused | abandoned
+status: active        # active | done | paused | abandoned
 created: 2026-10-15
-updated: 2026-10-16
+updated: 2026-10-19
 owner: study-worker
 ---
 
@@ -17,7 +17,55 @@ owner: study-worker
 
 ---
 
-## START HERE (status as of 2026-10-16)
+## START HERE (status as of 2026-10-18, review round)
+
+- **#194 back to DRAFT** (Luca's rule: ready only when CI is green AND every comment is resolved). Review round:
+  - Pushed **7b4ae42**: performance assertion removed (counts printed only); `jac_to_internal` tested on the
+    triangular-solve fallback; docstring sign fixed.
+  - Replied in the inline thread and resolved it; replied to the review body point by point.
+  - Dispatched the hodor review on the new head: run 39158391240. The previous run produced no review: it timed
+    out after 6 h on its own `find /`.
+- **2026-10-19:** CI on 7b4ae42 is all green (19 checks); 0 unresolved threads; the reply to the review body is posted.
+  **Bot review: none.** The dispatched hodor run 39158391240 hung again on its own
+  `find / -name minimize_trustregion_constr.py` on the runner (turn 28, 19:27) and was cancelled at the 6 h limit.
+  That is 2 of 2 runs on #194 hanging the same way: an infra issue, not a finding. **#194 stays DRAFT** (rule not met).
+  It needs a hodor-side fix (tool timeout, or keep `find` off `/`) or Luca's decision; I did not re-dispatch.
+- **Running:** nothing.
+
+---
+
+## START HERE (previous, 2026-10-18)
+
+
+- **PR #194 validated; comment posted:** https://github.com/WMass/rabbit/pull/194#issuecomment-6244958708
+  ([pr194_comment.md](pr194_comment.md)).
+  - **Isolated real-fit effect:** LAT's saturated ptll sub-fit takes 4667 → 1504 HVPs (3.1x) and 226 → 167
+    iterations, and converges (gtol) where plain stopped on xtol. It reaches the same minimum as the combined run
+    (3e-8 sigma). With the warm start on top: 982 HVPs (4.75x).
+  - **CI-gap checks:** bit-identical to main everywhere the PR should not act. Multi-device is refused. The
+    face-held post-fit agrees to 2e-8. Cold starts are a documented limitation.
+  - The 18:05 interim read is retracted (Log 2026-10-18).
+- **Running:** nothing. **Next action:** none (review on the PR).
+
+---
+
+## START HERE (previous, 2026-10-17 11:15)
+
+
+- **PR #194 validation (Luca: "did it solve the problem, did it introduce new ones?").** CI-gap checks DONE (Log
+  2026-10-17): all pass. The real fit that isolates #194's own effect is RUNNING.
+- **Running:** PR194_SATPC_LAT = LAT's saturated ptll sub-fit, #194 ONLY (rabbit c76c226 from the pinned worktree
+  `/work/submit/lavezzo/rabbit-tc-precond-val`), flags identical to SATWSPC_LAT. mem_gate pid 1263463, launched
+  2026-10-17 10:52. Log [logs/PR194_SATPC_LAT.log](logs/PR194_SATPC_LAT.log), job [PR194_SATPC_LAT.inner.sh](PR194_SATPC_LAT.inner.sh),
+  output `/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261017_pr_validation/`.
+- **Interim (18:05):** at iteration 51 / 3.7 h, preconditioning ALONE leaves the mu0 = 0.1 stage at iteration 40 (plain: 101) but does not
+  skip it (Log 18:05). Wall time is not comparable (node contention).
+- **Next action:** when it finishes (or if Luca stops it), finalize and post the comment drafted in [pr194_comment.md](pr194_comment.md).
+
+---
+
+## START HERE (previous, 2026-10-16)
+
 
 - **Answer:** feasible, implemented and validated; **PR opened: https://github.com/WMass/rabbit/pull/194** (branch
   `lucalavezzo:tc-precond-pr`, one commit c76c226 on WMass/rabbit main 2d9f380, without the local `--blindingFrame`).
@@ -75,6 +123,77 @@ owner: study-worker
 ---
 
 ## Log
+
+### 2026-10-18 (review round on #194)
+- davidwalter2's review: chain rule confirmed, incl. the untested `linv is None` path. Five comments; the open issue
+  (row with zero gradient at the start dropped) became #197. Addressed in 7b4ae42 ([7b4ae42 on the PR](https://github.com/WMass/rabbit/pull/194)):
+  - drop `assert n_pre < n_plain` (counts depend on scipy/BLAS; the test is about correctness);
+  - add jac_to_internal checks on both block paths to `test_explicit_inverse_and_triangular_fallback_agree`;
+  - fix the KKT-residual sign in the minimizer_status comment.
+  Checks: 78 tests in the three files passed; black/isort/flake8 clean.
+- Follow-up (not in this PR): precondition only the saturated sub-fit (review point 3).
+- hodor `review` job (run 38945463240): no findings. It timed out after 6 h because its own
+  `find / -name minimize_trustregion_constr.py` on the runner never returned. Re-dispatched on 7b4ae42 (run
+  39158391240), because draft PRs skip the automatic trigger.
+
+### 2026-10-18 (PR194_SATPC_LAT finished: the isolated effect, final)
+- Finished cleanly: status 1 (gtol), optimality 1.6e-9 (1.07e-6 in fitter units), **167 it / 1504 HVPs (`cg_niter`)**,
+  126 nfev; fit 30686 s on the contended node (rabbit total 43428 s, of which 8703 s was the cache load).
+  q = 79.10711, the same as SATWSPC to 5e-8, and the same point to 3e-8 sigma (max |dx| 1.4e-8). Against LAT's plain
+  sub-fit: dq = +1.7e-4 (plain stopped on xtol, optimality 6.6e-4), max 1.3e-4 sigma. Same faces and multipliers.
+  Evidence: [pr194_checks/compare_PR194_vs_LAT.json](pr194_checks/compare_PR194_vs_LAT.json),
+  [pr194_checks/compare_PR194_vs_SATWSPC.json](pr194_checks/compare_PR194_vs_SATWSPC.json),
+  [pr194_checks/tc_legs_PR194.txt](pr194_checks/tc_legs_PR194.txt) (the 261016 parsers, run unchanged).
+- **Isolated effect of the preconditioner: 4667 → 1504 HVPs (3.1x), 226 → 167 iterations.** Combined with the warm
+  start: 982 HVPs (4.75x), 89 iterations. The mu0 = 0.1 stage drops from 101 iterations to 39 (still present).
+  The small-mu rejected-step tail is still present: 82 iterations / 11.7 ks below q-to-go 1e-3, 71 rejected steps.
+- **RETRACTION of the 18:05 interim read** ("most of the 3.9x comes from the warm start"). The final counts say the
+  opposite: the preconditioner alone gives 3.1x of the combined 4.75x in HVPs. The warm start adds 1.5x on top, and
+  removes the mu0 stage. The interim read was taken from q-to-go at equal iteration, while the cost is in HVPs per iteration.
+
+### 2026-10-17 18:05 (isolated effect of #194 on the real saturated sub-fit — interim, job still running)
+- PR194_SATPC_LAT ran #194 ONLY (no warm-start change), with flags identical to SATWSPC_LAT, from LAT's postfit. **Node
+  contention makes its wall time incomparable:** cache load 8703 s (31 s in SATWSPC), reference Hessian 1335 s (407 s).
+  So iterations are compared, not hours.
+- **Finding: preconditioning alone does NOT remove the mu0 = 0.1 barrier stage; it shortens it.** The isolated run
+  left mu = 0.1 at iteration 40, against iteration 101 for the plain LAT sub-fit (which spent 33.5 ks there). The
+  combined SATWSPC run never enters that stage: the warm start begins at mu = 4e-10. Distance to the minimum, as
+  q-to-go = 2(loss − 336.91909) against the SATWSPC minimum:
+
+  | iteration | plain (LAT) | #194 only | #194 + warm start |
+  |---|---|---|---|
+  | 10 | 1.95 (mu 0.1) | 6.72 (mu 0.1) | 6.66 |
+  | 30 | 0.83 (mu 0.1) | 0.98 (mu 0.1) | 1.18 |
+  | 51 | 0.46 (mu 0.1) | 0.34 (mu 0.02) | 0.10 |
+  | q-to-go < 0.1 reached at | it 107 | not yet (it 51) | it 53 |
+  | finished | 226 it / 4667 HVP (xtol) | running | 89 it / 982 HVP (gtol) |
+
+  Interim read (RETRACTED 2026-10-18, see above): most of the 3.9x of the combined run comes from the warm start (no mu0 stage). On its own the
+  preconditioner leaves the biased stage 2.5x sooner but is not faster to q < 1. Final numbers when the job ends
+  (PID per orchestrator: 1273076). Not stopped by me: Luca decides.
+
+### 2026-10-17 (PR #194 validation: the checks CI does not cover)
+Runner [pr194_checks/run_checks.sh](pr194_checks/run_checks.sh) runs the same `rabbit_fit.py` configs from two worktrees,
+WMass/rabbit main 2d9f380 (`/work/submit/lavezzo/rabbit-main-2d9f380`) and #194 c76c226. Tensors are made exactly as
+CI makes them (`tests/make_tensor.py`), plus the polynomial toy. [pr194_checks/compare_results.py](pr194_checks/compare_results.py)
+walks every leaf of the stored `results` (all hists' values and variances, covariances, minimizer_status, every
+scalar). Only wall-clock leaves are skipped. Outputs: `/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261017_pr_validation/checks/`;
+results [pr194_checks/compare.out](pr194_checks/compare.out), [pr194_checks/e1_vs_b0.out](pr194_checks/e1_vs_b0.out).
+
+| check | config | result |
+|---|---|---|
+| (a) unconstrained, no precondition | CI "nominal fit" (impacts, global impacts, hists, cov, variations, 4 mappings) | **bit-identical** to main (231 leaves) |
+| (a) unconstrained + full-scope spectral | the same + `--precondition .* none spectral` (trust-krylov) | **bit-identical** (226 leaves) |
+| (a) penalty term + preconditioner | CI regularization config `-r SVD Select ch0_masked` + spectral | **bit-identical** (40 leaves) |
+| (a) ill-conditioned toy + preconditioner | polynomial tensor, order 8, trust-krylov | **bit-identical** (24 leaves) |
+| (b) trust-constr WITHOUT --precondition | binding `Bounds bkg_2_norm<=-0.2`, + saturated projection test | **bit-identical** (77 leaves); the only addition is the new key `minimizer_status/optimality_frame` = "physical" |
+| (d) multi-device | trust-constr + constraints + preconditioner + `--nDevices 2` | **refused up front**, as on main: "--constraints is not supported (not tested) with --nDevices > 1" |
+| (e) face-held post-fit under the transform | (b) with the preconditioner vs without (both #194) | same active face and multiplier (−3.4056950173 vs −3.4056950173); face-held cov to 2.3e-8 rel; parameters to 1.4e-9 sigma; NLL +2e-9 (barrier) |
+
+Bonus from (e): on the CI tensor itself, the PLAIN trust-constr saturated sub-fit hits maxiter (500 iterations, status 0,
+optimality 1.2e-4). The preconditioned one converges in 48 (gtol, 5e-11) to a q higher by 2e-5. The main fit takes
+53 → 27 iterations (an xtol exit becomes a gtol exit).
+(c) The cold-start penalty (PCLAT, Log 2026-10-15 16:10) is a known limitation. It is documented in the `--precondition` help and in the PR body.
 
 ### 2026-10-16
 - PR opened, Luca approved: https://github.com/WMass/rabbit/pull/194 ([pr_body.md](pr_body.md)). Before pushing:
@@ -252,6 +371,11 @@ preconditioned fit must be compared, not assumed equal.
 
 ### 3. Expected payoff (prediction, unmeasured)
 
+> **Superseded 2026-10-18 by measurements (Log 2026-10-15 16:10 and 2026-10-18).** Saturated sub-fit, preconditioner
+> only: 4667 → 1504 HVPs (3.1x), converged at the same minimum. Cold main fit: SLOWER with the preconditioner
+> (PCLAT; stopped 2026-10-15 16:32). The cold-start penalty is a documented limitation.
+
+
 - **Saturated ptll sub-fit**: this is the target. It starts at the main-fit minimum, where the reference Hessian is
   representative. That was the regime in which full-scope spectral cut trust-krylov from 2150 to 614 HVPs (SATP,
   `constrained-fit-strategy/261008-saturated-subfit-diagnosis`). trust-constr's projected CG has a loose forcing term,
@@ -264,6 +388,14 @@ preconditioned fit must be compared, not assumed equal.
   V2 already converges in 104 it / 2.3 h. Worth testing only after the saturated test passes.
 
 ### 4. Proposed real-fit test (for Luca to approve; NOT run)
+
+> **Superseded 2026-10-18.**
+> - Test A as written here (SATPC_NOLAT) was CANCELLED: NOLAT was stopped before writing a fitresult.
+> - It was replaced by PR194_SATPC_LAT, the same test from LAT's postfit, which RAN and passed (Log 2026-10-18).
+> - Test B ran as PCLAT, which was slower (Log 2026-10-15 16:10) and was stopped.
+> - PCNOLAT was never queued (permission denied).
+> - PR #194 is open with a validation comment.
+
 
 Test A, the saturated sub-fit only, from NOLAT's finished postfit (no main refit, so no main-fit trust-constr
 detour). Run when NOLAT is done and a 260 GB slot is free, through mem_gate as in `../261015-cold-tc-fits/logs/launches.txt`.

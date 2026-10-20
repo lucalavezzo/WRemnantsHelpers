@@ -2,9 +2,9 @@
 title: Saturated sub-fit diagnosis
 slug: 261016-saturated-subfit-diagnosis
 study: ct18z-nominal-fits
-status: active        # active | done | paused | abandoned
+status: done          # active | done | paused | abandoned
 created: 2026-10-16
-updated: 2026-10-16
+updated: 2026-10-18
 owner: study-worker
 ---
 
@@ -17,28 +17,31 @@ owner: study-worker
 
 ---
 
-## START HERE (status as of 2026-10-16 17:00)
+## START HERE (status as of 2026-10-18)
 
-- **Phase 1 answer (done, Result below):** plain trust-constr sub-fit slow = mu0 = 0.1 barrier restart on an
-  ill-conditioned Hessian; C (warm start + spectral precond) converges (gtol) in 3.2 h vs 12.6 h, q = 79.1071 (LAT).
-- **Phase 2 (NOLAT full postfit, all3 branch) — ANOMALY in the saturated sub-fit:** main postfit fine (NLL = snapshot,
-  faces lambda2_nu + cubic(2.5), traditional impacts computed). The WARM leg of the ptll sub-fit stopped at status 2
-  (xtol) at loss 335.537283 after 83 it / 567 HVPs / 1.52 h, sitting ON the cubic(|Y|=2.5) face with a RELEASING
-  multiplier (+1.48); NOLAT's stopped plain sub-fit had reached a LOWER 335.536953 with that face released (lambda4 =
-  1.8e-4, cubic(2.5) = 5.5e-4). The dual-sign check fired correctly and started the "release" leg from scipy's own
-  interior-point start (mu0 = 0.1, scipy slacks): that leg walked away (loss up to 335.92, lambda2 0.14 -> 0.24,
-  lambda2_nu 0 -> 0.04, cubic(2.5) violated by 3.4e-3) — the plain-ladder behaviour, likely hours. See Log 16:40.
-- **Running:** NOLAT_PF (gate pid 1627133, job pid 1627151), log [logs/NOLAT_PF.log](logs/NOLAT_PF.log); release leg
-  since 16:39. The fitresult (and so all deliverables) is written only at the end. NOT killed — orchestrator's call.
-- **Next action:** orchestrator to choose: (a) let the release leg run; (b) stop it, get the deliverables from a postfit
-  without the saturated test (~45 min) and redo the ptll test separately; (c) fix the release leg to start warm.
-- **Blocking on:** orchestrator decision.
+- **Answer:** plain trust-constr saturated sub-fit is slow because of the mu0 = 0.1 barrier restart on an
+  ill-conditioned Hessian; warm start + full spectral preconditioner converges LAT's sub-fit (gtol) in 3.2 h / 982 HVPs
+  vs 12.6 h / 4667, q = 79.1071 (Result). Measured split (rabbit #194, see Log 2026-10-18): preconditioner alone 3.1x
+  (1504 HVPs), both 4.75x.
+- **NOLAT_PF:** finished 2026-10-16 17:56 (saturated ptll sub-fit status 1, q = 68.36) after the release-leg anomaly in
+  Log 16:40; NOLAT's deliverables were made by the orchestrator.
+- **Next action:** none — task closed.
+- **Blocking on:** nothing.
+- **Running:** nothing.
 
 ---
 
 ## Log
 
 <!-- Newest first. What was tried, what happened, why — with an evidence path. -->
+
+### 2026-10-18 — logbook hygiene (orchestrator)
+- NOLAT_PF finished 2026-10-16 17:56: saturated ptll sub-fit status 1, q = 68.36; NOLAT deliverables made by the
+  orchestrator (not by this task).
+- **SUPERSEDED:** the Result's statement that the separate shares of the warm start and the preconditioner are
+  "inferred from the logs ..., not measured". They were since measured in rabbit #194's isolated run: preconditioner
+  alone 4667 -> 1504 HVPs (3.1x); with the warm start 982 (4.75x). Evidence: [../261015-trustconstr-precondition/LOGBOOK.md](../261015-trustconstr-precondition/LOGBOOK.md)
+  Log 2026-10-18, https://github.com/WMass/rabbit/pull/194#issuecomment-6244958708. The original text is kept below.
 
 ### 2026-10-16 14:00 — phase 2: all-three branch, NOLAT full postfit, deliverables
 - Branch `all3-local` in NEW worktree `/work/submit/lavezzo/rabbit-all3` = `satdiag-ws-pc` 0395383 + face-held-impacts
@@ -205,7 +208,7 @@ both from LAT's final result, commands [cmds/](cmds/), launch record [logs/launc
 
 **Caveats first.** Real data, alphaS blinded (only differences quoted). One problem (LAT = CT18Z nominal, lattice on,
 hard NP constraints) and one start (LAT's own minimum), one run per recipe: no scatter. The factorial was dropped (Luca,
-08:55), so the warm-start fix and the preconditioner were tested TOGETHER only; their separate shares below are inferred
+08:55), so the warm-start fix and the preconditioner were tested TOGETHER only; their separate shares below are inferred [SUPERSEDED 2026-10-18: measured in rabbit #194, see Log 2026-10-18]
 from the logs and the older trust-krylov study, not measured. The trust-krylov numbers (SATB8/SATP) come from an older
 configuration (relu² wall, pinned TMD priors, other lattice settings; q = 78.40 there).
 

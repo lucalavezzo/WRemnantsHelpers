@@ -1,7 +1,7 @@
 # NP-model parameter constraints (CS kernel and TMD b.c.)
 
 Source: AN-25-085 `theory.tex` Eqs. \ref{eq:npgamma}, \ref{eq:npf} (lines 233–234), with our locally-added $\lambda_6,\Lambda_6$ extensions.
-Last updated: 2026-10-09 (§21: the wall in use, its C² penalty default, and how exact it is)
+Last updated: 2026-10-20 (§22: the nominal fits with the conditions as HARD constraints — faces, lattice effect, gen vs reco)
 Status: the algebra below is implemented as `NPDampingWall` in WRemnants
 `wremnants/postprocessing/scetlib_ad/np_damping_wall.py` (§21; its module docstring is the reference for the
 conditions and options). §8 describes an earlier, superseded module.
@@ -1327,3 +1327,31 @@ Express each condition in the NP exponent at b_max, c̃ = s·c, and gate on max 
   6e8). The L₂(|Y| = 2.5) wall already adds an eigenvalue of 1.78e8 in θ (its gradient carries Y² = 6.25), against
   a data-only Hessian spanning [0.459, 4.31e4]: the walled κ is 3.9e8.
 
+## 22. The conditions as HARD constraints: where the CT18Z nominal fits sit (2026-10-20)
+
+Source: `studies/ct18z-nominal-fits/` (SUMMARY.pdf; tasks `261015-cold-tc-fits`, `261017-gen-cold-fits`,
+`261017-minima-vs-trustkrylov`). Since 2026-10-15 the §21 conditions enter as trust-constr inequality rows
+(`NPDomainConstraints`, margin 0: λ2_ν ≥ 0, λ4_ν ≥ 0, L₂ ≥ 0 and the cubic, each at |Y| = 0, 2.5) instead of a
+penalty, and no NP λ has a prior (CS prior-free since WRemnants cc3859f4). α_s only as differences (blinded), in
+units of the reco postfit σ(α_s).
+
+- **Faces are a property of the configuration, not of the level.** NOLAT (no lattice) ends on λ2_ν ≥ 0 + cubic(|Y| =
+  2.5); LAT (ASWZ lattice χ², τ = 8) on L₂(|Y| = 2.5) only, weakly binding. Reco and gen share them.
+- **The lattice moves the damping from the CS kernel to the TMD factor.** Without it the CS kernel turns on late
+  (λ2_ν = 0) and the TMD factor is weakly damped at large b_T; with it the CS kernel follows the lattice and F_eff
+  damps much more strongly. So the lattice decides which NP group dominates σ(α_s). Z–lattice tension 2ΔNLL 13.5
+  (reco) / 11.0 (gen) for the 2 CS λ; Δα_s(LAT − NOLAT) +0.21σ (reco) / +0.35σ (gen).
+- **gen − reco Δα_s = −0.61σ (NOLAT), −0.42σ (LAT)**, the LAT value identical to the old TMD-prior fits, so the gen–reco
+  offset does not depend on the TMD priors (iteration-0 real-data unfolding, 20 ptV × 10 |Y| bins; rerun if the 5-|Y|-bin unfolding
+  becomes nominal).
+- **These are the old trust-krylov + penalty-wall minima minus the NP priors.** LAT ≡ LATFROZ_V3/V2's basin, NOLAT ≡
+  XWSTIFF's (not CMR1B, 0.57 higher in NOLAT's objective); Δα_s ∓0.017σ, σ(α_s) < 0.2 %, same faces. Two reusable
+  tools: (i) **one Newton step with the old walled Hessian predicts a prior removal to ≤ 1e-2σ** — no refit needed to
+  know where a prior-free fit lands; (ii) the cache-free NLL split (data+BB = NLL − wall − lattice − card − priors,
+  each recomputed at the stored x) evaluates a new objective at an old fit's point exactly (rabbit's start loss agreed
+  to 1e-10 across Sept/Oct revisions and full vs |Y| ≤ 2.5 caches). `261017-minima-vs-trustkrylov/scripts/`.
+- **A face-held interval is one-sided when the face binds weakly** (LAT: released, σ(α_s) is ~12 % larger), so the
+  LAT α_s interval needs a likelihood scan (`../20_frameworks/likelihood_scans.md`); open as of 2026-10-20.
+- **Bands:** toy bands around a point ON the curved cubic face run away (toys cross it) — not a physical band; bands
+  pinch where a parameter sits on a face.
+- The ptll projection misfit on these fits: `../20_frameworks/saturated_gof_tests.md` §6.

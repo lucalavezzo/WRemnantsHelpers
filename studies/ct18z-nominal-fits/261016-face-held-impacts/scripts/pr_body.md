@@ -31,12 +31,13 @@ by the implicit-function theorem on the KKT system. The constraints do not depen
     held directions that lie inside it. This is exact, because `C_gg` and `v` both vanish on those directions.
   - `active_faces` is factored out of `face_held_covariance`, with the same arithmetic. That function now
     also returns the active rows' Jacobian and the constraint Hessian.
-- `Fitter.postfit_faces` is set by `constrained_postfit`, or by `postfit_faces_at` for an
-  `--externalPostfit` covariance. `impacts_parms` branches to the face-held path only when a face is
-  active; otherwise the existing graph runs unchanged.
-- Global impacts at a **curved** face: `C W C = C` gives `sum_sources = diag(C H C) = diag(C) + diag(C Hc C)`.
-  The data-stat remainder therefore gets `diag(C Hc C)` back. That term is zero for a face that is linear in
-  the fit parameters, and `None` (the same graph as before) with no active face.
+- `Fitter.postfit_faces` is set by `constrained_postfit`. `impacts_parms` branches to the face-held path
+  only when a face is active; otherwise the existing graph runs unchanged.
+- Global impacts: no code change. With the face-held `cov` they equal those of the fit with the faces
+  eliminated, including the grouped data-stat remainder. At a curved face, the curvature term
+  `sum mu d2c` counts as data: in eliminated coordinates it is part of the data Hessian (data gradient
+  times the curvature of the face). (A first version added `diag(C Hc C)` to the remainder. The
+  elimination test below showed that this was wrong, so it was removed in 8b3f180.)
 - `rabbit_fit.py`: the skip is removed. `postfit_faces` is reset at the start of every fit, so toys do not
   inherit it.
 - `traditional_impacts.impacts_parms` gets an optional `group_impact_fn` hook. The default path is untouched.
@@ -53,15 +54,19 @@ point. They test the algebra to round-off, not the minimizers.
   to 1e-8, and `a`'s impact is minus `b`'s.
 - **(c) Curved (disk) face,** where the Lagrangian term moves the stat-block variance by more than 1 %:
   - grouped impacts == `sqrt(sigma^2 - sigma^2[group frozen, face held])` from rabbit's own freeze path;
-  - global per-source responses == finite-difference constrained refits (2e-3; the released covariance is
-    10x further off);
-  - the corrected global stat^2 == `diag(C H_data C)`.
+  - covariance, global per-source impacts and grouped global impacts, including the data-stat
+    remainder, == the fit with the face ELIMINATED (the disk boundary parametrised by an angle; an
+    unconstrained fit, so the face curvature enters through the chain rule), to 1e-8;
+  - global per-source response == finite differences of that eliminated fit, refitted and Newton-polished.
+    The measured error is -0.051 delta^2, i.e. 5e-8 at delta = 1e-3, checked at rtol 1e-6; the released
+    covariance is more than 1e3x further off. An earlier version refitted the constrained problem with
+    trust-constr, which only converges to the barrier tolerance (~1 % of the response). It failed in CI at
+    0.9 % and was replaced.
 - **(d) No active face:** impacts unchanged.
 
 `test_trust_constr.py`: the "skipped" test becomes "written". At an active face, `--doImpacts`,
 `--globalImpacts` and `--gaussianGlobalImpacts` are all written and finite, and the held parameter's own
-impact is exactly 0. `test_sharded_fit.py`: the new driver call `postfit_faces_at` is classified as safe.
-It is parameter-level, and `--constraints` is refused with `--nDevices > 1`.
+impact is exactly 0.
 
 Separately, `rabbit_fit` was run on the test tensor with no constraints and with an inactive constraint
 (`--doImpacts --globalImpacts --gaussianGlobalImpacts --saveHists --computeHistErrors`). The output of this
@@ -90,8 +95,8 @@ NP parameters: releasing it lowers the NLL by 0.46.
   depend on faces. In the real check the face is linear, so `C H C = C` holds to 1e-12. Even so,
   `var_total - var_x0 - var_beta0 = -0.022` (rabbit units), the small difference of O(300) terms. This PR
   does not change that case. `--gaussianGlobalImpacts` gives a data stat that is never negative.
-- `global_impacts_obs` (global impacts on observables) has the same remainder. At a curved face it would need
-  the analogous `diag(J C Hc C J^T)` term, which is not done here.
+- `global_impacts_obs` (global impacts on observables) uses the same face-held `cov` and the same remainder.
+  By the elimination argument nothing more is needed, but it is not covered by a dedicated test.
 
 ### Related
 

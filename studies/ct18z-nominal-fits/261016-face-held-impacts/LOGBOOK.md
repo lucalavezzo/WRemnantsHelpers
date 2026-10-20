@@ -4,7 +4,7 @@ slug: 261016-face-held-impacts
 study: ct18z-nominal-fits
 status: done          # active | done | paused | abandoned
 created: 2026-10-16
-updated: 2026-10-16
+updated: 2026-10-19
 owner: study-worker
 ---
 
@@ -17,24 +17,80 @@ owner: study-worker
 
 ---
 
-## START HERE (status as of 2026-10-16)
+## START HERE (status as of 2026-10-18)
 
-- **Answer:** yes. rabbit branch `face-held-impacts` (bf9dfb1, 2 commits on WMass main 2d9f380, worktree
-  `/work/submit/lavezzo/rabbit-face-impacts`, NOT pushed, no PR) computes traditional impacts (ungrouped + grouped)
-  and Gaussian global impacts at an active face with the faces held; exact against frozen / eliminated / frozen-group
-  references; no-face fits bit-identical. On LAT the traditional impacts now exist (Data stat 0.86, total 1.14, alpha_s
-  x1e-3). LAT's GLOBAL Data stat stays undefined (NaN) -- not a face effect (the face is linear), see Result.
-- **PR:** https://github.com/WMass/rabbit/pull/196 (approved by Luca; head lucalavezzo:face-held-impacts = e50a872 +
-  bf9dfb1, base WMass main 2d9f380, not stacked). Body: `scripts/pr_body.md`.
-- **Next action:** review on #196; orchestrator: how the global "Data stat." is presented on LAT (Open questions).
+- **Answer:** yes. Face-held traditional impacts (ungrouped + grouped) are in PR
+  https://github.com/WMass/rabbit/pull/196 (head lucalavezzo:face-held-impacts 8b3f180, base WMass main 2d9f380), exact
+  against frozen / eliminated / frozen-group references; no-face fits bit-identical to main. Global impacts need no
+  change: the curvature correction claimed on 10-16 was wrong and has been removed (8b3f180; see Log 2026-10-17).
+  LAT: traditional impacts present (Data stat 0.86, total 1.14, alpha_s x1e-3). LAT's global Data stat stays NaN, which
+  is not a face effect.
+- **PR state:** #196 is READY for review (2026-10-19). CI is green on 8b3f180, the review bot found no issues on the
+  head, and the validation comment is posted (https://github.com/WMass/rabbit/pull/196#issuecomment-6263662760;
+  text in `scripts/pr196_validation_comment.md`).
+- **Next action:** none in this task; human review of #196.
 - **Blocking on:** nothing.
-- **Running:** nothing (LAT_facefix pid 774253 finished; results written).
+- **Running:** nothing.
 
 ---
 
 ## Log
 
 <!-- Newest first. What was tried, what happened, why — with an evidence path. -->
+
+### 2026-10-19
+- PR196_NOLAT_frozen finished (`--freezeParameters lambda2_nu`, same point; only the cubic face is active, mu 4.104 as
+  in held). `scripts/nolat_held_vs_frozen.py` -> `NOLAT_held_vs_frozen.txt`: cov (lambda2_nu excluded), traditional
+  impacts (3720 ungrouped + 63 grouped) and global impacts (ungrouped + grouped) are BIT-IDENTICAL between held and
+  frozen (max difference 0), the NaN pattern is equal, and the held lambda2_nu impact is exactly 0. On real data,
+  holding a bound face == freezing the parameter, exactly.
+- Re-checked #196 (head 8b3f180, CI green, bot clean on the head, no inline or human comments open), posted the
+  validation comment (claim -> test -> result table, with caveats) and marked #196 ready.
+
+### 2026-10-18
+- PR196_NOLAT_held finished at 06:46 (8b3f180, NOLAT minimum, both faces held: lambda2_nu >= 0 with mu 32.45 and the
+  curved TMD cubic with mu 4.10; edmval 3.8e-16) -> /ceph/.../261017_pr_validation/fitresults_PR196_NOLAT_held.hdf5.
+  Compared with NOLAT_PF (all3-local) in `NOLAT_held_vs_PF.txt`: cov agrees to 1.4e-13, traditional impacts
+  (ungrouped and grouped) to 1e-13 and global per-source impacts to 7e-14, the lambda2_nu cov row is exactly 0, and
+  everything is finite. The only difference is the global grouped stat (0.16220 vs 0.16244; PF^2 - held^2 = 7.807e-5),
+  which is exactly the removed correction. Global sources + bbb + stat now sum to sigma^2 exactly (0.295342). Held
+  traditional (rabbit units, x2 = 1e-3): stat 0.393, bbb 0.078, resumNonpert 0.432, scetlibNPgammaNu 0.415, pdfEig
+  0.354, TNP 0.324; sigma 0.5435. The plot tool runs cleanly on it: `NOLAT_PR196_impacts/` (rc 0).
+- PR196_NOLAT_frozen is still queued in mem_gate (run cap 2/2 held by other jobs).
+- Luca's rule: a PR is marked ready only when CI is green and every comment is resolved. The review bot had only
+  reviewed bf9dfb1 because the workflow skips drafts, so I dispatched it on #196 (`gh workflow run hodor-review.yml
+  -f pr_number=196`, run 39158352268). Its review of head 8b3f180: "No issues found. Patch is correct". There are no
+  inline comments and no human comments to resolve.
+
+### 2026-10-17
+- CI on #196 failed (run 38946539678): `test_curved_face_global_impacts`, FD response 0.000897 vs C_pj cw_j
+  0.000889 (0.9 %; locally < 0.2 %). Cause: the FD reference refitted the CONSTRAINED problem with trust-constr,
+  which converges only to the barrier tolerance, ~1e-8 in x = ~1 % of the response at delta = 1e-3, platform
+  dependent. Fixed properly (8b3f180): the reference is now the fit with the face ELIMINATED (disk boundary
+  parametrised by an angle phi, `FacePOUs(disk=...)`, unconstrained), refitted and finished with exact Newton
+  steps. FD step scan with the polish: error = -0.051 delta^2 (-4.8e-9, -5.1e-8, -4.6e-7, -5.1e-6, -4.6e-5 at
+  delta 3e-4 ... 3e-2), i.e. pure truncation; without the polish |grad| stops at 1e-8..1e-10 and the error is
+  ~1e-4 and erratic. Now checked at rtol 1e-6.
+- **RETRACTION (the global curvature correction).** The new elimination reference also compares the global
+  grouped impacts at a curved face: they equal the face-held ones to 1e-8 EXCEPT the stat column, which matched
+  only WITHOUT my diag(C Hc C) correction (0.0388 corrected vs 0.0399 eliminated). In eliminated coordinates the
+  face curvature term (data gradient x face curvature) is part of the data Hessian, so the plain remainder IS the
+  data stat and the sources add up to diag(C) as in any fit. Finding 2 of 2026-10-16 was wrong; the correction,
+  `postfit_faces_at` and its sharding classification are removed (global_impacts.py back to main). Consequence
+  for NOLAT_PF (run on all3-local, which still has the correction): its global stat^2 is too large by 7.8e-5
+  (rabbit units^2); its traditional impacts are unaffected. LAT is unaffected (linear face).
+- Full suite on 8b3f180: 476 passed; lint clean; pushed; PR body updated (`scripts/pr_body.md`).
+- Bit-identity matrix vs WMass main 2d9f380 (`scripts/bitident_matrix.sh`, `bitident_matrix.txt`): rabbit test
+  tensors, `--doImpacts --globalImpacts --gaussianGlobalImpacts --saveHists --computeHistErrors
+  --computeHistImpacts`, configs bbstat lite / full / off, sparse, inactive constraint (with and without bbb):
+  every output identical. `--chisqFit` is not run-to-run deterministic on main itself (two main runs differ in
+  the output key set: one has `minimizer_status`), impacts identical (0 diff) in this run. Pre-existing on main
+  too: sparse tensor + JVP global impacts crashes (`SparseMatrixMatMul` InternalError); sparse run with
+  `--globalImpactsDisableJVP`.
+- Launched (Luca's validation request) two NOLAT postfit jobs with 8b3f180 via mem_gate:
+  `scripts/run_NOLAT_pr196.sh held|frozen` -> /ceph/.../261017_pr_validation/fitresults_PR196_NOLAT_{held,frozen}.hdf5;
+  frozen = `--freezeParameters lambda2_nu` at the same point (the bound face then drops out, the cubic face stays
+  held). Exact expectation: identical impacts. Comparison script `scripts/nolat_held_vs_frozen.py`.
 
 ### 2026-10-16
 - Worktree `/work/submit/lavezzo/rabbit-face-impacts`, branch `face-held-impacts` off WMass main 2d9f380 (has #189).
@@ -117,8 +173,9 @@ and, needlessly, `--gaussianGlobalImpacts` (their response dx = -C_held d(grad)/
 **Fix** (`rabbit/constraints/postfit.py`, `rabbit/fitter.py`, `rabbit/impacts/*`, `bin/rabbit_fit.py`): every
 covariance in the impacts is taken with the faces held -- stat block (with and without bbb) =
 Z (Z^T W Z)^-1 Z^T on the stat block with W = H - sum mu d2c; groups conditioned on the complement of the face
-directions that lie inside the group; bound-pinned coordinates exactly zero. Global impacts: at a CURVED face the
-sources add up to diag(C H C) = diag(C) + diag(C Hc C), so `stat` gets diag(C Hc C) back (zero for a linear face).
+directions that lie inside the group; bound-pinned coordinates exactly zero. Global impacts: no change needed --
+with the face-held cov they equal the eliminated-face fit's, stat remainder included (a diag(C Hc C) correction
+added on 10-16 was wrong and is removed, see Log 2026-10-17).
 Skip removed. Without an active face nothing changes (bit-identical, checked end to end vs production).
 
 **Validation** (tests/test_face_held_impacts.py, all at the same point so they test the algebra to round-off):
@@ -126,8 +183,9 @@ Skip removed. Without an active face nothing changes (bit-identical, checked end
 six impact arrays (traditional, global, Gaussian; ungrouped + grouped) to rtol 1e-9; (b) linear face a + 2b >= lb ==
 the eliminated ParamModel (a = lb - 2b) to 1e-8, a's impact = -b's; (c) curved (disk) face, where the Lagrangian
 term moves the stat variance by > 1 %: grouped impacts == sqrt(sigma^2 - sigma^2[group frozen, face held]) from
-rabbit's own freeze path (1e-6), global source response == finite-difference constrained refits (2e-3; the released
-C is 10x worse), corrected `stat`^2 == diag(C H_data C) (1e-8); (d) no face: identical. Full suite 476 passed
+rabbit's own freeze path (1e-6); cov + global impacts (stat remainder included) == the eliminated-face fit (1e-8),
+global source response == Newton-polished FD of the eliminated fit (1e-6) [as of 8b3f180; the 10-16 version used
+trust-constr FD refits at 2e-3 and a diag(C Hc C) stat correction, both replaced]; (d) no face: identical. Full suite 476 passed
 (one sharding-classification failure for the new driver call, fixed in bf9dfb1, that file 43/43), container
 black/isort/flake8 clean.
 
@@ -168,9 +226,9 @@ are those of the fit ON the face, and the released fit has a larger total (sigma
    face directions) and condition groups on the complement of in-group face directions; then they equal the
    frozen / eliminated fits exactly. Gaussian global impacts were already correct with the face-held cov.
    — (evidence: tests/test_face_held_impacts.py, branch face-held-impacts bf9dfb1)
-2. Global impacts at a CURVED face: sources sum to diag(C H C) = diag(C) + diag(C Hc C); the data-stat remainder must
-   get diag(C Hc C) back. Zero for faces linear in the fit coordinates (the NP `unit`-reparametrised bounds and the
-   L2(Y) rows), non-zero for the TMD large-b cubic. — (evidence: test_curved_face_global_impacts)
+2. ~~Global impacts at a curved face need a diag(C Hc C) correction of the stat remainder~~ RETRACTED 2026-10-17:
+   against the eliminated-face fit the plain remainder is exact (the curvature term is data in eliminated
+   coordinates); no global-impacts change is needed at all. — (evidence: test_curved_face_global_impacts, 8b3f180)
 3. LAT's NaN global "Data stat." is NOT a face artefact: H minus the priors is indefinite on this fit and the
    remainder is a ~0 difference of O(300) terms, -0.022 held. — (evidence: Log 2026-10-16, LAT_impacts_table.txt)
 4. LAT postfit recomputed from x only reproduces the stored face-held covariance bit for bit. — (LAT_impacts_table.txt)
@@ -186,9 +244,8 @@ are those of the fit ON the face, and the released fit has a larger total (sigma
   stat (`--gaussianGlobalImpacts`, sum (dx/dn)^2 var(n), always >= 0, now allowed at a face) was NOT run on the real
   fit (not in the approved flags; its jacobian over 3720 parameters through the SCETlib model may be memory-heavy);
   or quote the traditional one.
-- `global_impacts_obs` (global impacts on observables) has the same remainder and would need diag(J C Hc C J^T) at a
-  curved face; not touched.
-- NOLAT (curved TMD cubic face active) is the first real case where the curvature correction is non-zero; rerun its
-  postfit with this branch once NOLAT is final.
+- `global_impacts_obs` uses the same face-held cov and remainder; by the elimination argument nothing more is
+  needed, but no dedicated test.
+- NOLAT_PF (all3-local) global stat carries the removed correction (+7.8e-5 in stat^2); rerun = PR196_NOLAT_held.
 - impacts_parms took 610 s on LAT, almost all of it the profile=False Hessian, as before; not a new cost.
 - PR opened: https://github.com/WMass/rabbit/pull/196 (independent of the tc-precond-pr / tc-warmstart PRs).

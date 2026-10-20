@@ -196,11 +196,46 @@ Higgs-combination prescription.
 
 **Verdict:** a correct frequentist parametric bootstrap, with the two stated approximations.
 
+## 6. The real-data ptll projection fails on the CT18Z nominal: what it is (2026-10-20)
+
+Source: `studies/ct18z-nominal-fits/261017-ptll-gof-forensics/` (Result "Phase 2 verdict", P1–P5a rabbit runs; bulk
+`/ceph/submit/data/group/cms/store/user/lavezzo/alphaS/261018_ptll_gof_tests/`). Card 260916_Z_2D (ptll × yll),
+N3LL+NNLO AD cache, hard NP constraints, LAT and NOLAT. The full saturated test passes; the ptll projection does not
+(also at gen: the ptVGen projection fails, |Y| is fine; `261017-gen-cold-fits`). The CT18Z numbers are in the study
+summary; what generalises:
+
+- **It is not bin-localised and not detector-like.** Marginal postfit residuals are statistically ordinary (data-only
+  Σz² ≈ ndf, no autocorrelation, no outlier); detector-group releases move q by ≤ 1.6. q sits in the
+  constrained-prior relief (A0 PtV15_20, FO envelope, lumi, mb, weak, FSR), the same pattern as every card-A fit.
+- **Two components.** (i) A **normalisation-vs-shape tension**: freeing the overall normalisation (`--lumiUncertainty
+  0`) gives −12.3 ± 3.0 %, a 4.0σ LR, and moves α_s by +4.2σ with σ(α_s) ×1.53 — the ptll×yll shape prefers an α_s/NP
+  point whose larger total σ the lumi/EW/FSR priors forbid; the nominal sits at the compromise. α_s IS sensitive to
+  this one. (ii) A **smooth, y-independent ±0.2–0.3 % wave at 3–22 GeV** (~10 GeV period; −0.2 % at 5–6, +0.3 % at
+  9–12, −0.2 % at 16–20 GeV). No existing nuisance spans it: with the theory priors ×2 the pulled nuisances
+  (A0, FO envelope, FSR, lumi) stay at 1–2σ of the WIDER prior, the signature of an uncaptured shape, while α_s
+  moves −0.01σ. α_s ignores the wave.
+- **Decision (Luca, 2026-10-20): no remedy adopted** (no normalisation-free systematic, no shape nuisance); quote it as
+  a characterised mis-modelling. Open: the NOLAT free-normalisation refit was not run.
+- **Method that works:** the saturated sub-fit Hessian gives exact ptll templates of every parameter,
+  H₁[s_j, θ_k] / (s_j H₁[s_j, s_j]), with no cache load. A quadratic surrogate in the M₁ frame localises q correctly
+  but underestimates it by ~25 %, and a low-order surrogate misread the wave as "low-order" (its flat/tilt modes were
+  α_s/NP drift) — confirm in rabbit. **Do not** rebuild the M₀ residual covariance from M₁ templates: the
+  near-degenerate α_s/λ cancellation breaks.
+- **Wilks along the normalisation–α_s–λ4 valley is not guaranteed.** Near the minimum a flat scale is degenerate with
+  α_s and λ (linear capture 2.0 units); far along the valley the LR finds ~20.
+- **ndf trap, again (§2):** a free normalisation is exactly the sum of the ptll scales (d = 1), so the true projected
+  ndf is J − 1 = 38 while rabbit prints 39; its linear χ² is meaningless (singular residual covariance).
+- **Under `--constraints` the saved `saturated_fit/edmval` is the UNCONSTRAINED EDM** (2.51 at a gtol-converged
+  constrained minimum with an active face of multiplier 207). Use `minimizer_status` (status, optimality, constraint
+  values) instead (`261016-saturated-subfit-diagnosis` finding 4). This qualifies the cross-reference below.
+- BB-lite costs each ptll bin 10–13 % of its information at projection level (σ_MC/σ_data ≈ 0.35).
+
 ## Cross-references
 
 - `saturated_test_toys.md`: toy calibration of both statistics with a ParamModel + wall.
 - `profile_likelihood_pitfalls.md`: why saturated p-values from two different prior choices are
   two different fits.
 - `rabbit_minimizer_tolerances.md`: `success`/`status` do not certify the M₁ minimum. Use the
-  saved `saturated_fit/edmval`. An under-converged M₁ biases q_proj low.
+  saved `saturated_fit/edmval` (unconstrained fits only; under `--constraints` see §6). An under-converged M₁
+  biases q_proj low.
 - `scetlib_ad_cache_validity.md`: the λ₂^ν < 0 caveat that M₁ runs into.

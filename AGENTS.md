@@ -133,6 +133,10 @@ Most of the framework knowledge lives under `knowledge/`:
 - Constrained slope and multiplier at an active wall face, read from the walled covariance: `knowledge/20_frameworks/active_wall_face_sensitivity.md`
 - What rabbit's blinding hides (parameter values) and does NOT hide (every saved post-fit
   histogram, including an unfolding's masked channel): `knowledge/20_frameworks/rabbit_blinding_scope.md`
+- Why the ptll-projected saturated test fails (normalisation-vs-shape tension + a smooth y-independent wave; no remedy):
+  `knowledge/20_frameworks/saturated_gof_tests.md` §6
+- The nominal reco/gen NOLAT/LAT fits (faces, lattice effect, same minima as the old wall fits):
+  `knowledge/30_physics_global/np_parametrization_constraints.md` §22
 - Plotting style and labels: `knowledge/60_plotting_style/plotting_and_labels.md`
 - Slide workflow: `knowledge/70_slides/study_slides_workflow.md`
 - Glossary: `knowledge/90_glossary.md`

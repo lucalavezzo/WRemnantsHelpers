@@ -4,7 +4,7 @@ slug: 261015-trustconstr-warmstart
 study: ct18z-nominal-fits
 status: done        # active | done | paused | abandoned
 created: 2026-10-15
-updated: 2026-10-16
+updated: 2026-10-19
 owner: study-worker
 ---
 
@@ -14,21 +14,131 @@ owner: study-worker
 
 ---
 
-## START HERE (status as of 2026-10-16)
+## START HERE (status as of 2026-10-19)
 
 - **Answer:** yes. There are three separate mechanisms, not one, and rabbit branch `tc-warmstart` (commit `f84e0a8`,
   off WMass main 2d9f380, now PR #195) fixes them with `--minimizerWarmStart {auto,on,off}`, default auto. On the toy the
   warm start converges with no loss excursion (worst 5e-12, against 0.5 before) and no wrong answers (0/44 runs,
   against 11/44). On rabbit's own saturated test the sub-fit takes 18 iterations instead of 82.
-- **Next action:** none in this task. The PR is open: https://github.com/WMass/rabbit/pull/195 (Luca approved it).
-  It was validated on real data in [261016-saturated-subfit-diagnosis](../261016-saturated-subfit-diagnosis/LOGBOOK.md),
-  combined with the preconditioner change.
-- **Blocking on:** PR review.
+- **Next action:** none in this task: #195 is ready and waiting for review. The pinned worktree
+  `/work/submit/lavezzo/rabbit-pr195-run` and the base worktree `/work/submit/lavezzo/rabbit-base-2d9f380` can be
+  removed.
+- **Blocking on:** nothing. #195 is READY at b2b965e (CI green, bot clean, 0 open threads).
 - **Running:** nothing.
 
 ---
 
 ## Log
+
+### 2026-10-19
+- **PR195_LAT finished** (18:22 on 2026-10-18; this PR only, 117cc67, no preconditioner; script
+  `pr195_validation/compare_lat_real.py`). One warm leg, started from the centred barrier 4.1e-10; no face released.
+  - Result: status 2 (radius < xtol, barrier 4.1e-10), optimality 3.0e-4, no violation, 115 iterations / 11.3 h.
+  - q = **79.107113**, against 79.107113 for SATWSPC_LAT (this PR + preconditioner: status 1, 89 iterations / 3.6 h),
+    Δq 6e-8. The point agrees with SATWSPC_LAT to <= 2.5e-6 sigma over all 3759 parameters.
+  - The plain sub-fit (main) took 226 iterations / 12.8 h and ended frozen at status 2, with the active face at a
+    slack of 9e-6. It sits 8.7e-5 higher in loss, so its q of 79.10694 is 1.7e-4 low.
+  - **Read:** no regression. This PR alone reaches the same minimum in half the plain run's iterations; the speed
+    comes from the preconditioner.
+- Added as a "second real check" to the #195 validation comment (edited in place; copy in
+  `pr195_validation/pr_comment.md`). #195 stays ready.
+
+### 2026-10-18
+- **PR195_NOLAT finished** (10:56; isolated: #195 only, no preconditioner; `fitresults_PR195_NOLAT.hdf5`; comparison
+  script `pr195_validation/compare_nolat_real.py`). The NOLAT_PF reference is f84e0a8 + preconditioner.
+  - Legs `warm, release-step, warm`; scipy's start was never used.
+  - The warm leg stopped on cubic(|Y|=2.5) (mu -1.48, distance 1.6e-9), exactly as in NOLAT_PF. The release step
+    (0.000217 along the normal) LOWERED the loss, 335.5372832 -> 335.5370706.
+  - Neither leg rose above its own start loss, and the constraint violation stayed 0 throughout.
+  - q = 68.363489 vs 68.363489 for NOLAT_PF (diff 3.4e-7). Saturated loss 335.5369528 vs 335.5369526. All 3759
+    parameters agree to <= 8.6e-5 sigma. Same constraint values.
+  - It ended at status 2 (xtol with barrier 7e-10 < barrier_tol), optimality 6.6e-4. NOLAT_PF, which had the
+    preconditioner, reached status 1.
+  - Cost: 237 iterations / 13.0 h (125 + 112, each leg with a ~38-iteration radius-collapse tail), against about 173
+    iterations / ~2.7 h for NOLAT_PF with the preconditioner. The wall times are not comparable: the node load is
+    shared (~600). NOLAT's plain sub-fit was killed (SIGTERM), so this case has no plain reference.
+  - **Read:** the fix solves the correctness problem (frozen stop on the face, walk-away) without the preconditioner.
+    The speed on this fit comes mostly from the preconditioner.
+- New rule (Luca): mark a PR ready only when CI is green AND every comment, from the bot and from humans, is
+  resolved. So #195 went back to draft. The hodor bot (on 117cc67) had flagged a P3: the `--minimizerWarmStart` help
+  text still said the fit "continues from scipy's own start". Fixed in **b2b965e** (help text; the PR description is
+  updated too; the `fit()` docstring and the `warm_start` module were already right). I replied on the PR with the
+  SHA. The bot skips drafts, so its re-review was dispatched by hand (`gh workflow run hodor-review.yml -f
+  pr_number=195`). Result on b2b965e: all CI jobs pass (all-unit-tests, fits, scans, linting, ...); the hodor
+  re-review says "No issues found" (the P3 is fixed); there are 0 unresolved review threads and no human comments.
+  Marked ready.
+- Posted the validation comment on #195 (claim -> test -> result: the real check above plus the local CI-gap table;
+  copy in `pr195_validation/pr_comment.md`) and marked #195 ready. LAT is marked pending in the comment.
+
+### 2026-10-17
+- **Real-fit bug in the first version (f84e0a8).** It showed up on NOLAT's ptll saturated sub-fit (NOLAT_PF, branch
+  all3-local d573c1d, which combines this fix with the preconditioner; log
+  `/ceph/.../261016_nolat_postfit/NOLAT_PF.log`).
+  - The warm leg converged in 44 iterations / 58 min to 335.537283. It then spent 38 rejected iterations / 33 min with
+    the trust radius collapsing ON the curved face cubic(|Y|=2.5), at status 2. That face's multiplier had turned
+    releasing (-1.48, distance 1.6e-9).
+  - The dual-sign check fired and fell back to scipy's start (mu 0.1). That walked away (335.537 -> 335.92, lambda2
+    0.14 -> 0.24, cubic violated by 3.4e-3) and took 90 iterations / 72 min to converge at 335.536953 (q 68.36).
+  - Why the warm leg stops on the face: in the scaled interior-point step, a slack of 1e-9 has a loss gradient
+    mu_i*s_i of about 1e-17 and a barrier push mu of about 1e-8. Neither survives scipy's relative CG stop next to the
+    2.8e-6 residual left in the other directions, nor the loss noise. Inside one leg only a large barrier pushes off a
+    face, and a large barrier is exactly the walk-away. So the warm leg cannot avoid stopping there.
+- **Fix, commit 117cc67, pushed to the PR.** When the check fires, take a release step and start a new centred warm
+  leg from there, for at most 3 rounds. scipy's start is now only the last resort.
+  - The release step: a Newton step on the loss along the releasing rows' unit normals, with the binding near rows held
+    to first order (their gradients projected out), using one HVP. It is halved until the loss decreases and no row is
+    violated (`warm_start.release_direction`, `Fitter._release_step`).
+  - New test `test_warm_leg_stopped_on_a_releasing_face_is_released_warm`. It simulates the stalled warm leg on the
+    test model: the data are scaled by 1.3, so the curved cubic face must release. Result: legs
+    `warm, release-step, warm`; no scipy-start leg; no loss rise above the start; no violated row; the reference
+    minimum is reached.
+  - Toy S8 (`toy_strategies.txt`): the 3 releasing cases now take [42, 15], [28, 26] and [32, 20] iterations, against
+    [42, 613], [28, 294] and [32, 534] with the old fallback (S7). Still 0/44 wrong answers.
+  - Suite: 483 passed, 1 failed. The failure is `test_snapshot.py::test_sigterm_writes_a_snapshot_before_the_process_dies`,
+    a wall-clock assertion (19.9 s > 15 s at load average 680). It passes alone (11/11). Lint is clean.
+- Launched (through mem_gate, MAXRUN=2), both isolated from the preconditioner, from the pinned worktree
+  `/work/submit/lavezzo/rabbit-pr195-run` @ 117cc67:
+  - PR195_NOLAT: NOLAT's ptll saturated sub-fit only, from `fitresults_NOLAT_PF.hdf5` with `--noFit`. This is the
+    releasing-face case.
+  - PR195_LAT: the same for LAT, from `fitresults_LAT.hdf5`. Its plain sub-fit took 226 iterations / 12.8 h,
+    q 79.10694.
+
+  Outputs go to `/ceph/.../261017_pr_validation/`. Both are queued in the shared gate behind 7 others.
+- Local before/after checks for what CI does not cover: `pr195_validation/run_checks.sh`, comparing WMass main
+  2d9f380 (BASE) with the PR at 117cc67 (NEW). The table comes from `recompare.sh` (`recompare.out`); outputs are in
+  `/ceph/.../261017_pr_validation/local_checks/`.
+  - **Bit-identical (worst |diff| = 0 over every stored leaf, every results group):**
+    - the CI nominal fit (impacts plus 6 mappings), the CI blinded fit, toys `-t 3`, and the saturated test plus scan,
+      all with the default minimizer;
+    - a cold trust-constr fit with constraints;
+    - `--minimizerWarmStart off` at every warm site: saturated test, `--externalPostfit` refit, scan, toys;
+    - toys under auto, since they start cold;
+    - with the scipy guard forced to fail, the warm-hinted fit equals the cold fit (dx = 0, nit 34 = 34).
+  - **Caveat on the CI blinded config:** it is nondeterministic run to run on the base as well. The first base run
+    converged at trust-krylov status 2 in 19 iterations; three repeats each of base and new all took the
+    stalled-and-restarted path. The parameters are identical either way, so `minimizer_status` is excluded for that
+    row.
+  - **Warm sites under auto, compared with before:**
+    - saturated test: worst |diff| 3.9e-10; the sub-fit takes 38 iterations at status 1, against 69 at status 2;
+    - `--externalPostfit` refit: identical; 1 iteration against 5;
+    - scan: the curve is equal to 3.2e-5 in dNLL. The PR's points are lower or equal everywhere, i.e. better minimised:
+      the base's cold restarts stop at gtol with a larger barrier gap. Per point it takes 3–4 iterations (one point 16)
+      against 11–26 (`--scanSaveDetail`). The total wall time on the toy was 34 s against 19 s, which is one-off
+      tracing of the extra TF functions and node load; per-point wall time is lower.
+  - Suite: 483 passed, 1 timing flake (see above).
+
+### 2026-10-16
+- The real-fit validation was done elsewhere, in task 261016-saturated-subfit-diagnosis, on branch satdiag-ws-pc
+  0395383. That branch combines this fix with the trust-constr preconditioner, so the two fixes' shares are not
+  separated. The run was LAT's saturated ptll sub-fit:
+  - plain run: ended FROZEN at status 2 (this task's cause (c)), q 79.10694, 226 iterations / 4667 HVPs / 12.8 h;
+  - combined run: status 1, optimality 2.5e-9, q 79.10711, the same point to <= 1.3e-4 sigma, 89 iterations / 982 HVPs
+    / 3.6 h, so 3.9x faster.
+- Luca approved the PR. The suite was rerun on f84e0a8: 482 passed, and lint is clean. Pushed and opened
+  https://github.com/WMass/rabbit/pull/195 (separate, not stacked).
+- Findings 1-4 (plus: the saturated `edmval` is the unconstrained EDM) were added to
+  `knowledge/20_frameworks/rabbit_minimizer_tolerances.md`. That section also says how to recognise a frozen status 2.
+  The note's old line "fixing needs copying the driver" is marked as superseded.
 
 ### 2026-10-15
 - Worktree `/work/submit/lavezzo/rabbit-tc-warmstart`, branch `tc-warmstart` off WMass main 2d9f380.
@@ -112,8 +222,13 @@ and 113 at mu0 = 1e-5. The centred mu0 = 2.56e-7 took 18 iterations. So the warm
   - holds no row feasible (new `hold_feasible` argument of `scipy_adapter.build_nonlinear_constraints`);
   - starts the slacks consistently, with floor 1e-3*mu0;
   - uses mu0 = initial barrier tolerance = `centred_barrier`, unless `--minimizerInitialBarrier*` are given;
-  - checks the multiplier signs at the end, and if a face should have been left, runs a "release" leg (no row held,
-    scipy's own start).
+  - checks the multiplier signs at the end. If a face should have been left, it takes a release step and starts a
+    new centred warm leg from there, for at most 3 rounds. The release step is a Newton step on the loss along the
+    releasing rows' normals, with the binding rows held, cut back until the loss decreases and no row is violated.
+    scipy's own start is only the last resort.
+
+    That is the 117cc67 version. The first version (f84e0a8) went straight to scipy's start, and on NOLAT's ptll
+    sub-fit that walked away and cost an hour; see the 2026-10-17 Log.
 
   `minimizer_status` records `warm_start_legs`, `warm_start_releasing` and `warm_start_barrier`.
 - `--minimizerWarmStart {auto,on,off}`, default `auto`. Under auto the warm start is used where rabbit knows the start
@@ -133,7 +248,8 @@ minimum for starts at or on it.
 |---|---|---|---|---|---|---|---|
 | before (S0) | 11 [78] | 86 [170] | 109 [177] | 164 [2000] | 1311 [2000] | 11/44 | 0.5 |
 | scipy start, no row held (S1) | 97 [121] | 91 [107] | 109 [177] | 93 [130] | 242 [1938] | 0/44 | 0.9 |
-| **warm start (S7)** | **1 [24]** | **3 [13]** | **8 [14]** | **14 [83]** | **136 [1779]** | **0/44** | **5e-12** |
+| warm start, f84e0a8 (S7) | 1 [24] | 3 [13] | 8 [14] | 14 [83] | 136 [1779] | 0/44 | 5e-12 |
+| **warm start + release step, 117cc67 (S8)** | **1 [24]** | **3 [13]** | **8 [14]** | **14 [83]** | **92 [1779]** | **0/44** | **5e-12** |
 
 For comparison, cold fits of the 1-sigma toys take a median of 212 iterations. In 3 of 44 runs the warm leg stopped
 falsely and the dual-sign check sent it to the release leg; those are in the 1-sigma column. The `[24]` at the minimum
@@ -165,6 +281,15 @@ before). The saturated sub-fit takes 18 iterations (82 before), with its NLL 1e-
 their barrier gaps.
 
 ### 5. Proposed real-fit test (NOT run; for Luca to approve)
+
+> **Superseded 2026-10-18.** SATWS_LAT below was never run as proposed. It was replaced by three runs:
+> - SATWSPC_LAT: the combined warm start + preconditioner run, in
+>   [261016-saturated-subfit-diagnosis](../261016-saturated-subfit-diagnosis/LOGBOOK.md);
+> - PR195_NOLAT (done): this PR only;
+> - PR195_LAT (done 2026-10-18, q 79.107113): this PR only.
+>
+> The PR195 runs are in the 2026-10-17 and 2026-10-18 Log entries, and in the #195 validation comment
+> https://github.com/WMass/rabbit/pull/195#issuecomment-6253853702. The proposal is kept below as written.
 
 **SATWS_LAT** reruns only the saturated ptll sub-fit, warm, from LAT's own final postfit. It goes through mem_gate like
 the other big loads, and the flags are LAT's own (LAT.log line 3), minus the impacts. Run it after LAT has finished and

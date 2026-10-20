@@ -9,7 +9,10 @@ relu² penalty face, trust-constr's warm-start and barrier problems, and full-sc
 preconditioning of ill-conditioned sub-fits).
 Extended 2026-10-16 from `studies/ct18z-nominal-fits/261015-trustconstr-warmstart/` (trust-constr warm
 starts: slack init, keep_feasible pinning, unsigned status 1, centred barrier; saturated `edmval`).
-Last updated: 2026-10-16.
+Extended 2026-10-20 at the close of `studies/ct18z-nominal-fits/` (trust-constr is now the cold default; the
+preconditioner under trust-constr, rabbit #194, warm legs only; the measured 3.1×/4.75× split; v·s frozen-tail test;
+the release leg; gtol 1e-5 on warm legs; the stale "no xtol/barrier_tol flag" line corrected).
+Last updated: 2026-10-20.
 
 ## The fact
 
@@ -180,8 +183,9 @@ only the constraint Jacobian and the trust-region subproblem). In the reference
 case it converged at iteration ~115 of 1000 and then burned 5.7 h doing nothing.
 
 **Fix:** pass `--minimizerGtol 1e-8`. Explicit options beat `tol` because scipy uses
-`setdefault`. Note `xtol`/`barrier_tol` have no rabbit flag, so only the status-1
-exit becomes reachable — which is the one you want anyway.
+`setdefault`. *(Stale since rabbit #189, c1a47ec: `--minimizerXtol` and
+`--minimizerBarrierTol` now exist, so status 2 is reachable too. The production
+trust-constr flags are `--minimizerGtol 1e-8 --minimizerXtol 1e-10 --minimizerBarrierTol 1e-9`.)*
 
 ### Even with tolerances set, trust-constr is a certifier, not a default (2026-10-06)
 
@@ -200,20 +204,26 @@ constraints, rabbit branch `trust-constr-nominal`;
   only on a sup-norm optimality < 0.1. TCB1 (cold start) spent all **600 iterations / 13.6 h**
   in that stage and stopped at -0.33 sigma(alpha_s), +0.38 NLL — mostly the stage's own answer.
 - **Its projected CG is unpreconditioned with a loose forcing term** (3–10x residual
-  reduction), so in the tail it runs 1–3 HVPs per step. rabbit refuses `--precondition` with
-  trust-constr.
+  reduction), so in the tail it runs 1–3 HVPs per step. rabbit refused `--precondition` with
+  trust-constr. *(Superseded 2026-10-19: rabbit #194, df99d93, maps the constraint Jacobian and HVP
+  by the chain rule, J_y = J T and T^T d²c T. Use it on WARM legs only; see "trust-constr and the
+  spectral preconditioner" below.)*
 - Per-call costs from scipy's own counters (two equations, nfev and cg_niter): **~27 s per
   loss+grad, ~13 s per HVP** on the shared node — each iteration costs as much as a
   trust-krylov iteration or more.
 
 Decision (Luca, 2026-10-06): trust-krylov stays the production minimiser; trust-constr only
-as a warm certifier.
+as a warm certifier. *(Superseded 2026-10-15: trust-constr + hard `NPDomainConstraints`, run COLD,
+is the default for AD fits (`workflows/fitterAD.sh --constraints`). It converged cold on all four
+CT18Z nominal fits and lands on the old trust-krylov + wall minima up to the prior removal;
+`studies/ct18z-nominal-fits/`, `nominal_workflow.md` §"SCETlib-AD fits". The mu0 = 0.1 bias above
+is still real, but the barrier ladder finishes it.)*
 
 ## trust-constr warm starts: what walks away, what freezes, the fix (2026-10-16)
 
 Source: `studies/ct18z-nominal-fits/261015-trustconstr-warmstart/`, a toy with 40 parameters, kappa 1e3 and 8 rows,
-plus rabbit's test model. Real-fit check in `261016-saturated-subfit-diagnosis/`. The fix is rabbit branch
-`tc-warmstart` (PR to WMass/rabbit), flag `--minimizerWarmStart auto|on|off`.
+plus rabbit's test model. Real-fit check in `261016-saturated-subfit-diagnosis/`. The fix is rabbit PR #195
+(branch `tc-warmstart`, head 4532443; READY, not merged as of 2026-10-20), flag `--minimizerWarmStart auto|on|off`.
 
 1. **The slack init `s0 = max(1.5(c-lb), 1)` only hits rows NOT held feasible.** For a row with
    `keep_feasible=True`, scipy overwrites the slack in place with c - lb, on the same array it then starts from.
@@ -226,7 +236,10 @@ plus rabbit's test model. Real-fit check in `261016-saturated-subfit-diagnosis/`
    away from the minimum. On the toy that was 11/44 runs; linear rows alone do not freeze. **How to recognise a
    frozen status 2:** the loss is bit-identical over many iterations, `tr_radius` drops ×10 per iteration down to
    xtol, and the constraint values still equal their start values. LAT's plain saturated ptll sub-fit ended exactly
-   like this (226 iterations, 12.8 h).
+   like this (226 iterations, 12.8 h). A second test: compare multiplier × slack (v·s) on the active rows with the
+   final barrier — a converged leg has v·s ≈ mu; LAT's sub-fit sat at v·s ~ 7e-5 for its last 100 iterations, far
+   above its barrier (`261016-saturated-subfit-diagnosis` finding 3). The plain barrier restart at mu0 = 0.1 from a
+   minimum was 74–75 % of that sub-fit's time, mostly polishing a barrier-displaced point.
 3. **scipy's status 1 does not check the multipliers' sign.** With a small barrier it can stop on a face the loss
    wants to leave (toy: 8/44 with mu0 = 1e-9). Check the sign of each near-bound row's least-squares multiplier
    yourself. In practice a warm leg whose minimum has moved off a face stops on it at status 2 (see "Why" below).
@@ -246,8 +259,14 @@ tests that pin the internals; centre mu0; run the dual-sign check. If the check 
 step on the loss along the releasing rows' normals, with the binding rows held, cut back until the loss decreases and
 no row is violated. Then start a new centred warm leg from that point, for at most 3 rounds.
 
-Do not continue from scipy's own start here. That was the first version, and on NOLAT's ptll sub-fit
-(2026-10-16) it walked away from 335.537 to 335.92 and needed about 1 h to come back.
+Do not continue from scipy's own start here. That was the first version of the release leg, and on NOLAT's ptll
+sub-fit (2026-10-16) it walked away from 335.537 to 335.92 (cubic violated by 3.4e-3) and needed about 1 h to come
+back; fixed in #195 commit 117cc67 (Newton release step, then a new CENTRED warm leg; scipy's cold start only as the
+last resort). On the toy grid: 0/44 failures with it, against 11/44 (keep_feasible) and 8/44 (unsigned status 1).
+
+Two more traps seen on the same fits (`261016-face-held-impacts` finding 5): a trust-constr refit warm-started ON a
+face with the OLD code gave a wrong finite-difference response (the keep_feasible freeze), and a constraint row whose
+gradient is exactly zero at the start is silently dropped by `build_scipy_constraints`.
 
 Why the warm leg stops ON a face it should leave: in the scaled interior-point step, a slack of about 1e-9 has a
 loss gradient mu_i·s_i ~ 1e-17 and a barrier push mu ~ 1e-8. Neither survives the relative CG stop next to the
@@ -258,7 +277,34 @@ refits; cold fits are unchanged.
 
 Real data, LAT saturated ptll, combined with the trust-constr preconditioner: status 1, q = 79.10711 vs 79.10694
 for the plain run (which was frozen at status 2), the same point to ≤ 1.3e-4 σ, 89 iterations / 3.6 h vs 226 / 12.8 h.
-The two fixes' shares were not separated; 74 % of the plain run's time was the mu0 = 0.1 stage.
+Shares, measured 2026-10-18 (`261015-trustconstr-precondition` Result): preconditioner alone 4667 → 1504 HVPs (3.1×,
+226 → 167 it, same point to 3e-8 σ); both 982 HVPs (4.75×). So the preconditioner is the speed and the warm start
+adds 1.5× on top; the warm start's real job is correctness. (An interim 2026-10-17 claim that most of the gain was
+the warm start was wrong and was retracted in the study logbook.)
+
+**gtol on warm legs.** A warm leg starts with the barrier already ≤ barrier_tol, so only the gtol (status 1) and xtol
+(status 2) exits remain, and its optimality floor is ~1e-6–1e-5 (loss noise): at gtol 1e-8 it spends 30–40 % of its
+time in an xtol tail at a frozen point. For warm refits/sub-fits use `--minimizerGtol 1e-5`; on the P1 ptll sub-fits
+the loss at optimality 1.4e-5 was within 3e-8–1e-7 of its final value (`261017-ptll-gof-forensics`, Log
+2026-10-19). Keep 1e-8 for COLD main fits, which do reach it (LAT 3.2e-9, NOLAT 3.8e-9).
+
+## trust-constr and the spectral preconditioner (rabbit #194, 2026-10-19)
+
+Source: `studies/ct18z-nominal-fits/261015-trustconstr-precondition/` (rabbit `tc-precond` 2a64792, merged as df99d93).
+
+- **Frame-independent where it matters.** Values, bounds, multipliers, keep_feasible and the face-held post-fit do not
+  change; the test `test_preconditioning_does_not_move_the_constrained_fit` pins it. HVP savings grow with kappa
+  (1.3× at 1e5, 2.25× at 4.5e6 on the toy).
+- **But gtol, xtol and the trust radius are in the whitened frame.** A gtol exit can come at a different barrier mu
+  (NLL excess ~mu per active face, ~mu/v inside it). Read `optimality_physical` (||∇f + Jᵀv||_inf in fitter units)
+  and `optimality_frame` from `minimizer_status`, not scipy's optimality.
+- **A change of frame changes the path.** With a non-convex constraint set the two frames found different constrained
+  local minima on the toy: compare losses, never assume.
+- **Cold main fits get SLOWER.** PCLAT (LAT, cold, preconditioned) was ~70× behind the plain fit in loss at equal wall
+  time (33664 vs 483 at ~840 s). The chain rule checked out (FD ≤ 3.4e-8 on all 6 rows); the cause is whitening built
+  far from the minimum: unit y-steps are ~1σ in soft directions, scipy grows the radius to hundreds, physical steps of
+  hundreds of σ get rejected. On the toy cold starts were slower even with T built AT the minimum. Precondition warm
+  legs only (saturated sub-fit, warm refits); the `--precondition` help says so.
 
 ## `--earlyStopping` is NOT a safe substitute with trust-constr
 
@@ -457,9 +503,12 @@ in the process: the main fit builds a transform at its start, and each saturated
 deep copy of the fitter) builds its own at its own start. A `--noFit` main step builds nothing.
 Each build is one Hessian: 306 s (SATP), 650–870 s on a loaded node, so budget **5–15 min per
 fit**. `workflows/fitterAD.sh` passes the flag for every fit since WRemnantsHelpers 1c5d93a
-(2026-10-09), so main fits now pay it too.
+(2026-10-09), so main fits now pay it too — EXCEPT with `--constraints`, where it drops the flag entirely (cold
+trust-constr main fits must not be preconditioned, see above), so a `--constraints` run's saturated sub-fit is
+unpreconditioned; get it back with a second warm `--externalPostfit --noFit` pass (`nominal_workflow.md`).
 
-**Untested** (state as of 2026-10-09): the effect on the walled *main* fit (the only
+**Measured for trust-constr since (2026-10-15): a cold main fit is much slower preconditioned** (PCLAT, above).
+**Untested** (state as of 2026-10-09): the effect on the walled trust-krylov *main* fit (the only
 evidence is the relu² surrogate above, where start-built whitening helped 2 of 5 starts and
 hurt 3; not measured with the C² wall on a real fit); the gain on toys, whose valley is
 shorter (q ~ 39). Compare nfev/nhev before and after if a main fit looks slower.
@@ -489,7 +538,8 @@ iterate (`xval = callback.xval`) only from an *exception raised inside*
 `FitterCallback` keeps only `intermediate_result.fun`, and `minimizer_status()`
 records only `success/status/nit/nfev/message`. For trust-constr the result also
 carries `optimality`, `constr_violation`, `tr_radius`, `barrier_parameter`,
-`cg_niter` — none of which reach the output. Without them **nothing downstream can
+`cg_niter` — none of which reach the output. *(Partly closed by rabbit #189/#194: `minimizer_status` now carries
+trust-constr's optimality, barrier, constraint values, `optimality_frame` and `optimality_physical`.)* Without them **nothing downstream can
 distinguish "converged" from "pinned against a constraint boundary"**, which is
 precisely the question a walled/constrained NP fit is asking.
 
